@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwint Online</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Strona A: Menu główne -->
+    <div class="main-menu" id="mainMenu">
+        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
+        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
+        <div class="menu-wrapper">
+            <img src="assets/srodekmenu.png" class="center-menu" alt="Menu">
+            <div class="button-container">
+                <div class="menu-button play-button" onclick="showHostScreen()">
+                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                </div>
+                <div class="menu-button join-button" onclick="showJoinScreen()">
+                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                </div>
+            </div>
+        </div>
+        <div class="info-button" onclick="showInfoScreen()">INFO</div>
+    </div>
+
+    <!-- Strona B: Tworzenie hosta -->
+    <div class="host-screen" id="hostScreen" style="display: none;">
+        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
+        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
+        <div class="menu-wrapper">
+            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
+            <div class="host-content">
+                <div class="mode-options">
+                    <div class="mode-button wszystkie_karty" onclick="selectMode('wszystkie_karty')">
+                        <img src="assets/swszystkiekarty.png" class="mode-text wszystkie_karty-text" alt="Wszystkie karty">
+                    </div>
+                    <div class="mode-button wybrane_karty" onclick="selectMode('wybrane_karty')">
+                        <img src="assets/swybranekarty.png" class="mode-text wybrane_karty-text" alt="Wybrane karty">
+                    </div>
+                </div>
+                <div class="game-code">
+                    <span class="code-text">123456</span>
+                    <div class="copy-icon code-copy" onclick="copyCode()"></div>
+                    <span class="copy-message">Copy!</span>
+                </div>
+                <div class="game-link">
+                    <span class="link-text">https://gwent...</span>
+                    <div class="copy-icon link-copy" onclick="copyLink()"></div>
+                    <span class="copy-message">Copy!</span>
+                </div>
+                <div class="player-icon">
+                    <img src="assets/ludekn.png" alt="Gracz">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strona C: Dołączanie -->
+    <div class="join-screen" id="joinScreen" style="display: none;">
+        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
+        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
+        <div class="menu-wrapper">
+            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
+            <div class="join-content">
+                <img src="assets/kod.png" class="code-label" alt="KOD">
+                <input type="text" class="code-input" placeholder="Wpisz kod" autocomplete="off">
+                <div class="ok-button" onclick="joinGame()">
+                    <img src="assets/ok.png" class="ok-icon" alt="OK">
+                </div>
+                <span class="error-message">Nie poprawny kod</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strona D: Wybór nicków -->
+    <div class="nickname-screen" id="nicknameScreen" style="display: none;">
+        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
+        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
+        <div class="menu-wrapper">
+            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
+            <div class="nickname-content">
+                <img src="assets/nick.png" class="nick-label" alt="NICK">
+                <input type="text" class="nickname-input" placeholder="Wybierz nick">
+                <div class="submit-button" onclick="submitNickname()">
+                    <img src="assets/ok.png" class="submit-icon" alt="OK">
+                </div>
+                <!-- Usunięto frame-overlay-left i frame-overlay-right -->
+                <div class="player-icon host-player-icon">
+                    <img src="assets/ludekn.png" alt="Gracz host">
+                </div>
+                <div class="player-icon opponent-player-icon">
+                    <img src="assets/ludekn.png" alt="Gracz przeciwnik">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Strona C.5: Oczekiwanie na wybór trybu -->
+    <div class="loading-screen" id="loadingScreen" style="display: none;">
+        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
+        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
+        <div class="menu-wrapper">
+            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
+            <div class="loading-content">
+                <img src="assets/ladowanie.png" class="loading-icon" alt="Ładowanie">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Strona I: Informacje -->
+<div class="info-screen" id="infoScreen" style="display: none;">
+    <div class="info-content">
+        <h1>Informacje</h1>
+        <!-- Miejsce na Twoją treść -->
+         <br>Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem programować. Całą stronę od strony programowania robił Grok, ja tylko niektóre grafiki.
+         <p>Tu jest rozpiska, skąd co mam:
+         <br>Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3
+         <br>Ramki: bezpośrednio z gry i częściowo poprzerabiane
+         <br>Napis "Gwint": z Google Grafika
+         <br> Pasek ten czarny: z filmu <a href="https://www.youtube.com/watch?v=xx8kQ4s5hCY" target="_blank">https://www.youtube.com/watch?v=xx8kQ4s5hCY</a>
+         <br> Gradient: sam robiłem.
+         <br>Dźwięk przycisków: podjebane bezpośrednio z gry.
+         <br>Napisy: zrobione na stronie <a href="https://www.fontspace.com/category/the-witcher" target="_blank">https://www.fontspace.com/category/the-witcher</a>
+         <p>
+        <!-- Koniec miejsca na treść -->
+        <button onclick="showMainMenu()">Wróć do menu</button>
+    </div>
+</div>
+
+    <!-- Ekran gry (testowy) -->
+<div id="gameScreen" class="screen">
+    <div class="game-content">
+        <h2>Stan gry</h2>
+        <p>Host: <span id="hostNickname">...</span></p>
+        <p>Przeciwnik: <span id="opponentNickname">...</span></p>
+    </div>
+</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

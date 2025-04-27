@@ -1,0 +1,685 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-color: black;
+}
+
+.main-menu, .host-screen, .join-screen, .nickname-screen {
+    background-image: url('../assets/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+}
+
+.host-screen, .join-screen, .nickname-screen {
+    background-image: url('../assets/background2.jpg');
+}
+
+.side-bar {
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    width: auto;
+    object-fit: contain;
+    z-index: 1;
+}
+
+.left-bar {
+    left: 0;
+}
+
+.right-bar {
+    right: 0;
+}
+
+.menu-wrapper {
+    position: relative;
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    z-index: 2;
+}
+
+.center-menu {
+    display: block;
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+}
+
+.button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3;
+}
+
+.menu-button {
+    position: absolute;
+    width: 39.72%;
+    height: 5.56%;
+    cursor: pointer;
+}
+
+.play-button {
+    top: 43.61%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.join-button {
+    top: 49.44%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hover-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('../assets/ramka.png') no-repeat center;
+    background-size: contain;
+    display: none;
+}
+
+.menu-button:hover .hover-frame {
+    display: block;
+}
+
+/* Napis INFO na stronie A */
+.info-button {
+    position: absolute;
+    bottom: 20px; /* Odległość od dołu */
+    right: 20px; /* Odległość od prawej */
+    color: #ffffff; /* Biały tekst */
+    font-family: 'Cinzel', serif; /* Czcionka zgodna z projektem */
+    font-size: 18px;
+    cursor: pointer; /* Kursor jak przycisk */
+    z-index: 4; /* Nad innymi elementami */
+}
+
+/* Styl strony I */
+.info-screen {
+    background-color: #1e1e1e; /* Ciemne tło, jak w notatniku */
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    opacity: 1;
+    transition: opacity 0.5s ease; /* Płynne przejścia */
+    z-index: 0;
+}
+
+.info-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: left; /* Tekst wyrównany do lewej, jak w notatniku */
+    font-family: 'Courier New', Courier, monospace; /* Czcionka jak w notatniku */
+    color: #d4d4d4; /* Jasnoszary tekst, który nie razi w oczy */
+    z-index: 3;
+    padding: 40px; /* Większy padding dla czytelności */
+    overflow-y: auto; /* Możliwość przewijania, jeśli tekst jest długi */
+    background-color: #1e1e1e; /* Dopasowanie tła */
+    box-sizing: border-box;
+}
+
+.info-content h1 {
+    font-size: 24px; /* Mniejszy nagłówek, bardziej minimalistyczny */
+    margin-bottom: 20px;
+    color: #ffffff; /* Biały nagłówek dla kontrastu */
+}
+
+.info-content p {
+    font-size: 16px; /* Rozmiar tekstu jak w notatniku */
+    line-height: 1.6; /* Większa przestrzeń między liniami dla czytelności */
+    margin-bottom: 15px;
+}
+
+.info-content button {
+    background-color: #333; /* Ciemny przycisk */
+    color: #d4d4d4; /* Jasny tekst na przycisku */
+    border: 1px solid #555; /* Delikatna ramka */
+    padding: 8px 16px;
+    font-family: 'Courier New', Courier, monospace; /* Czcionka przycisku jak w notatniku */
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.info-content button:hover {
+    background-color: #444; /* Lekkie rozjaśnienie po najechaniu */
+}
+
+.info-content h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.info-content p {
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+.info-content button {
+    background-color: #333;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Strona B: Tworzenie hosta */
+.host-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-family: 'Tagesschrift', sans-serif;
+    color: rgb(200, 200, 200);
+    z-index: 3;
+}
+
+.mode-options {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.mode-button {
+    position: absolute;
+    width: 18%;
+    height: 9.35%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mode-button.wszystkie_karty {
+    top: 34.35%;
+    left: 39%;
+    transform: translate(-50%, -50%);
+}
+
+.mode-button.wybrane_karty {
+    top: 34.35%;
+    left: 61.11%;
+    transform: translate(-50%, -50%);
+}
+
+.mode-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('../assets/ramkaszer.png') no-repeat center;
+    background-size: contain;
+    display: none;
+    z-index: -1;
+}
+
+.mode-button:hover::before {
+    display: block;
+}
+
+.mode-text.wszystkie_karty-text {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+}
+
+.mode-text.wybrane_karty-text {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+}
+
+.game-code, .game-link {
+    position: absolute;
+    width: 39.72%;
+    height: 5.56%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-code {
+    top: 43.61%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.game-link {
+    top: 50.37%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.copy-icon {
+    position: absolute;
+    right: 67%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50%;
+    height: 50%;
+    background: url('../assets/kopiuj.png') no-repeat center;
+    background-size: contain;
+    z-index: 4;
+}
+
+.copy-icon.code-copy {
+    /* Pozycja relatywna do .game-code */
+}
+
+.copy-icon.link-copy {
+    /* Pozycja relatywna do .game-link */
+}
+
+.code-text {
+    font-family: 'Tagesschrift', sans-serif;
+    font-size: clamp(12px, 2vw, 20px);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    text-align: center;
+}
+
+.link-text {
+    font-family: 'Tagesschrift', sans-serif;
+    font-size: clamp(12px, 2vw, 20px);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    padding-left: 15%;
+    padding-right: 1%;
+    box-sizing: border-box;
+}
+
+.game-code::before, .game-link::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('../assets/ramka.png') no-repeat center;
+    background-size: contain;
+    z-index: -1;
+}
+
+.player-icon {
+    position: absolute;
+    top: 56.67%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8%;
+    height: 8%;
+    object-fit: contain;
+}
+
+.player-icon img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.player-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('../assets/ramkamala.png') no-repeat center;
+    background-size: contain;
+    z-index: -1;
+}
+
+/* Strona C: Dołączanie */
+.join-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-family: 'Tagesschrift', sans-serif;
+    z-index: 3;
+}
+
+.code-label {
+    position: absolute;
+    top: 33.33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 19.31%;
+    height: 5.37%;
+}
+
+.code-input {
+    position: absolute;
+    top: 39.44%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 39.72%;
+    height: 5.56%;
+    color: rgb(200, 200, 200);
+    border: none;
+    text-align: center;
+    font-family: 'Tagesschrift', sans-serif;
+    font-size: clamp(12px, 2vw, 20px);
+    font-weight: 700;
+    background: url('../assets/ramka.png') no-repeat center;
+    background-size: contain;
+    z-index: 1;
+}
+
+.code-input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.code-input::placeholder {
+    color: rgb(100, 100, 100);
+    font-family: 'Tagesschrift', sans-serif;
+    font-weight: 700;
+}
+
+.ok-button {
+    position: absolute;
+    top: 45.83%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10%;
+    height: 5%;
+    cursor: pointer;
+}
+
+.ok-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('../assets/ramkamala.png') no-repeat center;
+    background-size: contain;
+    display: none;
+    z-index: -1;
+}
+
+.ok-button:hover::before {
+    display: block;
+}
+
+.ok-icon {
+    width: 60%;
+    height: auto;
+    object-fit: contain;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Strona D: Wybór nicków */
+.nickname-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-family: 'Tagesschrift', sans-serif;
+    z-index: 3;
+}
+
+.nickname-input {
+    position: absolute;
+    top: 39.44%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 39.72%;
+    height: 5.56%;
+    background: url('../assets/ramka.png') no-repeat center;
+    background-size: contain;
+    color: rgb(200, 200, 200);
+    border: none;
+    text-align: center;
+    font-family: 'Tagesschrift', sans-serif;
+    font-size: clamp(12px, 2vw, 20px);
+}
+
+.nickname-input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.nickname-input::placeholder {
+    color: #666;
+    font-family: 'Tagesschrift', sans-serif;
+}
+
+.nick-label {
+    position: absolute;
+    top: 33.33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 19.31%;
+    height: 5.37%;
+}
+
+.submit-button {
+    position: absolute;
+    top: 45.83%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10%;
+    height: 5%;
+    cursor: pointer;
+}
+
+.submit-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('../assets/ramkamala.png') no-repeat center;
+    background-size: contain;
+    display: none;
+    z-index: -1;
+}
+
+.submit-button:hover::before {
+    display: block;
+}
+
+.submit-icon {
+    width: 60%;
+    height: auto;
+    object-fit: contain;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Pozycjonowanie ikonek graczy na stronie D */
+.host-player-icon {
+    top: 45.83%;
+    left: calc(50% + 10%); /* Po prawej stronie */
+    transform: translate(-50%, -50%);
+}
+
+.opponent-player-icon {
+    top: 45.83%;
+    left: calc(50% - 10%); /* Po lewej stronie */
+    transform: translate(-50%, -50%);
+} 
+
+/* Strona C.5: Oczekiwanie na wybór trybu */
+.loading-screen {
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+}
+
+.loading-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    z-index: 3;
+}
+
+.loading-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10%;
+    height: auto;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.copy-message {
+    position: absolute;
+    left: calc(50% - 1.04vw - 150px);
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ffffff;
+    font-family: 'Tagesschrift', sans-serif;
+    font-size: clamp(10px, 1.5vw, 14px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.copy-message.show {
+    opacity: 1;
+}
+
+.error-message {
+    position: absolute;
+    top: 52%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffffff;
+    font-family: 'Tagesschrift', sans-serif;
+    font-size: clamp(10px, 1.5vw, 14px);
+    max-width: 39.72%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.error-message.show {
+    opacity: 1;
+}
+
+/* Strona testowa*/
+#gameScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #1a1a1a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.game-content {
+    text-align: center;
+}
+
+.game-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.game-content p {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.game-content span {
+    font-weight: bold;
+    color: #ffd700; /* Złoty kolor dla nicków */
+}
