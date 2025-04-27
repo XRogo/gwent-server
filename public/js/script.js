@@ -1,4 +1,4 @@
-const socket = io('http://localhost:3000');
+const socket = io();
 
 const buttons = document.querySelectorAll('.menu-button');
 const okButtons = document.querySelectorAll('.ok-button');
