@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server); // Poprawna inicjalizacja io
+const io = new Server(server);
 
 const games = {};
 
@@ -82,18 +82,30 @@ io.on('connection', (socket) => {
             if (games[gameCode].host === socket.id) {
                 const players = games[gameCode].players;
                 players.forEach(player => {
-                    io.to(player).emit('hostLeft'); // Powiadom przeciwnika
+                    io.to(player).emit('hostLeft');
                 });
             }
         }
     });
 
     socket.on('opponentLeft', (message) => {
+        console.log(`Przeciwnik opuścił grę: ${socket.id}, wiadomość: ${message}`);
         for (const gameCode in games) {
             const playerIndex = games[gameCode].players.findIndex(player => player === socket.id);
             if (playerIndex !== -1) {
-                io.to(games[gameCode].host).emit('opponentLeft', message); // Powiadom hosta
+                games[gameCode].players.splice(playerIndex, 1);
+                games[gameCode].isClosed = false;
+                io.to(games[gameCode].host).emit('opponentLeft', message);
+                console.log(`Wysłano opponentLeft do hosta: ${games[gameCode].host}`);
             }
+        }
+    });
+
+    socket.on('checkOpponent', (gameCode) => {
+        if (games[gameCode] && games[gameCode].host === socket.id) {
+            const opponentConnected = games[gameCode].players.length > 0;
+            socket.emit('opponentStatus', { connected: opponentConnected });
+            console.log(`Sprawdzono status przeciwnika dla gry ${gameCode}: ${opponentConnected}`);
         }
     });
 
@@ -120,14 +132,6 @@ io.on('connection', (socket) => {
             }
         }
     });
-});
-
-socket.on('checkOpponent', (gameCode) => {
-    if (games[gameCode] && games[gameCode].host === socket.id) {
-        const opponentConnected = games[gameCode].players.length > 0;
-        socket.emit('opponentStatus', { connected: opponentConnected });
-        console.log(`Sprawdzono status przeciwnika dla gry ${gameCode}: ${opponentConnected}`);
-    }
 });
 
 server.listen(3000, '0.0.0.0', () => {
