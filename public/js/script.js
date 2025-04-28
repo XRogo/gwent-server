@@ -464,36 +464,50 @@ function showMainMenu() {
     });
 }
 
+// Funkcje powrotu
 function goBackFromHostScreen() {
     fadeOut(hostScreen, () => {
-        fadeIn(mainMenu);
+        fadeIn(mainMenu); // Host wraca na stronę A
+        if (isHost) {
+            socket.emit('hostLeft');
+            socket.disconnect(); // Rozłączamy hosta
+        }
         resetGameState();
     });
 }
 
 function goBackFromJoinScreen() {
     fadeOut(joinScreen, () => {
-        fadeIn(mainMenu);
+        fadeIn(mainMenu); // Przeciwnik wraca na stronę A
+        if (!isHost) {
+            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
+            socket.disconnect(); // Rozłączamy przeciwnika
+        }
         resetGameState();
     });
 }
 
 function goBackFromLoadingScreen() {
     fadeOut(loadingScreen, () => {
-        fadeIn(joinScreen);
+        fadeIn(joinScreen); // Przeciwnik wraca na stronę C
+        if (!isHost) {
+            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
+            socket.disconnect(); // Rozłączamy przeciwnika
+        }
     });
 }
 
 function goBackFromNicknameScreen() {
     if (isHost) {
         fadeOut(nicknameScreen, () => {
-            fadeIn(hostScreen);
+            fadeIn(hostScreen); // Host wraca na stronę B
             socket.emit('hostLeft');
         });
     } else {
         fadeOut(nicknameScreen, () => {
-            fadeIn(mainMenu);
+            fadeIn(mainMenu); // Przeciwnik wraca na stronę A
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
+            socket.disconnect(); // Rozłączamy przeciwnika
         });
     }
 }
