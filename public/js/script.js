@@ -27,6 +27,7 @@ let opponentId = null;
 let hostId = null;
 let hostNickname = null;
 let opponentNickname = null;
+let checkOpponentInterval = null;
 
 const nicknames = [
     "Geralt", "Yennefer", "Ciri", "Triss", "Jaskier", "Zoltan", "Vesemir", "Lambert", "Eskel", "Foltest",
@@ -139,11 +140,12 @@ function showNicknameScreen() {
                     hoverSound.play();
                 });
             }
-            // Resetowanie ikonek na stronie D
             const hostIcon = document.querySelector('.host-player-icon img');
             const opponentIcon = document.querySelector('.opponent-player-icon img');
             if (hostIcon) hostIcon.src = 'assets/ludekn.png';
             if (opponentIcon) opponentIcon.src = 'assets/ludekn.png';
+            // Zacznij sprawdzanie przeciwnika
+            checkOpponentInterval = setInterval(startCheckingOpponent, 5000);
         });
     } else {
         fadeOut(loadingScreen, () => {
@@ -156,7 +158,6 @@ function showNicknameScreen() {
                     hoverSound.play();
                 });
             }
-            // Resetowanie ikonek na stronie D
             const hostIcon = document.querySelector('.host-player-icon img');
             const opponentIcon = document.querySelector('.opponent-player-icon img');
             if (hostIcon) hostIcon.src = 'assets/ludekn.png';
@@ -206,7 +207,10 @@ function joinGame() {
 
 function selectMode(mode) {
     if (!isHost) return;
-    if (!opponentJoined) return;
+    if (!opponentJoined || !opponentId) {
+        alert('Przeciwnik opuścił grę. Czekaj na nowego gracza.');
+        return;
+    }
     selectedMode = mode;
     socket.emit('send-to-opponent', { opponentId, message: { type: 'mode-selected', mode } });
     showNicknameScreen();
@@ -281,6 +285,7 @@ nicknameInput.addEventListener('keydown', (event) => {
 });
 
 function startGame() {
+    stopCheckingOpponent();
     fadeOut(nicknameScreen, () => {
         fadeIn(gameScreen);
         hostNicknameElement.textContent = hostNickname || 'Brak';
@@ -354,20 +359,19 @@ socket.on('opponent-left', (message) => {
         hostNickname = null;
         opponentNickname = null;
         resetHostUI();
-        fadeOut(nicknameScreen, () => {
-            fadeOut(gameScreen, () => {
-                fadeIn(hostScreen);
-            });
-        });
+        nicknameScreen.style.display = 'none';
+        gameScreen.style.display = 'none';
+        loadingScreen.style.display = 'none';
+        joinScreen.style.display = 'none';
+        fadeIn(hostScreen);
+        stopCheckingOpponent();
     } else {
         resetGameState();
-        fadeOut(nicknameScreen, () => {
-            fadeOut(gameScreen, () => {
-                fadeOut(loadingScreen, () => {
-                    fadeIn(mainMenu);
-                });
-            });
-        });
+        nicknameScreen.style.display = 'none';
+        gameScreen.style.display = 'none';
+        loadingScreen.style.display = 'none';
+        joinScreen.style.display = 'none';
+        fadeIn(mainMenu);
     }
 });
 
@@ -376,7 +380,6 @@ socket.on('message-from-opponent', (data) => {
     if (message.type === 'submit-nickname') {
         opponentNickname = message.nickname;
         console.log(`Przeciwnik wybrał nick: ${opponentNickname}`);
-        // Zmiana ikony przeciwnika na ludeka.png
         const opponentIcon = document.querySelector('.opponent-player-icon img');
         if (opponentIcon) {
             opponentIcon.src = 'assets/ludeka.png?cache=' + Date.now();
@@ -401,7 +404,6 @@ socket.on('message-from-host', (message) => {
     } else if (message.type === 'host-nickname-confirmed') {
         hostNickname = message.nickname;
         console.log(`Host potwierdził nick: ${hostNickname}`);
-        // Zmiana ikony hosta na ludeka.png w widoku przeciwnika
         const hostIcon = document.querySelector('.host-player-icon img');
         if (hostIcon) {
             hostIcon.src = 'assets/ludeka.png?cache=' + Date.now();
@@ -419,12 +421,10 @@ function submitNickname() {
     if (isHost) {
         hostNickname = nickname;
         console.log(`Host wybrał nick: ${hostNickname}`);
-        // Zmiana ikony hosta na ludeka.png
         const hostIcon = document.querySelector('.host-player-icon img');
         if (hostIcon) {
             hostIcon.src = 'assets/ludeka.png?cache=' + Date.now();
         }
-        // Wysłanie wiadomości do przeciwnika, że host potwierdził nick
         if (opponentId) {
             socket.emit('send-to-opponent', { opponentId, message: { type: 'host-nickname-confirmed', nickname: hostNickname } });
         }
@@ -435,13 +435,13 @@ function submitNickname() {
     } else {
         const gameCode = document.querySelector('.code-input').value.trim();
         socket.emit('send-to-host', { gameCode, message: { type: 'submit-nickname', nickname } });
-        // Zmiana ikony przeciwnika na ludeka.png (dla widoku przeciwnika)
         const opponentIcon = document.querySelector('.opponent-player-icon img');
         if (opponentIcon) {
             opponentIcon.src = 'assets/ludeka.png?cache=' + Date.now();
         }
     }
 }
+
 // Referencje do elementów
 const infoScreen = document.getElementById('infoScreen');
 
@@ -458,48 +458,79 @@ function showMainMenu() {
         fadeIn(mainMenu);
     });
 }
+
 function goBackFromHostScreen() {
-    // Ze strony B (hostScreen) do strony A (mainMenu)
     fadeOut(hostScreen, () => {
         fadeIn(mainMenu);
-        resetGameState(); // Resetuj stan gry
+        resetGameState();
     });
 }
 
 function goBackFromJoinScreen() {
-    // Ze strony C (joinScreen) do strony A (mainMenu)
     fadeOut(joinScreen, () => {
         fadeIn(mainMenu);
-        resetGameState(); // Resetuj stan gry
+        resetGameState();
     });
 }
 
 function goBackFromLoadingScreen() {
-    // Ze strony C.5 (loadingScreen) do strony C (joinScreen)
     fadeOut(loadingScreen, () => {
         fadeIn(joinScreen);
     });
 }
 
 function goBackFromNicknameScreen() {
+    stopCheckingOpponent();
     if (isHost) {
-        // @ cofa: @ wraca na stronę B (hostScreen), przeciwnik (&) na stronę C.5 (loadingScreen)
         fadeOut(nicknameScreen, () => {
             fadeIn(hostScreen);
-            socket.emit('hostLeft'); // Powiadom przeciwnika
+            socket.emit('hostLeft');
         });
     } else {
-        // & cofa: & wraca na stronę A (mainMenu), host (@) dostaje powiadomienie
         fadeOut(nicknameScreen, () => {
             fadeIn(mainMenu);
-            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.'); // Powiadom hosta
+            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
         });
     }
 }
 
 socket.on('hostLeft', () => {
-    // Przeciwnik (&) wraca na stronę C.5 (loadingScreen)
     fadeOut(nicknameScreen, () => {
         fadeIn(loadingScreen);
     });
+});
+
+// Mechanizm sprawdzania statusu przeciwnika
+function startCheckingOpponent() {
+    if (isHost && nicknameScreen.style.display !== 'none') {
+        const gameCode = gameCodeElement.textContent;
+        socket.emit('checkOpponent', gameCode);
+    }
+}
+
+function stopCheckingOpponent() {
+    if (checkOpponentInterval) {
+        clearInterval(checkOpponentInterval);
+        checkOpponentInterval = null;
+    }
+}
+
+socket.on('opponentStatus', (data) => {
+    if (isHost && !data.connected) {
+        alert('Przeciwnik opuścił grę. Czekaj na nowego gracza.');
+        selectedMode = null;
+        isJoined = false;
+        hasJoined = false;
+        opponentJoined = false;
+        opponentId = null;
+        hostNickname = null;
+        opponentNickname = null;
+        resetHostUI();
+        nicknameScreen.style.display = 'none';
+        gameScreen.style.display = 'none';
+        loadingScreen.style.display = 'none';
+        joinScreen.style.display = 'none';
+        fadeIn(hostScreen);
+        stopCheckingOpponent();
+    }
 });

@@ -122,6 +122,14 @@ io.on('connection', (socket) => {
     });
 });
 
+socket.on('checkOpponent', (gameCode) => {
+    if (games[gameCode] && games[gameCode].host === socket.id) {
+        const opponentConnected = games[gameCode].players.length > 0;
+        socket.emit('opponentStatus', { connected: opponentConnected });
+        console.log(`Sprawdzono status przeciwnika dla gry ${gameCode}: ${opponentConnected}`);
+    }
+});
+
 server.listen(3000, '0.0.0.0', () => {
     console.log('Serwer działa na http://0.0.0.0:3000');
 });

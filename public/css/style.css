@@ -109,25 +109,25 @@ body {
 /* Napis INFO na stronie A */
 .info-button {
     position: absolute;
-    bottom: 20px; /* Odległość od dołu */
-    right: 20px; /* Odległość od prawej */
-    color: #ffffff; /* Biały tekst */
-    font-family: 'Cinzel', serif; /* Czcionka zgodna z projektem */
+    bottom: 20px;
+    right: 20px;
+    color: #ffffff;
+    font-family: 'Cinzel', serif;
     font-size: 18px;
-    cursor: pointer; /* Kursor jak przycisk */
-    z-index: 4; /* Nad innymi elementami */
+    cursor: pointer;
+    z-index: 4;
 }
 
 /* Styl strony I */
 .info-screen {
-    background-color: #1e1e1e; /* Ciemne tło, jak w notatniku */
+    background-color: #1e1e1e;
     height: 100vh;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     opacity: 1;
-    transition: opacity 0.5s ease; /* Płynne przejścia */
+    transition: opacity 0.5s ease;
     z-index: 0;
 }
 
@@ -137,61 +137,41 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    text-align: left; /* Tekst wyrównany do lewej, jak w notatniku */
-    font-family: 'Courier New', Courier, monospace; /* Czcionka jak w notatniku */
-    color: #d4d4d4; /* Jasnoszary tekst, który nie razi w oczy */
+    text-align: left;
+    font-family: 'Courier New', Courier, monospace;
+    color: #d4d4d4;
     z-index: 3;
-    padding: 40px; /* Większy padding dla czytelności */
-    overflow-y: auto; /* Możliwość przewijania, jeśli tekst jest długi */
-    background-color: #1e1e1e; /* Dopasowanie tła */
+    padding: 40px;
+    overflow-y: auto;
+    background-color: #1e1e1e;
     box-sizing: border-box;
 }
 
 .info-content h1 {
-    font-size: 24px; /* Mniejszy nagłówek, bardziej minimalistyczny */
+    font-size: 24px;
     margin-bottom: 20px;
-    color: #ffffff; /* Biały nagłówek dla kontrastu */
+    color: #ffffff;
 }
 
 .info-content p {
-    font-size: 16px; /* Rozmiar tekstu jak w notatniku */
-    line-height: 1.6; /* Większa przestrzeń między liniami dla czytelności */
+    font-size: 16px;
+    line-height: 1.6;
     margin-bottom: 15px;
 }
 
 .info-content button {
-    background-color: #333; /* Ciemny przycisk */
-    color: #d4d4d4; /* Jasny tekst na przycisku */
-    border: 1px solid #555; /* Delikatna ramka */
+    background-color: #333;
+    color: #d4d4d4;
+    border: 1px solid #555;
     padding: 8px 16px;
-    font-family: 'Courier New', Courier, monospace; /* Czcionka przycisku jak w notatniku */
+    font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
     cursor: pointer;
     margin-top: 20px;
 }
 
 .info-content button:hover {
-    background-color: #444; /* Lekkie rozjaśnienie po najechaniu */
-}
-
-.info-content h1 {
-    font-size: 36px;
-    margin-bottom: 20px;
-}
-
-.info-content p {
-    font-size: 18px;
-    margin-bottom: 40px;
-}
-
-.info-content button {
-    background-color: #333;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    font-family: 'Cinzel', serif;
-    font-size: 18px;
-    cursor: pointer;
+    background-color: #444;
 }
 
 /* Strona B: Tworzenie hosta */
@@ -253,6 +233,11 @@ body {
 
 .mode-button:hover::before {
     display: block;
+}
+
+.mode-button.disabled {
+    pointer-events: none; /* Blokuje kliknięcia */
+    opacity: 0.5; /* Wizualne wskazanie, że przycisk jest nieaktywny */
 }
 
 .mode-text.wszystkie_karty-text {
@@ -562,19 +547,18 @@ body {
 /* Pozycjonowanie ikonek graczy na stronie D */
 .host-player-icon {
     top: 45.83%;
-    left: calc(50% + 10%); /* Po prawej stronie */
+    left: calc(50% + 10%);
     transform: translate(-50%, -50%);
 }
 
 .opponent-player-icon {
     top: 45.83%;
-    left: calc(50% - 10%); /* Po lewej stronie */
+    left: calc(50% - 10%);
     transform: translate(-50%, -50%);
-} 
+}
 
 /* Strona C.5: Oczekiwanie na wybór trybu */
 .loading-screen {
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -655,18 +639,23 @@ body {
 
 .back-button {
     position: absolute;
-    bottom: 20px; /* Odległość od dołu */
-    left: 20px; /* Odległość od lewej krawędzi */
+    bottom: 20px;
+    left: 20px;
     cursor: pointer;
-    z-index: 10;
+    z-index: 10; /* Wyższy niż inne elementy */
 }
 
 .back-button img {
-    width: 60px; /* Rozmiar obrazka 60x60px */
+    width: 60px;
     height: 60px;
 }
 
-/* Strona testowa*/
+.back-button:hover img {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Strona testowa */
 #gameScreen {
     display: none;
     flex-direction: column;
