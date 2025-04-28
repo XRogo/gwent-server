@@ -29,6 +29,15 @@ let hostNickname = null;
 let opponentNickname = null;
 let checkOpponentInterval = null;
 
+const urlParams = new URLSearchParams(window.location.search);
+const gameCodeFromUrl = urlParams.get('game');
+if (gameCodeFromUrl) {
+    fadeOut(mainMenu, () => {
+        fadeIn(joinScreen);
+        document.querySelector('.code-input').value = gameCodeFromUrl;
+    });
+}
+
 const nicknames = [
     "Geralt", "Yennefer", "Ciri", "Triss", "Jaskier", "Zoltan", "Vesemir", "Lambert", "Eskel", "Foltest",
     "Emhyr", "Fringilla", "Meve", "Eredin", "Regis", "Yarpen", "Keira", "Letho", "Roche", "Ves", "Iorveth",
