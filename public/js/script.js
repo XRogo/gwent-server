@@ -178,7 +178,7 @@ function showNicknameScreen() {
 function generateGameCode() {
     const code = Math.floor(100000 + Math.random() * 900000);
     gameCodeElement.textContent = code;
-    gameLinkElement.textContent = `https://gwent-online.com/game/${code}`;
+    gameLinkElement.textContent = `https://gwent-1vs1.onrender.com/?game=${code}`;
 }
 
 function copyCode() {
