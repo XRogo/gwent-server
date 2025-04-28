@@ -1,3 +1,19 @@
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server); // Poprawna inicjalizacja io
+
+const games = {};
+
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 io.on('connection', (socket) => {
     console.log('Nowy użytkownik połączony:', socket.id);
 
@@ -61,7 +77,6 @@ io.on('connection', (socket) => {
         io.to(opponentId).emit('message-from-host', message);
     });
 
-    // Dodajemy obsługę hostLeft i opponentLeft
     socket.on('hostLeft', () => {
         for (const gameCode in games) {
             if (games[gameCode].host === socket.id) {
@@ -105,4 +120,8 @@ io.on('connection', (socket) => {
             }
         }
     });
+});
+
+server.listen(3000, '0.0.0.0', () => {
+    console.log('Serwer działa na http://0.0.0.0:3000');
 });
