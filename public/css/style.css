@@ -658,6 +658,7 @@ body {
     bottom: 20px; /* Odległość od dołu */
     left: 20px; /* Odległość od lewej krawędzi */
     cursor: pointer;
+    z-index: 10;
 }
 
 .back-button img {
