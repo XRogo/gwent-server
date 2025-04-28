@@ -236,8 +236,8 @@ body {
 }
 
 .mode-button.disabled {
-    pointer-events: none; /* Blokuje kliknięcia */
-    opacity: 0.5; /* Wizualne wskazanie, że przycisk jest nieaktywny */
+    pointer-events: none;
+    opacity: 0.5;
 }
 
 .mode-text.wszystkie_karty-text {
@@ -642,12 +642,16 @@ body {
     bottom: 20px;
     left: 20px;
     cursor: pointer;
-    z-index: 10; /* Wyższy niż inne elementy */
+    z-index: 10;
 }
 
 .back-button img {
     width: 60px;
     height: 60px;
+}
+
+.back-button:hover img {
+    /* Brak efektu powiększenia */
 }
 
 /* Strona testowa */
@@ -678,5 +682,7 @@ body {
 
 .game-content span {
     font-weight: bold;
-    color: #ffd700; /* Złoty kolor dla nicków */
+   
+
+    color: #ffd700;
 }

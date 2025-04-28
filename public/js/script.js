@@ -27,8 +27,14 @@ let opponentId = null;
 let hostId = null;
 let hostNickname = null;
 let opponentNickname = null;
-let checkOpponentInterval = null;
 
+const nicknames = [
+    "Geralt", "Yennefer", "Ciri", "Triss", "Jaskier", "Zoltan", "Vesemir", "Lambert", "Eskel", "Foltest",
+    "Emhyr", "Fringilla", "Meve", "Eredin", "Regis", "Yarpen", "Keira", "Letho", "Roche", "Ves", "Iorveth",
+    "Radovid", "Dettlaff", "Barnabo", "Baron", "Milva"
+];
+
+// Odczyt parametru game z URL
 const urlParams = new URLSearchParams(window.location.search);
 const gameCodeFromUrl = urlParams.get('game');
 if (gameCodeFromUrl) {
@@ -37,12 +43,6 @@ if (gameCodeFromUrl) {
         document.querySelector('.code-input').value = gameCodeFromUrl;
     });
 }
-
-const nicknames = [
-    "Geralt", "Yennefer", "Ciri", "Triss", "Jaskier", "Zoltan", "Vesemir", "Lambert", "Eskel", "Foltest",
-    "Emhyr", "Fringilla", "Meve", "Eredin", "Regis", "Yarpen", "Keira", "Letho", "Roche", "Ves", "Iorveth",
-    "Radovid", "Dettlaff", "Barnabo", "Baron", "Milva"
-];
 
 // Dźwięk przy najechaniu
 buttons.forEach(button => {
@@ -153,8 +153,6 @@ function showNicknameScreen() {
             const opponentIcon = document.querySelector('.opponent-player-icon img');
             if (hostIcon) hostIcon.src = 'assets/ludekn.png';
             if (opponentIcon) opponentIcon.src = 'assets/ludekn.png';
-            // Zacznij sprawdzanie przeciwnika
-            checkOpponentInterval = setInterval(startCheckingOpponent, 5000);
         });
     } else {
         fadeOut(loadingScreen, () => {
@@ -294,7 +292,6 @@ nicknameInput.addEventListener('keydown', (event) => {
 });
 
 function startGame() {
-    stopCheckingOpponent();
     fadeOut(nicknameScreen, () => {
         fadeIn(gameScreen);
         hostNicknameElement.textContent = hostNickname || 'Brak';
@@ -373,7 +370,6 @@ socket.on('opponent-left', (message) => {
         loadingScreen.style.display = 'none';
         joinScreen.style.display = 'none';
         fadeIn(hostScreen);
-        stopCheckingOpponent();
     } else {
         resetGameState();
         nicknameScreen.style.display = 'none';
@@ -489,7 +485,6 @@ function goBackFromLoadingScreen() {
 }
 
 function goBackFromNicknameScreen() {
-    stopCheckingOpponent();
     if (isHost) {
         fadeOut(nicknameScreen, () => {
             fadeIn(hostScreen);
@@ -509,44 +504,8 @@ socket.on('hostLeft', () => {
     });
 });
 
-// Mechanizm sprawdzania statusu przeciwnika
-function startCheckingOpponent() {
-    if (isHost && nicknameScreen.style.display !== 'none') {
-        const gameCode = gameCodeElement.textContent;
-        socket.emit('checkOpponent', gameCode);
-    }
-}
-
-function stopCheckingOpponent() {
-    if (checkOpponentInterval) {
-        clearInterval(checkOpponentInterval);
-        checkOpponentInterval = null;
-    }
-}
-
-socket.on('opponentStatus', (data) => {
-    if (isHost && !data.connected) {
-        alert('Przeciwnik opuścił grę. Czekaj na nowego gracza.');
-        selectedMode = null;
-        isJoined = false;
-        hasJoined = false;
-        opponentJoined = false;
-        opponentId = null;
-        hostNickname = null;
-        opponentNickname = null;
-        resetHostUI();
-        nicknameScreen.style.display = 'none';
-        gameScreen.style.display = 'none';
-        loadingScreen.style.display = 'none';
-        joinScreen.style.display = 'none';
-        fadeIn(hostScreen);
-        stopCheckingOpponent();
-    }
-});
-
 // Nowa funkcja do odtwarzania dźwięku dla przycisku Back
 const backButtons = document.querySelectorAll('.back-button');
-
 backButtons.forEach(button => {
     button.addEventListener('mouseenter', () => {
         const backHoverSound = new Audio('assets/hover-sound.mp3');
