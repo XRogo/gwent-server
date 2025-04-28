@@ -653,6 +653,18 @@ body {
     opacity: 1;
 }
 
+.back-button {
+    position: absolute;
+    bottom: 20px; /* Odległość od dołu */
+    left: 20px; /* Odległość od lewej krawędzi */
+    cursor: pointer;
+}
+
+.back-button img {
+    width: 60px; /* Rozmiar obrazka 60x60px */
+    height: 60px;
+}
+
 /* Strona testowa*/
 #gameScreen {
     display: none;

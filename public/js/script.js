@@ -458,3 +458,48 @@ function showMainMenu() {
         fadeIn(mainMenu);
     });
 }
+function goBackFromHostScreen() {
+    // Ze strony B (hostScreen) do strony A (mainMenu)
+    fadeOut(hostScreen, () => {
+        fadeIn(mainMenu);
+        resetGameState(); // Resetuj stan gry
+    });
+}
+
+function goBackFromJoinScreen() {
+    // Ze strony C (joinScreen) do strony A (mainMenu)
+    fadeOut(joinScreen, () => {
+        fadeIn(mainMenu);
+        resetGameState(); // Resetuj stan gry
+    });
+}
+
+function goBackFromLoadingScreen() {
+    // Ze strony C.5 (loadingScreen) do strony C (joinScreen)
+    fadeOut(loadingScreen, () => {
+        fadeIn(joinScreen);
+    });
+}
+
+function goBackFromNicknameScreen() {
+    if (isHost) {
+        // @ cofa: @ wraca na stronę B (hostScreen), przeciwnik (&) na stronę C.5 (loadingScreen)
+        fadeOut(nicknameScreen, () => {
+            fadeIn(hostScreen);
+            socket.emit('hostLeft'); // Powiadom przeciwnika
+        });
+    } else {
+        // & cofa: & wraca na stronę A (mainMenu), host (@) dostaje powiadomienie
+        fadeOut(nicknameScreen, () => {
+            fadeIn(mainMenu);
+            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.'); // Powiadom hosta
+        });
+    }
+}
+
+socket.on('hostLeft', () => {
+    // Przeciwnik (&) wraca na stronę C.5 (loadingScreen)
+    fadeOut(nicknameScreen, () => {
+        fadeIn(loadingScreen);
+    });
+});
