@@ -534,3 +534,13 @@ socket.on('opponentStatus', (data) => {
         stopCheckingOpponent();
     }
 });
+
+// Nowa funkcja do odtwarzania dźwięku dla przycisku Back
+const backButtons = document.querySelectorAll('.back-button');
+
+backButtons.forEach(button => {
+    button.addEventListener('mouseenter', () => {
+        const backHoverSound = new Audio('assets/hover-sound.mp3');
+        backHoverSound.play();
+    });
+});
