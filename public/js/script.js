@@ -489,11 +489,12 @@ function goBackFromJoinScreen() {
 
 function goBackFromLoadingScreen() {
     fadeOut(loadingScreen, () => {
-        fadeIn(joinScreen); // Przeciwnik wraca na stronę C
+        fadeIn(mainMenu); // Przeciwnik wraca na stronę A
         if (!isHost) {
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
             socket.disconnect(); // Rozłączamy przeciwnika
         }
+        resetGameState();
     });
 }
 
