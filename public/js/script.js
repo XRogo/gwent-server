@@ -201,15 +201,17 @@ function copyLink() {
 
 function joinGame() {
     const gameCode = document.querySelector('.code-input').value.trim();
-    if (hasJoined) {
-        alert('Już dołączyłeś do gry!');
+    if (!gameCode) {
+        alert('Wprowadź kod gry!');
         return;
     }
-    if (gameCode) {
-        socket.emit('join-game', { gameCode });
-    } else {
-        alert('Wprowadź kod gry!');
+    // Jeśli gracz jest rozłączony, resetujemy jego stan przed dołączeniem
+    if (hasJoined) {
+        socket.disconnect(); // Rozłączamy stare połączenie
+        resetGameState(); // Resetujemy stan gry
     }
+    socket.connect(); // Nawiązujemy nowe połączenie
+    socket.emit('join-game', { gameCode });
 }
 
 function selectMode(mode) {
@@ -303,13 +305,20 @@ function resetGameState() {
     selectedMode = null;
     isHost = false;
     isJoined = false;
-    hasJoined = false;
+    hasJoined = false; // Upewniamy się, że hasJoined jest zresetowane
     opponentJoined = false;
     opponentId = null;
     hostId = null;
     hostNickname = null;
     opponentNickname = null;
+    // Resetowanie UI hosta
     resetHostUI();
+    // Resetowanie inputu kodu, aby można było wpisać nowy kod
+    const codeInput = document.querySelector('.code-input');
+    if (codeInput) {
+        codeInput.value = '';
+        codeInput.disabled = false; // Upewniamy się, że pole kodu jest aktywne
+    }
 }
 
 socket.on('join-success', (data) => {
@@ -483,7 +492,7 @@ function goBackFromJoinScreen() {
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
             socket.disconnect(); // Rozłączamy przeciwnika
         }
-        resetGameState();
+        resetGameState(); // Resetujemy stan gry
     });
 }
 
@@ -494,7 +503,7 @@ function goBackFromLoadingScreen() {
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
             socket.disconnect(); // Rozłączamy przeciwnika
         }
-        resetGameState();
+        resetGameState(); // Resetujemy stan gry
     });
 }
 
@@ -509,6 +518,7 @@ function goBackFromNicknameScreen() {
             fadeIn(mainMenu); // Przeciwnik wraca na stronę A
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
             socket.disconnect(); // Rozłączamy przeciwnika
+            resetGameState(); // Resetujemy stan gry
         });
     }
 }
@@ -519,7 +529,7 @@ socket.on('hostLeft', () => {
     });
 });
 
-// Nowa funkcja do odtwarzania dźwięku dla przycisku Back
+// Dźwięk dla przycisku Back
 const backButtons = document.querySelectorAll('.back-button');
 backButtons.forEach(button => {
     button.addEventListener('mouseenter', () => {
