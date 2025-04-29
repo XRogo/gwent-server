@@ -1,18 +1,36 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gwint Online</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
-    <meta name="google-site-verification" content="hLf1PX-1fD-PLj-3HAYo-pzLykQeqSmrrMrvrvE-lM8" />
-    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
-    <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
-    <link rel="icon" type="image/png" href="/icons/android-chrome-192x192.png" sizes="192x192">
-    <link rel="icon" type="image/png" href="/icons/android-chrome-512x512.png" sizes="512x512">
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gwint Online, Player vs Player</title>
+        <!-- Opis strony dla wyszukiwarek -->
+        <meta name="description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
+        <!-- Tag weryfikacyjny Google (nie usuwaj!) -->
+        <meta name="google-site-verification" content="hLf1PX-1fD-PLj-3HAYo-pzLykQeqSmrrMrvrvE-lM8" />
+        <!-- Meta tagi Open Graph (dla mediów społecznościowych) -->
+        <meta property="og:title" content="Gwint Online">
+        <meta property="og:description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://gwent-1vs1.onrender.com/">
+        <meta property="og:image" content="/assets/zdlink.jpg"> 
+        <!-- Meta tagi dla Twittera -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Gwint Online">
+        <meta name="twitter:description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
+        <meta name="twitter:image" content="/assets/zdlink.jpg"> 
+        <!-- Istniejące linki do stylów, faviconów itd. -->
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+        <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
+        <link rel="icon" type="image/png" href="/icons/android-chrome-192x192.png" sizes="192x192">
+        <link rel="icon" type="image/png" href="/icons/android-chrome-512x512.png" sizes="512x512">
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+        <!-- Skrypty -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="script.js" defer></script>
+    </head>
 <body>
     <!-- Strona A: Menu główne -->
     <div class="main-menu" id="mainMenu">
