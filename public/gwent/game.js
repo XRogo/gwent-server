@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
 
-            let bannerFaction = card.frakcja;
+            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
             if (card.nazwa === "Bies" && playerFaction !== "4") {
                 bannerFaction = playerFaction;
             }
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = `
                 <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
                 <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === 'nie' ? 'neutral.webp' : bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
+                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
             `;
 
             if (card.pozycja) {
@@ -65,9 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="power-icon" style="background-image: url('assets/dkarty/${card.moc}.webp');"></div>`;
             }
 
-            if (card.punkty) {
+            if (card.punkty || card.moc === 'pogoda') {
                 html += `<div class="points-bg"></div>`;
-                html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
+                if (card.punkty) {
+                    html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
+                }
             }
 
             if (card.bohater) {

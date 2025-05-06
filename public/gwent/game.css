@@ -61,7 +61,7 @@ body {
     z-index: 1;
 }
 
-@keyframes-moveBackground {
+@keyframes moveBackground {
     0% { background-position: 0 0; }
     100% { background-position: -3840px 0; }
 }
@@ -84,8 +84,8 @@ body {
 
 .button {
     position: absolute;
-    width: 2.53vw;
-    height: 3.7vh;
+    width: 2.53vw; /* 97px / 3840 * 100 */
+    height: 3.7vh; /* 80px / 2160 * 100 */
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
@@ -121,10 +121,10 @@ body {
 }
 
 .card-area.collection {
-    top: 22.73vh;
-    left: 9.53vw;
-    width: 31.12vw;
-    height: 67.13vh;
+    top: 22.73vh; /* 491px */
+    left: 9.53vw; /* 366px */
+    width: 31.12vw; /* 1195px */
+    height: 67.13vh; /* 1449px */
 }
 
 .card-area.deck {
@@ -135,8 +135,8 @@ body {
 }
 
 .card-area .card {
-    width: 9.11vw;
-    height: 17.26vh;
+    width: 9.11vw; /* 350px / 3840 * 100 */
+    height: 33.47vh; /* 723px / 2160 * 100, aby zmieścić 2 karty w pionie w 1449px */
     display: inline-block;
     margin: 0.25vw;
     position: relative;
@@ -189,10 +189,10 @@ body {
 
 .card-area .card .points-bg {
     position: absolute;
-    top: 8.15%;
-    left: 14.31%;
-    width: 20%;
-    height: 10%;
+    top: 8.15%; /* 81px / 993px */
+    left: 10%; /* Zmniejszone z 14.31% */
+    width: 15.27%; /* 80px / 524px */
+    height: 8.06%; /* 80px / 993px */
     background: url('assets/dkarty/punkty.webp') no-repeat;
     background-size: contain;
 }
@@ -200,9 +200,8 @@ body {
 .card-area .card .points {
     position: absolute;
     top: 8.15%;
-    left: 14.31%;
-    color: #fff;
-    font-size: 1vw;
+    left: 10%;
+    font-size: 1.5vw; /* Zwiększone */
     text-align: center;
     z-index: 1;
 }
