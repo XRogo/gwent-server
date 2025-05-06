@@ -1,0 +1,236 @@
+@font-face {
+    font-family: 'PFDinTextCondPro';
+    src: url('assets/fonts/PFDinTextCondPro-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'PFDinTextCondPro-Bold';
+    src: url('assets/fonts/PFDinTextCondPro-Bold.ttf') format('truetype');
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    overflow: hidden;
+    height: 100vh;
+    font-family: 'PFDinTextCondPro', sans-serif;
+}
+
+/* Ekran startowy */
+#startScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #fff;
+}
+
+.typing-effect {
+    font-size: 24px;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid #fff;
+    animation: typing 4s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: #fff; }
+}
+
+#startButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Ekran wyboru kart */
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('assets/wybor/hmory.webp') repeat-x;
+    animation: moveBackground 192s linear infinite;
+}
+
+@keyframes moveBackground {
+    0% { background-position: 0 0; }
+    100% { background-position: -3840px 0; }
+}
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('assets/wybor/gui.webp') no-repeat center;
+    background-size: cover;
+}
+
+.content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.button {
+    position: absolute;
+    width: 97px;
+    height: 80px;
+    cursor: pointer;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.button.collection.all { top: 354px; left: 373px; background-image: url('assets/wybor/all.webp'); }
+.button.collection.mecz { top: 356px; left: 549px; background-image: url('assets/wybor/mecz.webp'); }
+/* Pozostałe przyciski musisz dopasować do swoich assetów */
+
+.card-area {
+    position: absolute;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.card-area.collection {
+    top: 491px;
+    left: 366px;
+    width: 1195px;
+    height: 1449px;
+}
+
+.card-area.deck {
+    top: 491px;
+    left: 2290px;
+    width: 1194px;
+    height: 1449px;
+}
+
+.card-area .card {
+    width: 150px;
+    height: 200px;
+    display: inline-block;
+    margin: 5px;
+    position: relative;
+}
+
+.card-area .card img {
+    width: 100%;
+    height: 100%;
+}
+
+.stats {
+    position: absolute;
+    top: 1152px;
+    left: 1934px;
+    color: #fff;
+    font-family: 'PFDinTextCondPro', sans-serif;
+}
+
+.page-left, .page-right {
+    position: absolute;
+    cursor: pointer;
+}
+
+.page-left {
+    top: 155px;
+    left: 1452px;
+    width: 49px;
+    height: 43px;
+    background: url('assets/wybor/wlewo.webp');
+}
+
+.page-right {
+    top: 154px;
+    left: 2336px;
+    width: 49px;
+    height: 43px;
+    background: url('assets/wybor/wprawo.webp');
+}
+
+.page-indicators {
+    position: absolute;
+    top: 208px;
+    left: 1850px;
+    display: flex;
+}
+
+.page-dot {
+    width: 25px;
+    height: 22px;
+    margin-right: 10px;
+    background: url('assets/wybor/strona.webp');
+    cursor: pointer;
+}
+
+.page-dot.active {
+    filter: brightness(1.5);
+}
+
+.faction-name {
+    position: absolute;
+    top: 208px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 24px;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+}
+
+.faction-shield {
+    position: absolute;
+    top: 208px;
+    left: 1800px;
+    width: 50px;
+    height: 50px;
+}
+
+.faction-ability {
+    position: absolute;
+    top: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 18px;
+}
+
+.leader-card {
+    position: absolute;
+    top: 539px;
+    left: 1792px;
+    width: 259px;
+    height: 490px;
+    background: url('assets/dkarty/beton.webp');
+}
+
+#goToGameButton {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Ekran gry */
+.game-content {
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Skalowanie */
+@media (max-width: 1366px) {
+    .overlay { background-size: contain; }
+    .card-area { width: 50%; }
+    .stats { left: 60%; }
+}

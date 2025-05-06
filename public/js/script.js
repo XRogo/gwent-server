@@ -294,11 +294,8 @@ nicknameInput.addEventListener('keydown', (event) => {
 });
 
 function startGame() {
-    fadeOut(nicknameScreen, () => {
-        fadeIn(gameScreen);
-        hostNicknameElement.textContent = hostNickname || 'Brak';
-        opponentNicknameElement.textContent = opponentNickname || 'Brak';
-    });
+    // Twój istniejący kod walidacji nicków itp.
+    window.location.href = '/gwent/game.html';
 }
 
 function resetGameState() {
