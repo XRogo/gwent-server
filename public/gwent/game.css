@@ -167,15 +167,9 @@ body {
 .faction-info {
     position: absolute;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: auto; /* Upewniamy się, że szerokość jest dynamiczna */
-}
-
-.faction-header {
-    display: flex;
     align-items: center;
     justify-content: center;
+    color: #fff;
 }
 
 .faction-shield {
@@ -183,16 +177,12 @@ body {
 }
 
 .faction-name {
-    color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-left: 10px;
 }
 
 .faction-ability {
-    color: #fff;
     max-width: 600px;
     white-space: normal;
-    text-align: center;
 }
 
 .leader-card {
