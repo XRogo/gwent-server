@@ -21,7 +21,7 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url('assets/wybor/hmory.webp') repeat-x; /* Tylko tutaj repeat-x */
+    background: url('assets/wybor/hmory.webp') repeat-x;
     background-size: 100% auto;
     animation: moveBackground 192s linear infinite;
     z-index: 1;
@@ -53,7 +53,7 @@ body {
     position: absolute;
     cursor: pointer;
     background-size: contain;
-    background-repeat: no-repeat; /* Zapobiega powtarzaniu */
+    background-repeat: no-repeat;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -87,8 +87,8 @@ body {
     width: 100%;
     height: 100%;
     background-size: contain;
-    background-repeat: no-repeat; /* Zapobiega powtarzaniu */
-    z-index: 1; /* Ustawiam z-index, aby kontrolować nakładanie */
+    background-repeat: no-repeat;
+    z-index: 1;
 }
 
 .card-area .card .card-image { z-index: 1; }
@@ -107,7 +107,7 @@ body {
     height: 6.34%;
     text-align: center;
     line-height: 6.34%;
-    z-index: 8; /* Wyżej niż inne elementy karty */
+    z-index: 8;
 }
 
 .card-area .card .name {
@@ -119,7 +119,7 @@ body {
     color: #000;
     text-align: center;
     line-height: 12.39%;
-    z-index: 9; /* Wyżej niż inne elementy karty */
+    z-index: 9;
 }
 
 .stats {
@@ -132,7 +132,7 @@ body {
     position: absolute;
     cursor: pointer;
     background-size: contain;
-    background-repeat: no-repeat; /* Zapobiega powtarzaniu */
+    background-repeat: no-repeat;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -150,7 +150,7 @@ body {
     margin-right: 10px;
     background: url('assets/wybor/strona.webp');
     background-size: contain;
-    background-repeat: no-repeat; /* Zapobiega powtarzaniu */
+    background-repeat: no-repeat;
     cursor: pointer;
     opacity: 0;
 }
@@ -185,7 +185,7 @@ body {
     position: absolute;
     background: url('assets/dkarty/beton.webp');
     background-size: contain;
-    background-repeat: no-repeat; /* Zapobiega powtarzaniu */
+    background-repeat: no-repeat;
 }
 
 #goToGameButton {

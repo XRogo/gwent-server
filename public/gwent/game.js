@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('.button.collection.pogoda').style.width = `${97 * scaleX}px`;
         document.querySelector('.button.collection.pogoda').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.collection.pogoda').style.left = `${overlayLeft + 1278 * scaleX}px`;
+        document.querySelector('.button.collection.pogoda').style.left = `${overlayLeft + 1277 * scaleX}px`; // Poprawiona pozycja z 1278 na 1277
         document.querySelector('.button.collection.pogoda').style.top = `${overlayTop + 351 * scaleY}px`;
         document.querySelector('.button.collection.pogoda').style.backgroundImage = `url('assets/wybor/pogoda.webp')`;
 
@@ -77,13 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Przyciski talii
         document.querySelector('.button.deck.all').style.width = `${97 * scaleX}px`;
         document.querySelector('.button.deck.all').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.all').style.left = `${overlayLeft + 2299 * scaleX}px`;
+        document.querySelector('.button.deck.all').style.left = `${overlayLeft + 2297 * scaleX}px`; // Poprawiona pozycja z 2299 na 2297
         document.querySelector('.button.deck.all').style.top = `${overlayTop + 354 * scaleY}px`;
         document.querySelector('.button.deck.all').style.backgroundImage = `url('assets/wybor/all.webp')`;
 
         document.querySelector('.button.deck.mecz').style.width = `${97 * scaleX}px`;
         document.querySelector('.button.deck.mecz').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.mecz').style.left = `${overlayLeft + 2471 * scaleX}px`;
+        document.querySelector('.button.deck.mecz').style.left = `${overlayLeft + 2473 * scaleX}px`; // Poprawiona pozycja z 2471 na 2473
         document.querySelector('.button.deck.mecz').style.top = `${overlayTop + 356 * scaleY}px`;
         document.querySelector('.button.deck.mecz').style.backgroundImage = `url('assets/wybor/mecz.webp')`;
 
@@ -101,13 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('.button.deck.hero').style.width = `${97 * scaleX}px`;
         document.querySelector('.button.deck.hero').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.hero').style.left = `${overlayLeft + 3023 * scaleX}px`;
+        document.querySelector('.button.deck.hero').style.left = `${overlayLeft + 3022 * scaleX}px`; // Poprawiona pozycja z 3023 na 3022
         document.querySelector('.button.deck.hero').style.top = `${overlayTop + 356 * scaleY}px`;
         document.querySelector('.button.deck.hero').style.backgroundImage = `url('assets/wybor/boharer.webp')`;
 
         document.querySelector('.button.deck.pogoda').style.width = `${97 * scaleX}px`;
         document.querySelector('.button.deck.pogoda').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.pogoda').style.left = `${overlayLeft + 3202 * scaleX}px`;
+        document.querySelector('.button.deck.pogoda').style.left = `${overlayLeft + 3201 * scaleX}px`; // Poprawiona pozycja z 3202 na 3201
         document.querySelector('.button.deck.pogoda').style.top = `${overlayTop + 351 * scaleY}px`;
         document.querySelector('.button.deck.pogoda').style.backgroundImage = `url('assets/wybor/pogoda.webp')`;
 
@@ -210,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie") {
-        // Usuwam wszystkie istniejące karty
         while (area.firstChild) {
             area.removeChild(area.firstChild);
         }
