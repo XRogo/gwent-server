@@ -169,23 +169,28 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: auto; /* Upewniamy się, że szerokość jest dynamiczna */
+    width: auto;
+    margin: 0; /* Usuwamy marginesy, aby nie wpływały na pozycję */
 }
 
 .faction-header {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0; /* Usuwamy marginesy */
 }
 
 .faction-shield {
     object-fit: contain;
+    margin: 0; /* Usuwamy marginesy */
 }
 
 .faction-name {
     color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
     margin-left: 10px;
+    margin-top: 0; /* Usuwamy marginesy */
+    margin-bottom: 0;
 }
 
 .faction-ability {
@@ -193,6 +198,7 @@ body {
     max-width: 600px;
     white-space: normal;
     text-align: center;
+    margin: 0; /* Usuwamy marginesy */
 }
 
 .leader-card {
