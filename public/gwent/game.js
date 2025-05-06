@@ -31,106 +31,126 @@ document.addEventListener('DOMContentLoaded', () => {
         const scaleX = overlayWidth / GUI_WIDTH;
         const scaleY = overlayHeight / GUI_HEIGHT;
 
+        // Oblicz przesunięcie tła gui.webp (wyśrodkowane przez background-position: center)
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+
+        let backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+
+        if (windowAspectRatio > guiAspectRatio) {
+            // Okno jest szersze niż tło – tło jest skalowane do wysokości okna
+            backgroundHeight = overlayHeight;
+            backgroundWidth = backgroundHeight * (GUI_WIDTH / GUI_HEIGHT);
+            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+            backgroundTop = overlayTop;
+        } else {
+            // Okno jest wyższe niż tło – tło jest skalowane do szerokości okna
+            backgroundWidth = overlayWidth;
+            backgroundHeight = backgroundWidth * (GUI_HEIGHT / GUI_WIDTH);
+            backgroundLeft = overlayLeft;
+            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
+        }
+
         // Przyciski kolekcji
         const buttonWidth = 97 * scaleX;
         const buttonHeight = 80 * scaleY;
 
         document.querySelector('.button.collection.all').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.all').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.all').style.left = `${overlayLeft + 373 * scaleX}px`;
-        document.querySelector('.button.collection.all').style.top = `${overlayTop + 354 * scaleY}px`;
+        document.querySelector('.button.collection.all').style.left = `${backgroundLeft + 373 * scaleX}px`;
+        document.querySelector('.button.collection.all').style.top = `${backgroundTop + 354 * scaleY}px`;
         document.querySelector('.button.collection.all').style.backgroundImage = `url('assets/wybor/all.webp')`;
 
         document.querySelector('.button.collection.mecz').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.mecz').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.mecz').style.left = `${overlayLeft + 549 * scaleX}px`;
-        document.querySelector('.button.collection.mecz').style.top = `${overlayTop + 356 * scaleY}px`;
+        document.querySelector('.button.collection.mecz').style.left = `${backgroundLeft + 549 * scaleX}px`;
+        document.querySelector('.button.collection.mecz').style.top = `${backgroundTop + 356 * scaleY}px`;
         document.querySelector('.button.collection.mecz').style.backgroundImage = `url('assets/wybor/mecz.webp')`;
 
         document.querySelector('.button.collection.lok').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.lok').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.lok').style.left = `${overlayLeft + 765 * scaleX}px`;
-        document.querySelector('.button.collection.lok').style.top = `${overlayTop + 355 * scaleY}px`; // Poprawione z 415 na 355
+        document.querySelector('.button.collection.lok').style.left = `${backgroundLeft + 765 * scaleX}px`;
+        document.querySelector('.button.collection.lok').style.top = `${backgroundTop + 355 * scaleY}px`;
         document.querySelector('.button.collection.lok').style.backgroundImage = `url('assets/wybor/lok.webp')`;
 
         document.querySelector('.button.collection.obl').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.obl').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.obl').style.left = `${overlayLeft + 916 * scaleX}px`;
-        document.querySelector('.button.collection.obl').style.top = `${overlayTop + 355 * scaleY}px`;
+        document.querySelector('.button.collection.obl').style.left = `${backgroundLeft + 916 * scaleX}px`;
+        document.querySelector('.button.collection.obl').style.top = `${backgroundTop + 355 * scaleY}px`;
         document.querySelector('.button.collection.obl').style.backgroundImage = `url('assets/wybor/kapatulta.webp')`;
 
         document.querySelector('.button.collection.hero').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.hero').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.hero').style.left = `${overlayLeft + 1098 * scaleX}px`;
-        document.querySelector('.button.collection.hero').style.top = `${overlayTop + 356 * scaleY}px`;
+        document.querySelector('.button.collection.hero').style.left = `${backgroundLeft + 1098 * scaleX}px`;
+        document.querySelector('.button.collection.hero').style.top = `${backgroundTop + 356 * scaleY}px`;
         document.querySelector('.button.collection.hero').style.backgroundImage = `url('assets/wybor/boharer.webp')`;
 
         document.querySelector('.button.collection.pogoda').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.pogoda').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.pogoda').style.left = `${overlayLeft + 1277 * scaleX}px`;
-        document.querySelector('.button.collection.pogoda').style.top = `${overlayTop + 351 * scaleY}px`;
+        document.querySelector('.button.collection.pogoda').style.left = `${backgroundLeft + 1277 * scaleX}px`;
+        document.querySelector('.button.collection.pogoda').style.top = `${backgroundTop + 351 * scaleY}px`;
         document.querySelector('.button.collection.pogoda').style.backgroundImage = `url('assets/wybor/pogoda.webp')`;
 
         document.querySelector('.button.collection.specjalne').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.specjalne').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.specjalne').style.left = `${overlayLeft + 1459 * scaleX}px`;
-        document.querySelector('.button.collection.specjalne').style.top = `${overlayTop + 361 * scaleY}px`;
+        document.querySelector('.button.collection.specjalne').style.left = `${backgroundLeft + 1459 * scaleX}px`;
+        document.querySelector('.button.collection.specjalne').style.top = `${backgroundTop + 361 * scaleY}px`;
         document.querySelector('.button.collection.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
         // Przyciski talii
         document.querySelector('.button.deck.all').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.all').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.all').style.left = `${overlayLeft + 2297 * scaleX}px`;
-        document.querySelector('.button.deck.all').style.top = `${overlayTop + 354 * scaleY}px`;
+        document.querySelector('.button.deck.all').style.left = `${backgroundLeft + 2297 * scaleX}px`;
+        document.querySelector('.button.deck.all').style.top = `${backgroundTop + 354 * scaleY}px`;
         document.querySelector('.button.deck.all').style.backgroundImage = `url('assets/wybor/all.webp')`;
 
         document.querySelector('.button.deck.mecz').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.mecz').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.mecz').style.left = `${overlayLeft + 2473 * scaleX}px`;
-        document.querySelector('.button.deck.mecz').style.top = `${overlayTop + 356 * scaleY}px`;
+        document.querySelector('.button.deck.mecz').style.left = `${backgroundLeft + 2473 * scaleX}px`;
+        document.querySelector('.button.deck.mecz').style.top = `${backgroundTop + 356 * scaleY}px`;
         document.querySelector('.button.deck.mecz').style.backgroundImage = `url('assets/wybor/mecz.webp')`;
 
         document.querySelector('.button.deck.lok').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.lok').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.lok').style.left = `${overlayLeft + 2679 * scaleX}px`;
-        document.querySelector('.button.deck.lok').style.top = `${overlayTop + 355 * scaleY}px`;
+        document.querySelector('.button.deck.lok').style.left = `${backgroundLeft + 2679 * scaleX}px`;
+        document.querySelector('.button.deck.lok').style.top = `${backgroundTop + 355 * scaleY}px`; // Poprawione z 415 na 355
         document.querySelector('.button.deck.lok').style.backgroundImage = `url('assets/wybor/lok.webp')`;
 
         document.querySelector('.button.deck.obl').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.obl').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.obl').style.left = `${overlayLeft + 2840 * scaleX}px`;
-        document.querySelector('.button.deck.obl').style.top = `${overlayTop + 355 * scaleY}px`;
+        document.querySelector('.button.deck.obl').style.left = `${backgroundLeft + 2840 * scaleX}px`;
+        document.querySelector('.button.deck.obl').style.top = `${backgroundTop + 355 * scaleY}px`;
         document.querySelector('.button.deck.obl').style.backgroundImage = `url('assets/wybor/kapatulta.webp')`;
 
         document.querySelector('.button.deck.hero').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.hero').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.hero').style.left = `${overlayLeft + 3022 * scaleX}px`;
-        document.querySelector('.button.deck.hero').style.top = `${overlayTop + 356 * scaleY}px`;
+        document.querySelector('.button.deck.hero').style.left = `${backgroundLeft + 3022 * scaleX}px`;
+        document.querySelector('.button.deck.hero').style.top = `${backgroundTop + 356 * scaleY}px`;
         document.querySelector('.button.deck.hero').style.backgroundImage = `url('assets/wybor/boharer.webp')`;
 
         document.querySelector('.button.deck.pogoda').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.pogoda').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.pogoda').style.left = `${overlayLeft + 3201 * scaleX}px`;
-        document.querySelector('.button.deck.pogoda').style.top = `${overlayTop + 351 * scaleY}px`;
+        document.querySelector('.button.deck.pogoda').style.left = `${backgroundLeft + 3201 * scaleX}px`;
+        document.querySelector('.button.deck.pogoda').style.top = `${backgroundTop + 351 * scaleY}px`;
         document.querySelector('.button.deck.pogoda').style.backgroundImage = `url('assets/wybor/pogoda.webp')`;
 
         document.querySelector('.button.deck.specjalne').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.specjalne').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.specjalne').style.left = `${overlayLeft + 3380 * scaleX}px`;
-        document.querySelector('.button.deck.specjalne').style.top = `${overlayTop + 361 * scaleY}px`;
+        document.querySelector('.button.deck.specjalne').style.left = `${backgroundLeft + 3380 * scaleX}px`;
+        document.querySelector('.button.deck.specjalne').style.top = `${backgroundTop + 361 * scaleY}px`;
         document.querySelector('.button.deck.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
         // Obszary kart
         collectionArea.style.width = `${1195 * scaleX}px`;
         collectionArea.style.height = `${1449 * scaleY}px`;
-        collectionArea.style.left = `${overlayLeft + 366 * scaleX}px`;
-        collectionArea.style.top = `${overlayTop + 491 * scaleY}px`;
+        collectionArea.style.left = `${backgroundLeft + 366 * scaleX}px`;
+        collectionArea.style.top = `${backgroundTop + 491 * scaleY}px`;
         collectionArea.style.padding = `${10 * scaleX}px`;
 
         deckArea.style.width = `${1193 * scaleX}px`;
         deckArea.style.height = `${1449 * scaleY}px`;
-        deckArea.style.left = `${overlayLeft + 2291 * scaleX}px`;
-        deckArea.style.top = `${overlayTop + 491 * scaleY}px`;
+        deckArea.style.left = `${backgroundLeft + 2291 * scaleX}px`;
+        deckArea.style.top = `${backgroundTop + 491 * scaleY}px`;
         deckArea.style.padding = `${10 * scaleX}px`;
 
         // Karty
@@ -152,26 +172,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Statystyki
-        stats.style.left = `${overlayLeft + 1935 * scaleX}px`;
-        stats.style.top = `${overlayTop + 1152 * scaleY}px`;
+        stats.style.left = `${backgroundLeft + 1935 * scaleX}px`;
+        stats.style.top = `${backgroundTop + 1152 * scaleY}px`;
         stats.style.fontSize = `${16 * scaleX}px`;
 
         // Przyciski przewijania
         document.querySelector('.page-left').style.width = `${49 * scaleX}px`;
         document.querySelector('.page-left').style.height = `${43 * scaleY}px`;
-        document.querySelector('.page-left').style.left = `${overlayLeft + 1452 * scaleX}px`;
-        document.querySelector('.page-left').style.top = `${overlayTop + 155 * scaleY}px`;
+        document.querySelector('.page-left').style.left = `${backgroundLeft + 1452 * scaleX}px`;
+        document.querySelector('.page-left').style.top = `${backgroundTop + 155 * scaleY}px`;
         document.querySelector('.page-left').style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
 
         document.querySelector('.page-right').style.width = `${49 * scaleX}px`;
         document.querySelector('.page-right').style.height = `${43 * scaleY}px`;
-        document.querySelector('.page-right').style.left = `${overlayLeft + 2338 * scaleX}px`;
-        document.querySelector('.page-right').style.top = `${overlayTop + 154 * scaleY}px`;
+        document.querySelector('.page-right').style.left = `${backgroundLeft + 2338 * scaleX}px`;
+        document.querySelector('.page-right').style.top = `${backgroundTop + 154 * scaleY}px`;
         document.querySelector('.page-right').style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
 
         // Kropki
-        document.querySelector('.page-indicators').style.left = `${overlayLeft + 1850 * scaleX}px`;
-        document.querySelector('.page-indicators').style.top = `${overlayTop + 208 * scaleY}px`;
+        document.querySelector('.page-indicators').style.left = `${backgroundLeft + 1850 * scaleX}px`;
+        document.querySelector('.page-indicators').style.top = `${backgroundTop + 208 * scaleY}px`;
         pageDots.forEach(dot => {
             dot.style.width = `${25 * scaleX}px`;
             dot.style.height = `${22 * scaleY}px`;
@@ -179,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Informacje o frakcji
-        document.querySelector('.faction-info').style.left = `${overlayLeft + (GUI_WIDTH / 2) * scaleX}px`;
-        document.querySelector('.faction-info').style.top = `${overlayTop + 173 * scaleY}px`;
+        document.querySelector('.faction-info').style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scaleX}px`;
+        document.querySelector('.faction-info').style.top = `${backgroundTop + 173 * scaleY}px`;
         document.querySelector('.faction-info').style.transform = `translateX(-50%)`;
 
         document.querySelector('.faction-shield').style.width = `${106 * scaleX}px`;
@@ -192,12 +212,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scaleX}px`;
         document.querySelector('.leader-card').style.height = `${490 * scaleY}px`;
-        document.querySelector('.leader-card').style.left = `${overlayLeft + 1792 * scaleX}px`;
-        document.querySelector('.leader-card').style.top = `${overlayTop + 539 * scaleY}px`;
+        document.querySelector('.leader-card').style.left = `${backgroundLeft + 1792 * scaleX}px`;
+        document.querySelector('.leader-card').style.top = `${backgroundTop + 539 * scaleY}px`;
 
         // Przycisk "Przejdź do gry"
         const goToGameButton = document.getElementById('goToGameButton');
-        goToGameButton.style.left = `${overlayLeft + (GUI_WIDTH / 2) * scaleX}px`;
+        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scaleX}px`;
         goToGameButton.style.bottom = `${43 * scaleY}px`;
         goToGameButton.style.padding = `${10 * scaleY}px ${20 * scaleX}px`;
         goToGameButton.style.fontSize = `${30 * scaleX}px`;
