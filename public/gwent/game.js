@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Informacje o frakcji
         const factionInfo = document.querySelector('.faction-info');
-        factionInfo.style.left = `${overlayLeft + (overlayWidth / 2)}px`;
-        factionInfo.style.top = `${overlayTop + (174 - 60) * scale}px`; // Podniesienie o 60 px w 4K (nowa pozycja: 114 px)
+        factionInfo.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`; // Wyśrodkowanie względem tła GUI
+        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`; // Pozycja względem tła GUI (114 px w 4K)
         factionInfo.style.transform = `translateX(-50%)`;
 
         document.querySelector('.faction-shield').style.width = `${106 * scale}px`;
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('.faction-ability').style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
         document.querySelector('.faction-ability').style.position = 'absolute';
-        document.querySelector('.faction-ability').style.top = `${(276 - (174 - 60)) * scale}px`; // Nowa pozycja opisu: 276 - 114 = 162 px odstępu
+        document.querySelector('.faction-ability').style.top = `${(276 - (174 - 60)) * scale}px`; // Pozycja względem .faction-info
 
         // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scale}px`;
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Przycisk "Przejdź do gry"
         const goToGameButton = document.getElementById('goToGameButton');
-        goToGameButton.style.left = `${overlayLeft + (overlayWidth / 2)}px`;
+        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`; // Wyśrodkowanie względem tła GUI
         goToGameButton.style.bottom = `${43 * scale}px`;
         goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
         goToGameButton.style.fontSize = `${30 * scale}px`;

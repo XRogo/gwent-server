@@ -166,9 +166,7 @@ body {
 
 .faction-info {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: block; /* Zmieniamy z flex na block, aby nie ograniczać szerokości dzieci */
     width: auto;
     margin: 0;
 }
@@ -194,10 +192,12 @@ body {
 }
 
 .faction-ability {
-    color: #b48b42; /* Nowy kolor */
+    color: #b48b42;
     white-space: normal;
     text-align: center;
     margin: 0;
+    width: 100%; /* Upewniamy się, że opis może się rozciągać */
+    box-sizing: border-box;
 }
 
 .leader-card {
