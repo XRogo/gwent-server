@@ -1,3 +1,5 @@
+
+
 import cards from './cards.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameScreen.style.display = 'block';
     });
 
-    // Wyświetlanie kart (używamy dkarta)
+    // Wyświetlanie kart z warstwami
     function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie") {
         area.innerHTML = '';
         const filteredCards = cards.filter(card => {
@@ -45,11 +47,44 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+
+            // Określ frakcję dla banera
             let bannerFaction = card.frakcja;
             if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction; // Dynamiczny baner
+                bannerFaction = playerFaction;
             }
-            cardElement.innerHTML = `<img src="${card.dkarta}" alt="${card.nazwa}" data-faction="${bannerFaction}">`;
+
+            // Warstwy karty
+            let html = `
+                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
+                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
+                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === 'nie' ? 'neutral.webp' : bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
+            `;
+            
+            // Ikona pozycji
+            if (card.pozycja) {
+                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+            }
+
+            // Ikona mocy
+            if (card.moc) {
+                html += `<div class="power-icon" style="background-image: url('assets/dkarty/${card.moc}.webp');"></div>`;
+            }
+
+            // Punkty
+            if (card.punkty) {
+                html += `<div class="points">${card.punkty}</div>`;
+            }
+
+            // Ikona bohatera
+            if (card.bohater) {
+                html += `<div class="hero-icon"></div>`;
+            }
+
+            // Nazwa (opis pomijamy w trybie wyboru)
+            html += `<div class="name">${card.nazwa}</div>`;
+
+            cardElement.innerHTML = html;
             area.appendChild(cardElement);
         });
     }

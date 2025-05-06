@@ -11,7 +11,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #000;
+    background-color: #000; /* Czarne tło jako pierwsza warstwa */
     overflow: hidden;
     height: 100vh;
     font-family: 'PFDinTextCondPro', sans-serif;
@@ -58,13 +58,14 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/hmory.webp') repeat-x;
-    background-size: 50% auto; /* Skalowanie tła */
+    background-size: 50% auto; /* 1920x1080 px jako baza */
     animation: moveBackground 192s linear infinite;
+    z-index: 1; /* Druga warstwa */
 }
 
 @keyframes moveBackground {
     0% { background-position: 0 0; }
-    100% { background-position: -3840px 0; }
+    100% { background-position: -200% 0; } /* Przesunięcie proporcjonalne do szerokości */
 }
 
 .overlay {
@@ -72,39 +73,44 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/gui.webp') no-repeat center;
-    background-size: 100% 100%; /* Lepsze skalowanie tła */
+    background-size: cover; /* Zachowuje proporcje 16:9 */
+    z-index: 2; /* Trzecia warstwa */
 }
 
 .content {
     position: relative;
     width: 100%;
     height: 100%;
+    z-index: 3; /* Elementy na wierzchu */
 }
 
+/* Przeliczenie pozycji: 3840px = 100vw, 2160px = 100vh */
 .button {
     position: absolute;
-    width: 5vw;
-    height: 4vh;
+    width: 2.53vw; /* 97px / 3840 * 100 */
+    height: 3.7vh; /* 80px / 2160 * 100 */
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
 }
 
-.button.collection.all { top: 18vh; left: 19vw; background-image: url('assets/wybor/all.webp'); }
-.button.collection.mecz { top: 18vh; left: 28vw; background-image: url('assets/wybor/mecz.webp'); }
-.button.collection.lok { top: 18vh; left: 37vw; background-image: url('assets/wybor/lok.webp'); }
-.button.collection.obl { top: 18vh; left: 46vw; background-image: url('assets/wybor/obl.webp'); }
-.button.collection.hero { top: 18vh; left: 55vw; background-image: url('assets/wybor/hero.webp'); }
-.button.collection.pogoda { top: 18vh; left: 64vw; background-image: url('assets/wybor/pogoda.webp'); }
-.button.collection.specjalne { top: 18vh; left: 73vw; background-image: url('assets/wybor/specjalne.webp'); }
+/* Kolekcja */
+.button.collection.all { top: 16.39vh; left: 9.71vw; background-image: url('assets/wybor/all.webp'); } /* 354px, 373px */
+.button.collection.mecz { top: 16.48vh; left: 14.30vw; background-image: url('assets/wybor/mecz.webp'); } /* 356px, 549px */
+.button.collection.lok { top: 19.21vh; left: 19.92vw; background-image: url('assets/wybor/lok.webp'); } /* 415px, 765px */
+.button.collection.obl { top: 16.44vh; left: 23.85vw; background-image: url('assets/wybor/obl.webp'); } /* 355px, 916px */
+.button.collection.hero { top: 16.48vh; left: 28.59vw; background-image: url('assets/wybor/hero.webp'); } /* 356px, 1098px */
+.button.collection.pogoda { top: 16.25vh; left: 33.26vw; background-image: url('assets/wybor/pogoda.webp'); } /* 351px, 1277px */
+.button.collection.specjalne { top: 16.71vh; left: 37.97vw; background-image: url('assets/wybor/specjalne.webp'); } /* 361px, 1459px */
 
-.button.deck.all { top: 18vh; left: 81vw; background-image: url('assets/wybor/all.webp'); }
-.button.deck.mecz { top: 18vh; left: 90vw; background-image: url('assets/wybor/mecz.webp'); }
-.button.deck.lok { top: 18vh; left: 99vw; background-image: url('assets/wybor/lok.webp'); }
-.button.deck.obl { top: 18vh; left: 108vw; background-image: url('assets/wybor/obl.webp'); }
-.button.deck.hero { top: 18vh; left: 117vw; background-image: url('assets/wybor/hero.webp'); }
-.button.deck.pogoda { top: 18vh; left: 126vw; background-image: url('assets/wybor/pogoda.webp'); }
-.button.deck.specjalne { top: 18vh; left: 135vw; background-image: url('assets/wybor/specjalne.webp'); }
+/* Talia */
+.button.deck.all { top: 16.39vh; left: 59.84vw; background-image: url('assets/wybor/all.webp'); } /* 354px, 2297px */
+.button.deck.mecz { top: 16.48vh; left: 64.35vw; background-image: url('assets/wybor/mecz.webp'); } /* 356px, 2473px */
+.button.deck.lok { top: 19.21vh; left: 69.77vw; background-image: url('assets/wybor/lok.webp'); } /* 415px, 2679px */
+.button.deck.obl { top: 16.44vh; left: 73.96vw; background-image: url('assets/wybor/obl.webp'); } /* 355px, 2840px */
+.button.deck.hero { top: 16.48vh; left: 78.70vw; background-image: url('assets/wybor/hero.webp'); } /* 356px, 3022px */
+.button.deck.pogoda { top: 16.25vh; left: 83.36vw; background-image: url('assets/wybor/pogoda.webp'); } /* 351px, 3201px */
+.button.deck.specjalne { top: 16.71vh; left: 88.02vw; background-image: url('assets/wybor/specjalne.webp'); } /* 361px, 3380px */
 
 .card-area {
     position: absolute;
@@ -114,77 +120,144 @@ body {
 }
 
 .card-area.collection {
-    top: 25vh;
-    left: 19vw;
-    width: 62vw;
-    height: 75vh;
+    top: 22.73vh; /* 491px */
+    left: 9.53vw; /* 366px */
+    width: 31.12vw; /* 1195px */
+    height: 67.13vh; /* 1449px */
 }
 
 .card-area.deck {
-    top: 25vh;
-    left: 81vw;
-    width: 62vw;
-    height: 75vh;
-    transform: translateX(-100%);
+    top: 22.73vh;
+    left: 59.64vw; /* 2290px */
+    width: 31.09vw; /* 1194px */
+    height: 67.13vh;
 }
 
 .card-area .card {
-    width: 12vw; /* Skalowanie dużych kart (524x993px) */
-    height: 22.5vh; /* Zachowanie proporcji */
+    width: 9.11vw; /* Skalowanie dużych kart: 524px / 3840 * 100 */
+    height: 34.77vh; /* 993px / 2160 * 100 */
     display: inline-block;
     margin: 0.5vw;
     position: relative;
 }
 
-.card-area .card img {
+.card-area .card .card-image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    background-size: contain;
+}
+
+.card-area .card .beton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+}
+
+.card-area .card .faction-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+}
+
+.card-area .card .position-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+}
+
+.card-area .card .power-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+}
+
+.card-area .card .points {
+    position: absolute;
+    top: 3.75vh; /* 81px / 2160 * 100 */
+    left: 1.95vw; /* 75px / 3840 * 100 */
+    color: #fff;
+    font-size: 1vw;
+    text-align: center;
+}
+
+.card-area .card .hero-icon {
+    position: absolute;
+    top: -0.43vh; /* -23px / 2160 * 100 */
+    left: -0.60vw; /* -23px / 3840 * 100 */
+    width: 8.07vw; /* 310px / 3840 * 100 */
+    height: 37.41vh; /* 808px / 2160 * 100 */
+    background: url('assets/dkarty/bohater.webp') no-repeat;
+    background-size: contain;
+}
+
+.card-area .card .name {
+    position: absolute;
+    top: 35.09vh; /* 758px / 2160 * 100 */
+    left: 3.02vw; /* 116px / 3840 * 100 */
+    width: 10.23vw; /* (509-116)px / 3840 * 100 */
+    height: 5.69vh; /* (881-758)px / 2160 * 100 */
+    color: #fff;
+    font-size: 1vw;
+    text-align: center;
 }
 
 .stats {
     position: absolute;
-    top: 60vh;
-    left: 75vw;
+    top: 53.33vh; /* 1152px */
+    left: 50.36vw; /* 1934px */
     color: #fff;
     font-family: 'PFDinTextCondPro', sans-serif;
-    font-size: 1vw;
-}
-
-.page-left, .page-right {
-    position: absolute;
-    cursor: pointer;
+    font-size: 0.8vw;
 }
 
 .page-left {
-    top: 8vh;
-    left: 75vw;
-    width: 2.5vw;
-    height: 2.2vh;
+    position: absolute;
+    top: 7.18vh; /* 155px */
+    left: 37.81vw; /* 1452px */
+    width: 1.27vw; /* 49px / 3840 * 100 */
+    height: 1.99vh; /* 43px / 2160 * 100 */
     background: url('assets/wybor/wlewo.webp');
     background-size: contain;
+    cursor: pointer;
 }
 
 .page-right {
-    top: 8vh;
-    left: 85vw;
-    width: 2.5vw;
-    height: 2.2vh;
+    position: absolute;
+    top: 7.13vh; /* 154px */
+    left: 60.83vw; /* 2336px */
+    width: 1.27vw;
+    height: 1.99vh;
     background: url('assets/wybor/wprawo.webp');
     background-size: contain;
+    cursor: pointer;
 }
 
 .page-indicators {
     position: absolute;
-    top: 10vh;
-    left: 80vw;
+    top: 9.63vh; /* 208px */
+    left: 48.18vw; /* 1850px */
     display: flex;
 }
 
 .page-dot {
-    width: 1.3vw;
-    height: 1.1vh;
-    margin-right: 0.5vw;
+    width: 0.65vw; /* 25px / 3840 * 100 */
+    height: 1.02vh; /* 22px / 2160 * 100 */
+    margin-right: 0.26vw;
     background: url('assets/wybor/strona.webp');
     background-size: contain;
     cursor: pointer;
@@ -196,7 +269,7 @@ body {
 
 .faction-name {
     position: absolute;
-    top: 10vh;
+    top: 9.63vh; /* 208px */
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
@@ -206,15 +279,15 @@ body {
 
 .faction-shield {
     position: absolute;
-    top: 10vh;
-    left: 70vw;
-    width: 2.5vw;
-    height: 2.5vh;
+    top: 9.63vh; /* 208px */
+    left: 46.88vw; /* 1800px */
+    width: 2.76vw; /* 106px / 3840 * 100 */
+    height: 5.09vh; /* 110px / 2160 * 100 */
 }
 
 .faction-ability {
     position: absolute;
-    top: 12vh;
+    top: 11.11vh; /* 240px */
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
@@ -223,10 +296,10 @@ body {
 
 .leader-card {
     position: absolute;
-    top: 28vh;
-    left: 70vw;
-    width: 13vw;
-    height: 25vh;
+    top: 24.95vh; /* 539px */
+    left: 46.67vw; /* 1792px */
+    width: 6.74vw; /* 259px / 3840 * 100 */
+    height: 22.69vh; /* 490px / 2160 * 100 */
     background: url('assets/dkarty/beton.webp');
     background-size: contain;
 }
@@ -247,43 +320,4 @@ body {
     text-align: center;
     padding: 2vh;
     font-size: 1.5vw;
-}
-
-/* Skalowanie dla mniejszych ekranów */
-@media (max-width: 1366px) {
-    .card-area.collection {
-        width: 50vw;
-        left: 15vw;
-    }
-    .card-area.deck {
-        width: 50vw;
-        left: 65vw;
-    }
-    .stats {
-        left: 65vw;
-        font-size: 0.8vw;
-    }
-    .card-area .card {
-        width: 10vw;
-        height: 18.5vh;
-    }
-}
-
-@media (max-width: 768px) {
-    .card-area.collection {
-        width: 70vw;
-        left: 10vw;
-    }
-    .card-area.deck {
-        width: 70vw;
-        left: 80vw;
-    }
-    .stats {
-        left: 60vw;
-        font-size: 0.6vw;
-    }
-    .card-area .card {
-        width: 8vw;
-        height: 14.8vh;
-    }
 }
