@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageDots = document.querySelectorAll('.page-dot');
     const hoverSound = document.getElementById('hoverSound');
     let currentPage = 1;
-    const GUI_WIDTH = 3840;
+    const GUI_WIDTH = 3840; // Rozmiar tła gui.webp
     const GUI_HEIGHT = 2160;
 
     const factions = [
@@ -32,87 +32,90 @@ document.addEventListener('DOMContentLoaded', () => {
         const scaleY = overlayHeight / GUI_HEIGHT;
 
         // Przyciski kolekcji
-        document.querySelector('.button.collection.all').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.all').style.height = `${80 * scaleY}px`;
+        const buttonWidth = 97 * scaleX;
+        const buttonHeight = 80 * scaleY;
+
+        document.querySelector('.button.collection.all').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.all').style.height = `${buttonHeight}px`;
         document.querySelector('.button.collection.all').style.left = `${overlayLeft + 373 * scaleX}px`;
         document.querySelector('.button.collection.all').style.top = `${overlayTop + 354 * scaleY}px`;
         document.querySelector('.button.collection.all').style.backgroundImage = `url('assets/wybor/all.webp')`;
 
-        document.querySelector('.button.collection.mecz').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.mecz').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.collection.mecz').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.mecz').style.height = `${buttonHeight}px`;
         document.querySelector('.button.collection.mecz').style.left = `${overlayLeft + 549 * scaleX}px`;
         document.querySelector('.button.collection.mecz').style.top = `${overlayTop + 356 * scaleY}px`;
         document.querySelector('.button.collection.mecz').style.backgroundImage = `url('assets/wybor/mecz.webp')`;
 
-        document.querySelector('.button.collection.lok').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.lok').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.collection.lok').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.lok').style.height = `${buttonHeight}px`;
         document.querySelector('.button.collection.lok').style.left = `${overlayLeft + 765 * scaleX}px`;
-        document.querySelector('.button.collection.lok').style.top = `${overlayTop + 415 * scaleY}px`;
+        document.querySelector('.button.collection.lok').style.top = `${overlayTop + 355 * scaleY}px`; // Poprawione z 415 na 355
         document.querySelector('.button.collection.lok').style.backgroundImage = `url('assets/wybor/lok.webp')`;
 
-        document.querySelector('.button.collection.obl').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.obl').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.collection.obl').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.obl').style.height = `${buttonHeight}px`;
         document.querySelector('.button.collection.obl').style.left = `${overlayLeft + 916 * scaleX}px`;
         document.querySelector('.button.collection.obl').style.top = `${overlayTop + 355 * scaleY}px`;
         document.querySelector('.button.collection.obl').style.backgroundImage = `url('assets/wybor/kapatulta.webp')`;
 
-        document.querySelector('.button.collection.hero').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.hero').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.collection.hero').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.hero').style.height = `${buttonHeight}px`;
         document.querySelector('.button.collection.hero').style.left = `${overlayLeft + 1098 * scaleX}px`;
         document.querySelector('.button.collection.hero').style.top = `${overlayTop + 356 * scaleY}px`;
         document.querySelector('.button.collection.hero').style.backgroundImage = `url('assets/wybor/boharer.webp')`;
 
-        document.querySelector('.button.collection.pogoda').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.pogoda').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.collection.pogoda').style.left = `${overlayLeft + 1277 * scaleX}px`; // Poprawiona pozycja z 1278 na 1277
+        document.querySelector('.button.collection.pogoda').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.pogoda').style.height = `${buttonHeight}px`;
+        document.querySelector('.button.collection.pogoda').style.left = `${overlayLeft + 1277 * scaleX}px`;
         document.querySelector('.button.collection.pogoda').style.top = `${overlayTop + 351 * scaleY}px`;
         document.querySelector('.button.collection.pogoda').style.backgroundImage = `url('assets/wybor/pogoda.webp')`;
 
-        document.querySelector('.button.collection.specjalne').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.collection.specjalne').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.collection.specjalne').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.collection.specjalne').style.height = `${buttonHeight}px`;
         document.querySelector('.button.collection.specjalne').style.left = `${overlayLeft + 1459 * scaleX}px`;
         document.querySelector('.button.collection.specjalne').style.top = `${overlayTop + 361 * scaleY}px`;
         document.querySelector('.button.collection.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
         // Przyciski talii
-        document.querySelector('.button.deck.all').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.all').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.all').style.left = `${overlayLeft + 2297 * scaleX}px`; // Poprawiona pozycja z 2299 na 2297
+        document.querySelector('.button.deck.all').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.all').style.height = `${buttonHeight}px`;
+        document.querySelector('.button.deck.all').style.left = `${overlayLeft + 2297 * scaleX}px`;
         document.querySelector('.button.deck.all').style.top = `${overlayTop + 354 * scaleY}px`;
         document.querySelector('.button.deck.all').style.backgroundImage = `url('assets/wybor/all.webp')`;
 
-        document.querySelector('.button.deck.mecz').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.mecz').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.mecz').style.left = `${overlayLeft + 2473 * scaleX}px`; // Poprawiona pozycja z 2471 na 2473
+        document.querySelector('.button.deck.mecz').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.mecz').style.height = `${buttonHeight}px`;
+        document.querySelector('.button.deck.mecz').style.left = `${overlayLeft + 2473 * scaleX}px`;
         document.querySelector('.button.deck.mecz').style.top = `${overlayTop + 356 * scaleY}px`;
         document.querySelector('.button.deck.mecz').style.backgroundImage = `url('assets/wybor/mecz.webp')`;
 
-        document.querySelector('.button.deck.lok').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.lok').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.deck.lok').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.lok').style.height = `${buttonHeight}px`;
         document.querySelector('.button.deck.lok').style.left = `${overlayLeft + 2679 * scaleX}px`;
-        document.querySelector('.button.deck.lok').style.top = `${overlayTop + 415 * scaleY}px`;
+        document.querySelector('.button.deck.lok').style.top = `${overlayTop + 355 * scaleY}px`;
         document.querySelector('.button.deck.lok').style.backgroundImage = `url('assets/wybor/lok.webp')`;
 
-        document.querySelector('.button.deck.obl').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.obl').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.deck.obl').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.obl').style.height = `${buttonHeight}px`;
         document.querySelector('.button.deck.obl').style.left = `${overlayLeft + 2840 * scaleX}px`;
         document.querySelector('.button.deck.obl').style.top = `${overlayTop + 355 * scaleY}px`;
         document.querySelector('.button.deck.obl').style.backgroundImage = `url('assets/wybor/kapatulta.webp')`;
 
-        document.querySelector('.button.deck.hero').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.hero').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.hero').style.left = `${overlayLeft + 3022 * scaleX}px`; // Poprawiona pozycja z 3023 na 3022
+        document.querySelector('.button.deck.hero').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.hero').style.height = `${buttonHeight}px`;
+        document.querySelector('.button.deck.hero').style.left = `${overlayLeft + 3022 * scaleX}px`;
         document.querySelector('.button.deck.hero').style.top = `${overlayTop + 356 * scaleY}px`;
         document.querySelector('.button.deck.hero').style.backgroundImage = `url('assets/wybor/boharer.webp')`;
 
-        document.querySelector('.button.deck.pogoda').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.pogoda').style.height = `${80 * scaleY}px`;
-        document.querySelector('.button.deck.pogoda').style.left = `${overlayLeft + 3201 * scaleX}px`; // Poprawiona pozycja z 3202 na 3201
+        document.querySelector('.button.deck.pogoda').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.pogoda').style.height = `${buttonHeight}px`;
+        document.querySelector('.button.deck.pogoda').style.left = `${overlayLeft + 3201 * scaleX}px`;
         document.querySelector('.button.deck.pogoda').style.top = `${overlayTop + 351 * scaleY}px`;
         document.querySelector('.button.deck.pogoda').style.backgroundImage = `url('assets/wybor/pogoda.webp')`;
 
-        document.querySelector('.button.deck.specjalne').style.width = `${97 * scaleX}px`;
-        document.querySelector('.button.deck.specjalne').style.height = `${80 * scaleY}px`;
+        document.querySelector('.button.deck.specjalne').style.width = `${buttonWidth}px`;
+        document.querySelector('.button.deck.specjalne').style.height = `${buttonHeight}px`;
         document.querySelector('.button.deck.specjalne').style.left = `${overlayLeft + 3380 * scaleX}px`;
         document.querySelector('.button.deck.specjalne').style.top = `${overlayTop + 361 * scaleY}px`;
         document.querySelector('.button.deck.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;

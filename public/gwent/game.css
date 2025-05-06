@@ -168,13 +168,13 @@ body {
 
 .faction-shield {
     object-fit: contain;
-    margin-right: 1vw;
+    margin-right: 10px;
 }
 
 .faction-name {
     color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-right: 1vw;
+    margin-right: 10px;
 }
 
 .faction-ability {
@@ -204,5 +204,5 @@ body {
 .game-content {
     color: #fff;
     text-align: center;
-    padding: 2vh;
+    padding: 20px;
 }
