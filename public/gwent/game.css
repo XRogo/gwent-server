@@ -166,28 +166,32 @@ body {
 
 .faction-info {
     position: absolute;
-    text-align: center; /* Wyśrodkowanie tekstu w pionie */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.faction-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .faction-shield {
     object-fit: contain;
-    display: block; /* Tarcza jako osobny blok */
-    margin: 0 auto; /* Wyśrodkowanie tarczy */
 }
 
 .faction-name {
     color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    display: block; /* Nazwa jako osobny blok */
-    margin: 0 auto;
+    margin-left: 10px; /* Odstęp między tarczą a nazwą */
 }
 
 .faction-ability {
     color: #fff;
-    display: block; /* Opis jako osobny blok */
-    margin: 0 auto;
-    max-width: 600px; /* Ograniczenie szerokości opisu */
-    white-space: normal; /* Zezwalamy na zawijanie tekstu */
+    max-width: 600px;
+    white-space: normal;
 }
 
 .leader-card {
