@@ -195,7 +195,6 @@ body {
 
 .faction-ability {
     color: #b48b42; /* Nowy kolor */
-    max-width: 600px;
     white-space: normal;
     text-align: center;
     margin: 0;
