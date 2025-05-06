@@ -63,7 +63,7 @@ body {
 }
 
 .button.active {
-    opacity: 1; /* Aktywny przycisk jest widoczny (podświetlony) */
+    opacity: 1;
 }
 
 .card-area {
@@ -166,23 +166,28 @@ body {
 
 .faction-info {
     position: absolute;
-    display: flex;
-    align-items: center;
+    text-align: center; /* Wyśrodkowanie tekstu w pionie */
 }
 
 .faction-shield {
     object-fit: contain;
-    margin-right: 10px;
+    display: block; /* Tarcza jako osobny blok */
+    margin: 0 auto; /* Wyśrodkowanie tarczy */
 }
 
 .faction-name {
     color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-right: 10px;
+    display: block; /* Nazwa jako osobny blok */
+    margin: 0 auto;
 }
 
 .faction-ability {
     color: #fff;
+    display: block; /* Opis jako osobny blok */
+    margin: 0 auto;
+    max-width: 600px; /* Ograniczenie szerokości opisu */
+    white-space: normal; /* Zezwalamy na zawijanie tekstu */
 }
 
 .leader-card {
