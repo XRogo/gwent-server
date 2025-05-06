@@ -7,10 +7,8 @@
     <link rel="stylesheet" href="game.css">
 </head>
 <body>
-    <!-- Dźwięk -->
     <audio id="hoverSound" src="assets/sounds/hover.mp3"></audio>
 
-    <!-- Ekran startowy z animacją pisania -->
     <div id="startScreen" class="screen">
         <div class="typing-effect">
             <p id="typingText">Cześć! Pracowaliśmy nad tym projektem przez ostatnie 40 godzin...</p>
@@ -18,12 +16,10 @@
         <button id="startButton">Rozpocznij grę</button>
     </div>
 
-    <!-- Ekran wyboru kart -->
     <div id="cardSelectionScreen" class="screen" style="display: none;">
         <div class="background"></div>
         <div class="overlay"></div>
         <div class="content">
-            <!-- Przyciski filtrów kolekcji -->
             <div class="button collection all" data-filter="all"></div>
             <div class="button collection mecz" data-filter="miecz"></div>
             <div class="button collection lok" data-filter="luk"></div>
@@ -32,7 +28,6 @@
             <div class="button collection pogoda" data-filter="pogoda"></div>
             <div class="button collection specjalne" data-filter="specjalne"></div>
 
-            <!-- Przyciski filtrów talii -->
             <div class="button deck all" data-filter="all"></div>
             <div class="button deck mecz" data-filter="miecz"></div>
             <div class="button deck lok" data-filter="luk"></div>
@@ -41,26 +36,20 @@
             <div class="button deck pogoda" data-filter="pogoda"></div>
             <div class="button deck specjalne" data-filter="specjalne"></div>
 
-            <!-- Obszar kolekcji kart -->
             <div class="card-area collection"></div>
-
-            <!-- Obszar talii -->
             <div class="card-area deck"></div>
 
-            <!-- Statystyki talii -->
             <div class="stats">
-                <p class="total-cards">Wszystkie karty w talii: 0</p>
-                <p class="unit-cards">Liczba kart jednostek: 0/22</p>
-                <p class="special-cards">Karty specjalne: 0/10</p>
-                <p class="total-strength">Całkowita siła jednostek: 0</p>
-                <p class="hero-cards">Karty bohaterów: 0</p>
+                <p class="total-cards">0</p>
+                <p class="unit-cards">0/22</p>
+                <p class="special-cards">0/10</p>
+                <p class="total-strength">0</p>
+                <p class="hero-cards">0</p>
             </div>
 
-            <!-- Przyciski przewijania stron -->
             <div class="page-left"></div>
             <div class="page-right"></div>
 
-            <!-- Znaczniki stron -->
             <div class="page-indicators">
                 <div class="page-dot active" data-page="1"></div>
                 <div class="page-dot" data-page="2"></div>
@@ -69,22 +58,17 @@
                 <div class="page-dot" data-page="5"></div>
             </div>
 
-            <!-- Informacje o frakcji -->
             <div class="faction-info">
+                <img class="faction-shield" src="" alt="Tarcza frakcji">
                 <div class="faction-name"></div>
                 <p class="faction-ability"></p>
-                <img class="faction-shield" src="" alt="Tarcza frakcji">
             </div>
 
-            <!-- Karta przywódcy -->
             <div class="leader-card"></div>
-
-            <!-- Przycisk przejścia do gry -->
             <button id="goToGameButton">Przejdź do gry</button>
         </div>
     </div>
 
-    <!-- Ekran gry (plansza) -->
     <div id="gameScreen" class="screen" style="display: none;">
         <div class="game-content">
             <h2>Stan gry</h2>

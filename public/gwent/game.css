@@ -17,7 +17,6 @@ body {
     font-family: 'PFDinTextCondPro', sans-serif;
 }
 
-/* Ekran startowy */
 #startScreen {
     display: flex;
     flex-direction: column;
@@ -52,20 +51,19 @@ body {
     cursor: pointer;
 }
 
-/* Ekran wyboru kart */
 .background {
     position: absolute;
     width: 100%;
     height: 100%;
     background: url('assets/wybor/hmory.webp') repeat-x;
-    background-size: 50% auto;
+    background-size: 100% auto;
     animation: moveBackground 192s linear infinite;
     z-index: 1;
 }
 
-@keyframes moveBackground {
+@keyframes-moveBackground {
     0% { background-position: 0 0; }
-    100% { background-position: -200% 0; }
+    100% { background-position: -3840px 0; }
 }
 
 .overlay {
@@ -84,39 +82,36 @@ body {
     z-index: 3;
 }
 
-/* Przyciski sortowania */
 .button {
     position: absolute;
-    width: 2.53vw; /* 97px / 3840 * 100 */
-    height: 3.7vh; /* 80px / 2160 * 100 */
+    width: 2.53vw;
+    height: 3.7vh;
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
-    opacity: 0; /* Domyślnie niewidoczne */
+    opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .button:hover {
-    opacity: 1; /* Widoczne przy najechaniu */
+    opacity: 1;
 }
 
-/* Kolekcja - poprawione pozycje */
-.button.collection.all { top: 16.39vh; left: 9.71vw; background-image: url('assets/wybor/all.webp'); } /* 354px, 373px */
-.button.collection.mecz { top: 16.48vh; left: 14.30vw; background-image: url('assets/wybor/mecz.webp'); } /* 356px, 549px */
-.button.collection.lok { top: 19.21vh; left: 19.92vw; background-image: url('assets/wybor/lok.webp'); } /* 415px, 765px */
-.button.collection.obl { top: 16.44vh; left: 23.85vw; background-image: url('assets/wybor/kapatulta.webp'); } /* 355px, 916px */
-.button.collection.hero { top: 16.48vh; left: 28.59vw; background-image: url('assets/wybor/boharer.webp'); } /* 356px, 1098px */
-.button.collection.pogoda { top: 16.25vh; left: 33.26vw; background-image: url('assets/wybor/pogoda.webp'); } /* 351px, 1277px */
-.button.collection.specjalne { top: 16.71vh; left: 37.97vw; background-image: url('assets/wybor/inne.webp'); } /* 361px, 1459px */
+.button.collection.all { top: 16.39vh; left: 9.71vw; background-image: url('assets/wybor/all.webp'); }
+.button.collection.mecz { top: 16.48vh; left: 14.30vw; background-image: url('assets/wybor/mecz.webp'); }
+.button.collection.lok { top: 19.21vh; left: 19.92vw; background-image: url('assets/wybor/lok.webp'); }
+.button.collection.obl { top: 16.44vh; left: 23.85vw; background-image: url('assets/wybor/kapatulta.webp'); }
+.button.collection.hero { top: 16.48vh; left: 28.59vw; background-image: url('assets/wybor/boharer.webp'); }
+.button.collection.pogoda { top: 16.25vh; left: 33.26vw; background-image: url('assets/wybor/pogoda.webp'); }
+.button.collection.specjalne { top: 16.71vh; left: 37.97vw; background-image: url('assets/wybor/inne.webp'); }
 
-/* Talia */
-.button.deck.all { top: 16.39vh; left: 59.84vw; background-image: url('assets/wybor/all.webp'); } /* 354px, 2297px */
-.button.deck.mecz { top: 16.48vh; left: 64.35vw; background-image: url('assets/wybor/mecz.webp'); } /* 356px, 2473px */
-.button.deck.lok { top: 19.21vh; left: 69.77vw; background-image: url('assets/wybor/lok.webp'); } /* 415px, 2679px */
-.button.deck.obl { top: 16.44vh; left: 73.96vw; background-image: url('assets/wybor/kapatulta.webp'); } /* 355px, 2840px */
-.button.deck.hero { top: 16.48vh; left: 78.70vw; background-image: url('assets/wybor/boharer.webp'); } /* 356px, 3022px */
-.button.deck.pogoda { top: 16.25vh; left: 83.36vw; background-image: url('assets/wybor/pogoda.webp'); } /* 351px, 3201px */
-.button.deck.specjalne { top: 16.71vh; left: 88.02vw; background-image: url('assets/wybor/inne.webp'); } /* 361px, 3380px */
+.button.deck.all { top: 16.39vh; left: 59.84vw; background-image: url('assets/wybor/all.webp'); }
+.button.deck.mecz { top: 16.48vh; left: 64.35vw; background-image: url('assets/wybor/mecz.webp'); }
+.button.deck.lok { top: 19.21vh; left: 69.77vw; background-image: url('assets/wybor/lok.webp'); }
+.button.deck.obl { top: 16.44vh; left: 73.96vw; background-image: url('assets/wybor/kapatulta.webp'); }
+.button.deck.hero { top: 16.48vh; left: 78.70vw; background-image: url('assets/wybor/boharer.webp'); }
+.button.deck.pogoda { top: 16.25vh; left: 83.36vw; background-image: url('assets/wybor/pogoda.webp'); }
+.button.deck.specjalne { top: 16.71vh; left: 88.02vw; background-image: url('assets/wybor/inne.webp'); }
 
 .card-area {
     position: absolute;
@@ -141,9 +136,9 @@ body {
 
 .card-area .card {
     width: 9.11vw;
-    height: 34.77vh;
+    height: 17.26vh;
     display: inline-block;
-    margin: 0.5vw;
+    margin: 0.25vw;
     position: relative;
 }
 
@@ -192,35 +187,46 @@ body {
     background-size: contain;
 }
 
+.card-area .card .points-bg {
+    position: absolute;
+    top: 8.15%;
+    left: 14.31%;
+    width: 20%;
+    height: 10%;
+    background: url('assets/dkarty/punkty.webp') no-repeat;
+    background-size: contain;
+}
+
 .card-area .card .points {
     position: absolute;
-    top: 3.75vh;
-    left: 1.95vw;
+    top: 8.15%;
+    left: 14.31%;
     color: #fff;
     font-size: 1vw;
     text-align: center;
+    z-index: 1;
 }
 
 .card-area .card .hero-icon {
     position: absolute;
-    top: -0.43vh; /* -23px / 2160 * 100 */
-    left: -0.60vw; /* -23px / 3840 * 100 */
-    width: 59.35%; /* 310px / 524px (proporcja do karty) */
-    height: 81.37%; /* 808px / 993px (proporcja do karty) */
+    top: -4.38%;
+    left: -4.38%;
+    width: 59.16%;
+    height: 81.37%;
     background: url('assets/dkarty/bohater.webp') no-repeat;
     background-size: contain;
 }
 
 .card-area .card .name {
     position: absolute;
-    top: 76.33%; /* 758px / 993px */
-    left: 22.14%; /* 116px / 524px */
-    width: 75.00%; /* (509-116)px / 524px */
-    height: 12.39%; /* (881-758)px / 993px */
-    color: #fff;
-    font-size: 1vw;
+    top: 76.33%;
+    left: 22.14%;
+    width: 75%;
+    height: 12.39%;
+    color: #000;
+    font-size: 0.8vw;
     text-align: center;
-    line-height: 12.39%; /* Dopasowanie do wysokości */
+    line-height: 12.39%;
 }
 
 .stats {
@@ -232,26 +238,30 @@ body {
     font-size: 0.8vw;
 }
 
-.page-left {
+.page-left, .page-right {
     position: absolute;
-    top: 7.18vh;
-    left: 37.81vw;
     width: 1.27vw;
     height: 1.99vh;
-    background: url('assets/wybor/wlewo.webp');
-    background-size: contain;
     cursor: pointer;
+    background-size: contain;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.page-left:hover, .page-right:hover {
+    opacity: 1;
+}
+
+.page-left {
+    top: 7.18vh;
+    left: 37.81vw;
+    background-image: url('assets/wybor/wlewo.webp');
 }
 
 .page-right {
-    position: absolute;
     top: 7.13vh;
     left: 60.83vw;
-    width: 1.27vw;
-    height: 1.99vh;
-    background: url('assets/wybor/wprawo.webp');
-    background-size: contain;
-    cursor: pointer;
+    background-image: url('assets/wybor/wprawo.webp');
 }
 
 .page-indicators {
@@ -268,40 +278,40 @@ body {
     background: url('assets/wybor/strona.webp');
     background-size: contain;
     cursor: pointer;
+    opacity: 0.5;
 }
 
 .page-dot.active {
+    opacity: 1;
     filter: brightness(1.5);
 }
 
 .faction-info {
     position: absolute;
-    top: 9.63vh;
+    top: 8vh;
     left: 50%;
     transform: translateX(-50%);
-    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.faction-shield {
+    width: 2.76vw;
+    height: 5.09vh;
+    object-fit: contain;
+    margin-right: 1vw;
 }
 
 .faction-name {
     color: #fff;
-    font-size: clamp(1vw, 1.5vw, 2vw); /* Skalowanie nazwy */
+    font-size: clamp(1vw, 1.5vw, 2vw);
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-bottom: 0.5vh;
+    margin-right: 1vw;
 }
 
 .faction-ability {
     color: #fff;
-    font-size: clamp(0.8vw, 1vw, 1.2vw); /* Skalowanie opisu */
-    margin-bottom: 0.5vh;
-}
-
-.faction-shield {
-    position: absolute;
-    top: 0;
-    left: calc(50% + 10vw); /* Przesunięcie na prawo od napisów */
-    width: 2.76vw;
-    height: 5.09vh;
-    object-fit: contain; /* Zachowanie proporcji */
+    font-size: clamp(0.8vw, 1vw, 1.2vw);
 }
 
 .leader-card {
@@ -324,7 +334,6 @@ body {
     cursor: pointer;
 }
 
-/* Ekran gry */
 .game-content {
     color: #fff;
     text-align: center;
