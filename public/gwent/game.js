@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-name').style.fontSize = `${Math.min(40 * scale, 60 * scale)}px`; // Większa czcionka dla nazwy
         document.querySelector('.faction-name').style.marginTop = `${(174 - 110) * scale}px`; // Pozycja nazwy: 174 px - wysokość tarczy (110 px)
 
-        document.querySelector('.faction-ability').style.fontSize = `${Math.min(24 * scale, 36 * scale)}px`; // Większa czcionka dla opisu
+        document.querySelector('.faction-ability').style.fontSize = `${Math.min(24 * scale, 36 * scale)}px`; // Większa czcionka dla opisu, aby lepiej pasowała do zakresu 254-298 px
         document.querySelector('.faction-ability').style.marginTop = `${(276 - 174 - 40) * scale}px`; // Pozycja opisu: 276 px - pozycja nazwy (174 px) - przybliżona wysokość nazwy (40 px)
 
         // Karta lidera
