@@ -28,10 +28,10 @@ body {
 }
 
 .typing-effect {
-    font-size: 24px;
+    font-size: 2vw;
     overflow: hidden;
     white-space: nowrap;
-    border-right: 2px solid #fff;
+    border-right: 0.2vw solid #fff;
     animation: typing 4s steps(40, end), blink-caret 0.75s step-end infinite;
 }
 
@@ -46,9 +46,9 @@ body {
 }
 
 #startButton {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 18px;
+    margin-top: 2vh;
+    padding: 1vh 2vw;
+    font-size: 1.5vw;
     cursor: pointer;
 }
 
@@ -71,7 +71,7 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/gui.webp') no-repeat center;
-    background-size: cover;
+    background-size: 100% 100%;
 }
 
 .content {
@@ -82,57 +82,72 @@ body {
 
 .button {
     position: absolute;
-    width: 97px;
-    height: 80px;
+    width: 5vw;
+    height: 4vh;
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
 }
 
-.button.collection.all { top: 354px; left: 373px; background-image: url('assets/wybor/all.webp'); }
-.button.collection.mecz { top: 356px; left: 549px; background-image: url('assets/wybor/mecz.webp'); }
-/* Pozostałe przyciski musisz dopasować do swoich assetów */
+.button.collection.all { top: 18vh; left: 19vw; background-image: url('assets/wybor/all.webp'); }
+.button.collection.mecz { top: 18vh; left: 28vw; background-image: url('assets/wybor/mecz.webp'); }
+.button.collection.lok { top: 18vh; left: 37vw; }
+.button.collection.obl { top: 18vh; left: 46vw; }
+.button.collection.hero { top: 18vh; left: 55vw; }
+.button.collection.pogoda { top: 18vh; left: 64vw; }
+.button.collection.specjalne { top: 18vh; left: 73vw; }
+
+.button.deck.all { top: 18vh; left: 81vw; background-image: url('assets/wybor/all.webp'); }
+.button.deck.mecz { top: 18vh; left: 90vw; background-image: url('assets/wybor/mecz.webp'); }
+.button.deck.lok { top: 18vh; left: 99vw; }
+.button.deck.obl { top: 18vh; left: 108vw; }
+.button.deck.hero { top: 18vh; left: 117vw; }
+.button.deck.pogoda { top: 18vh; left: 126vw; }
+.button.deck.specjalne { top: 18vh; left: 135vw; }
 
 .card-area {
     position: absolute;
     overflow-y: auto;
-    padding: 10px;
+    padding: 0.5vw;
     box-sizing: border-box;
 }
 
 .card-area.collection {
-    top: 491px;
-    left: 366px;
-    width: 1195px;
-    height: 1449px;
+    top: 25vh;
+    left: 19vw;
+    width: 62vw;
+    height: 75vh;
 }
 
 .card-area.deck {
-    top: 491px;
-    left: 2290px;
-    width: 1194px;
-    height: 1449px;
+    top: 25vh;
+    left: 81vw;
+    width: 62vw;
+    height: 75vh;
+    transform: translateX(-100%);
 }
 
 .card-area .card {
-    width: 150px;
-    height: 200px;
+    width: 12vw;
+    height: 22.5vh;
     display: inline-block;
-    margin: 5px;
+    margin: 0.5vw;
     position: relative;
 }
 
 .card-area .card img {
     width: 100%;
     height: 100%;
+    object-fit: contain;
 }
 
 .stats {
     position: absolute;
-    top: 1152px;
-    left: 1934px;
+    top: 60vh;
+    left: 75vw;
     color: #fff;
     font-family: 'PFDinTextCondPro', sans-serif;
+    font-size: 1vw;
 }
 
 .page-left, .page-right {
@@ -141,33 +156,36 @@ body {
 }
 
 .page-left {
-    top: 155px;
-    left: 1452px;
-    width: 49px;
-    height: 43px;
+    top: 8vh;
+    left: 75vw;
+    width: 2.5vw;
+    height: 2.2vh;
     background: url('assets/wybor/wlewo.webp');
+    background-size: contain;
 }
 
 .page-right {
-    top: 154px;
-    left: 2336px;
-    width: 49px;
-    height: 43px;
+    top: 8vh;
+    left: 85vw;
+    width: 2.5vw;
+    height: 2.2vh;
     background: url('assets/wybor/wprawo.webp');
+    background-size: contain;
 }
 
 .page-indicators {
     position: absolute;
-    top: 208px;
-    left: 1850px;
+    top: 10vh;
+    left: 80vw;
     display: flex;
 }
 
 .page-dot {
-    width: 25px;
-    height: 22px;
-    margin-right: 10px;
+    width: 1.3vw;
+    height: 1.1vh;
+    margin-right: 0.5vw;
     background: url('assets/wybor/strona.webp');
+    background-size: contain;
     cursor: pointer;
 }
 
@@ -177,47 +195,48 @@ body {
 
 .faction-name {
     position: absolute;
-    top: 208px;
+    top: 10vh;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
-    font-size: 24px;
+    font-size: 1.5vw;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
 }
 
 .faction-shield {
     position: absolute;
-    top: 208px;
-    left: 1800px;
-    width: 50px;
-    height: 50px;
+    top: 10vh;
+    left: 70vw;
+    width: 2.5vw;
+    height: 2.5vh;
 }
 
 .faction-ability {
     position: absolute;
-    top: 240px;
+    top: 12vh;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
-    font-size: 18px;
+    font-size: 1vw;
 }
 
 .leader-card {
     position: absolute;
-    top: 539px;
-    left: 1792px;
-    width: 259px;
-    height: 490px;
+    top: 28vh;
+    left: 70vw;
+    width: 13vw;
+    height: 25vh;
     background: url('assets/dkarty/beton.webp');
+    background-size: contain;
 }
 
 #goToGameButton {
     position: absolute;
-    bottom: 20px;
+    bottom: 2vh;
     left: 50%;
     transform: translateX(-50%);
-    padding: 10px 20px;
-    font-size: 18px;
+    padding: 1vh 2vw;
+    font-size: 1.5vw;
     cursor: pointer;
 }
 
@@ -225,12 +244,45 @@ body {
 .game-content {
     color: #fff;
     text-align: center;
-    padding: 20px;
+    padding: 2vh;
+    font-size: 1.5vw;
 }
 
-/* Skalowanie */
+/* Skalowanie dla mniejszych ekranów */
 @media (max-width: 1366px) {
-    .overlay { background-size: contain; }
-    .card-area { width: 50%; }
-    .stats { left: 60%; }
+    .card-area.collection {
+        width: 50vw;
+        left: 15vw;
+    }
+    .card-area.deck {
+        width: 50vw;
+        left: 65vw;
+    }
+    .stats {
+        left: 65vw;
+        font-size: 0.8vw;
+    }
+    .card-area .card {
+        width: 10vw;
+        height: 18.5vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-area.collection {
+        width: 70vw;
+        left: 10vw;
+    }
+    .card-area.deck {
+        width: 70vw;
+        left: 80vw;
+    }
+    .stats {
+        left: 60vw;
+        font-size: 0.6vw;
+    }
+    .card-area .card {
+        width: 8vw;
+        height: 14.8vh;
+    }
 }

@@ -45,7 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.innerHTML = `<img src="${card.karta}" alt="${card.nazwa}">`;
+            let bannerFaction = card.frakcja;
+            if (card.nazwa === "Bies" && playerFaction !== "4") {
+                bannerFaction = playerFaction;
+            }
+            cardElement.innerHTML = `<img src="${card.dkarta}" alt="${card.nazwa}" data-faction="${bannerFaction}">`;
             area.appendChild(cardElement);
         });
     }
