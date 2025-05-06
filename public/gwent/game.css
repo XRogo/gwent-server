@@ -17,40 +17,6 @@ body {
     font-family: 'PFDinTextCondPro', sans-serif;
 }
 
-#startScreen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #fff;
-}
-
-.typing-effect {
-    font-size: 2vw;
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: 0.2vw solid #fff;
-    animation: typing 4s steps(40, end), blink-caret 0.75s step-end infinite;
-}
-
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-}
-
-@keyframes blink-caret {
-    from, to { border-color: transparent; }
-    50% { border-color: #fff; }
-}
-
-#startButton {
-    margin-top: 2vh;
-    padding: 1vh 2vw;
-    font-size: 1.5vw;
-    cursor: pointer;
-}
-
 .background {
     position: absolute;
     width: 100%;
@@ -71,7 +37,8 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/gui.webp') no-repeat center;
-    background-size: cover;
+    background-size: contain; /* Zmienione z cover na contain */
+    background-position: center;
     z-index: 2;
 }
 
@@ -84,8 +51,8 @@ body {
 
 .button {
     position: absolute;
-    width: 2.53vw; /* 97px / 3840 * 100 */
-    height: 3.7vh; /* 80px / 2160 * 100 */
+    width: 2.53vw;
+    height: 3.7vh;
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
@@ -135,8 +102,8 @@ body {
 }
 
 .card-area .card {
-    width: 9.11vw; /* 350px / 3840 * 100 */
-    height: 33.47vh; /* 723px / 2160 * 100 */
+    width: 9.11vw;
+    height: 33.47vh;
     display: inline-block;
     margin: 0.25vw;
     position: relative;
@@ -189,10 +156,10 @@ body {
 
 .card-area .card .points-bg {
     position: absolute;
-    top: 4.43%; /* 44px / 993px */
-    left: 5.34%; /* 28px / 524px */
-    width: 17.94%; /* (122-28)px / 524px */
-    height: 6.34%; /* (107-44)px / 993px */
+    top: 4.43%;
+    left: 5.34%;
+    width: 17.94%;
+    height: 6.34%;
     background: url('assets/dkarty/punkty.webp') no-repeat;
     background-size: contain;
 }

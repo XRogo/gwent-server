@@ -1,7 +1,6 @@
 import cards from './cards.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const startScreen = document.getElementById('startScreen');
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
     const gameScreen = document.getElementById('gameScreen');
     const collectionArea = document.querySelector('.card-area.collection');
@@ -17,11 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zachowujesz losową kartę po każdej rundzie." },
         { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "Wskrzesza 2 losowe karty w trzeciej rundzie." },
     ];
-
-    document.getElementById('startButton').addEventListener('click', () => {
-        startScreen.style.display = 'none';
-        cardSelectionScreen.style.display = 'block';
-    });
 
     document.getElementById('goToGameButton').addEventListener('click', () => {
         cardSelectionScreen.style.display = 'none';
