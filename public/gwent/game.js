@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('.button.collection.lok').style.width = `${buttonWidth}px`;
         document.querySelector('.button.collection.lok').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.collection.lok').style.left = `${backgroundLeft + 735 * scale}px`; // Poprawione z 765 na 735
+        document.querySelector('.button.collection.lok').style.left = `${backgroundLeft + 735 * scale}px`;
         document.querySelector('.button.collection.lok').style.top = `${backgroundTop + 355 * scale}px`;
         document.querySelector('.button.collection.lok').style.backgroundImage = `url('assets/wybor/lok.webp')`;
 
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('.button.deck.lok').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.lok').style.height = `${buttonHeight}px`;
-        document.querySelector('.button.deck.lok').style.left = `${backgroundLeft + 2659 * scale}px`; // Poprawione z 2679 na 2659
+        document.querySelector('.button.deck.lok').style.left = `${backgroundLeft + 2659 * scale}px`;
         document.querySelector('.button.deck.lok').style.top = `${backgroundTop + 355 * scale}px`;
         document.querySelector('.button.deck.lok').style.backgroundImage = `url('assets/wybor/lok.webp')`;
 
@@ -296,11 +296,25 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePositionsAndScaling();
     }
 
-    displayCards('all', collectionArea, factions[0].id);
+    // Ustaw domyślnie aktywny tryb "all" dla obu sekcji
+    document.querySelector('.button.collection.all').classList.add('active');
+    document.querySelector('.button.deck.all').classList.add('active');
 
+    // Dodaj obsługę kliknięcia dla przycisków sortowania
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', () => {
             const area = button.classList.contains('collection') ? collectionArea : deckArea;
+            const section = button.classList.contains('collection') ? 'collection' : 'deck';
+
+            // Usuń klasę .active z obecnie aktywnego przycisku w tej sekcji
+            document.querySelectorAll(`.button.${section}`).forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Dodaj klasę .active do klikniętego przycisku
+            button.classList.add('active');
+
+            // Wyświetl karty z nowym filtrem
             displayCards(button.dataset.filter, area, factions[currentPage - 1].id);
         });
     });
@@ -321,7 +335,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').src = faction.shield;
         document.querySelector('.faction-ability').textContent = faction.ability;
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
+
+        // Po zmianie frakcji, ustaw domyślny filtr na "all" i podświetl odpowiedni przycisk
+        document.querySelectorAll('.button.collection').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.button.deck').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('.button.collection.all').classList.add('active');
+        document.querySelector('.button.deck.all').classList.add('active');
         displayCards('all', collectionArea, faction.id);
+        displayCards('all', deckArea, faction.id);
     }
 
     function updateStats() {
@@ -331,6 +352,10 @@ document.addEventListener('DOMContentLoaded', () => {
         stats.querySelector('.total-strength').textContent = '0';
         stats.querySelector('.hero-cards').textContent = '0';
     }
+
+    // Początkowe wyświetlenie kart z domyślnym filtrem "all"
+    displayCards('all', collectionArea, factions[0].id);
+    displayCards('all', deckArea, factions[0].id);
 
     updatePage();
     updateStats();

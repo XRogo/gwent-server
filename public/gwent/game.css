@@ -62,6 +62,10 @@ body {
     opacity: 1;
 }
 
+.button.active {
+    opacity: 1; /* Aktywny przycisk jest widoczny (podświetlony) */
+}
+
 .card-area {
     position: absolute;
     overflow-y: auto;
