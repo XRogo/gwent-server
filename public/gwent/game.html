@@ -3,67 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wybór kart - Gwint</title>
+    <title>Gwint</title>
     <link rel="stylesheet" href="game.css">
 </head>
 <body>
-    <div class="background"></div>
-    <div class="overlay"></div>
-    <div class="content">
-        <!-- Przyciski filtrów kolekcji -->
-        <div class="button collection all" data-filter="all" style="top: 354px; left: 373px;"></div>
-        <div class="button collection mecz" data-filter="miecz" style="top: 356px; left: 549px;"></div>
-        <div class="button collection lok" data-filter="luk" style="top: 415px; left: 765px;"></div>
-        <div class="button collection obl" data-filter="oblezenie" style="top: 355px; left: 916px;"></div>
-        <div class="button collection hero" data-filter="bohater" style="top: 356px; left: 1098px;"></div>
-        <div class="button collection pogoda" data-filter="pogoda" style="top: 351px; left: 1277px;"></div>
-        <div class="button collection inne" data-filter="specjalne" style="top: 361px; left: 1459px;"></div>
-
-        <!-- Przyciski filtrów talii -->
-        <div class="button deck all" data-filter="all" style="top: 354px; left: 2297px;"></div>
-        <div class="button deck mecz" data-filter="miecz" style="top: 356px; left: 2473px;"></div>
-        <div class="button deck lok" data-filter="luk" style="top: 415px; left: 2679px;"></div>
-        <div class="button deck obl" data-filter="oblezenie" style="top: 355px; left: 2840px;"></div>
-        <div class="button deck hero" data-filter="bohater" style="top: 356px; left: 3022px;"></div>
-        <div class="button deck pogoda" data-filter="pogoda" style="top: 351px; left: 3201px;"></div>
-        <div class="button deck inne" data-filter="specjalne" style="top: 361px; left: 3380px;"></div>
-
-        <!-- Obszar kolekcji kart -->
-        <div class="card-area collection" style="top: 491px; left: 366px; width: 1195px; height: 1449px;"></div>
-
-        <!-- Obszar talii -->
-        <div class="card-area deck" style="top: 491px; left: 2290px; width: 1194px; height: 1449px;"></div>
-
-        <!-- Statystyki talii -->
-        <div class="stats" style="top: 1152px; left: 1934px;">
-            <p class="total-cards">Wszystkie karty w talii: 0</p>
-            <p class="unit-cards">Liczba kart jednostek: 0/22</p>
-            <p class="special-cards">Karty specjalne: 0/10</p>
-            <p class="total-strength">Całkowita siła jednostek: 0</p>
-            <p class="hero-cards">Karty bohaterów: 0</p>
+    <!-- Ekran startowy z animacją pisania -->
+    <div id="startScreen" class="screen">
+        <div class="typing-effect">
+            <p id="typingText">Cześć! Pracowaliśmy nad tym projektem przez ostatnie 40 godzin...</p>
         </div>
-
-        <!-- Przyciski przewijania stron -->
-        <div class="page-left" style="top: 155px; left: 1452px;"></div>
-        <div class="page-right" style="top: 154px; left: 2336px;"></div>
-
-        <!-- Znaczniki stron -->
-        <div class="page-indicators" style="top: 208px; left: 1850px;">
-            <div class="page-dot active" data-page="1"></div>
-            <div class="page-dot" data-page="2"></div>
-            <div class="page-dot" data-page="3"></div>
-            <div class="page-dot" data-page="4"></div>
-            <div class="page-dot" data-page="5"></div>
-        </div>
-
-        <!-- Informacje o frakcji -->
-        <div class="faction-name" style="top: 208px;"></div>
-        <img class="faction-shield" src="" alt="Tarcza frakcji" style="top: 208px; left: 1800px;">
-        <p class="faction-ability" style="top: 240px;"></p>
-
-        <!-- Karta przywódcy -->
-        <div class="leader-card" style="top: 539px; left: 1792px;"></div>
+        <button id="startButton">Rozpocznij grę</button>
     </div>
+
+    <!-- Ekran wyboru kart -->
+    <div id="cardSelectionScreen" class="screen" style="display: none;">
+        <div class="background"></div>
+        <div class="overlay"></div>
+        <div class="content">
+            <!-- Przyciski filtrów kolekcji -->
+            <div class="button collection all" data-filter="all"></div>
+            <div class="button collection mecz" data-filter="miecz"></div>
+            <div class="button collection lok" data-filter="luk"></div>
+            <div class="button collection obl" data-filter="oblezenie"></div>
+            <div class="button collection hero" data-filter="bohater"></div>
+            <div class="button collection pogoda" data-filter="pogoda"></div>
+            <div class="button collection specjalne" data-filter="specjalne"></div>
+
+            <!-- Przyciski filtrów talii -->
+            <div class="button deck all" data-filter="all"></div>
+            <div class="button deck mecz" data-filter="miecz"></div>
+            <div class="button deck lok" data-filter="luk"></div>
+            <div class="button deck obl" data-filter="oblezenie"></div>
+            <div class="button deck hero" data-filter="bohater"></div>
+            <div class="button deck pogoda" data-filter="pogoda"></div>
+            <div class="button deck specjalne" data-filter="specjalne"></div>
+
+            <!-- Obszar kolekcji kart -->
+            <div class="card-area collection"></div>
+
+            <!-- Obszar talii -->
+            <div class="card-area deck"></div>
+
+            <!-- Statystyki talii -->
+            <div class="stats">
+                <p class="total-cards">Wszystkie karty w talii: 0</p>
+                <p class="unit-cards">Liczba kart jednostek: 0/22</p>
+                <p class="special-cards">Karty specjalne: 0/10</p>
+                <p class="total-strength">Całkowita siła jednostek: 0</p>
+                <p class="hero-cards">Karty bohaterów: 0</p>
+            </div>
+
+            <!-- Przyciski przewijania stron -->
+            <div class="page-left"></div>
+            <div class="page-right"></div>
+
+            <!-- Znaczniki stron -->
+            <div class="page-indicators">
+                <div class="page-dot active" data-page="1"></div>
+                <div class="page-dot" data-page="2"></div>
+                <div class="page-dot" data-page="3"></div>
+                <div class="page-dot" data-page="4"></div>
+                <div class="page-dot" data-page="5"></div>
+            </div>
+
+            <!-- Informacje o frakcji -->
+            <div class="faction-name"></div>
+            <img class="faction-shield" src="" alt="Tarcza frakcji">
+            <p class="faction-ability"></p>
+
+            <!-- Karta przywódcy -->
+            <div class="leader-card"></div>
+
+            <!-- Przycisk przejścia do gry -->
+            <button id="goToGameButton">Przejdź do gry</button>
+        </div>
+    </div>
+
+    <!-- Ekran gry (plansza) -->
+    <div id="gameScreen" class="screen" style="display: none;">
+        <div class="game-content">
+            <h2>Stan gry</h2>
+            <p>Host: <span id="hostNickname">...</span></p>
+            <p>Przeciwnik: <span id="opponentNickname">...</span></p>
+        </div>
+    </div>
+
     <script src="game.js" type="module"></script>
 </body>
 </html>

@@ -1,21 +1,36 @@
 import cards from './cards.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    const startScreen = document.getElementById('startScreen');
+    const cardSelectionScreen = document.getElementById('cardSelectionScreen');
+    const gameScreen = document.getElementById('gameScreen');
     const collectionArea = document.querySelector('.card-area.collection');
     const deckArea = document.querySelector('.card-area.deck');
     const stats = document.querySelector('.stats');
     const pageDots = document.querySelectorAll('.page-dot');
     let currentPage = 1;
     const factions = [
-        { name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Po wygranej rundzie dobierasz 1 kartę z talii." },
-        { name: "Nilfgaard", shield: "assets/asety/tnilfgaard.webp", ability: "Wygrywasz remisy." },
-        { name: "Scoia'tael", shield: "assets/asety/tscoiatael.webp", ability: "Decydujesz, kto zaczyna rundę." },
-        { name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zachowujesz losową kartę po każdej rundzie." },
-        { name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "Wskrzesza 2 losowe karty w trzeciej rundzie." },
+        { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Po wygranej rundzie dobierasz 1 kartę z talii." },
+        { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Wygrywasz remisy." },
+        { id: "3", name: "Scoia'tael", shield: "assets/asety/tscoiatael.webp", ability: "Decydujesz, kto zaczyna rundę." },
+        { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zachowujesz losową kartę po każdej rundzie." },
+        { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "Wskrzesza 2 losowe karty w trzeciej rundzie." },
     ];
 
-    // Wyświetlanie kart
-    function displayCards(filter = 'all', area = collectionArea) {
+    // Przejście z ekranu startowego
+    document.getElementById('startButton').addEventListener('click', () => {
+        startScreen.style.display = 'none';
+        cardSelectionScreen.style.display = 'block';
+    });
+
+    // Przejście do ekranu gry
+    document.getElementById('goToGameButton').addEventListener('click', () => {
+        cardSelectionScreen.style.display = 'none';
+        gameScreen.style.display = 'block';
+    });
+
+    // Wyświetlanie kart (używamy dkarta)
+    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie") {
         area.innerHTML = '';
         const filteredCards = cards.filter(card => {
             if (filter === 'all') return true;
@@ -30,22 +45,23 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.innerHTML = `<img src="${card.karta}" alt="${card.nazwa}">`;
-            if (card.bohater) {
-                cardElement.innerHTML += `<div class="hero-icon"></div>`;
+            let bannerFaction = card.frakcja;
+            if (card.nazwa === "Bies" && playerFaction !== "4") {
+                bannerFaction = playerFaction; // Dynamiczny baner
             }
+            cardElement.innerHTML = `<img src="${card.dkarta}" alt="${card.nazwa}" data-faction="${bannerFaction}">`;
             area.appendChild(cardElement);
         });
     }
 
     // Inicjalne wyświetlenie kart
-    displayCards();
+    displayCards('all', collectionArea, factions[0].id);
 
     // Filtry
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', () => {
             const area = button.classList.contains('collection') ? collectionArea : deckArea;
-            displayCards(button.dataset.filter, area);
+            displayCards(button.dataset.filter, area, factions[currentPage - 1].id);
         });
     });
 
@@ -66,9 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').src = faction.shield;
         document.querySelector('.faction-ability').textContent = faction.ability;
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
+        displayCards('all', collectionArea, faction.id);
     }
 
-    // Placeholder dla statystyk
+    // Statystyki (placeholder)
     function updateStats() {
         stats.querySelector('.total-cards').textContent = 'Wszystkie karty w talii: 0';
         stats.querySelector('.unit-cards').textContent = 'Liczba kart jednostek: 0/22';
@@ -76,12 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stats.querySelector('.total-strength').textContent = 'Całkowita siła jednostek: 0';
         stats.querySelector('.hero-cards').textContent = 'Karty bohaterów: 0';
     }
-
-    // Interakcje klawiszowe (placeholder)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'x') console.log('Zmiana dowódcy');
-        if (e.key === 'e') console.log('Dodanie karty do talii');
-    });
 
     updatePage();
     updateStats();

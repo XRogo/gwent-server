@@ -1,17 +1,64 @@
+@font-face {
+    font-family: 'PFDinTextCondPro';
+    src: url('assets/fonts/PFDinTextCondPro-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'PFDinTextCondPro-Bold';
+    src: url('assets/fonts/PFDinTextCondPro-Bold.ttf') format('truetype');
+}
+
 body {
     margin: 0;
     padding: 0;
     background-color: #000;
     overflow: hidden;
     height: 100vh;
+    font-family: 'PFDinTextCondPro', sans-serif;
 }
 
+/* Ekran startowy */
+#startScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #fff;
+}
+
+.typing-effect {
+    font-size: 2vw;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 0.2vw solid #fff;
+    animation: typing 4s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: #fff; }
+}
+
+#startButton {
+    margin-top: 2vh;
+    padding: 1vh 2vw;
+    font-size: 1.5vw;
+    cursor: pointer;
+}
+
+/* Ekran wyboru kart */
 .background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url('assets/asety/hmory.webp') repeat-x;
-    background-size: 1920px 1080px;
+    background: url('assets/wybor/hmory.webp') repeat-x;
+    background-size: 50% auto; /* Skalowanie tła */
     animation: moveBackground 192s linear infinite;
 }
 
@@ -24,8 +71,8 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url('assets/asety/gui.webp') no-repeat center;
-    background-size: 3840px 2160px;
+    background: url('assets/wybor/gui.webp') no-repeat center;
+    background-size: 100% 100%; /* Lepsze skalowanie tła */
 }
 
 .content {
@@ -36,95 +83,110 @@ body {
 
 .button {
     position: absolute;
-    width: 97px;
-    height: 80px;
+    width: 5vw;
+    height: 4vh;
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
-    opacity: 0.5;
 }
 
-.button:hover {
-    opacity: 1;
-}
+.button.collection.all { top: 18vh; left: 19vw; background-image: url('assets/wybor/all.webp'); }
+.button.collection.mecz { top: 18vh; left: 28vw; background-image: url('assets/wybor/mecz.webp'); }
+.button.collection.lok { top: 18vh; left: 37vw; background-image: url('assets/wybor/lok.webp'); }
+.button.collection.obl { top: 18vh; left: 46vw; background-image: url('assets/wybor/obl.webp'); }
+.button.collection.hero { top: 18vh; left: 55vw; background-image: url('assets/wybor/hero.webp'); }
+.button.collection.pogoda { top: 18vh; left: 64vw; background-image: url('assets/wybor/pogoda.webp'); }
+.button.collection.specjalne { top: 18vh; left: 73vw; background-image: url('assets/wybor/specjalne.webp'); }
 
-.button.collection.all { background-image: url('assets/asety/all.webp'); }
-.button.collection.mecz { background-image: url('assets/asety/mecz.webp'); }
- kiedyś.button.collection.lok { background-image: url('assets/asety/lok.webp'); }
-.button.collection.obl { background-image: url('assets/asety/kapatulta.webp'); }
-.button.collection.hero { background-image: url('assets/asety/boharer.webp'); }
-.button.collection.pogoda { background-image: url('assets/asety/pogoda.webp'); }
-.button.collection.inne { background-image: url('assets/asety/inne.webp'); }
-
-.button.deck.all { background-image: url('assets/asety/all.webp'); }
-.button.deck.mecz { background-image: url('assets/asety/mecz.webp'); }
-.button.deck.lok { background-image: url('assets/asety/lok.webp'); }
-.button.deck.obl { background-image: url('assets/asety/kapatulta.webp'); }
-.button.deck.hero { background-image: url('assets/asety/boharer.webp'); }
-.button.deck.pogoda { background-image: url('assets/asety/pogoda.webp'); }
-.button.deck.inne { background-image: url('assets/asety/inne.webp'); }
+.button.deck.all { top: 18vh; left: 81vw; background-image: url('assets/wybor/all.webp'); }
+.button.deck.mecz { top: 18vh; left: 90vw; background-image: url('assets/wybor/mecz.webp'); }
+.button.deck.lok { top: 18vh; left: 99vw; background-image: url('assets/wybor/lok.webp'); }
+.button.deck.obl { top: 18vh; left: 108vw; background-image: url('assets/wybor/obl.webp'); }
+.button.deck.hero { top: 18vh; left: 117vw; background-image: url('assets/wybor/hero.webp'); }
+.button.deck.pogoda { top: 18vh; left: 126vw; background-image: url('assets/wybor/pogoda.webp'); }
+.button.deck.specjalne { top: 18vh; left: 135vw; background-image: url('assets/wybor/specjalne.webp'); }
 
 .card-area {
     position: absolute;
     overflow-y: auto;
-    padding: 10px;
+    padding: 0.5vw;
     box-sizing: border-box;
 }
 
+.card-area.collection {
+    top: 25vh;
+    left: 19vw;
+    width: 62vw;
+    height: 75vh;
+}
+
+.card-area.deck {
+    top: 25vh;
+    left: 81vw;
+    width: 62vw;
+    height: 75vh;
+    transform: translateX(-100%);
+}
+
 .card-area .card {
-    position: relative;
-    width: 180px;
-    height: 240px;
+    width: 12vw; /* Skalowanie dużych kart (524x993px) */
+    height: 22.5vh; /* Zachowanie proporcji */
     display: inline-block;
-    margin: 5px;
+    margin: 0.5vw;
+    position: relative;
 }
 
 .card-area .card img {
     width: 100%;
     height: 100%;
-}
-
-.card-area .card .hero-icon {
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    width: 116px;
-    height: 118px;
-    background: url('assets/asety/bohater.webp') no-repeat;
+    object-fit: contain;
 }
 
 .stats {
     position: absolute;
+    top: 60vh;
+    left: 75vw;
     color: #fff;
-    font-family: sans-serif; /* Placeholder, zmień na Tagesschrift lub inną czcionkę */
+    font-family: 'PFDinTextCondPro', sans-serif;
+    font-size: 1vw;
+}
+
+.page-left, .page-right {
+    position: absolute;
+    cursor: pointer;
 }
 
 .page-left {
-    position: absolute;
-    width: 49px;
-    height: 43px;
-    cursor: pointer;
-    background: url('assets/asety/wlewo.webp') no-repeat center;
+    top: 8vh;
+    left: 75vw;
+    width: 2.5vw;
+    height: 2.2vh;
+    background: url('assets/wybor/wlewo.webp');
+    background-size: contain;
 }
 
 .page-right {
-    position: absolute;
-    width: 49px;
-    height: 43px;
-    cursor: pointer;
-    background: url('assets/asety/wprawo.webp') no-repeat center;
+    top: 8vh;
+    left: 85vw;
+    width: 2.5vw;
+    height: 2.2vh;
+    background: url('assets/wybor/wprawo.webp');
+    background-size: contain;
 }
 
 .page-indicators {
     position: absolute;
+    top: 10vh;
+    left: 80vw;
     display: flex;
 }
 
 .page-dot {
-    width: 25px;
-    height: 22px;
-    margin-right: 10px;
-    background: url('assets/asety/strona.webp') no-repeat center;
+    width: 1.3vw;
+    height: 1.1vh;
+    margin-right: 0.5vw;
+    background: url('assets/wybor/strona.webp');
+    background-size: contain;
     cursor: pointer;
 }
 
@@ -134,41 +196,94 @@ body {
 
 .faction-name {
     position: absolute;
+    top: 10vh;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
-    font-size: 24px;
-    font-family: sans-serif; /* Placeholder */
+    font-size: 1.5vw;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
 }
 
 .faction-shield {
     position: absolute;
-    width: 106px;
-    height: 110px;
+    top: 10vh;
+    left: 70vw;
+    width: 2.5vw;
+    height: 2.5vh;
 }
 
 .faction-ability {
     position: absolute;
+    top: 12vh;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
-    font-size: 18px;
+    font-size: 1vw;
 }
 
 .leader-card {
     position: absolute;
-    width: 259px;
-    height: 490px;
-    background: url('assets/dkarty/beton.webp') no-repeat center;
+    top: 28vh;
+    left: 70vw;
+    width: 13vw;
+    height: 25vh;
+    background: url('assets/dkarty/beton.webp');
+    background-size: contain;
 }
 
-/* Skalowanie */
-@media (max-width: 3840px) {
-    .background, .overlay {
-        background-size: contain;
+#goToGameButton {
+    position: absolute;
+    bottom: 2vh;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1vh 2vw;
+    font-size: 1.5vw;
+    cursor: pointer;
+}
+
+/* Ekran gry */
+.game-content {
+    color: #fff;
+    text-align: center;
+    padding: 2vh;
+    font-size: 1.5vw;
+}
+
+/* Skalowanie dla mniejszych ekranów */
+@media (max-width: 1366px) {
+    .card-area.collection {
+        width: 50vw;
+        left: 15vw;
     }
-    .card-area, .stats, .button, .page-left, .page-right, .faction-name, .faction-shield, .faction-ability, .leader-card {
-        transform: scale(0.5);
-        transform-origin: top left;
+    .card-area.deck {
+        width: 50vw;
+        left: 65vw;
+    }
+    .stats {
+        left: 65vw;
+        font-size: 0.8vw;
+    }
+    .card-area .card {
+        width: 10vw;
+        height: 18.5vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-area.collection {
+        width: 70vw;
+        left: 10vw;
+    }
+    .card-area.deck {
+        width: 70vw;
+        left: 80vw;
+    }
+    .stats {
+        left: 60vw;
+        font-size: 0.6vw;
+    }
+    .card-area .card {
+        width: 8vw;
+        height: 14.8vh;
     }
 }
