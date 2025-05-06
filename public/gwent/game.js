@@ -139,19 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const points = card.querySelector('.points');
             if (points) {
-                points.style.fontSize = `${1.5 * scaleX * 100}vw`;
+                points.style.fontSize = `${30 * scaleX}px`; // Skalowanie w pikselach
             }
 
             const name = card.querySelector('.name');
             if (name) {
-                name.style.fontSize = `${0.8 * scaleX * 100}vw`;
+                name.style.fontSize = `${16 * scaleX}px`; // Skalowanie w pikselach
             }
         });
 
         // Statystyki
         stats.style.left = `${overlayLeft + 1935 * scaleX}px`;
         stats.style.top = `${overlayTop + 1152 * scaleY}px`;
-        stats.style.fontSize = `${0.8 * scaleX * 100}vw`;
+        stats.style.fontSize = `${16 * scaleX}px`; // Skalowanie w pikselach
 
         // Przyciski przewijania
         document.querySelector('.page-left').style.width = `${49 * scaleX}px`;
@@ -183,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').style.width = `${106 * scaleX}px`;
         document.querySelector('.faction-shield').style.height = `${110 * scaleY}px`;
 
-        document.querySelector('.faction-name').style.fontSize = `${Math.min(1 * scaleX * 100, 2 * scaleX * 100)}vw`;
-        document.querySelector('.faction-ability').style.fontSize = `${Math.min(0.8 * scaleX * 100, 1.2 * scaleX * 100)}vw`;
+        document.querySelector('.faction-name').style.fontSize = `${Math.min(20 * scaleX, 40 * scaleX)}px`; // Skalowanie w pikselach
+        document.querySelector('.faction-ability').style.fontSize = `${Math.min(16 * scaleX, 24 * scaleX)}px`; // Skalowanie w pikselach
 
         // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scaleX}px`;
@@ -196,8 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const goToGameButton = document.getElementById('goToGameButton');
         goToGameButton.style.left = `${overlayLeft + (GUI_WIDTH / 2) * scaleX}px`;
         goToGameButton.style.bottom = `${43 * scaleY}px`;
-        goToGameButton.style.padding = `${21 * scaleY}px ${77 * scaleX}px`;
-        goToGameButton.style.fontSize = `${1.5 * scaleX * 100}vw`;
+        goToGameButton.style.padding = `${10 * scaleY}px ${20 * scaleX}px`; // Zmniejszone padding
+        goToGameButton.style.fontSize = `${30 * scaleX}px`; // Skalowanie w pikselach
         goToGameButton.style.transform = `translateX(-50%)`;
     }
 

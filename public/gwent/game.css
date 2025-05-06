@@ -177,6 +177,14 @@ body {
 #goToGameButton {
     position: absolute;
     cursor: pointer;
+    z-index: 4; /* Niższy niż .content, aby nie zasłaniał */
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    max-width: 300px; /* Ograniczenie maksymalnej szerokości */
+    max-height: 60px; /* Ograniczenie maksymalnej wysokości */
+    box-sizing: border-box;
 }
 
 .game-content {
