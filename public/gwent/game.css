@@ -37,13 +37,13 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/gui.webp') no-repeat center;
-    background-size: contain; /* Zmienione z cover na contain */
+    background-size: contain;
     background-position: center;
     z-index: 2;
 }
 
 .content {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
     z-index: 3;
@@ -51,8 +51,6 @@ body {
 
 .button {
     position: absolute;
-    width: 2.53vw;
-    height: 3.7vh;
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
@@ -64,103 +62,30 @@ body {
     opacity: 1;
 }
 
-.button.collection.all { top: 16.39vh; left: 9.71vw; background-image: url('assets/wybor/all.webp'); }
-.button.collection.mecz { top: 16.48vh; left: 14.30vw; background-image: url('assets/wybor/mecz.webp'); }
-.button.collection.lok { top: 19.21vh; left: 19.92vw; background-image: url('assets/wybor/lok.webp'); }
-.button.collection.obl { top: 16.44vh; left: 23.85vw; background-image: url('assets/wybor/kapatulta.webp'); }
-.button.collection.hero { top: 16.48vh; left: 28.59vw; background-image: url('assets/wybor/boharer.webp'); }
-.button.collection.pogoda { top: 16.25vh; left: 33.26vw; background-image: url('assets/wybor/pogoda.webp'); }
-.button.collection.specjalne { top: 16.71vh; left: 37.97vw; background-image: url('assets/wybor/inne.webp'); }
-
-.button.deck.all { top: 16.39vh; left: 59.84vw; background-image: url('assets/wybor/all.webp'); }
-.button.deck.mecz { top: 16.48vh; left: 64.35vw; background-image: url('assets/wybor/mecz.webp'); }
-.button.deck.lok { top: 19.21vh; left: 69.77vw; background-image: url('assets/wybor/lok.webp'); }
-.button.deck.obl { top: 16.44vh; left: 73.96vw; background-image: url('assets/wybor/kapatulta.webp'); }
-.button.deck.hero { top: 16.48vh; left: 78.70vw; background-image: url('assets/wybor/boharer.webp'); }
-.button.deck.pogoda { top: 16.25vh; left: 83.36vw; background-image: url('assets/wybor/pogoda.webp'); }
-.button.deck.specjalne { top: 16.71vh; left: 88.02vw; background-image: url('assets/wybor/inne.webp'); }
-
 .card-area {
     position: absolute;
     overflow-y: auto;
-    padding: 0.5vw;
+    padding: 0;
     box-sizing: border-box;
 }
 
-.card-area.collection {
-    top: 22.73vh;
-    left: 9.53vw;
-    width: 31.12vw;
-    height: 67.13vh;
-}
-
-.card-area.deck {
-    top: 22.73vh;
-    left: 59.64vw;
-    width: 31.09vw;
-    height: 67.13vh;
-}
-
 .card-area .card {
-    width: 9.11vw;
-    height: 33.47vh;
     display: inline-block;
-    margin: 0.25vw;
     position: relative;
 }
 
-.card-area .card .card-image {
+.card-area .card .card-image,
+.card-area .card .beton,
+.card-area .card .faction-banner,
+.card-area .card .position-icon,
+.card-area .card .power-icon,
+.card-area .card .points-bg,
+.card-area .card .hero-icon {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: contain;
-}
-
-.card-area .card .beton {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-}
-
-.card-area .card .faction-banner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-}
-
-.card-area .card .position-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-}
-
-.card-area .card .power-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-}
-
-.card-area .card .points-bg {
-    position: absolute;
-    top: 4.43%;
-    left: 5.34%;
-    width: 17.94%;
-    height: 6.34%;
-    background: url('assets/dkarty/punkty.webp') no-repeat;
     background-size: contain;
 }
 
@@ -170,20 +95,9 @@ body {
     left: 5.34%;
     width: 17.94%;
     height: 6.34%;
-    font-size: 1.5vw;
     text-align: center;
     line-height: 6.34%;
     z-index: 1;
-}
-
-.card-area .card .hero-icon {
-    position: absolute;
-    top: -4.38%;
-    left: -4.38%;
-    width: 59.16%;
-    height: 81.37%;
-    background: url('assets/dkarty/bohater.webp') no-repeat;
-    background-size: contain;
 }
 
 .card-area .card .name {
@@ -193,24 +107,18 @@ body {
     width: 75%;
     height: 12.39%;
     color: #000;
-    font-size: 0.8vw;
     text-align: center;
     line-height: 12.39%;
 }
 
 .stats {
     position: absolute;
-    top: 53.33vh;
-    left: 50.36vw;
     color: #fff;
     font-family: 'PFDinTextCondPro', sans-serif;
-    font-size: 0.8vw;
 }
 
 .page-left, .page-right {
     position: absolute;
-    width: 1.27vw;
-    height: 1.99vh;
     cursor: pointer;
     background-size: contain;
     opacity: 0;
@@ -221,29 +129,13 @@ body {
     opacity: 1;
 }
 
-.page-left {
-    top: 7.18vh;
-    left: 37.81vw;
-    background-image: url('assets/wybor/wlewo.webp');
-}
-
-.page-right {
-    top: 7.13vh;
-    left: 60.83vw;
-    background-image: url('assets/wybor/wprawo.webp');
-}
-
 .page-indicators {
     position: absolute;
-    top: 9.63vh;
-    left: 48.18vw;
     display: flex;
 }
 
 .page-dot {
-    width: 0.65vw;
-    height: 1.02vh;
-    margin-right: 0.26vw;
+    margin-right: 10px;
     background: url('assets/wybor/strona.webp');
     background-size: contain;
     cursor: pointer;
@@ -257,49 +149,33 @@ body {
 
 .faction-info {
     position: absolute;
-    top: 8vh;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     align-items: center;
 }
 
 .faction-shield {
-    width: 2.76vw;
-    height: 5.09vh;
     object-fit: contain;
     margin-right: 1vw;
 }
 
 .faction-name {
     color: #fff;
-    font-size: clamp(1vw, 1.5vw, 2vw);
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
     margin-right: 1vw;
 }
 
 .faction-ability {
     color: #fff;
-    font-size: clamp(0.8vw, 1vw, 1.2vw);
 }
 
 .leader-card {
     position: absolute;
-    top: 24.95vh;
-    left: 46.67vw;
-    width: 6.74vw;
-    height: 22.69vh;
     background: url('assets/dkarty/beton.webp');
     background-size: contain;
 }
 
 #goToGameButton {
     position: absolute;
-    bottom: 2vh;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 1vh 2vw;
-    font-size: 1.5vw;
     cursor: pointer;
 }
 
@@ -307,5 +183,4 @@ body {
     color: #fff;
     text-align: center;
     padding: 2vh;
-    font-size: 1.5vw;
 }
