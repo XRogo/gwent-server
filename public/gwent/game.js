@@ -198,18 +198,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Informacje o frakcji
-        document.querySelector('.faction-info').style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        document.querySelector('.faction-info').style.top = `${backgroundTop + 50 * scale}px`; // Przesuwamy cały kontener, aby zmieścić się w zakresie
-        document.querySelector('.faction-info').style.transform = `translateX(-50%)`;
+        // Ustawiamy pozycję całego kontenera, aby był wyśrodkowany
+        const factionInfo = document.querySelector('.faction-info');
+        factionInfo.style.left = `${overlayLeft + (overlayWidth / 2)}px`; // Wyśrodkowanie względem overlay
+        factionInfo.style.top = `${backgroundTop + 174 * scale}px`; // Pozycja nazwy na 174 px
+        factionInfo.style.transform = `translateX(-50%)`; // Przesunięcie o połowę szerokości, aby wyśrodkować
 
         document.querySelector('.faction-shield').style.width = `${106 * scale}px`;
         document.querySelector('.faction-shield').style.height = `${110 * scale}px`;
 
-        document.querySelector('.faction-name').style.fontSize = `${Math.min(40 * scale, 60 * scale)}px`; // Większa czcionka dla nazwy
-        document.querySelector('.faction-name').style.marginTop = `${(174 - 110) * scale}px`; // Pozycja nazwy: 174 px - wysokość tarczy (110 px)
+        document.querySelector('.faction-name').style.fontSize = `${Math.min(80 * scale, 120 * scale)}px`;
+        document.querySelector('.faction-name').style.lineHeight = `${110 * scale}px`;
 
-        document.querySelector('.faction-ability').style.fontSize = `${Math.min(24 * scale, 36 * scale)}px`; // Większa czcionka dla opisu, aby lepiej pasowała do zakresu 254-298 px
-        document.querySelector('.faction-ability').style.marginTop = `${(276 - 174 - 40) * scale}px`; // Pozycja opisu: 276 px - pozycja nazwy (174 px) - przybliżona wysokość nazwy (40 px)
+        document.querySelector('.faction-ability').style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
+        document.querySelector('.faction-ability').style.marginTop = `${(276 - 174) * scale}px`; // Pozycja opisu: 276 px
 
         // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scale}px`;
@@ -219,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Przycisk "Przejdź do gry"
         const goToGameButton = document.getElementById('goToGameButton');
-        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
+        goToGameButton.style.left = `${overlayLeft + (overlayWidth / 2)}px`;
         goToGameButton.style.bottom = `${43 * scale}px`;
         goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
         goToGameButton.style.fontSize = `${30 * scale}px`;

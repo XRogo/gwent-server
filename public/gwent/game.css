@@ -166,10 +166,10 @@ body {
 
 .faction-info {
     position: absolute;
-    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: auto; /* Upewniamy się, że szerokość jest dynamiczna */
 }
 
 .faction-header {
@@ -185,13 +185,14 @@ body {
 .faction-name {
     color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-left: 10px; /* Odstęp między tarczą a nazwą */
+    margin-left: 10px;
 }
 
 .faction-ability {
     color: #fff;
     max-width: 600px;
     white-space: normal;
+    text-align: center;
 }
 
 .leader-card {
