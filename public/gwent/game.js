@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageDots = document.querySelectorAll('.page-dot');
     const hoverSound = document.getElementById('hoverSound');
     let currentPage = 1;
-    const GUI_WIDTH = 3840;
+    const GUI_WIDTH = 3840; // Rozmiar tła gui.webp
     const GUI_HEIGHT = 2160;
 
     const factions = [
@@ -28,18 +28,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const overlayLeft = overlayRect.left;
         const overlayTop = overlayRect.top;
 
+        // Oblicz skalę na podstawie proporcji okna i tła
         const windowAspectRatio = window.innerWidth / window.innerHeight;
         const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
 
         let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
 
         if (windowAspectRatio > guiAspectRatio) {
+            // Okno szersze niż tło – skalujemy do wysokości okna
             scale = overlayHeight / GUI_HEIGHT;
             backgroundWidth = GUI_WIDTH * scale;
             backgroundHeight = overlayHeight;
             backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
             backgroundTop = overlayTop;
         } else {
+            // Okno wyższe niż tło – skalujemy do szerokości okna
             scale = overlayWidth / GUI_WIDTH;
             backgroundWidth = overlayWidth;
             backgroundHeight = GUI_HEIGHT * scale;
@@ -47,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
         }
 
+        // Przyciski kolekcji
         const buttonWidth = 97 * scale;
         const buttonHeight = 80 * scale;
 
@@ -92,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.button.collection.specjalne').style.top = `${backgroundTop + 361 * scale}px`;
         document.querySelector('.button.collection.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
+        // Przyciski talii
         document.querySelector('.button.deck.all').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.all').style.height = `${buttonHeight}px`;
         document.querySelector('.button.deck.all').style.left = `${backgroundLeft + 2297 * scale}px`;
@@ -134,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.button.deck.specjalne').style.top = `${backgroundTop + 361 * scale}px`;
         document.querySelector('.button.deck.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
+        // Obszary kart
         collectionArea.style.width = `${1195 * scale}px`;
         collectionArea.style.height = `${1449 * scale}px`;
         collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
@@ -146,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deckArea.style.top = `${backgroundTop + 491 * scale}px`;
         deckArea.style.padding = `${10 * scale}px`;
 
+        // Karty
         const cards = document.querySelectorAll('.card-area .card');
         cards.forEach(card => {
             card.style.width = `${350 * scale}px`;
@@ -163,10 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Statystyki
         stats.style.left = `${backgroundLeft + 1935 * scale}px`;
         stats.style.top = `${backgroundTop + 1152 * scale}px`;
         stats.style.fontSize = `${16 * scale}px`;
 
+        // Przyciski przewijania
         document.querySelector('.page-left').style.width = `${49 * scale}px`;
         document.querySelector('.page-left').style.height = `${43 * scale}px`;
         document.querySelector('.page-left').style.left = `${backgroundLeft + 1452 * scale}px`;
@@ -179,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.page-right').style.top = `${backgroundTop + 154 * scale}px`;
         document.querySelector('.page-right').style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
 
+        // Kropki
         document.querySelector('.page-indicators').style.left = `${backgroundLeft + 1850 * scale}px`;
         document.querySelector('.page-indicators').style.top = `${backgroundTop + 208 * scale}px`;
         pageDots.forEach(dot => {
@@ -187,23 +197,27 @@ document.addEventListener('DOMContentLoaded', () => {
             dot.style.marginRight = `${10 * scale}px`;
         });
 
+        // Informacje o frakcji
         document.querySelector('.faction-info').style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        document.querySelector('.faction-info').style.top = `${backgroundTop + 50 * scale}px`;
+        document.querySelector('.faction-info').style.top = `${backgroundTop + 50 * scale}px`; // Przesuwamy cały kontener, aby zmieścić się w zakresie
         document.querySelector('.faction-info').style.transform = `translateX(-50%)`;
 
         document.querySelector('.faction-shield').style.width = `${106 * scale}px`;
         document.querySelector('.faction-shield').style.height = `${110 * scale}px`;
 
-        document.querySelector('.faction-name').style.fontSize = `${Math.min(40 * scale, 60 * scale)}px`;
-        document.querySelector('.faction-name').style.margin = `0 ${10 * scale}px`;
+        document.querySelector('.faction-name').style.fontSize = `${Math.min(40 * scale, 60 * scale)}px`; // Większa czcionka dla nazwy
+        document.querySelector('.faction-name').style.marginTop = `${(174 - 110) * scale}px`; // Pozycja nazwy: 174 px - wysokość tarczy (110 px)
 
-        document.querySelector('.faction-ability').style.fontSize = `${Math.min(20 * scale, 30 * scale)}px`;
+        document.querySelector('.faction-ability').style.fontSize = `${Math.min(24 * scale, 36 * scale)}px`; // Większa czcionka dla opisu
+        document.querySelector('.faction-ability').style.marginTop = `${(276 - 174 - 40) * scale}px`; // Pozycja opisu: 276 px - pozycja nazwy (174 px) - przybliżona wysokość nazwy (40 px)
 
+        // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scale}px`;
         document.querySelector('.leader-card').style.height = `${490 * scale}px`;
         document.querySelector('.leader-card').style.left = `${backgroundLeft + 1792 * scale}px`;
         document.querySelector('.leader-card').style.top = `${backgroundTop + 539 * scale}px`;
 
+        // Przycisk "Przejdź do gry"
         const goToGameButton = document.getElementById('goToGameButton');
         goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
         goToGameButton.style.bottom = `${43 * scale}px`;
@@ -285,20 +299,25 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePositionsAndScaling();
     }
 
+    // Ustaw domyślnie aktywny tryb "all" dla obu sekcji
     document.querySelector('.button.collection.all').classList.add('active');
     document.querySelector('.button.deck.all').classList.add('active');
 
+    // Dodaj obsługę kliknięcia dla przycisków sortowania
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', () => {
             const area = button.classList.contains('collection') ? collectionArea : deckArea;
             const section = button.classList.contains('collection') ? 'collection' : 'deck';
 
+            // Usuń klasę .active z obecnie aktywnego przycisku w tej sekcji
             document.querySelectorAll(`.button.${section}`).forEach(btn => {
                 btn.classList.remove('active');
             });
 
+            // Dodaj klasę .active do klikniętego przycisku
             button.classList.add('active');
 
+            // Wyświetl karty z nowym filtrem
             displayCards(button.dataset.filter, area, factions[currentPage - 1].id);
         });
     });
@@ -320,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-ability').textContent = faction.ability;
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
 
+        // Po zmianie frakcji, ustaw domyślny filtr na "all" i podświetl odpowiedni przycisk
         document.querySelectorAll('.button.collection').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.button.deck').forEach(btn => btn.classList.remove('active'));
         document.querySelector('.button.collection.all').classList.add('active');
@@ -336,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stats.querySelector('.hero-cards').textContent = '0';
     }
 
+    // Początkowe wyświetlenie kart z domyślnym filtrem "all"
     displayCards('all', collectionArea, factions[0].id);
     displayCards('all', deckArea, factions[0].id);
 
