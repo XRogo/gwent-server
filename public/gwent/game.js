@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_HEIGHT = 2160;
 
     const factions = [
-        { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
-        { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Jeśli rozgrywka zakończy się remisem, to ty odnosisz zwycięstwo." },
-        { id: "3", name: "Scoia'tael", shield: "assets/asety/tscoiatael.webp", ability: "Zdecyduj, kto rozpoczyna rozgrywkę." },
-        { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zatrzymaj losowo wybraną jednostkę na polu bitwy po każdej rundzie." },
-        { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "W trzeciej rundzie dwie przypadkowe karty ze stosu kart odrzuconych wracają na stół." },
+        { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Po wygranej rundzie dobierasz 1 kartę z talii." },
+        { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Wygrywasz remisy." },
+        { id: "3", name: "Scoia'tael", shield: "assets/asety/tscoiatael.webp", ability: "Decydujesz, kto zaczyna rundę." },
+        { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zachowujesz losową kartę po każdej rundzie." },
+        { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "Wskrzesza 2 losowe karty w trzeciej rundzie." },
     ];
 
     function updatePositionsAndScaling() {
@@ -199,17 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Informacje o frakcji
         document.querySelector('.faction-info').style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        document.querySelector('.faction-info').style.top = `${backgroundTop + 50 * scale}px`; // Przesuwamy cały kontener, aby zmieścić się w zakresie
+        document.querySelector('.faction-info').style.top = `${backgroundTop + 173 * scale}px`;
         document.querySelector('.faction-info').style.transform = `translateX(-50%)`;
 
         document.querySelector('.faction-shield').style.width = `${106 * scale}px`;
         document.querySelector('.faction-shield').style.height = `${110 * scale}px`;
 
-        document.querySelector('.faction-name').style.fontSize = `${Math.min(40 * scale, 60 * scale)}px`; // Większa czcionka dla nazwy
-        document.querySelector('.faction-name').style.marginTop = `${(174 - 110) * scale}px`; // Pozycja nazwy: 174 px - wysokość tarczy (110 px)
-
-        document.querySelector('.faction-ability').style.fontSize = `${Math.min(24 * scale, 36 * scale)}px`; // Większa czcionka dla opisu, aby lepiej pasowała do zakresu 254-298 px
-        document.querySelector('.faction-ability').style.marginTop = `${(276 - 174 - 40) * scale}px`; // Pozycja opisu: 276 px - pozycja nazwy (174 px) - przybliżona wysokość nazwy (40 px)
+        document.querySelector('.faction-name').style.fontSize = `${Math.min(20 * scale, 40 * scale)}px`;
+        document.querySelector('.faction-ability').style.fontSize = `${Math.min(16 * scale, 24 * scale)}px`;
 
         // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scale}px`;
