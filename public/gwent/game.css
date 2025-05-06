@@ -11,7 +11,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #000; /* Czarne tło jako pierwsza warstwa */
+    background-color: #000;
     overflow: hidden;
     height: 100vh;
     font-family: 'PFDinTextCondPro', sans-serif;
@@ -58,14 +58,14 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/hmory.webp') repeat-x;
-    background-size: 50% auto; /* 1920x1080 px jako baza */
+    background-size: 50% auto;
     animation: moveBackground 192s linear infinite;
-    z-index: 1; /* Druga warstwa */
+    z-index: 1;
 }
 
 @keyframes moveBackground {
     0% { background-position: 0 0; }
-    100% { background-position: -200% 0; } /* Przesunięcie proporcjonalne do szerokości */
+    100% { background-position: -200% 0; }
 }
 
 .overlay {
@@ -73,18 +73,18 @@ body {
     width: 100%;
     height: 100%;
     background: url('assets/wybor/gui.webp') no-repeat center;
-    background-size: cover; /* Zachowuje proporcje 16:9 */
-    z-index: 2; /* Trzecia warstwa */
+    background-size: cover;
+    z-index: 2;
 }
 
 .content {
     position: relative;
     width: 100%;
     height: 100%;
-    z-index: 3; /* Elementy na wierzchu */
+    z-index: 3;
 }
 
-/* Przeliczenie pozycji: 3840px = 100vw, 2160px = 100vh */
+/* Przyciski sortowania */
 .button {
     position: absolute;
     width: 2.53vw; /* 97px / 3840 * 100 */
@@ -92,25 +92,31 @@ body {
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
+    opacity: 0; /* Domyślnie niewidoczne */
+    transition: opacity 0.3s ease;
 }
 
-/* Kolekcja */
+.button:hover {
+    opacity: 1; /* Widoczne przy najechaniu */
+}
+
+/* Kolekcja - poprawione pozycje */
 .button.collection.all { top: 16.39vh; left: 9.71vw; background-image: url('assets/wybor/all.webp'); } /* 354px, 373px */
 .button.collection.mecz { top: 16.48vh; left: 14.30vw; background-image: url('assets/wybor/mecz.webp'); } /* 356px, 549px */
 .button.collection.lok { top: 19.21vh; left: 19.92vw; background-image: url('assets/wybor/lok.webp'); } /* 415px, 765px */
-.button.collection.obl { top: 16.44vh; left: 23.85vw; background-image: url('assets/wybor/obl.webp'); } /* 355px, 916px */
-.button.collection.hero { top: 16.48vh; left: 28.59vw; background-image: url('assets/wybor/hero.webp'); } /* 356px, 1098px */
+.button.collection.obl { top: 16.44vh; left: 23.85vw; background-image: url('assets/wybor/kapatulta.webp'); } /* 355px, 916px */
+.button.collection.hero { top: 16.48vh; left: 28.59vw; background-image: url('assets/wybor/boharer.webp'); } /* 356px, 1098px */
 .button.collection.pogoda { top: 16.25vh; left: 33.26vw; background-image: url('assets/wybor/pogoda.webp'); } /* 351px, 1277px */
-.button.collection.specjalne { top: 16.71vh; left: 37.97vw; background-image: url('assets/wybor/specjalne.webp'); } /* 361px, 1459px */
+.button.collection.specjalne { top: 16.71vh; left: 37.97vw; background-image: url('assets/wybor/inne.webp'); } /* 361px, 1459px */
 
 /* Talia */
 .button.deck.all { top: 16.39vh; left: 59.84vw; background-image: url('assets/wybor/all.webp'); } /* 354px, 2297px */
 .button.deck.mecz { top: 16.48vh; left: 64.35vw; background-image: url('assets/wybor/mecz.webp'); } /* 356px, 2473px */
 .button.deck.lok { top: 19.21vh; left: 69.77vw; background-image: url('assets/wybor/lok.webp'); } /* 415px, 2679px */
-.button.deck.obl { top: 16.44vh; left: 73.96vw; background-image: url('assets/wybor/obl.webp'); } /* 355px, 2840px */
-.button.deck.hero { top: 16.48vh; left: 78.70vw; background-image: url('assets/wybor/hero.webp'); } /* 356px, 3022px */
+.button.deck.obl { top: 16.44vh; left: 73.96vw; background-image: url('assets/wybor/kapatulta.webp'); } /* 355px, 2840px */
+.button.deck.hero { top: 16.48vh; left: 78.70vw; background-image: url('assets/wybor/boharer.webp'); } /* 356px, 3022px */
 .button.deck.pogoda { top: 16.25vh; left: 83.36vw; background-image: url('assets/wybor/pogoda.webp'); } /* 351px, 3201px */
-.button.deck.specjalne { top: 16.71vh; left: 88.02vw; background-image: url('assets/wybor/specjalne.webp'); } /* 361px, 3380px */
+.button.deck.specjalne { top: 16.71vh; left: 88.02vw; background-image: url('assets/wybor/inne.webp'); } /* 361px, 3380px */
 
 .card-area {
     position: absolute;
@@ -120,22 +126,22 @@ body {
 }
 
 .card-area.collection {
-    top: 22.73vh; /* 491px */
-    left: 9.53vw; /* 366px */
-    width: 31.12vw; /* 1195px */
-    height: 67.13vh; /* 1449px */
+    top: 22.73vh;
+    left: 9.53vw;
+    width: 31.12vw;
+    height: 67.13vh;
 }
 
 .card-area.deck {
     top: 22.73vh;
-    left: 59.64vw; /* 2290px */
-    width: 31.09vw; /* 1194px */
+    left: 59.64vw;
+    width: 31.09vw;
     height: 67.13vh;
 }
 
 .card-area .card {
-    width: 9.11vw; /* Skalowanie dużych kart: 524px / 3840 * 100 */
-    height: 34.77vh; /* 993px / 2160 * 100 */
+    width: 9.11vw;
+    height: 34.77vh;
     display: inline-block;
     margin: 0.5vw;
     position: relative;
@@ -188,8 +194,8 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 3.75vh; /* 81px / 2160 * 100 */
-    left: 1.95vw; /* 75px / 3840 * 100 */
+    top: 3.75vh;
+    left: 1.95vw;
     color: #fff;
     font-size: 1vw;
     text-align: center;
@@ -199,27 +205,28 @@ body {
     position: absolute;
     top: -0.43vh; /* -23px / 2160 * 100 */
     left: -0.60vw; /* -23px / 3840 * 100 */
-    width: 8.07vw; /* 310px / 3840 * 100 */
-    height: 37.41vh; /* 808px / 2160 * 100 */
+    width: 59.35%; /* 310px / 524px (proporcja do karty) */
+    height: 81.37%; /* 808px / 993px (proporcja do karty) */
     background: url('assets/dkarty/bohater.webp') no-repeat;
     background-size: contain;
 }
 
 .card-area .card .name {
     position: absolute;
-    top: 35.09vh; /* 758px / 2160 * 100 */
-    left: 3.02vw; /* 116px / 3840 * 100 */
-    width: 10.23vw; /* (509-116)px / 3840 * 100 */
-    height: 5.69vh; /* (881-758)px / 2160 * 100 */
+    top: 76.33%; /* 758px / 993px */
+    left: 22.14%; /* 116px / 524px */
+    width: 75.00%; /* (509-116)px / 524px */
+    height: 12.39%; /* (881-758)px / 993px */
     color: #fff;
     font-size: 1vw;
     text-align: center;
+    line-height: 12.39%; /* Dopasowanie do wysokości */
 }
 
 .stats {
     position: absolute;
-    top: 53.33vh; /* 1152px */
-    left: 50.36vw; /* 1934px */
+    top: 53.33vh;
+    left: 50.36vw;
     color: #fff;
     font-family: 'PFDinTextCondPro', sans-serif;
     font-size: 0.8vw;
@@ -227,10 +234,10 @@ body {
 
 .page-left {
     position: absolute;
-    top: 7.18vh; /* 155px */
-    left: 37.81vw; /* 1452px */
-    width: 1.27vw; /* 49px / 3840 * 100 */
-    height: 1.99vh; /* 43px / 2160 * 100 */
+    top: 7.18vh;
+    left: 37.81vw;
+    width: 1.27vw;
+    height: 1.99vh;
     background: url('assets/wybor/wlewo.webp');
     background-size: contain;
     cursor: pointer;
@@ -238,8 +245,8 @@ body {
 
 .page-right {
     position: absolute;
-    top: 7.13vh; /* 154px */
-    left: 60.83vw; /* 2336px */
+    top: 7.13vh;
+    left: 60.83vw;
     width: 1.27vw;
     height: 1.99vh;
     background: url('assets/wybor/wprawo.webp');
@@ -249,14 +256,14 @@ body {
 
 .page-indicators {
     position: absolute;
-    top: 9.63vh; /* 208px */
-    left: 48.18vw; /* 1850px */
+    top: 9.63vh;
+    left: 48.18vw;
     display: flex;
 }
 
 .page-dot {
-    width: 0.65vw; /* 25px / 3840 * 100 */
-    height: 1.02vh; /* 22px / 2160 * 100 */
+    width: 0.65vw;
+    height: 1.02vh;
     margin-right: 0.26vw;
     background: url('assets/wybor/strona.webp');
     background-size: contain;
@@ -267,39 +274,42 @@ body {
     filter: brightness(1.5);
 }
 
-.faction-name {
+.faction-info {
     position: absolute;
-    top: 9.63vh; /* 208px */
+    top: 9.63vh;
     left: 50%;
     transform: translateX(-50%);
+    text-align: center;
+}
+
+.faction-name {
     color: #fff;
-    font-size: 1.5vw;
+    font-size: clamp(1vw, 1.5vw, 2vw); /* Skalowanie nazwy */
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
+    margin-bottom: 0.5vh;
+}
+
+.faction-ability {
+    color: #fff;
+    font-size: clamp(0.8vw, 1vw, 1.2vw); /* Skalowanie opisu */
+    margin-bottom: 0.5vh;
 }
 
 .faction-shield {
     position: absolute;
-    top: 9.63vh; /* 208px */
-    left: 46.88vw; /* 1800px */
-    width: 2.76vw; /* 106px / 3840 * 100 */
-    height: 5.09vh; /* 110px / 2160 * 100 */
-}
-
-.faction-ability {
-    position: absolute;
-    top: 11.11vh; /* 240px */
-    left: 50%;
-    transform: translateX(-50%);
-    color: #fff;
-    font-size: 1vw;
+    top: 0;
+    left: calc(50% + 10vw); /* Przesunięcie na prawo od napisów */
+    width: 2.76vw;
+    height: 5.09vh;
+    object-fit: contain; /* Zachowanie proporcji */
 }
 
 .leader-card {
     position: absolute;
-    top: 24.95vh; /* 539px */
-    left: 46.67vw; /* 1792px */
-    width: 6.74vw; /* 259px / 3840 * 100 */
-    height: 22.69vh; /* 490px / 2160 * 100 */
+    top: 24.95vh;
+    left: 46.67vw;
+    width: 6.74vw;
+    height: 22.69vh;
     background: url('assets/dkarty/beton.webp');
     background-size: contain;
 }

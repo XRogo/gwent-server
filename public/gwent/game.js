@@ -1,5 +1,3 @@
-
-
 import cards from './cards.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deckArea = document.querySelector('.card-area.deck');
     const stats = document.querySelector('.stats');
     const pageDots = document.querySelectorAll('.page-dot');
+    const hoverSound = document.getElementById('hoverSound');
     let currentPage = 1;
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Po wygranej rundzie dobierasz 1 kartę z talii." },
@@ -33,8 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Wyświetlanie kart z warstwami
     function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie") {
-        area.innerHTML = '';
+        area.innerHTML = ''; // Czyszczenie obszaru przed dodaniem kart
         const filteredCards = cards.filter(card => {
+            // Filtr po frakcji
+            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
+            // Filtr po typie
             if (filter === 'all') return true;
             if (filter === 'miecz') return card.pozycja === 1;
             if (filter === 'luk') return card.pozycja === 2;
@@ -81,11 +83,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="hero-icon"></div>`;
             }
 
-            // Nazwa (opis pomijamy w trybie wyboru)
+            // Nazwa
             html += `<div class="name">${card.nazwa}</div>`;
 
             cardElement.innerHTML = html;
             area.appendChild(cardElement);
+
+            // Dźwięk przy najechaniu
+            cardElement.addEventListener('mouseover', () => {
+                hoverSound.currentTime = 0; // Reset dźwięku
+                hoverSound.play();
+            });
         });
     }
 

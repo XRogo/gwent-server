@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="game.css">
 </head>
 <body>
+    <!-- Dźwięk -->
+    <audio id="hoverSound" src="assets/sounds/hover.mp3"></audio>
+
     <!-- Ekran startowy z animacją pisania -->
     <div id="startScreen" class="screen">
         <div class="typing-effect">
@@ -67,9 +70,11 @@
             </div>
 
             <!-- Informacje o frakcji -->
-            <div class="faction-name"></div>
-            <img class="faction-shield" src="" alt="Tarcza frakcji">
-            <p class="faction-ability"></p>
+            <div class="faction-info">
+                <div class="faction-name"></div>
+                <p class="faction-ability"></p>
+                <img class="faction-shield" src="" alt="Tarcza frakcji">
+            </div>
 
             <!-- Karta przywódcy -->
             <div class="leader-card"></div>
