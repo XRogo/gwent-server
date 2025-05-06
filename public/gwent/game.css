@@ -121,10 +121,10 @@ body {
 }
 
 .card-area.collection {
-    top: 22.73vh; /* 491px */
-    left: 9.53vw; /* 366px */
-    width: 31.12vw; /* 1195px */
-    height: 67.13vh; /* 1449px */
+    top: 22.73vh;
+    left: 9.53vw;
+    width: 31.12vw;
+    height: 67.13vh;
 }
 
 .card-area.deck {
@@ -136,7 +136,7 @@ body {
 
 .card-area .card {
     width: 9.11vw; /* 350px / 3840 * 100 */
-    height: 33.47vh; /* 723px / 2160 * 100, aby zmieścić 2 karty w pionie w 1449px */
+    height: 33.47vh; /* 723px / 2160 * 100 */
     display: inline-block;
     margin: 0.25vw;
     position: relative;
@@ -189,20 +189,23 @@ body {
 
 .card-area .card .points-bg {
     position: absolute;
-    top: 8.15%; /* 81px / 993px */
-    left: 10%; /* Zmniejszone z 14.31% */
-    width: 15.27%; /* 80px / 524px */
-    height: 8.06%; /* 80px / 993px */
+    top: 4.43%; /* 44px / 993px */
+    left: 5.34%; /* 28px / 524px */
+    width: 17.94%; /* (122-28)px / 524px */
+    height: 6.34%; /* (107-44)px / 993px */
     background: url('assets/dkarty/punkty.webp') no-repeat;
     background-size: contain;
 }
 
 .card-area .card .points {
     position: absolute;
-    top: 8.15%;
-    left: 10%;
-    font-size: 1.5vw; /* Zwiększone */
+    top: 4.43%;
+    left: 5.34%;
+    width: 17.94%;
+    height: 6.34%;
+    font-size: 1.5vw;
     text-align: center;
+    line-height: 6.34%;
     z-index: 1;
 }
 
@@ -277,7 +280,7 @@ body {
     background: url('assets/wybor/strona.webp');
     background-size: contain;
     cursor: pointer;
-    opacity: 0.5;
+    opacity: 0;
 }
 
 .page-dot.active {

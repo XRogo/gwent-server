@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage = (currentPage - 2 + factions.length) % factions.length + 1;
         updatePage();
     });
+
     document.querySelector('.page-right').addEventListener('click', () => {
         currentPage = currentPage % factions.length + 1;
         updatePage();
