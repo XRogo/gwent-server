@@ -139,19 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const points = card.querySelector('.points');
             if (points) {
-                points.style.fontSize = `${30 * scaleX}px`; // Skalowanie w pikselach
+                points.style.fontSize = `${30 * scaleX}px`;
             }
 
             const name = card.querySelector('.name');
             if (name) {
-                name.style.fontSize = `${16 * scaleX}px`; // Skalowanie w pikselach
+                name.style.fontSize = `${16 * scaleX}px`;
             }
         });
 
         // Statystyki
         stats.style.left = `${overlayLeft + 1935 * scaleX}px`;
         stats.style.top = `${overlayTop + 1152 * scaleY}px`;
-        stats.style.fontSize = `${16 * scaleX}px`; // Skalowanie w pikselach
+        stats.style.fontSize = `${16 * scaleX}px`;
 
         // Przyciski przewijania
         document.querySelector('.page-left').style.width = `${49 * scaleX}px`;
@@ -183,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').style.width = `${106 * scaleX}px`;
         document.querySelector('.faction-shield').style.height = `${110 * scaleY}px`;
 
-        document.querySelector('.faction-name').style.fontSize = `${Math.min(20 * scaleX, 40 * scaleX)}px`; // Skalowanie w pikselach
-        document.querySelector('.faction-ability').style.fontSize = `${Math.min(16 * scaleX, 24 * scaleX)}px`; // Skalowanie w pikselach
+        document.querySelector('.faction-name').style.fontSize = `${Math.min(20 * scaleX, 40 * scaleX)}px`;
+        document.querySelector('.faction-ability').style.fontSize = `${Math.min(16 * scaleX, 24 * scaleX)}px`;
 
         // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scaleX}px`;
@@ -196,8 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const goToGameButton = document.getElementById('goToGameButton');
         goToGameButton.style.left = `${overlayLeft + (GUI_WIDTH / 2) * scaleX}px`;
         goToGameButton.style.bottom = `${43 * scaleY}px`;
-        goToGameButton.style.padding = `${10 * scaleY}px ${20 * scaleX}px`; // Zmniejszone padding
-        goToGameButton.style.fontSize = `${30 * scaleX}px`; // Skalowanie w pikselach
+        goToGameButton.style.padding = `${10 * scaleY}px ${20 * scaleX}px`;
+        goToGameButton.style.fontSize = `${30 * scaleX}px`;
         goToGameButton.style.transform = `translateX(-50%)`;
     }
 
@@ -210,8 +210,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie") {
-        if (area === deckArea) return;
-        area.innerHTML = '';
+        // Usuwam wszystkie istniejące karty
+        while (area.firstChild) {
+            area.removeChild(area.firstChild);
+        }
+
         const filteredCards = cards.filter(card => {
             if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
             if (filter === 'all') return true;
@@ -223,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (filter === 'specjalne') return card.moc === 'specjalne';
             return false;
         });
+
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
@@ -266,9 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 hoverSound.currentTime = 0;
                 hoverSound.play();
             });
-
-            updatePositionsAndScaling();
         });
+
+        updatePositionsAndScaling();
     }
 
     displayCards('all', collectionArea, factions[0].id);
