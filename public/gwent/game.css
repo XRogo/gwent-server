@@ -227,3 +227,10 @@ body {
     text-align: center;
     padding: 20px;
 }
+
+.stats p {
+    position: absolute;
+    margin: 0;
+    color: #fff;
+    font-family: 'PFDinTextCondPro', sans-serif;
+}
