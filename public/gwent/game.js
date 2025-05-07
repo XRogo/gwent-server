@@ -305,23 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         updatePositionsAndScaling();
-        // Pozycje liczników
-const counters = [
-    { element: '.total-cards', top: 1197 },       // Ilość kart
-    { element: '.unit-cards', top: 1299 },       // Ilość jednostek
-    { element: '.special-cards', top: 1418 },    // Karty specjalne
-    { element: '.total-strength', top: 1537 },   // Suma punktów jednostek
-    { element: '.hero-cards', top: 1658 },       // Ilość bohaterów w talii
-];
-
-counters.forEach(counter => {
-    const el = document.querySelector(counter.element);
-    if (el) {
-        el.style.left = `${backgroundLeft + 1933 * scale}px`;
-        el.style.top = `${backgroundTop + counter.top * scale}px`;
-        el.style.fontSize = `${16 * scale}px`;
-    }
-});
     }
 
     document.querySelector('.page-left').addEventListener('click', () => {
