@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pageDots.forEach((dot, index) => {
         dot.style.width = `${25 * scale}px`;
         dot.style.height = `${22 * scale}px`;
-        dot.style.left = `${index * 26 * scale}px`; // 36 px = szerokość kropki (25) + odstęp (11)
+        dot.style.left = `${index * 1 * scale}px`; // 36 px = szerokość kropki (25) + odstęp (11)
         });
 
         // Informacje o frakcji
