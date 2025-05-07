@@ -151,7 +151,7 @@ body {
 }
 
 .page-dot {
-    margin-right: 10px;
+    position: absolute; /* Ustawiamy pozycję absolutną, aby ręcznie ustawiać kropki */
     background: url('assets/wybor/strona.webp');
     background-size: contain;
     background-repeat: no-repeat;

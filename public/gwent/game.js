@@ -189,12 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.page-right').style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
 
         // Kropki – tylko skalowanie, pozycja ustawiana w updatePage()
-        pageDots.forEach(dot => {
-            dot.style.width = `${25 * scale}px`;
-            dot.style.height = `${22 * scale}px`;
-            dot.style.marginRight = `${10 * scale}px`;
+        pageDots.forEach((dot, index) => {
+        dot.style.width = `${25 * scale}px`;
+        dot.style.height = `${22 * scale}px`;
+        dot.style.left = `${index * 36 * scale}px`; // 36 px = szerokość kropki (25) + odstęp (11)
         });
-
+        
         // Informacje o frakcji
         const factionInfo = document.querySelector('.faction-info');
         factionInfo.style.left = `${backgroundLeft}px`;
@@ -323,10 +323,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').src = faction.shield;
         document.querySelector('.faction-ability').textContent = faction.ability;
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
-
+    
         // Pozycje kropek dla każdej strony
-        const baseLeft = 1850; // Pozycja pierwszej strony
-        const spacing = 26; // Różnica między stronami (1876 - 1850 = 26)
+        const baseLeft = 1850;
+        const spacing = 26;
         const topPosition = 208;
         const overlay = document.querySelector('.overlay');
         const overlayRect = overlay.getBoundingClientRect();
@@ -344,10 +344,12 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundLeft = overlayRect.left;
             backgroundTop = overlayRect.top + (overlayHeight - (GUI_HEIGHT * scale)) / 2;
         }
-        const leftPosition = baseLeft + (currentPage - 1) * spacing;
+        // Kompensacja marginesu: każda kropka ma margin-right: 10px * scale, więc dla strony N musimy odjąć (N-1) * (10 * scale)
+        const marginCompensation = (currentPage - 1) * (10 * scale);
+        const leftPosition = baseLeft + (currentPage - 1) * spacing - marginCompensation;
         document.querySelector('.page-indicators').style.left = `${backgroundLeft + leftPosition * scale}px`;
         document.querySelector('.page-indicators').style.top = `${backgroundTop + topPosition * scale}px`;
-
+    
         // Po zmianie frakcji, ustaw domyślny filtr na "all" i podświetl odpowiedni przycisk
         document.querySelectorAll('.button.collection').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.button.deck').forEach(btn => btn.classList.remove('active'));
