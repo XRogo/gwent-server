@@ -167,7 +167,7 @@ body {
 .faction-info {
     position: absolute;
     display: block; /* Zmieniamy z flex na block, aby nie ograniczać szerokości dzieci */
-    width: auto;
+    width: 100%;
     margin: 0;
 }
 

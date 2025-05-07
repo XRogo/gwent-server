@@ -189,8 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.page-right').style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
 
         // Kropki
-        document.querySelector('.page-indicators').style.left = `${backgroundLeft + 1850 * scale}px`;
-        document.querySelector('.page-indicators').style.top = `${backgroundTop + 208 * scale}px`;
         pageDots.forEach(dot => {
             dot.style.width = `${25 * scale}px`;
             dot.style.height = `${22 * scale}px`;
@@ -199,9 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Informacje o frakcji
         const factionInfo = document.querySelector('.faction-info');
-        factionInfo.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`; // Wyśrodkowanie względem tła GUI
-        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`; // Pozycja względem tła GUI (114 px w 4K)
-        factionInfo.style.transform = `translateX(-50%)`;
+        factionInfo.style.left = `${backgroundLeft}px`; // Początek od lewej krawędzi tła GUI
+        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
+        factionInfo.style.transform = `none`; // Usuwamy transform, bo szerokość jest 100%
 
         document.querySelector('.faction-shield').style.width = `${106 * scale}px`;
         document.querySelector('.faction-shield').style.height = `${110 * scale}px`;
@@ -340,7 +338,35 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').src = faction.shield;
         document.querySelector('.faction-ability').textContent = faction.ability;
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
-
+    
+        // Pozycje kropek dla każdej strony
+        const positions = [
+            { left: 1850, top: 208 }, // Strona 1
+            { left: 1876, top: 208 }, // Strona 2
+            { left: 1902, top: 208 }, // Strona 3
+            { left: 1928, top: 208 }, // Strona 4
+            { left: 1954, top: 208 }  // Strona 5
+        ];
+        const overlay = document.querySelector('.overlay');
+        const overlayRect = overlay.getBoundingClientRect();
+        const overlayWidth = overlayRect.width;
+        const overlayHeight = overlayRect.height;
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+        let scale, backgroundLeft, backgroundTop;
+        if (windowAspectRatio > guiAspectRatio) {
+            scale = overlayHeight / GUI_HEIGHT;
+            backgroundLeft = overlayRect.left + (overlayWidth - (GUI_WIDTH * scale)) / 2;
+            backgroundTop = overlayRect.top;
+        } else {
+            scale = overlayWidth / GUI_WIDTH;
+            backgroundLeft = overlayRect.left;
+            backgroundTop = overlayRect.top + (overlayHeight - (GUI_HEIGHT * scale)) / 2;
+        }
+        const position = positions[currentPage - 1];
+        document.querySelector('.page-indicators').style.left = `${backgroundLeft + position.left * scale}px`;
+        document.querySelector('.page-indicators').style.top = `${backgroundTop + position.top * scale}px`;
+    
         // Po zmianie frakcji, ustaw domyślny filtr na "all" i podświetl odpowiedni przycisk
         document.querySelectorAll('.button.collection').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.button.deck').forEach(btn => btn.classList.remove('active'));
