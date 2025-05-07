@@ -166,12 +166,13 @@ body {
 
 .faction-info {
     position: absolute;
-    display: block; /* Zmieniamy z flex na block, aby nie ograniczać szerokości dzieci */
+    display: block;
     width: 100%;
     margin: 0;
 }
 
 .faction-header {
+    position: absolute; /* Ustawiamy pozycję absolutną, aby wyśrodkować */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,11 +193,12 @@ body {
 }
 
 .faction-ability {
+    position: absolute; /* Ustawiamy pozycję absolutną, aby wyśrodkować */
     color: #b48b42;
     white-space: normal;
     text-align: center;
     margin: 0;
-    width: 100%; /* Upewniamy się, że opis może się rozciągać */
+    width: 100%;
     box-sizing: border-box;
 }
 
