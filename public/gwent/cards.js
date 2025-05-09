@@ -1528,23 +1528,24 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
-     },
-
+     }
 
      // powfory =======================================================================================
 
-     {
-        nazwa: "",
-        karta: "/gwent/assets/karty/scio'tel/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        moc: "",
-        frakcja: "",
-        punkty: 2,
-        pozycja: 2,
-        summon:"",
-        ilosc: 1,
-     },
+//     {
+//        nazwa: "",
+//        karta: "/gwent/assets/karty/scio'tel/",
+//        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+//        opis: "WORK.",
+//        bohater: false,
+//        moc: "",
+//        frakcja: "",
+//        punkty: 2,
+//        pozycja: 2,
+//        summon:"",
+//        ilosc: 1,
+//     },
 
 ];
+
+export default cards;
