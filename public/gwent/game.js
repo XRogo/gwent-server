@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "W trzeciej rundzie dwie przypadkowe karty ze stosu kart odrzuconych wracają na stół." },
     ];
 
-    function updatePositionsAndScaling() {
+function updatePositionsAndScaling() {
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
 
