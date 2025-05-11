@@ -303,9 +303,9 @@ body {
 
 .points {
     position: absolute;
-    top: 105px; /* Dostosowane do okręgu w punkty.webp */
+    top: 105px;
     left: 95px;
-    width: 50px; /* Mniejszy obszar dla liczby punktów */
+    width: 50px;
     height: 50px;
     line-height: 50px;
     text-align: center;
@@ -315,12 +315,12 @@ body {
 
 .power-icon {
     position: absolute;
-    top: 0; /* Pełny rozmiar, od [0, 0] */
+    top: 0;
     left: 0;
     width: 524px;
     height: 993px;
     background-size: cover;
-    z-index: 5;
+    z-index: 10; /* Najwyższy priorytet */
 }
 
 .position-icon {
@@ -330,7 +330,7 @@ body {
     width: 524px;
     height: 993px;
     background-size: cover;
-    z-index: 5;
+    z-index: 6; /* Niższy niż power-icon, ale wyższy niż points-bg */
 }
 
 .hero-icon {
@@ -341,7 +341,7 @@ body {
     height: 808px;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 5;
+    z-index: 7; /* Niższy niż power-icon */
 }
 
 .card.large .description {
