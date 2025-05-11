@@ -228,3 +228,69 @@ body {
     padding: 20px;
 }
 
+.card {
+    position: relative; /* Żeby z-index działał */
+    width: 350px;
+    height: 723px;
+}
+
+.card-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Obraz karty na samym dole */
+}
+
+.beton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Beton nad obrazem */
+}
+
+.faction-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3; /* Pasek frakcji nad betonem */
+}
+
+.power-icon {
+    position: absolute;
+    top: 10px; /* Dostosuj pozycję, jeśli trzeba */
+    left: 10px;
+    width: 50px; /* Dostosuj rozmiar */
+    height: 50px;
+    z-index: 5; /* Ikona mocy (np. deszcz.webp) na wierzchu */
+}
+
+.points-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4; /* punkty.webp między paskiem frakcji a ikoną mocy */
+}
+
+.points {
+    position: absolute;
+    top: 20px; /* Dostosuj pozycję */
+    left: 20px;
+    z-index: 6; /* Punkty (liczba) nad wszystkim */
+}
+
+.name {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 6; /* Nazwa nad wszystkim */
+}

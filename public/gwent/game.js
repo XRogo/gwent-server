@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pageDots.forEach((dot, index) => {
             dot.style.width = `${25 * scale}px`;
             dot.style.height = `${22 * scale}px`;
-            dot.style.left = `${index * 3 * scale}px`;
+            dot.style.left = `${index * 4 * scale}px`;
         });
 
         const factionInfo = document.querySelector('.faction-info');
