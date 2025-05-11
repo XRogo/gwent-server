@@ -4,17 +4,18 @@ const cards = [
     {
         nazwa: "Manekin do ćwiczeń",
         karta: "/gwent/assets/karty/niezalerzne/manekin_do_cwiczen.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/manek.webp",
         opis: "WORK.",
         bohater: false,
         moc: "manek",
+        frakcja: "nie",
         ilosc: 3,
     },
 
     {
         nazwa: "Róg dowódcy",
         karta: "/gwent/assets/karty/niezalerzne/rog_dowodcy.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/rog.webp",
         opis: "WORK.",
         bohater: false,
         moc: "rog",
@@ -25,7 +26,7 @@ const cards = [
     {
         nazwa: "Pożoga",
         karta: "/gwent/assets/karty/niezalerzne/pozoga.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/porz.webp",
         opis: "WORK.",
         bohater: false,
         moc: "porz",
@@ -36,7 +37,7 @@ const cards = [
     {
         nazwa: "Trzaskający mróz",
         karta: "/gwent/assets/karty/niezalerzne/trzaskajacy_mroz.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/mroz.webp",
         opis: "WORK.",
         bohater: false,
         moc: "mroz",
@@ -47,7 +48,7 @@ const cards = [
     {
         nazwa: "Gęsta mgła",
         karta: "/gwent/assets/karty/niezalerzne/gesta_mgla.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/mgla.webp",
         opis: "WORK.",
         bohater: false,
         moc: "mgla",
@@ -58,7 +59,7 @@ const cards = [
     {
         nazwa: "Ulewny deszcz",
         karta: "/gwent/assets/karty/niezalerzne/ulewny_deszcz.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/deszcz.webp",
         opis: "WORK.",
         bohater: false,
         moc: "deszcz",
@@ -69,7 +70,7 @@ const cards = [
     {
         nazwa: "Czyste niebo",
         karta: "/gwent/assets/karty/niezalerzne/czyste_niebo.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/",
         opis: "WORK.",
         bohater: false,
         moc: "niebo",
@@ -784,7 +785,7 @@ const cards = [
     {
         nazwa: "Cahir Mawr Dyffryn aep Ceallach",
         karta: "/gwent/assets/karty/nilftgard/cahir_mawr_dyffryn_aep_ceallach.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/3/kachir.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "2",
@@ -1097,7 +1098,7 @@ const cards = [
      {
         nazwa: "Milva",
         karta: "/gwent/assets/karty/scio'tel/milva.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/4/milwa.webp",
         opis: "WORK.",
         bohater: false,
         moc: "morale",
