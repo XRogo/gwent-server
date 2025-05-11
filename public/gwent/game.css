@@ -269,8 +269,8 @@ body {
     position: absolute;
     top: 758px;
     left: 116px;
-    width: 393px; /* 509 - 116 */
-    height: 123px; /* 881 - 758 */
+    width: 393px;
+    height: 123px;
     text-align: center;
     font-size: 28px;
     color: #000;
@@ -282,8 +282,8 @@ body {
     position: absolute;
     top: 899px;
     left: 18px;
-    width: 482px; /* 500 - 18 */
-    height: 76px; /* 975 - 899 */
+    width: 482px;
+    height: 76px;
     font-size: 18px;
     color: #000;
     text-align: center;
@@ -293,7 +293,7 @@ body {
 
 .points-bg {
     position: absolute;
-    top: 0; /* Poprawione na [0, 0] */
+    top: 0;
     left: 0;
     width: 524px;
     height: 993px;
@@ -305,23 +305,23 @@ body {
     position: absolute;
     top: 105px; /* Dostosowane, aby wyśrodkować w okręgu punkty.webp */
     left: 95px;
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
+    width: 150px; /* Zwiększone, aby ikony były większe */
+    height: 150px;
+    line-height: 150px;
     text-align: center;
     font-size: 28px;
     z-index: 5;
 }
 
 .power-icon {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
+    width: 150px; /* Zwiększone, aby ikony były większe */
+    height: 150px;
+    object-fit: contain; /* Zachowuje proporcje */
 }
 
 .position-icon {
     position: absolute;
-    top: 0; /* Poprawione na [0, 0] */
+    top: 0;
     left: 0;
     width: 524px;
     height: 993px;
@@ -340,7 +340,6 @@ body {
     z-index: 5;
 }
 
-/* Pokazanie opisu w największym widoku */
 .card.large .description {
     display: block;
 }
