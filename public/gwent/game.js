@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageDots = document.querySelectorAll('.page-dot');
     const hoverSound = document.getElementById('hoverSound');
     let currentPage = 1;
-    const GUI_WIDTH = 3840; // Rozmiar tła gui.webp
+    const GUI_WIDTH = 3840;
     const GUI_HEIGHT = 2160;
+    let deck = [];
 
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
@@ -28,21 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const overlayLeft = overlayRect.left;
         const overlayTop = overlayRect.top;
 
-        // Oblicz skalę na podstawie proporcji okna i tła
         const windowAspectRatio = window.innerWidth / window.innerHeight;
         const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
 
         let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
 
         if (windowAspectRatio > guiAspectRatio) {
-            // Okno szersze niż tło – skalujemy do wysokości okna
             scale = overlayHeight / GUI_HEIGHT;
             backgroundWidth = GUI_WIDTH * scale;
             backgroundHeight = overlayHeight;
             backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
             backgroundTop = overlayTop;
         } else {
-            // Okno wyższe niż tło – skalujemy do szerokości okna
             scale = overlayWidth / GUI_WIDTH;
             backgroundWidth = overlayWidth;
             backgroundHeight = GUI_HEIGHT * scale;
@@ -50,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
         }
 
-        // Przyciski kolekcji
         const buttonWidth = 97 * scale;
         const buttonHeight = 80 * scale;
 
@@ -96,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.button.collection.specjalne').style.top = `${backgroundTop + 361 * scale}px`;
         document.querySelector('.button.collection.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
-        // Przyciski talii
         document.querySelector('.button.deck.all').style.width = `${buttonWidth}px`;
         document.querySelector('.button.deck.all').style.height = `${buttonHeight}px`;
         document.querySelector('.button.deck.all').style.left = `${backgroundLeft + 2297 * scale}px`;
@@ -139,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.button.deck.specjalne').style.top = `${backgroundTop + 361 * scale}px`;
         document.querySelector('.button.deck.specjalne').style.backgroundImage = `url('assets/wybor/inne.webp')`;
 
-        // Obszary kart
         collectionArea.style.width = `${1195 * scale}px`;
         collectionArea.style.height = `${1449 * scale}px`;
         collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
@@ -152,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         deckArea.style.top = `${backgroundTop + 491 * scale}px`;
         deckArea.style.padding = `${10 * scale}px`;
 
-        // Karty
         const cards = document.querySelectorAll('.card-area .card');
         cards.forEach(card => {
             card.style.width = `${350 * scale}px`;
@@ -170,12 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Statystyki
         stats.style.left = `${backgroundLeft + 1935 * scale}px`;
         stats.style.top = `${backgroundTop + 1152 * scale}px`;
         stats.style.fontSize = `${16 * scale}px`;
 
-        // Przyciski przewijania
         document.querySelector('.page-left').style.width = `${49 * scale}px`;
         document.querySelector('.page-left').style.height = `${43 * scale}px`;
         document.querySelector('.page-left').style.left = `${backgroundLeft + 1452 * scale}px`;
@@ -188,19 +180,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.page-right').style.top = `${backgroundTop + 154 * scale}px`;
         document.querySelector('.page-right').style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
 
-        // Kropki – tylko skalowanie, pozycja ustawiana w updatePage()
         pageDots.forEach((dot, index) => {
-        dot.style.width = `${25 * scale}px`;
-        dot.style.height = `${22 * scale}px`;
-        dot.style.left = `${index * 3 * scale}px`; // 36 px = szerokość kropki (25) + odstęp (11)
+            dot.style.width = `${25 * scale}px`;
+            dot.style.height = `${22 * scale}px`;
+            dot.style.left = `${index * 3 * scale}px`;
         });
 
-        // Informacje o frakcji
         const factionInfo = document.querySelector('.faction-info');
         factionInfo.style.left = `${backgroundLeft}px`;
-        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`; // 114 px w 4K
+        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
 
-        // Wyśrodkowanie .faction-header (tarcza + nazwa)
         const factionHeader = document.querySelector('.faction-header');
         factionHeader.style.left = `${(GUI_WIDTH / 2) * scale}px`;
         factionHeader.style.top = `0px`;
@@ -212,20 +201,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-name').style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
         document.querySelector('.faction-name').style.lineHeight = `${110 * scale}px`;
 
-        // Wyśrodkowanie .faction-ability (opis)
         const factionAbility = document.querySelector('.faction-ability');
         factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
         factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-        factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`; // 276 px w 4K
+        factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
         factionAbility.style.transform = `translateX(-50%)`;
 
-        // Karta lidera
         document.querySelector('.leader-card').style.width = `${259 * scale}px`;
         document.querySelector('.leader-card').style.height = `${490 * scale}px`;
         document.querySelector('.leader-card').style.left = `${backgroundLeft + 1792 * scale}px`;
         document.querySelector('.leader-card').style.top = `${backgroundTop + 539 * scale}px`;
 
-        // Przycisk "Przejdź do gry"
         const goToGameButton = document.getElementById('goToGameButton');
         goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
         goToGameButton.style.bottom = `${43 * scale}px`;
@@ -237,25 +223,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
 
-    document.getElementById('goToGameButton').addEventListener('click', () => {
-        cardSelectionScreen.style.display = 'none';
-        gameScreen.style.display = 'block';
-    });
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie") {
+    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards) {
         while (area.firstChild) {
             area.removeChild(area.firstChild);
         }
 
-        const filteredCards = cards.filter(card => {
+        const filteredCards = cardList.filter(card => {
             if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
             if (filter === 'all') return true;
             if (filter === 'miecz') return card.pozycja === 1;
             if (filter === 'luk') return card.pozycja === 2;
             if (filter === 'oblezenie') return card.pozycja === 3;
             if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return card.moc === 'pogoda';
-            if (filter === 'specjalne') return card.moc === 'specjalne';
+            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
             return false;
         });
 
@@ -307,6 +288,75 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePositionsAndScaling();
     }
 
+    function displayDeck() {
+        displayCards('all', deckArea, factions[currentPage - 1].id, deck);
+    }
+
+    function displayCollection(filter) {
+        displayCards(filter, collectionArea, factions[currentPage - 1].id);
+    }
+
+    function updateStats() {
+        const totalCards = deck.length;
+        const unitCards = deck.filter(card => typeof card.punkty === 'number').length;
+        const specialCards = totalCards - unitCards;
+        const totalStrength = deck.reduce((sum, card) => sum + (typeof card.punkty === 'number' ? card.punkty : 0), 0);
+        const heroCards = deck.filter(card => card.bohater).length;
+
+        stats.querySelector('.total-cards').textContent = totalCards;
+        stats.querySelector('.unit-cards').textContent = `${unitCards}/22`;
+        stats.querySelector('.special-cards').textContent = `${specialCards}/10`;
+        stats.querySelector('.total-strength').textContent = totalStrength;
+        stats.querySelector('.hero-cards').textContent = heroCards;
+    }
+
+    document.getElementById('goToGameButton').addEventListener('click', () => {
+        if (deck.length < 10) {
+            alert('Talia musi mieć co najmniej 10 kart!');
+            return;
+        }
+        cardSelectionScreen.style.display = 'none';
+        gameScreen.style.display = 'block';
+    });
+
+    collectionArea.addEventListener('click', (event) => {
+        const cardElement = event.target.closest('.card');
+        if (cardElement) {
+            const cardName = cardElement.querySelector('.name').textContent;
+            const card = cards.find(c => c.nazwa === cardName);
+            if (card) {
+                const countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (countInDeck < card.ilosc) {
+                    const isUnitCard = typeof card.punkty === 'number';
+                    const unitCount = deck.filter(c => typeof c.punkty === 'number').length;
+                    const specialCount = deck.filter(c => typeof c.punkty !== 'number').length;
+                    if ((isUnitCard && unitCount < 22) || (!isUnitCard && specialCount < 10)) {
+                        deck.push({ ...card });
+                        displayDeck();
+                        updateStats();
+                    } else {
+                        alert('Osiągnięto limit kart w talii.');
+                    }
+                } else {
+                    alert('Nie ma więcej kopii tej karty do dodania.');
+                }
+            }
+        }
+    });
+
+    deckArea.addEventListener('click', (event) => {
+        const cardElement = event.target.closest('.card');
+        if (cardElement) {
+            const cardName = cardElement.querySelector('.name').textContent;
+            const index = deck.findIndex(c => c.nazwa === cardName);
+            if (index !== -1) {
+                deck.splice(index, 1);
+                displayDeck();
+                updateStats();
+            }
+        }
+    });
+
     document.querySelector('.page-left').addEventListener('click', () => {
         currentPage = (currentPage - 2 + factions.length) % factions.length + 1;
         updatePage();
@@ -323,8 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.faction-shield').src = faction.shield;
         document.querySelector('.faction-ability').textContent = faction.ability;
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
-    
-        // Pozycje kropek dla każdej strony
+        
+        const leaderCard = document.querySelector('.leader-card');
+        leaderCard.innerHTML = `<img src="assets/dkarty/lider_${faction.id}.webp" style="width: 100%; height: 100%;">`;
+
         const baseLeft = 1850;
         const spacing = 26;
         const topPosition = 208;
@@ -344,55 +396,32 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundLeft = overlayRect.left;
             backgroundTop = overlayRect.top + (overlayHeight - (GUI_HEIGHT * scale)) / 2;
         }
-        // Kompensacja marginesu: każda kropka ma margin-right: 10px * scale, więc dla strony N musimy odjąć (N-1) * (10 * scale)
         const marginCompensation = (currentPage - 1) * (10 * scale);
         const leftPosition = baseLeft + (currentPage - 1) * spacing - marginCompensation;
         document.querySelector('.page-indicators').style.left = `${backgroundLeft + leftPosition * scale}px`;
         document.querySelector('.page-indicators').style.top = `${backgroundTop + topPosition * scale}px`;
-    
-        // Po zmianie frakcji, ustaw domyślny filtr na "all" i podświetl odpowiedni przycisk
+
         document.querySelectorAll('.button.collection').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.button.deck').forEach(btn => btn.classList.remove('active'));
         document.querySelector('.button.collection.all').classList.add('active');
         document.querySelector('.button.deck.all').classList.add('active');
-        displayCards('all', collectionArea, faction.id);
-        displayCards('all', deckArea, faction.id);
+        displayCollection('all');
+        displayDeck();
     }
 
-    function updateStats() {
-        stats.querySelector('.total-cards').textContent = '0';
-        stats.querySelector('.unit-cards').textContent = '0/22';
-        stats.querySelector('.special-cards').textContent = '0/10';
-        stats.querySelector('.total-strength').textContent = '0';
-        stats.querySelector('.hero-cards').textContent = '0';
-    }
-
-    // Ustaw domyślnie aktywny tryb "all" dla obu sekcji
-    document.querySelector('.button.collection.all').classList.add('active');
-    document.querySelector('.button.deck.all').classList.add('active');
-
-    // Dodaj obsługę kliknięcia dla przycisków sortowania
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', () => {
             const area = button.classList.contains('collection') ? collectionArea : deckArea;
             const section = button.classList.contains('collection') ? 'collection' : 'deck';
-
-            // Usuń klasę .active z obecnie aktywnego przycisku w tej sekcji
-            document.querySelectorAll(`.button.${section}`).forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Dodaj klasę .active do klikniętego przycisku
+            document.querySelectorAll(`.button.${section}`).forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-
-            // Wyświetl karty z nowym filtrem
-            displayCards(button.dataset.filter, area, factions[currentPage - 1].id);
+            if (area === collectionArea) {
+                displayCollection(button.dataset.filter);
+            } else {
+                displayCards(button.dataset.filter, deckArea, factions[currentPage - 1].id, deck);
+            }
         });
     });
-
-    // Początkowe wyświetlenie kart z domyślnym filtrem "all"
-    displayCards('all', collectionArea, factions[0].id);
-    displayCards('all', deckArea, factions[0].id);
 
     updatePage();
     updateStats();
