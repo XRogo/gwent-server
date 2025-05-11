@@ -85,8 +85,7 @@ body {
 .card-area .card .beton,
 .card-area .card .faction-banner,
 .card-area .card .position-icon,
-.card-area .card .points-bg,
-.card-area .card .hero-icon {
+.card-area .card .points-bg {
     position: absolute;
     top: 0;
     left: 0;
@@ -102,7 +101,17 @@ body {
 .card-area .card .faction-banner { z-index: 3; }
 .card-area .card .points-bg { z-index: 4; }
 .card-area .card .position-icon { z-index: 6; }
-.card-area .card .hero-icon { z-index: 7; }
+
+.card-area .card .hero-icon {
+    position: absolute;
+    top: -19px;
+    left: -23px;
+    width: 310px; /* Oryginalne wymiary obrazka */
+    height: 808px;
+    object-fit: contain;
+    object-position: top left;
+    z-index: 7;
+}
 
 .card-area .card .power-icon {
     position: absolute;
@@ -111,7 +120,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    object-position: top left; /* Wyrównaj do lewego górnego rogu */
+    object-position: top left;
     z-index: 10;
 }
 

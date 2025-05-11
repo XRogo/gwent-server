@@ -113,13 +113,21 @@ function updatePositionsAndScaling() {
             name.style.fontSize = `${16 * scale}px`;
         }
 
-        // Poprawka pozycjonowania power-icon
         const powerIcon = card.querySelector('.power-icon');
         if (powerIcon) {
             powerIcon.style.width = `${350 * scale}px`;
             powerIcon.style.height = `${723 * scale}px`;
             powerIcon.style.top = '0px';
             powerIcon.style.left = '0px';
+        }
+
+        // Skalowanie hero-icon
+        const heroIcon = card.querySelector('.hero-icon');
+        if (heroIcon) {
+            heroIcon.style.width = `${310 * scale}px`; // Oryginalne 310px skalowane proporcjonalnie
+            heroIcon.style.height = `${808 * scale}px`; // Oryginalne 808px skalowane proporcjonalnie
+            heroIcon.style.top = `${-19 * scale}px`; // Przesunięcie skalowane proporcjonalnie
+            heroIcon.style.left = `${-23 * scale}px`; // Przesunięcie skalowane proporcjonalnie
         }
     });
 
@@ -266,7 +274,7 @@ function updatePositionsAndScaling() {
             }
 
             if (card.bohater) {
-                html += `<div class="hero-icon" style="background-image: url('assets/dkarty/bohater.webp');"></div>`;
+                html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
             }
 
             if (card.moc) {
