@@ -272,8 +272,9 @@ body {
     width: 393px; /* 509 - 116 */
     height: 123px; /* 881 - 758 */
     text-align: center;
-    font-size: 28px; /* Zwiększony rozmiar tekstu */
+    font-size: 28px;
     color: #000;
+    line-height: 123px;
     z-index: 4;
 }
 
@@ -283,44 +284,48 @@ body {
     left: 18px;
     width: 482px; /* 500 - 18 */
     height: 76px; /* 975 - 899 */
-    font-size: 18px; /* Rozmiar tekstu dla opisu */
+    font-size: 18px;
     color: #000;
+    text-align: center;
+    display: none;
     z-index: 4;
-    display: none; /* Ukryty domyślnie */
 }
 
 .points-bg {
     position: absolute;
-    top: 81px;
-    left: 75px;
-    width: 50px;
-    height: 50px;
-    background-size: contain;
-    background-repeat: no-repeat;
+    top: 0; /* Poprawione na [0, 0] */
+    left: 0;
+    width: 524px;
+    height: 993px;
+    background-size: cover;
     z-index: 4;
 }
 
 .points {
     position: absolute;
-    top: 81px;
-    left: 75px;
+    top: 105px; /* Dostosowane, aby wyśrodkować w okręgu punkty.webp */
+    left: 95px;
     width: 50px;
     height: 50px;
     line-height: 50px;
     text-align: center;
-    font-size: 28px; /* Zwiększony rozmiar tekstu */
+    font-size: 28px;
     z-index: 5;
+}
+
+.power-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
 }
 
 .position-icon {
     position: absolute;
-    top: 5px; /* Dostosuj pozycję */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    background-size: contain;
-    background-repeat: no-repeat;
+    top: 0; /* Poprawione na [0, 0] */
+    left: 0;
+    width: 524px;
+    height: 993px;
+    background-size: cover;
     z-index: 5;
 }
 

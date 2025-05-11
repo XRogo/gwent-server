@@ -70,7 +70,7 @@ const cards = [
     {
         nazwa: "Czyste niebo",
         karta: "/gwent/assets/karty/niezalerzne/czyste_niebo.webp",
-        dkarta: "/gwent/assets/dkarty/1/",
+        dkarta: "/gwent/assets/dkarty/1/niebo.webp",
         opis: "WORK.",
         bohater: false,
         moc: "niebo",
