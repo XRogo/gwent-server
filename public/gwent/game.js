@@ -22,180 +22,189 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     function updatePositionsAndScaling() {
-        const overlay = document.querySelector('.overlay');
-        if (!overlay) return;
+    const overlay = document.querySelector('.overlay');
+    if (!overlay) return;
 
-        const overlayRect = overlay.getBoundingClientRect();
-        const overlayWidth = overlayRect.width;
-        const overlayHeight = overlayRect.height;
-        const overlayLeft = overlayRect.left;
-        const overlayTop = overlayRect.top;
+    const overlayRect = overlay.getBoundingClientRect();
+    const overlayWidth = overlayRect.width;
+    const overlayHeight = overlayRect.height;
+    const overlayLeft = overlayRect.left;
+    const overlayTop = overlayRect.top;
 
-        const windowAspectRatio = window.innerWidth / window.innerHeight;
-        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+    const windowAspectRatio = window.innerWidth / window.innerHeight;
+    const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
 
-        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+    let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
 
-        if (windowAspectRatio > guiAspectRatio) {
-            scale = overlayHeight / GUI_HEIGHT;
-            backgroundWidth = GUI_WIDTH * scale;
-            backgroundHeight = overlayHeight;
-            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-            backgroundTop = overlayTop;
-        } else {
-            scale = overlayWidth / GUI_WIDTH;
-            backgroundWidth = overlayWidth;
-            backgroundHeight = GUI_HEIGHT * scale;
-            backgroundLeft = overlayLeft;
-            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-        }
-
-        const buttonWidth = 97 * scale;
-        const buttonHeight = 80 * scale;
-
-        const buttons = [
-            { selector: '.button.collection.all', left: 373, top: 354, image: 'assets/wybor/all.webp' },
-            { selector: '.button.collection.mecz', left: 549, top: 356, image: 'assets/wybor/mecz.webp' },
-            { selector: '.button.collection.lok', left: 735, top: 355, image: 'assets/wybor/lok.webp' },
-            { selector: '.button.collection.obl', left: 916, top: 355, image: 'assets/wybor/kapatulta.webp' },
-            { selector: '.button.collection.hero', left: 1098, top: 356, image: 'assets/wybor/boharer.webp' },
-            { selector: '.button.collection.pogoda', left: 1277, top: 351, image: 'assets/wybor/pogoda.webp' },
-            { selector: '.button.collection.specjalne', left: 1459, top: 361, image: 'assets/wybor/inne.webp' },
-            { selector: '.button.deck.all', left: 2297, top: 354, image: 'assets/wybor/all.webp' },
-            { selector: '.button.deck.mecz', left: 2473, top: 356, image: 'assets/wybor/mecz.webp' },
-            { selector: '.button.deck.lok', left: 2659, top: 355, image: 'assets/wybor/lok.webp' },
-            { selector: '.button.deck.obl', left: 2840, top: 355, image: 'assets/wybor/kapatulta.webp' },
-            { selector: '.button.deck.hero', left: 3022, top: 356, image: 'assets/wybor/boharer.webp' },
-            { selector: '.button.deck.pogoda', left: 3201, top: 351, image: 'assets/wybor/pogoda.webp' },
-            { selector: '.button.deck.specjalne', left: 3380, top: 361, image: 'assets/wybor/inne.webp' },
-        ];
-
-        buttons.forEach(({ selector, left, top, image }) => {
-            const button = document.querySelector(selector);
-            if (button) {
-                button.style.width = `${buttonWidth}px`;
-                button.style.height = `${buttonHeight}px`;
-                button.style.left = `${backgroundLeft + left * scale}px`;
-                button.style.top = `${backgroundTop + top * scale}px`;
-                button.style.backgroundImage = `url('${image}')`;
-            }
-        });
-
-        if (collectionArea) {
-            collectionArea.style.width = `${1195 * scale}px`;
-            collectionArea.style.height = `${1449 * scale}px`;
-            collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
-            collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
-            collectionArea.style.padding = `${10 * scale}px`;
-        }
-
-        if (deckArea) {
-            deckArea.style.width = `${1193 * scale}px`;
-            deckArea.style.height = `${1449 * scale}px`;
-            deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
-            deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-            deckArea.style.padding = `${10 * scale}px`;
-        }
-
-        const cards = document.querySelectorAll('.card-area .card');
-        cards.forEach(card => {
-            card.style.width = `${350 * scale}px`;
-            card.style.height = `${723 * scale}px`;
-            card.style.margin = `${10 * scale}px`;
-
-            const points = card.querySelector('.points');
-            if (points) {
-                points.style.fontSize = `${30 * scale}px`;
-            }
-
-            const name = card.querySelector('.name');
-            if (name) {
-                name.style.fontSize = `${16 * scale}px`;
-            }
-        });
-
-        if (stats) {
-            stats.style.left = `${backgroundLeft + 1935 * scale}px`;
-            stats.style.top = `${backgroundTop + 1152 * scale}px`;
-            stats.style.fontSize = `${16 * scale}px`;
-        }
-
-        const pageLeft = document.querySelector('.page-left');
-        if (pageLeft) {
-            pageLeft.style.width = `${49 * scale}px`;
-            pageLeft.style.height = `${43 * scale}px`;
-            pageLeft.style.left = `${backgroundLeft + 1452 * scale}px`;
-            pageLeft.style.top = `${backgroundTop + 155 * scale}px`;
-            pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
-        }
-
-        const pageRight = document.querySelector('.page-right');
-        if (pageRight) {
-            pageRight.style.width = `${49 * scale}px`;
-            pageRight.style.height = `${43 * scale}px`;
-            pageRight.style.left = `${backgroundLeft + 2338 * scale}px`;
-            pageRight.style.top = `${backgroundTop + 154 * scale}px`;
-            pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
-        }
-
-        pageDots.forEach((dot, index) => {
-            if (dot) {
-                dot.style.width = `${25 * scale}px`;
-                dot.style.height = `${22 * scale}px`;
-                dot.style.left = `${index * 4 * scale}px`;
-            }
-        });
-
-        const factionInfo = document.querySelector('.faction-info');
-        if (factionInfo) {
-            factionInfo.style.left = `${backgroundLeft}px`;
-            factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
-        }
-
-        const factionHeader = document.querySelector('.faction-header');
-        if (factionHeader) {
-            factionHeader.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-            factionHeader.style.top = `0px`;
-            factionHeader.style.transform = `translateX(-50%)`;
-        }
-
-        const factionShield = document.querySelector('.faction-shield');
-        if (factionShield) {
-            factionShield.style.width = `${106 * scale}px`;
-            factionShield.style.height = `${110 * scale}px`;
-        }
-
-        const factionName = document.querySelector('.faction-name');
-        if (factionName) {
-            factionName.style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
-            factionName.style.lineHeight = `${110 * scale}px`;
-        }
-
-        const factionAbility = document.querySelector('.faction-ability');
-        if (factionAbility) {
-            factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
-            factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-            factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
-            factionAbility.style.transform = `translateX(-50%)`;
-        }
-
-        const leaderCard = document.querySelector('.leader-card');
-        if (leaderCard) {
-            leaderCard.style.width = `${259 * scale}px`;
-            leaderCard.style.height = `${490 * scale}px`;
-            leaderCard.style.left = `${backgroundLeft + 1792 * scale}px`;
-            leaderCard.style.top = `${backgroundTop + 539 * scale}px`;
-        }
-
-        const goToGameButton = document.getElementById('goToGameButton');
-        if (goToGameButton) {
-            goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-            goToGameButton.style.bottom = `${43 * scale}px`;
-            goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
-            goToGameButton.style.fontSize = `${30 * scale}px`;
-            goToGameButton.style.transform = `translateX(-50%)`;
-        }
+    if (windowAspectRatio > guiAspectRatio) {
+        scale = overlayHeight / GUI_HEIGHT;
+        backgroundWidth = GUI_WIDTH * scale;
+        backgroundHeight = overlayHeight;
+        backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+        backgroundTop = overlayTop;
+    } else {
+        scale = overlayWidth / GUI_WIDTH;
+        backgroundWidth = overlayWidth;
+        backgroundHeight = GUI_HEIGHT * scale;
+        backgroundLeft = overlayLeft;
+        backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
     }
+
+    const buttonWidth = 97 * scale;
+    const buttonHeight = 80 * scale;
+
+    const buttons = [
+        { selector: '.button.collection.all', left: 373, top: 354, image: 'assets/wybor/all.webp' },
+        { selector: '.button.collection.mecz', left: 549, top: 356, image: 'assets/wybor/mecz.webp' },
+        { selector: '.button.collection.lok', left: 735, top: 355, image: 'assets/wybor/lok.webp' },
+        { selector: '.button.collection.obl', left: 916, top: 355, image: 'assets/wybor/kapatulta.webp' },
+        { selector: '.button.collection.hero', left: 1098, top: 356, image: 'assets/wybor/boharer.webp' },
+        { selector: '.button.collection.pogoda', left: 1277, top: 351, image: 'assets/wybor/pogoda.webp' },
+        { selector: '.button.collection.specjalne', left: 1459, top: 361, image: 'assets/wybor/inne.webp' },
+        { selector: '.button.deck.all', left: 2297, top: 354, image: 'assets/wybor/all.webp' },
+        { selector: '.button.deck.mecz', left: 2473, top: 356, image: 'assets/wybor/mecz.webp' },
+        { selector: '.button.deck.lok', left: 2659, top: 355, image: 'assets/wybor/lok.webp' },
+        { selector: '.button.deck.obl', left: 2840, top: 355, image: 'assets/wybor/kapatulta.webp' },
+        { selector: '.button.deck.hero', left: 3022, top: 356, image: 'assets/wybor/boharer.webp' },
+        { selector: '.button.deck.pogoda', left: 3201, top: 351, image: 'assets/wybor/pogoda.webp' },
+        { selector: '.button.deck.specjalne', left: 3380, top: 361, image: 'assets/wybor/inne.webp' },
+    ];
+
+    buttons.forEach(({ selector, left, top, image }) => {
+        const button = document.querySelector(selector);
+        if (button) {
+            button.style.width = `${buttonWidth}px`;
+            button.style.height = `${buttonHeight}px`;
+            button.style.left = `${backgroundLeft + left * scale}px`;
+            button.style.top = `${backgroundTop + top * scale}px`;
+            button.style.backgroundImage = `url('${image}')`;
+        }
+    });
+
+    if (collectionArea) {
+        collectionArea.style.width = `${1195 * scale}px`;
+        collectionArea.style.height = `${1449 * scale}px`;
+        collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
+        collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
+        collectionArea.style.padding = `${10 * scale}px`;
+    }
+
+    if (deckArea) {
+        deckArea.style.width = `${1193 * scale}px`;
+        deckArea.style.height = `${1449 * scale}px`;
+        deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
+        deckArea.style.top = `${backgroundTop + 491 * scale}px`;
+        deckArea.style.padding = `${10 * scale}px`;
+    }
+
+    const cards = document.querySelectorAll('.card-area .card');
+    cards.forEach(card => {
+        card.style.width = `${350 * scale}px`;
+        card.style.height = `${723 * scale}px`;
+        card.style.margin = `${10 * scale}px`;
+
+        const points = card.querySelector('.points');
+        if (points) {
+            points.style.fontSize = `${30 * scale}px`;
+        }
+
+        const name = card.querySelector('.name');
+        if (name) {
+            name.style.fontSize = `${16 * scale}px`;
+        }
+
+        // Poprawka pozycjonowania power-icon
+        const powerIcon = card.querySelector('.power-icon');
+        if (powerIcon) {
+            powerIcon.style.width = `${350 * scale}px`;
+            powerIcon.style.height = `${723 * scale}px`;
+            powerIcon.style.top = '0px';
+            powerIcon.style.left = '0px';
+        }
+    });
+
+    if (stats) {
+        stats.style.left = `${backgroundLeft + 1935 * scale}px`;
+        stats.style.top = `${backgroundTop + 1152 * scale}px`;
+        stats.style.fontSize = `${16 * scale}px`;
+    }
+
+    const pageLeft = document.querySelector('.page-left');
+    if (pageLeft) {
+        pageLeft.style.width = `${49 * scale}px`;
+        pageLeft.style.height = `${43 * scale}px`;
+        pageLeft.style.left = `${backgroundLeft + 1452 * scale}px`;
+        pageLeft.style.top = `${backgroundTop + 155 * scale}px`;
+        pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
+    }
+
+    const pageRight = document.querySelector('.page-right');
+    if (pageRight) {
+        pageRight.style.width = `${49 * scale}px`;
+        pageRight.style.height = `${43 * scale}px`;
+        pageRight.style.left = `${backgroundLeft + 2338 * scale}px`;
+        pageRight.style.top = `${backgroundTop + 154 * scale}px`;
+        pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
+    }
+
+    pageDots.forEach((dot, index) => {
+        if (dot) {
+            dot.style.width = `${25 * scale}px`;
+            dot.style.height = `${22 * scale}px`;
+            dot.style.left = `${index * 4 * scale}px`;
+        }
+    });
+
+    const factionInfo = document.querySelector('.faction-info');
+    if (factionInfo) {
+        factionInfo.style.left = `${backgroundLeft}px`;
+        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
+    }
+
+    const factionHeader = document.querySelector('.faction-header');
+    if (factionHeader) {
+        factionHeader.style.left = `${(GUI_WIDTH / 2) * scale}px`;
+        factionHeader.style.top = `0px`;
+        factionHeader.style.transform = `translateX(-50%)`;
+    }
+
+    const factionShield = document.querySelector('.faction-shield');
+    if (factionShield) {
+        factionShield.style.width = `${106 * scale}px`;
+        factionShield.style.height = `${110 * scale}px`;
+    }
+
+    const factionName = document.querySelector('.faction-name');
+    if (factionName) {
+        factionName.style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
+        factionName.style.lineHeight = `${110 * scale}px`;
+    }
+
+    const factionAbility = document.querySelector('.faction-ability');
+    if (factionAbility) {
+        factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
+        factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
+        factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
+        factionAbility.style.transform = `translateX(-50%)`;
+    }
+
+    const leaderCard = document.querySelector('.leader-card');
+    if (leaderCard) {
+        leaderCard.style.width = `${259 * scale}px`;
+        leaderCard.style.height = `${490 * scale}px`;
+        leaderCard.style.left = `${backgroundLeft + 1792 * scale}px`;
+        leaderCard.style.top = `${backgroundTop + 539 * scale}px`;
+    }
+
+    const goToGameButton = document.getElementById('goToGameButton');
+    if (goToGameButton) {
+        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
+        goToGameButton.style.bottom = `${43 * scale}px`;
+        goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
+        goToGameButton.style.fontSize = `${30 * scale}px`;
+        goToGameButton.style.transform = `translateX(-50%)`;
+    }
+}
 
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
