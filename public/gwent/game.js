@@ -123,8 +123,8 @@ function updatePositionsAndScaling() {
 
         const heroIcon = card.querySelector('.hero-icon');
         if (heroIcon) {
-            heroIcon.style.width = `${381 * scale}px`; // Proporcjonalna szerokość
-            heroIcon.style.height = `${723 * scale}px`; // Taka sama wysokość jak karta po skalowaniu
+            heroIcon.style.width = `${310 * scale}px`; // Skalowanie proporcjonalne do oryginalnych wymiarów
+            heroIcon.style.height = `${808 * scale}px`; // Skalowanie proporcjonalne do oryginalnych wymiarów
             heroIcon.style.top = `${-19 * scale}px`;
             heroIcon.style.left = `${-23 * scale}px`;
         }
