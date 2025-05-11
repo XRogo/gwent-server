@@ -121,13 +121,12 @@ function updatePositionsAndScaling() {
             powerIcon.style.left = '0px';
         }
 
-        // Skalowanie hero-icon
         const heroIcon = card.querySelector('.hero-icon');
         if (heroIcon) {
-            heroIcon.style.width = `${310 * scale}px`; // Oryginalne 310px skalowane proporcjonalnie
-            heroIcon.style.height = `${808 * scale}px`; // Oryginalne 808px skalowane proporcjonalnie
-            heroIcon.style.top = `${-19 * scale}px`; // Przesunięcie skalowane proporcjonalnie
-            heroIcon.style.left = `${-23 * scale}px`; // Przesunięcie skalowane proporcjonalnie
+            heroIcon.style.width = `${381 * scale}px`; // Proporcjonalna szerokość
+            heroIcon.style.height = `${723 * scale}px`; // Taka sama wysokość jak karta po skalowaniu
+            heroIcon.style.top = `${-19 * scale}px`;
+            heroIcon.style.left = `${-23 * scale}px`;
         }
     });
 
