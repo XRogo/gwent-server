@@ -255,22 +255,21 @@ function displayCards(filter = 'all', area = collectionArea, playerFaction = "ni
             <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
         `;
 
-        // Przenosimy points-bg przed power-icon, ale po faction-banner
+        if (card.pozycja) {
+            html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+        }
+
         const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
         const isSpecialCard = ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
         if (card.punkty || isWeatherCard || isSpecialCard) {
             html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
             if (card.punkty) {
+                // Dla kart z punktami wyświetlamy liczbę
                 html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
+            } else if (card.moc) {
+                // Dla kart pogodowych/specjalnych wyświetlamy ikonę mocy w tym samym miejscu
+                html += `<div class="points"><img src="assets/dkarty/${card.moc}.webp" style="width: 100%; height: 100%;"></div>`;
             }
-        }
-
-        if (card.pozycja) {
-            html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-        }
-
-        if (card.moc) {
-            html += `<div class="power-icon" style="background-image: url('assets/dkarty/${card.moc}.webp');"></div>`;
         }
 
         if (card.bohater) {

@@ -242,7 +242,7 @@ body {
     width: 100%;
     height: 100%;
     background-size: cover;
-    z-index: 1; /* Najniżej */
+    z-index: 1;
 }
 
 .beton {
@@ -252,7 +252,7 @@ body {
     width: 100%;
     height: 100%;
     background-size: cover;
-    z-index: 2; /* Nad card-image */
+    z-index: 2;
 }
 
 .faction-banner {
@@ -262,35 +262,29 @@ body {
     width: 100%;
     height: 100%;
     background-size: cover;
-    z-index: 3; /* Nad beton */
+    z-index: 3;
 }
 
 .points-bg {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    z-index: 4; /* Nad faction-banner */
-}
-
-.power-icon {
-    position: absolute;
     top: 5px;
     left: 5px;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 6; /* Nad points-bg */
+    z-index: 4;
 }
 
 .points {
     position: absolute;
-    top: 10px;
+    top: 10px; /* Dostosuj pozycję, żeby ikona była wyśrodkowana w points-bg */
     left: 10px;
-    z-index: 6; /* Nad wszystkim */
+    width: 40px; /* Rozmiar taki sam jak power-icon */
+    height: 40px;
+    line-height: 40px; /* Dla tekstu (liczb punktów) */
+    text-align: center; /* Dla tekstu */
+    z-index: 5;
 }
 
 .hero-icon {
@@ -301,7 +295,7 @@ body {
     height: 40px;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 5; /* Na tym samym poziomie co power-icon */
+    z-index: 5;
 }
 
 .position-icon {
@@ -313,7 +307,7 @@ body {
     height: 40px;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 4; /* Na tym samym poziomie co power-icon */
+    z-index: 5;
 }
 
 .name {
@@ -322,5 +316,5 @@ body {
     left: 0;
     width: 100%;
     text-align: center;
-    z-index: 7; /* Nad wszystkim */
+    z-index: 5;
 }
