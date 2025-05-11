@@ -283,7 +283,7 @@ body {
     height: 40px;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 5; /* Nad points-bg */
+    z-index: 6; /* Nad points-bg */
 }
 
 .points {
@@ -313,7 +313,7 @@ body {
     height: 40px;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 5; /* Na tym samym poziomie co power-icon */
+    z-index: 4; /* Na tym samym poziomie co power-icon */
 }
 
 .name {
@@ -322,5 +322,5 @@ body {
     left: 0;
     width: 100%;
     text-align: center;
-    z-index: 6; /* Nad wszystkim */
+    z-index: 7; /* Nad wszystkim */
 }
