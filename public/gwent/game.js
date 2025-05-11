@@ -223,70 +223,73 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
 
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards) {
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
+function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards) {
+    while (area.firstChild) {
+        area.removeChild(area.firstChild);
+    }
+
+    const filteredCards = cardList.filter(card => {
+        if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
+        if (filter === 'all') return true;
+        if (filter === 'miecz') return card.pozycja === 1;
+        if (filter === 'luk') return card.pozycja === 2;
+        if (filter === 'oblezenie') return card.pozycja === 3;
+        if (filter === 'bohater') return card.bohater === true;
+        if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+        if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
+        return false;
+    });
+
+    filteredCards.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card';
+
+        let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
+        if (card.nazwa === "Bies" && playerFaction !== "4") {
+            bannerFaction = playerFaction;
         }
 
-        const filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
-            return false;
+        let html = `
+            <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
+            <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
+            <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
+        `;
+
+        // Przenosimy points-bg przed power-icon, ale po faction-banner
+        const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+        const isSpecialCard = ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
+        if (card.punkty || isWeatherCard || isSpecialCard) {
+            html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
+            if (card.punkty) {
+                html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
+            }
+        }
+
+        if (card.pozycja) {
+            html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+        }
+
+        if (card.moc) {
+            html += `<div class="power-icon" style="background-image: url('assets/dkarty/${card.moc}.webp');"></div>`;
+        }
+
+        if (card.bohater) {
+            html += `<div class="hero-icon" style="background-image: url('assets/dkarty/bohater.webp');"></div>`;
+        }
+
+        html += `<div class="name">${card.nazwa}</div>`;
+
+        cardElement.innerHTML = html;
+        area.appendChild(cardElement);
+
+        cardElement.addEventListener('mouseover', () => {
+            hoverSound.currentTime = 0;
+            hoverSound.play();
         });
+    });
 
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            if (card.pozycja) {
-                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-            }
-
-            if (card.moc) {
-                html += `<div class="power-icon" style="background-image: url('assets/dkarty/${card.moc}.webp');"></div>`;
-            }
-
-            if (card.punkty || card.moc === 'pogoda') {
-                html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                if (card.punkty) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
-                }
-            }
-
-            if (card.bohater) {
-                html += `<div class="hero-icon" style="background-image: url('assets/dkarty/bohater.webp');"></div>`;
-            }
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            cardElement.addEventListener('mouseover', () => {
-                hoverSound.currentTime = 0;
-                hoverSound.play();
-            });
-        });
-
-        updatePositionsAndScaling();
-    }
+    updatePositionsAndScaling();
+}
 
     function displayDeck() {
         displayCards('all', deckArea, factions[currentPage - 1].id, deck);
