@@ -319,8 +319,8 @@ body {
     left: 0;
     width: 524px;
     height: 993px;
-    background-size: cover;
-    z-index: 10; /* Najwyższy priorytet */
+    object-fit: cover; /* Zapewnia, że obrazek wypełnia obszar */
+    z-index: 10;
 }
 
 .position-icon {

@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (card.moc) {
-                    html += `<div class="power-icon" style="background-image: url('assets/dkarty/${card.moc}.webp');"></div>`;
+                     html += `<img src="assets/dkarty/${card.moc}.webp" class="power-icon">`;
                 }
             }
 
