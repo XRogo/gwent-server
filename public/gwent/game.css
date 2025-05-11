@@ -291,16 +291,6 @@ body {
     z-index: 4;
 }
 
-.points-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 524px;
-    height: 993px;
-    background-size: cover;
-    z-index: 4;
-}
-
 .points {
     position: absolute;
     top: 105px;
@@ -313,6 +303,19 @@ body {
     z-index: 5;
 }
 
+.points-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 524px;
+    height: 993px;
+    background-size: cover;
+<<<<<<< HEAD
+    z-index: 10; /* Najwyższy priorytet */
+=======
+    z-index: 4; /* Niższy priorytet */
+}
+
 .power-icon {
     position: absolute;
     top: 0;
@@ -320,7 +323,8 @@ body {
     width: 524px;
     height: 993px;
     background-size: cover;
-    z-index: 10; /* Najwyższy priorytet */
+    z-index: 6; /* Wyższy priorytet, aby był nad points-bg */
+>>>>>>> f7a3ed30227434e832905b15636ed11e9afc8dde
 }
 
 .position-icon {
