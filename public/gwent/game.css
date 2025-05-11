@@ -291,16 +291,6 @@ body {
     z-index: 4;
 }
 
-.points-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 524px;
-    height: 993px;
-    background-size: cover;
-    z-index: 4;
-}
-
 .points {
     position: absolute;
     top: 105px; /* Dostosowane do okręgu w punkty.webp */
@@ -313,14 +303,24 @@ body {
     z-index: 5;
 }
 
-.power-icon {
+.points-bg {
     position: absolute;
-    top: 0; /* Pełny rozmiar, od [0, 0] */
+    top: 0;
     left: 0;
     width: 524px;
     height: 993px;
     background-size: cover;
-    z-index: 5;
+    z-index: 4; /* Niższy priorytet */
+}
+
+.power-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 524px;
+    height: 993px;
+    background-size: cover;
+    z-index: 6; /* Wyższy priorytet, aby był nad points-bg */
 }
 
 .position-icon {
