@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
 
-function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards) {
+function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false) {
     while (area.firstChild) {
         area.removeChild(area.firstChild);
     }
@@ -255,28 +255,35 @@ function displayCards(filter = 'all', area = collectionArea, playerFaction = "ni
             <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
         `;
 
-        if (card.pozycja) {
-            html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+        // Nazwa karty (zawsze widoczna)
+        html += `<div class="name">${card.nazwa}</div>`;
+
+        // Opis karty (tylko w największym widoku)
+        if (isLargeView) {
+            html += `<div class="description">${card.opis}</div>`;
         }
 
-        const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-        const isSpecialCard = ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
-        if (card.punkty || isWeatherCard || isSpecialCard) {
-            html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-            if (card.punkty) {
-                // Dla kart z punktami wyświetlamy liczbę
-                html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
-            } else if (card.moc) {
-                // Dla kart pogodowych/specjalnych wyświetlamy ikonę mocy w tym samym miejscu
-                html += `<div class="points"><img src="assets/dkarty/${card.moc}.webp" style="width: 100%; height: 100%;"></div>`;
+        // Ikony i punkty (oprócz królów)
+        if (!card.isKing) {
+            if (card.punkty || card.moc) {
+                html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
+                if (card.punkty) {
+                    html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
+                } else if (card.moc) {
+                    html += `<div class="points"><img src="assets/dkarty/${card.moc}.webp" style="width: 100%; height: 100%;"></div>`;
+                }
+            }
+
+            // Ikona pozycji (tylko dla jednostek)
+            if (card.pozycja && !['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo', 'rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc)) {
+                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+            }
+
+            // Ikona bohatera
+            if (card.bohater) {
+                html += `<div class="hero-icon" style="background-image: url('assets/dkarty/bohater.webp');"></div>`;
             }
         }
-
-        if (card.bohater) {
-            html += `<div class="hero-icon" style="background-image: url('assets/dkarty/bohater.webp');"></div>`;
-        }
-
-        html += `<div class="name">${card.nazwa}</div>`;
 
         cardElement.innerHTML = html;
         area.appendChild(cardElement);

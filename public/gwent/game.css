@@ -230,8 +230,8 @@ body {
 
 .card {
     position: relative;
-    width: 350px;
-    height: 723px;
+    width: 524px;
+    height: 993px;
     overflow: visible;
 }
 
@@ -265,10 +265,34 @@ body {
     z-index: 3;
 }
 
+.name {
+    position: absolute;
+    top: 758px;
+    left: 116px;
+    width: 393px; /* 509 - 116 */
+    height: 123px; /* 881 - 758 */
+    text-align: center;
+    font-size: 28px; /* Zwiększony rozmiar tekstu */
+    color: #000;
+    z-index: 4;
+}
+
+.description {
+    position: absolute;
+    top: 899px;
+    left: 18px;
+    width: 482px; /* 500 - 18 */
+    height: 76px; /* 975 - 899 */
+    font-size: 18px; /* Rozmiar tekstu dla opisu */
+    color: #000;
+    z-index: 4;
+    display: none; /* Ukryty domyślnie */
+}
+
 .points-bg {
     position: absolute;
-    top: 5px;
-    left: 5px;
+    top: 81px;
+    left: 75px;
     width: 50px;
     height: 50px;
     background-size: contain;
@@ -278,29 +302,19 @@ body {
 
 .points {
     position: absolute;
-    top: 10px; /* Dostosuj pozycję, żeby ikona była wyśrodkowana w points-bg */
-    left: 10px;
-    width: 40px; /* Rozmiar taki sam jak power-icon */
-    height: 40px;
-    line-height: 40px; /* Dla tekstu (liczb punktów) */
-    text-align: center; /* Dla tekstu */
-    z-index: 5;
-}
-
-.hero-icon {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 40px;
-    height: 40px;
-    background-size: contain;
-    background-repeat: no-repeat;
+    top: 81px;
+    left: 75px;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 28px; /* Zwiększony rozmiar tekstu */
     z-index: 5;
 }
 
 .position-icon {
     position: absolute;
-    top: 5px;
+    top: 5px; /* Dostosuj pozycję */
     left: 50%;
     transform: translateX(-50%);
     width: 40px;
@@ -310,11 +324,18 @@ body {
     z-index: 5;
 }
 
-.name {
+.hero-icon {
     position: absolute;
-    bottom: 10px;
-    left: 0;
-    width: 100%;
-    text-align: center;
+    top: -19px;
+    left: -23px;
+    width: 310px;
+    height: 808px;
+    background-size: contain;
+    background-repeat: no-repeat;
     z-index: 5;
+}
+
+/* Pokazanie opisu w największym widoku */
+.card.large .description {
+    display: block;
 }
