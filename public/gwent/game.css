@@ -126,26 +126,29 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 4.43%;
+    top: 4.03%;
     left: 5.34%;
     width: 17.94%;
-    height: 6.34%;
+    height: 6.45%;
     text-align: center;
     line-height: normal;
-    font-size: 30px;
-    color: #fff; /* Domyślny kolor */
+    font-size: 40px;
+    font-weight: bold;
+    color: #fff;
     z-index: 11;
 }
 
 .card-area .card .name {
     position: absolute;
-    top: 76.33%;
+    top: 77.54%;
     left: 22.14%;
     width: 75%;
     height: 12.39%;
-    color: #000;
     text-align: center;
     line-height: 12.39%;
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
     z-index: 9;
 }
 
