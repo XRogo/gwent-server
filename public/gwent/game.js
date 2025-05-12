@@ -103,6 +103,11 @@ function updatePositionsAndScaling() {
         card.style.height = `${723 * scale}px`;
         card.style.margin = `${10 * scale}px`;
 
+        // Oblicz faktyczną skalę karty na podstawie jej szerokości
+        const originalCardWidth = 524; // Oryginalna szerokość karty
+        const currentCardWidth = parseFloat(card.style.width); // Aktualna szerokość karty (350 * scale)
+        const cardScale = currentCardWidth / originalCardWidth; // Skala karty (np. 0.67)
+
         const points = card.querySelector('.points');
         if (points) {
             points.style.fontSize = `${30 * scale}px`;
@@ -123,10 +128,11 @@ function updatePositionsAndScaling() {
 
         const heroIcon = card.querySelector('.hero-icon');
         if (heroIcon) {
-            heroIcon.style.width = `${310 * scale}px`; // Skalowanie proporcjonalne
-            heroIcon.style.height = `${308 * scale}px`; // Skalowanie proporcjonalne
-            heroIcon.style.top = `${-19 * scale}px`;
-            heroIcon.style.left = `${-23 * scale}px`;
+            // Skalowanie hero-icon względem skali karty
+            heroIcon.style.width = `${310 * cardScale}px`; // Skalowanie proporcjonalne do karty
+            heroIcon.style.height = `${308 * cardScale}px`; // Skalowanie proporcjonalne do karty
+            heroIcon.style.top = `${-19 * cardScale}px`;
+            heroIcon.style.left = `${-23 * cardScale}px`;
         }
     });
 
