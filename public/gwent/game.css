@@ -126,13 +126,13 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 4.03%;
+    top: 4.43%;
     left: 5.34%;
     width: 17.94%;
     height: 6.45%;
     text-align: center;
     line-height: normal;
-    font-size: 40px;
+    font-size: 80px;
     font-weight: bold;
     color: #fff;
     z-index: 11;
@@ -145,8 +145,8 @@ body {
     width: 75%;
     height: 12.39%;
     text-align: center;
-    line-height: 12.39%;
-    font-size: 24px;
+    line-height: normal;
+    font-size: 48px;
     font-weight: bold;
     color: #000;
     z-index: 9;

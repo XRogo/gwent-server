@@ -109,12 +109,12 @@ function updatePositionsAndScaling() {
 
         const points = card.querySelector('.points');
         if (points) {
-            points.style.fontSize = `${40 * cardScale}px`; // Nowy rozmiar czcionki dla punktów
+            points.style.fontSize = `${80 * cardScale}px`; // Nowy rozmiar czcionki
         }
 
         const name = card.querySelector('.name');
         if (name) {
-            name.style.fontSize = `${24 * cardScale}px`; // Nowy rozmiar czcionki dla nazwy
+            name.style.fontSize = `${48 * cardScale}px`; // Nowy rozmiar czcionki
         }
 
         const powerIcon = card.querySelector('.power-icon');
