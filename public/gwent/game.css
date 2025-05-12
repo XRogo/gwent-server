@@ -126,7 +126,7 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 3.5%; /* Możesz dostosować tę wartość, np. na 3%, 2.5%, itd. */
+    top: 3%; /* Możesz dostosować tę wartość, np. na 3%, 2.5%, itd. */
     left: 5.34%;
     width: 17.94%;
     height: 6.45%;
@@ -139,7 +139,7 @@ body {
 
 .card-area .card .name {
     position: absolute;
-    top: 75%; /* Możesz dostosować tę wartość, np. na 74%, 73%, itd. */
+    top: 70%; /* Możesz dostosować tę wartość, np. na 74%, 73%, itd. */
     left: 22.14%;
     width: 75%;
     height: 12.39%;
