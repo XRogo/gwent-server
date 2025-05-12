@@ -106,8 +106,8 @@ body {
     position: absolute;
     top: -19px;
     left: -23px;
-    width: 310px; /* Poprawne wymiary obrazka */
-    height: 308px; /* Poprawne wymiary obrazka */
+    width: 310px;
+    height: 308px;
     object-fit: contain;
     object-position: top left;
     z-index: 7;
@@ -131,8 +131,10 @@ body {
     width: 17.94%;
     height: 6.34%;
     text-align: center;
-    line-height: 6.34%;
-    z-index: 5;
+    line-height: normal;
+    font-size: 30px;
+    color: #fff; /* Domyślny kolor */
+    z-index: 11;
 }
 
 .card-area .card .name {

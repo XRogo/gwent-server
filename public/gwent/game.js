@@ -271,7 +271,7 @@ function updatePositionsAndScaling() {
             }
 
             if (card.punkty) {
-                html += `<div class="points" style="color: ${card.bohater ? '#fff' : '#000'};">${card.punkty}</div>`;
+                html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
             }
 
             if (card.pozycja && !isWeatherCard && !isSpecialCard) {
