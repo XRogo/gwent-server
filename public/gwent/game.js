@@ -237,7 +237,7 @@ function updatePositionsAndScaling() {
         if (filter === 'oblezenie') return card.pozycja === 3;
         if (filter === 'bohater') return card.bohater === true;
         if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-        if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
+        if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg', 'manek', 'wezwarniezza'].includes(card.moc);
         return false;
     });
 
@@ -264,13 +264,13 @@ function updatePositionsAndScaling() {
 
         if (!card.isKing) {
             const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            const isSpecialCard = ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg'].includes(card.moc);
+            const isSpecialCard = ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg', 'manek', 'wezwarniezza'].includes(card.moc);
 
-            if (card.punkty || isWeatherCard || isSpecialCard) {
+            if (card.punkty !== undefined || isWeatherCard || isSpecialCard) {
                 html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
             }
 
-            if (card.punkty) {
+            if (card.punkty !== undefined) {
                 html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
             }
 
