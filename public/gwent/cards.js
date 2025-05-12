@@ -287,18 +287,8 @@ const cards = [
         ilosc: 1,
     },
 
-    {
-        nazwa: "Bies",
-        karta: "/gwent/assets/karty/niezalerzne/bies.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        frakcja: "4",
-        punkty: 6,
-        pozycja: 1,
-        ilosc: 1,
-    },
-
+    //polnco======================================================================================================
+    //polnco======================================================================================================
     //polnco======================================================================================================
 
     {
@@ -1056,9 +1046,9 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Saesenthessis",
         karta: "/gwent/assets/karty/scio'tel/saesenthessis.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1068,9 +1058,9 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Isengrim Faoiltiarna",
         karta: "/gwent/assets/karty/scio'tel/isengrim_faoiltiarna.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1081,9 +1071,9 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Iorveth",
         karta: "/gwent/assets/karty/scio'tel/iorwet.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1093,9 +1083,9 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Milva",
         karta: "/gwent/assets/karty/scio'tel/milva.webp",
         dkarta: "/gwent/assets/dkarty/4/milwa.webp",
@@ -1106,9 +1096,9 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Schirrú",
         karta: "/gwent/assets/karty/scio'tel/schirru.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1119,9 +1109,9 @@ const cards = [
         punkty: 8,
         pozycja: 3,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Dennis Cranmer",
         karta: "/gwent/assets/karty/scio'tel/dennis_cranmer.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1131,9 +1121,9 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Ida Emean aep Sivney",
         karta: "/gwent/assets/karty/scio'tel/ida_emean_aep_sivney.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1143,9 +1133,9 @@ const cards = [
         punkty: 6,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Filavandrel aén Fidháil",
         karta: "/gwent/assets/karty/scio'tel/filavandrel_aen_fidhail.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1156,9 +1146,9 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Yaevinn",
         karta: "/gwent/assets/karty/scio'tel/yaevinn.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1169,9 +1159,9 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Barcayl Els",
         karta: "/gwent/assets/karty/scio'tel/barclay_els.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1182,9 +1172,9 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1196,9 +1186,9 @@ const cards = [
         pozycja: 4,
         summon:"",
         ilosc: 1,
-     },   
+    },   
     
-     {
+    {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1210,9 +1200,9 @@ const cards = [
         pozycja: 4,
         summon:"",
         ilosc: 1,
-     },   
+    },   
 
-     {
+    {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna2.webp-",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1224,9 +1214,9 @@ const cards = [
         pozycja: 4,
         summon:"",
         ilosc: 1,
-     },   
+    },   
     
-     {
+    {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1237,9 +1227,9 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
-     }, 
+    }, 
 
-     {
+    {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1250,9 +1240,9 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
-     },    
+    },    
        
-     {
+    {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1263,9 +1253,9 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
-     },      
+    },      
 
-     {
+    {
         nazwa: "Bryada Vrihedd",
         karta: "/gwent/assets/karty/scio'tel/brygada_vrihedd2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1276,9 +1266,9 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Bryada Vrihedd",
         karta: "/gwent/assets/karty/scio'tel/brygada_vrihedd.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1289,9 +1279,9 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1301,9 +1291,9 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1313,9 +1303,9 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1325,9 +1315,9 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu5.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1337,9 +1327,9 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu4.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1349,9 +1339,9 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Kadet Vrihedd",
         karta: "/gwent/assets/karty/scio'tel/kadet_vrihedd.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1361,9 +1351,9 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
        
-     {
+    {
         nazwa: "Łucznik z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/lucznik_z_blathanna.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1373,9 +1363,9 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
     
-     {
+    {
         nazwa: "Ciran aep Easnillien",
         karta: "/gwent/assets/karty/scio'tel/ciaran_aep_easnillien.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1386,9 +1376,9 @@ const cards = [
         punkty: 3,
         pozycja: 4,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Krasnolud Harcownik",
         karta: "/gwent/assets/karty/scio'tel/krasnolud_harcownik3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1399,9 +1389,9 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Krasnolud Harcownik",
         karta: "/gwent/assets/karty/scio'tel/krasnolud_harcownik2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1412,8 +1402,9 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
-     },    
-     {
+    }, 
+
+    {
         nazwa: "Krasnolud Harcownik",
         karta: "/gwent/assets/karty/scio'tel/krasnolud_harcownik.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1424,9 +1415,9 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Toruviel",
         karta: "/gwent/assets/karty/scio'tel/toruviel.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1436,9 +1427,9 @@ const cards = [
         punkty: 2,
         pozycja: 2, 
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Elfi harcownik",
         karta: "/gwent/assets/karty/scio'tel/elfi_harcownik.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1450,9 +1441,9 @@ const cards = [
         pozycja: 2,
         summon:"Elfi harcownik",
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Elfi harcownik",
         karta: "/gwent/assets/karty/scio'tel/elfi_harcownik3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1464,9 +1455,9 @@ const cards = [
         pozycja: 2,
         summon:"Elfi harcownik",
         ilosc: 1,
-     },    
+    },
 
-     {
+    {
         nazwa: "Elfi harcownik",
         karta: "/gwent/assets/karty/scio'tel/elfi_harcownik2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1478,9 +1469,9 @@ const cards = [
         pozycja: 2,
         summon:"Elfi harcownik",
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Riordain",
         karta: "/gwent/assets/karty/scio'tel/riordain.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1490,9 +1481,9 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Havekarski medyk",
         karta: "/gwent/assets/karty/scio'tel/havekarski_medyk3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1503,9 +1494,9 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Havekarski medyk",
         karta: "/gwent/assets/karty/scio'tel/havekarski_medyk2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1516,9 +1507,9 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
-     },
-     
-     {
+    },
+
+    {
         nazwa: "Havekarski medyk",
         karta: "/gwent/assets/karty/scio'tel/havekarski_medyk.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1529,12 +1520,15 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
-     },
+    },
 
      // powfory =======================================================================================
-     {
+     // powfory =======================================================================================
+     // powfory =======================================================================================
+
+    {
         nazwa: "Draug",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/draug.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater:"true",
@@ -1542,11 +1536,11 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
-     },
-         
-     {
+    },
+ 
+    {
         nazwa: "Imlerith",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/imlerith.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: true,
@@ -1554,11 +1548,11 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
-     }, 
-            
-     {
+    },
+    
+    {
         nazwa: "Leszy",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/leszy.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: true,
@@ -1566,11 +1560,11 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
-     },     
-        
-     {
+    },
+
+    {
         nazwa: "Kejran",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/kejran.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: true,
@@ -1579,9 +1573,11 @@ const cards = [
         punkty: 8,
         pozycja: 4,
         ilosc: 1,
-     },     {
+    },
+
+    {
         nazwa: "Królewicz ropuch",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/krolewicz_ropuch.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1590,9 +1586,11 @@ const cards = [
         punkty: 7,
         pozycja: 2,
         ilosc: 1,
-     },     {
+    },
+
+    {
         nazwa: "Żywiołak ziemi",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/zywiolak_ziemi.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1600,11 +1598,11 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
-     },   
-            
-     {
+    },
+
+    {
         nazwa: "Bies",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/bies.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1612,11 +1610,11 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
-     },    
+    },
 
-     {
+    {
         nazwa: "Żywiołak ognia",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/zywiolak_ognia.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1624,11 +1622,11 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
-     },
-            
-     {
+    },
+     
+    {
         nazwa: "Olbrzymi krabopająk",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/olbrzymi_krabopajak.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1638,11 +1636,11 @@ const cards = [
         pozycja: 3,
         summon:"Krabopająk",
         ilosc: 1,
-     },     
-    
-     {
+    },
+  
+    {
         nazwa: "Wiedzma: Kuchta",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/wiedzma_kuchta.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1652,23 +1650,9 @@ const cards = [
         pozycja: 1,
         summon:"Wiedzma: Szepciucha, Wiedzma: Prządka",
         ilosc: 1,
-     },
+    },
 
-     {
-        nazwa: "Wiedzma: Prządka",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        moc: "wezwanie",
-        frakcja: "4",
-        punkty: 6,
-        pozycja: 1,
-        summon:"Wiedzma: Kuchta, Wiedzma: Prządka",
-        ilosc: 1,
-     },
-
-     {
+    {
         nazwa: "Wiedzma: Prządka",
         karta: "/gwent/assets/karty/potwory/",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -1680,11 +1664,25 @@ const cards = [
         pozycja: 1,
         summon:"Wiedzma: Kuchta, Wiedzma: Szepciucha",
         ilosc: 1,
-     },
-    
-     {
+    },
+
+    {
+        nazwa: "Wiedzma: Szepciucha",
+        karta: "/gwent/assets/karty/potwory/wiedzma_przadka.webp",
+        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        opis: "WORK.",
+        bohater: false,
+        moc: "wezwanie",
+        frakcja: "4",
+        punkty: 6,
+        pozycja: 1,
+        summon:"Wiedzma: Kuchta, Wiedzma: Prządka",
+        ilosc: 1,
+    },
+
+    {
         nazwa: "Widłogon",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/widlogon.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1692,11 +1690,11 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },              
-    
-     {
+    },              
+
+    {
         nazwa: "Morowa dziewica",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/morowa_dziewica.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1704,11 +1702,11 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },
-    
-     {
+    },
+
+    {
         nazwa: "Gryf",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/gryf.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1716,11 +1714,11 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-      },
-        
-      {
+    },
+
+    {
         nazwa: "Wilkołak",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/wilkolak.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1728,11 +1726,11 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },     
+    },
 
-     {
+    {
         nazwa: "Przeraza",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/przeraza.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1740,23 +1738,23 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
-     },     
+    },
 
-     {
+    {
         nazwa: "Lodowy Gigant",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/lodowt_gigant.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
         punkty: 5,
-        pozycja 3,
+        pozycja: 3,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Baba cmentarna",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/baba_cmentarna.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1764,11 +1762,11 @@ const cards = [
         punkty: 5,
         pozycja: 2,
         ilosc: 1,
-     },
-    
-     {
+    },
+
+    {
         nazwa: "Wampir: Katakan",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/wampir_katakan.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1778,11 +1776,11 @@ const cards = [
         pozycja: 1,
         summon:"",
         ilosc: 1,
-     },
-    
-     {
+    },
+
+    {
         nazwa: "Poroniec",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/poroniec.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1790,11 +1788,11 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Krabopająk",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/krabopajak3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1804,11 +1802,11 @@ const cards = [
         pozycja:1 ,
         summon:"Krabopająk",
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Krabopająk",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/krabopajak2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1818,11 +1816,11 @@ const cards = [
         pozycja:1 ,
         summon:"Krabopająk",
         ilosc: 1,
-     },
+    },
 
-     {
+    {
         nazwa: "Krabopająk",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/krabopajak1.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1832,11 +1830,11 @@ const cards = [
         pozycja:1 ,
         summon:"Krabopająk",
         ilosc: 1,
-     },
+    },
 
-{
-        nazwa: "Wampir: ",
-        karta: "/gwent/assets/karty/potwory/",
+    {
+        nazwa: "Wampir: Ekimma",
+        karta: "/gwent/assets/karty/potwory/wampir_ekimma.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1846,9 +1844,11 @@ const cards = [
         pozycja: 1,
         summon:"Wampir",
         ilosc: 1,
-     },{
-        nazwa: "Wampir: ",
-        karta: "/gwent/assets/karty/potwory/",
+    },
+     
+    {
+        nazwa: "Wampir: Fleder",
+        karta: "/gwent/assets/karty/potwory/wampir_fleader.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1858,9 +1858,11 @@ const cards = [
         pozycja: 1,
         summon:"Wampir",
         ilosc: 1,
-     },{
-        nazwa: "Wampir: ",
-        karta: "/gwent/assets/karty/potwory/",
+    },
+     
+    {
+        nazwa: "Wampir: Garkain",
+        karta: "/gwent/assets/karty/potwory/wampir_garkain.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1870,9 +1872,11 @@ const cards = [
         pozycja: 1,
         summon:"Wampir",
         ilosc: 1,
-     },{
-        nazwa: "Wampir: ",
-        karta: "/gwent/assets/karty/potwory/",
+    },
+
+    {
+        nazwa: "Wampir: Bruxa",
+        karta: "/gwent/assets/karty/potwory/wampir_bruxa.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1882,7 +1886,7 @@ const cards = [
         pozycja: 1,
         summon:"Wampir",
         ilosc: 1,
-     },
+    }
 
 
 

@@ -106,8 +106,8 @@ body {
     position: absolute;
     top: -19px;
     left: -23px;
-    width: 310px; /* Oryginalna szerokość obrazka */
-    height: 808px; /* Oryginalna wysokość obrazka */
+    width: 310px; /* Poprawne wymiary obrazka */
+    height: 308px; /* Poprawne wymiary obrazka */
     object-fit: contain;
     object-position: top left;
     z-index: 7;

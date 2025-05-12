@@ -94,7 +94,7 @@ function updatePositionsAndScaling() {
         deckArea.style.height = `${1449 * scale}px`;
         deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
         deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-        deckArea.style.padding = `${10 * scale}px`;
+        collectionArea.style.padding = `${10 * scale}px`;
     }
 
     const cards = document.querySelectorAll('.card-area .card');
@@ -123,8 +123,8 @@ function updatePositionsAndScaling() {
 
         const heroIcon = card.querySelector('.hero-icon');
         if (heroIcon) {
-            heroIcon.style.width = `${310 * scale}px`; // Skalowanie proporcjonalne do oryginalnych wymiarów
-            heroIcon.style.height = `${808 * scale}px`; // Skalowanie proporcjonalne do oryginalnych wymiarów
+            heroIcon.style.width = `${310 * scale}px`; // Skalowanie proporcjonalne
+            heroIcon.style.height = `${308 * scale}px`; // Skalowanie proporcjonalne
             heroIcon.style.top = `${-19 * scale}px`;
             heroIcon.style.left = `${-23 * scale}px`;
         }
