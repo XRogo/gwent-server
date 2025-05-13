@@ -2426,8 +2426,35 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 1,
-    }
-
+    },
+    
+    {
+        nazwa: "Młody berserk",
+        karta: "/gwent/assets/karty/Skellige/",
+        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        opis: "WORK.",
+        bohater: false,
+        moc: "berserk",
+        frakcja: "5",
+        punkty: 2,
+        pozycja: 2,
+        summon:"",
+        ilosc: 3,
+    },
+    
+    {
+        nazwa: "Kambi",
+        karta: "/gwent/assets/karty/Skellige/",
+        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        opis: "WORK.",
+        bohater: false,
+        moc: "wezwaniezza",
+        frakcja: "5",
+        punkty: 0,
+        pozycja: 1,
+        summon:"",
+        ilosc: 1,
+    },
     
 //     {
 //     {
