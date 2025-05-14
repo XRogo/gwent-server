@@ -21,295 +21,340 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "W trzeciej rundzie dwie przypadkowe karty ze stosu kart odrzuconych wracają na stół." },
     ];
 
-function updatePositionsAndScaling() {
-    const overlay = document.querySelector('.overlay');
-    if (!overlay) return;
+    // Nowa funkcja getPowerImage
+    function getPowerImage(card) {
+        // Specjalne przypadki dla konkretnych kart
+        const specialCases = {
+            "000": { "grzybki": "grzybki.webp" }, // Mardroeme
+            "003": { "porz": "porz.webp" },      // Pożoga
+            "002": { "rog": "rog.webp" }         // Róg dowódcy
+        };
 
-    const overlayRect = overlay.getBoundingClientRect();
-    const overlayWidth = overlayRect.width;
-    const overlayHeight = overlayRect.height;
-    const overlayLeft = overlayRect.left;
-    const overlayTop = overlayRect.top;
-
-    const windowAspectRatio = window.innerWidth / window.innerHeight;
-    const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
-
-    let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
-
-    if (windowAspectRatio > guiAspectRatio) {
-        scale = overlayHeight / GUI_HEIGHT;
-        backgroundWidth = GUI_WIDTH * scale;
-        backgroundHeight = overlayHeight;
-        backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-        backgroundTop = overlayTop;
-    } else {
-        scale = overlayWidth / GUI_WIDTH;
-        backgroundWidth = overlayWidth;
-        backgroundHeight = GUI_HEIGHT * scale;
-        backgroundLeft = overlayLeft;
-        backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-    }
-
-    const buttonWidth = 97 * scale;
-    const buttonHeight = 80 * scale;
-
-    const buttons = [
-        { selector: '.button.collection.all', left: 373, top: 354, image: 'assets/wybor/all.webp' },
-        { selector: '.button.collection.mecz', left: 549, top: 356, image: 'assets/wybor/mecz.webp' },
-        { selector: '.button.collection.lok', left: 735, top: 355, image: 'assets/wybor/lok.webp' },
-        { selector: '.button.collection.obl', left: 916, top: 355, image: 'assets/wybor/kapatulta.webp' },
-        { selector: '.button.collection.hero', left: 1098, top: 356, image: 'assets/wybor/boharer.webp' },
-        { selector: '.button.collection.pogoda', left: 1277, top: 351, image: 'assets/wybor/pogoda.webp' },
-        { selector: '.button.collection.specjalne', left: 1459, top: 361, image: 'assets/wybor/inne.webp' },
-        { selector: '.button.deck.all', left: 2297, top: 354, image: 'assets/wybor/all.webp' },
-        { selector: '.button.deck.mecz', left: 2473, top: 356, image: 'assets/wybor/mecz.webp' },
-        { selector: '.button.deck.lok', left: 2659, top: 355, image: 'assets/wybor/lok.webp' },
-        { selector: '.button.deck.obl', left: 2840, top: 355, image: 'assets/wybor/kapatulta.webp' },
-        { selector: '.button.deck.hero', left: 3022, top: 356, image: 'assets/wybor/boharer.webp' },
-        { selector: '.button.deck.pogoda', left: 3201, top: 351, image: 'assets/wybor/pogoda.webp' },
-        { selector: '.button.deck.specjalne', left: 3380, top: 361, image: 'assets/wybor/inne.webp' },
-    ];
-
-    buttons.forEach(({ selector, left, top, image }) => {
-        const button = document.querySelector(selector);
-        if (button) {
-            button.style.width = `${buttonWidth}px`;
-            button.style.height = `${buttonHeight}px`;
-            button.style.left = `${backgroundLeft + left * scale}px`;
-            button.style.top = `${backgroundTop + top * scale}px`;
-            button.style.backgroundImage = `url('${image}')`;
-        }
-    });
-
-    if (collectionArea) {
-        collectionArea.style.width = `${1195 * scale}px`;
-        collectionArea.style.height = `${1449 * scale}px`;
-        collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
-        collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
-        collectionArea.style.padding = `${10 * scale}px`;
-    }
-
-    if (deckArea) {
-        deckArea.style.width = `${1193 * scale}px`;
-        deckArea.style.height = `${1449 * scale}px`;
-        deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
-        deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-        collectionArea.style.padding = `${10 * scale}px`;
-    }
-
-    const cards = document.querySelectorAll('.card-area .card');
-    cards.forEach(card => {
-        card.style.width = `${350 * scale}px`;
-        card.style.height = `${723 * scale}px`;
-        card.style.margin = `${10 * scale}px`;
-
-        const originalCardWidth = 524;
-        const currentCardWidth = parseFloat(card.style.width);
-        const cardScale = currentCardWidth / originalCardWidth;
-
-        const points = card.querySelector('.points');
-        if (points) {
-            points.style.fontSize = `${80 * cardScale}px`; // Nowy rozmiar czcionki
+        // Jeśli karta ma numer i umiejętność w specjalnych przypadkach, użyj tego obrazka
+        if (specialCases[card.numer] && specialCases[card.numer][card.moc]) {
+            return specialCases[card.numer][card.moc];
         }
 
-        const name = card.querySelector('.name');
-        if (name) {
-            name.style.fontSize = `${48 * cardScale}px`; // Nowy rozmiar czcionki
+        // Domyślne obrazki dla każdej umiejętności
+        const defaultImages = {
+            "berserk": "berserk.webp",
+            "deszcz": "deszcz.webp",
+            "grzybki": "igrzybki.webp",
+            "iporz": "iporz.webp",
+            "manek": "manek.webp",
+            "medyk": "medyk.webp",
+            "mgla": "mgla.webp",
+            "morale": "morale.webp",
+            "mroz": "mroz.webp",
+            "niebo": "niebo.webp",
+            "porz": "2porz.webp",
+            "rog": "irog.webp",
+            "szpieg": "szpieg.webp",
+            "sztorm": "sztorm.webp",
+            "wezwanie": "wezwanie.webp",
+            "wezwarniezza": "wezwarniezza.webp",
+            "wiez": "wiz.webp"
+        };
+
+        // Zwróć domyślny obrazek dla umiejętności lub pusty string, jeśli brak
+        return defaultImages[card.moc] || "";
+    }
+
+    function updatePositionsAndScaling() {
+        const overlay = document.querySelector('.overlay');
+        if (!overlay) return;
+
+        const overlayRect = overlay.getBoundingClientRect();
+        const overlayWidth = overlayRect.width;
+        const overlayHeight = overlayRect.height;
+        const overlayLeft = overlayRect.left;
+        const overlayTop = overlayRect.top;
+
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+
+        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+
+        if (windowAspectRatio > guiAspectRatio) {
+            scale = overlayHeight / GUI_HEIGHT;
+            backgroundWidth = GUI_WIDTH * scale;
+            backgroundHeight = overlayHeight;
+            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+            backgroundTop = overlayTop;
+        } else {
+            scale = overlayWidth / GUI_WIDTH;
+            backgroundWidth = overlayWidth;
+            backgroundHeight = GUI_HEIGHT * scale;
+            backgroundLeft = overlayLeft;
+            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
         }
 
-        const powerIcon = card.querySelector('.power-icon');
-        if (powerIcon) {
-            powerIcon.style.width = `${350 * scale}px`;
-            powerIcon.style.height = `${723 * scale}px`;
-            powerIcon.style.top = '0px';
-            powerIcon.style.left = '0px';
+        const buttonWidth = 97 * scale;
+        const buttonHeight = 80 * scale;
+
+        const buttons = [
+            { selector: '.button.collection.all', left: 373, top: 354, image: 'assets/wybor/all.webp' },
+            { selector: '.button.collection.mecz', left: 549, top: 356, image: 'assets/wybor/mecz.webp' },
+            { selector: '.button.collection.lok', left: 735, top: 355, image: 'assets/wybor/lok.webp' },
+            { selector: '.button.collection.obl', left: 916, top: 355, image: 'assets/wybor/kapatulta.webp' },
+            { selector: '.button.collection.hero', left: 1098, top: 356, image: 'assets/wybor/boharer.webp' },
+            { selector: '.button.collection.pogoda', left: 1277, top: 351, image: 'assets/wybor/pogoda.webp' },
+            { selector: '.button.collection.specjalne', left: 1459, top: 361, image: 'assets/wybor/inne.webp' },
+            { selector: '.button.deck.all', left: 2297, top: 354, image: 'assets/wybor/all.webp' },
+            { selector: '.button.deck.mecz', left: 2473, top: 356, image: 'assets/wybor/mecz.webp' },
+            { selector: '.button.deck.lok', left: 2659, top: 355, image: 'assets/wybor/lok.webp' },
+            { selector: '.button.deck.obl', left: 2840, top: 355, image: 'assets/wybor/kapatulta.webp' },
+            { selector: '.button.deck.hero', left: 3022, top: 356, image: 'assets/wybor/boharer.webp' },
+            { selector: '.button.deck.pogoda', left: 3201, top: 351, image: 'assets/wybor/pogoda.webp' },
+            { selector: '.button.deck.specjalne', left: 3380, top: 361, image: 'assets/wybor/inne.webp' },
+        ];
+
+        buttons.forEach(({ selector, left, top, image }) => {
+            const button = document.querySelector(selector);
+            if (button) {
+                button.style.width = `${buttonWidth}px`;
+                button.style.height = `${buttonHeight}px`;
+                button.style.left = `${backgroundLeft + left * scale}px`;
+                button.style.top = `${backgroundTop + top * scale}px`;
+                button.style.backgroundImage = `url('${image}')`;
+            }
+        });
+
+        if (collectionArea) {
+            collectionArea.style.width = `${1195 * scale}px`;
+            collectionArea.style.height = `${1449 * scale}px`;
+            collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
+            collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
+            collectionArea.style.padding = `${10 * scale}px`;
         }
 
-        const heroIcon = card.querySelector('.hero-icon');
-        if (heroIcon) {
-            heroIcon.style.width = `${310 * cardScale}px`;
-            heroIcon.style.height = `${308 * cardScale}px`;
-            heroIcon.style.top = `${-19 * cardScale}px`;
-            heroIcon.style.left = `${-23 * cardScale}px`;
+        if (deckArea) {
+            deckArea.style.width = `${1193 * scale}px`;
+            deckArea.style.height = `${1449 * scale}px`;
+            deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
+            deckArea.style.top = `${backgroundTop + 491 * scale}px`;
+            collectionArea.style.padding = `${10 * scale}px`;
         }
-    });
 
-    if (stats) {
-        stats.style.left = `${backgroundLeft + 1935 * scale}px`;
-        stats.style.top = `${backgroundTop + 1152 * scale}px`;
-        stats.style.fontSize = `${16 * scale}px`;
-    }
+        const cards = document.querySelectorAll('.card-area .card');
+        cards.forEach(card => {
+            card.style.width = `${350 * scale}px`;
+            card.style.height = `${723 * scale}px`;
+            card.style.margin = `${10 * scale}px`;
 
-    const pageLeft = document.querySelector('.page-left');
-    if (pageLeft) {
-        pageLeft.style.width = `${49 * scale}px`;
-        pageLeft.style.height = `${43 * scale}px`;
-        pageLeft.style.left = `${backgroundLeft + 1452 * scale}px`;
-        pageLeft.style.top = `${backgroundTop + 155 * scale}px`;
-        pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
-    }
+            const originalCardWidth = 524;
+            const currentCardWidth = parseFloat(card.style.width);
+            const cardScale = currentCardWidth / originalCardWidth;
 
-    const pageRight = document.querySelector('.page-right');
-    if (pageRight) {
-        pageRight.style.width = `${49 * scale}px`;
-        pageRight.style.height = `${43 * scale}px`;
-        pageRight.style.left = `${backgroundLeft + 2338 * scale}px`;
-        pageRight.style.top = `${backgroundTop + 154 * scale}px`;
-        pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
-    }
+            const points = card.querySelector('.points');
+            if (points) {
+                points.style.fontSize = `${80 * cardScale}px`; // Nowy rozmiar czcionki
+            }
 
-    pageDots.forEach((dot, index) => {
-        if (dot) {
-            dot.style.width = `${25 * scale}px`;
-            dot.style.height = `${22 * scale}px`;
-            dot.style.left = `${index * 4 * scale}px`;
+            const name = card.querySelector('.name');
+            if (name) {
+                name.style.fontSize = `${48 * cardScale}px`; // Nowy rozmiar czcionki
+            }
+
+            const powerIcon = card.querySelector('.power-icon');
+            if (powerIcon) {
+                powerIcon.style.width = `${350 * scale}px`;
+                powerIcon.style.height = `${723 * scale}px`;
+                powerIcon.style.top = '0px';
+                powerIcon.style.left = '0px';
+            }
+
+            const heroIcon = card.querySelector('.hero-icon');
+            if (heroIcon) {
+                heroIcon.style.width = `${310 * cardScale}px`;
+                heroIcon.style.height = `${308 * cardScale}px`;
+                heroIcon.style.top = `${-19 * cardScale}px`;
+                heroIcon.style.left = `${-23 * cardScale}px`;
+            }
+        });
+
+        if (stats) {
+            stats.style.left = `${backgroundLeft + 1935 * scale}px`;
+            stats.style.top = `${backgroundTop + 1152 * scale}px`;
+            stats.style.fontSize = `${16 * scale}px`;
         }
-    });
 
-    const factionInfo = document.querySelector('.faction-info');
-    if (factionInfo) {
-        factionInfo.style.left = `${backgroundLeft}px`;
-        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
-    }
+        const pageLeft = document.querySelector('.page-left');
+        if (pageLeft) {
+            pageLeft.style.width = `${49 * scale}px`;
+            pageLeft.style.height = `${43 * scale}px`;
+            pageLeft.style.left = `${backgroundLeft + 1452 * scale}px`;
+            pageLeft.style.top = `${backgroundTop + 155 * scale}px`;
+            pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
+        }
 
-    const factionHeader = document.querySelector('.faction-header');
-    if (factionHeader) {
-        factionHeader.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-        factionHeader.style.top = `0px`;
-        factionHeader.style.transform = `translateX(-50%)`;
-    }
+        const pageRight = document.querySelector('.page-right');
+        if (pageRight) {
+            pageRight.style.width = `${49 * scale}px`;
+            pageRight.style.height = `${43 * scale}px`;
+            pageRight.style.left = `${backgroundLeft + 2338 * scale}px`;
+            pageRight.style.top = `${backgroundTop + 154 * scale}px`;
+            pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
+        }
 
-    const factionShield = document.querySelector('.faction-shield');
-    if (factionShield) {
-        factionShield.style.width = `${106 * scale}px`;
-        factionShield.style.height = `${110 * scale}px`;
-    }
+        pageDots.forEach((dot, index) => {
+            if (dot) {
+                dot.style.width = `${25 * scale}px`;
+                dot.style.height = `${22 * scale}px`;
+                dot.style.left = `${index * 4 * scale}px`;
+            }
+        });
 
-    const factionName = document.querySelector('.faction-name');
-    if (factionName) {
-        factionName.style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
-        factionName.style.lineHeight = `${110 * scale}px`;
-    }
+        const factionInfo = document.querySelector('.faction-info');
+        if (factionInfo) {
+            factionInfo.style.left = `${backgroundLeft}px`;
+            factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
+        }
 
-    const factionAbility = document.querySelector('.faction-ability');
-    if (factionAbility) {
-        factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
-        factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-        factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
-        factionAbility.style.transform = `translateX(-50%)`;
-    }
+        const factionHeader = document.querySelector('.faction-header');
+        if (factionHeader) {
+            factionHeader.style.left = `${(GUI_WIDTH / 2) * scale}px`;
+            factionHeader.style.top = `0px`;
+            factionHeader.style.transform = `translateX(-50%)`;
+        }
 
-    const leaderCard = document.querySelector('.leader-card');
-    if (leaderCard) {
-        leaderCard.style.width = `${259 * scale}px`;
-        leaderCard.style.height = `${490 * scale}px`;
-        leaderCard.style.left = `${backgroundLeft + 1792 * scale}px`;
-        leaderCard.style.top = `${backgroundTop + 539 * scale}px`;
-    }
+        const factionShield = document.querySelector('.faction-shield');
+        if (factionShield) {
+            factionShield.style.width = `${106 * scale}px`;
+            factionShield.style.height = `${110 * scale}px`;
+        }
 
-    const goToGameButton = document.getElementById('goToGameButton');
-    if (goToGameButton) {
-        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        goToGameButton.style.bottom = `${43 * scale}px`;
-        goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
-        goToGameButton.style.fontSize = `${30 * scale}px`;
-        goToGameButton.style.transform = `translateX(-50%)`;
+        const factionName = document.querySelector('.faction-name');
+        if (factionName) {
+            factionName.style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
+            factionName.style.lineHeight = `${110 * scale}px`;
+        }
+
+        const factionAbility = document.querySelector('.faction-ability');
+        if (factionAbility) {
+            factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
+            factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
+            factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
+            factionAbility.style.transform = `translateX(-50%)`;
+        }
+
+        const leaderCard = document.querySelector('.leader-card');
+        if (leaderCard) {
+            leaderCard.style.width = `${259 * scale}px`;
+            leaderCard.style.height = `${490 * scale}px`;
+            leaderCard.style.left = `${backgroundLeft + 1792 * scale}px`;
+            leaderCard.style.top = `${backgroundTop + 539 * scale}px`;
+        }
+
+        const goToGameButton = document.getElementById('goToGameButton');
+        if (goToGameButton) {
+            goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
+            goToGameButton.style.bottom = `${43 * scale}px`;
+            goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
+            goToGameButton.style.fontSize = `${30 * scale}px`;
+            goToGameButton.style.transform = `translateX(-50%)`;
+        }
     }
-}
 
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
 
     function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false) {
-    if (!area) return;
+        if (!area) return;
 
-    // Wyczyść obszar przed dodaniem nowych kart
-    while (area.firstChild) {
-        area.removeChild(area.firstChild);
-    }
-
-    // Filtruj karty (bez zmian w tej części)
-    const filteredCards = cardList.filter(card => {
-        if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-        if (filter === 'all') return true;
-        if (filter === 'miecz') return card.pozycja === 1;
-        if (filter === 'luk') return card.pozycja === 2;
-        if (filter === 'oblezenie') return card.pozycja === 3;
-        if (filter === 'bohater') return card.bohater === true;
-        if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-        if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg', 'manek', 'wezwarniezza'].includes(card.moc);
-        return false;
-    });
-
-    filteredCards.forEach(card => {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'card';
-
-        let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-        if (card.nazwa === "Bies" && playerFaction !== "4") {
-            bannerFaction = playerFaction;
+        // Wyczyść obszar przed dodaniem nowych kart
+        while (area.firstChild) {
+            area.removeChild(area.firstChild);
         }
 
-        // Podstawowy HTML dla karty
-        let html = `
-            <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-            <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-            <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-        `;
+        // Filtruj karty
+        const filteredCards = cardList.filter(card => {
+            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
+            if (filter === 'all') return true;
+            if (filter === 'miecz') return card.pozycja === 1;
+            if (filter === 'luk') return card.pozycja === 2;
+            if (filter === 'oblezenie') return card.pozycja === 3;
+            if (filter === 'bohater') return card.bohater === true;
+            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
+            return false;
+        });
 
-        html += `<div class="name">${card.nazwa}</div>`;
+        filteredCards.forEach(card => {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
 
-        if (isLargeView) {
-            html += `<div class="description">${card.opis || ''}</div>`;
-        }
-
-        if (!card.isKing) {
-            // Sprawdź, czy karta jest kartą pogodową
-            const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-            // Dodaj tło punktów dla kart z punktami lub specjalnych
-            if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg', 'manek', 'wezwarniezza'].includes(card.moc)) {
-                html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
+            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
+            if (card.nazwa === "Bies" && playerFaction !== "4") {
+                bannerFaction = playerFaction;
             }
 
-            // Dodaj punkty, jeśli karta je ma
-            if (card.punkty !== undefined) {
-                html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
+            // Podstawowy HTML dla karty
+            let html = `
+                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
+                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
+                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
+            `;
+
+            html += `<div class="name">${card.nazwa}</div>`;
+
+            if (isLargeView) {
+                html += `<div class="description">${card.opis || ''}</div>`;
             }
 
-            // Dodaj obrazek umiejętności, jeśli karta ma moc
-            if (card.moc) {
-                const powerImage = getPowerImage(card);
-                if (powerImage) {
-                    html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
+            if (!card.isKing) {
+                // Sprawdź, czy karta jest kartą pogodową
+                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+
+                // Dodaj tło punktów dla kart z punktami lub specjalnych
+                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
+                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
+                }
+
+                // Dodaj punkty, jeśli karta je ma
+                if (card.punkty !== undefined) {
+                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
+                }
+
+                // Dodaj obrazek umiejętności, jeśli karta ma moc
+                if (card.moc) {
+                    const powerImage = getPowerImage(card);
+                    if (powerImage) {
+                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
+                    }
+                }
+
+                // Dodaj obrazek pozycji, jeśli karta ma pozycję i nie jest kartą pogodową
+                if (card.pozycja && !isWeatherCard) {
+                    // Jeśli pozycja to 4 i karta nie ma innej mocy, użyj zrecznoac.webp
+                    if (card.pozycja === 4 && !card.moc) {
+                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
+                    } else {
+                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+                    }
+                }
+
+                // Dodaj obrazek bohatera, jeśli karta jest bohaterem
+                if (card.bohater) {
+                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
                 }
             }
 
-            // Dodaj obrazek pozycji, jeśli karta ma pozycję i nie jest kartą pogodową
-            if (card.pozycja && !isWeatherCard) {
-                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-            }
+            cardElement.innerHTML = html;
+            area.appendChild(cardElement);
 
-            // Dodaj obrazek bohatera, jeśli karta jest bohaterem
-            if (card.bohater) {
-                html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-            }
-        }
-
-        cardElement.innerHTML = html;
-        area.appendChild(cardElement);
-
-        // Dźwięk przy najechaniu (bez zmian)
-        cardElement.addEventListener('mouseover', () => {
-            if (hoverSound) {
-                hoverSound.currentTime = 0;
-                hoverSound.play();
-            }
+            // Dźwięk przy najechaniu
+            cardElement.addEventListener('mouseover', () => {
+                if (hoverSound) {
+                    hoverSound.currentTime = 0;
+                    hoverSound.play();
+                }
+            });
         });
-    });
 
-    updatePositionsAndScaling();
-}
+        updatePositionsAndScaling();
+    }
+
     function displayDeck() {
         displayCards('all', deckArea, factions[currentPage - 1].id, deck);
     }
@@ -479,337 +524,6 @@ function updatePositionsAndScaling() {
             }
         });
     });
-
-    // Nowa funkcja do przypisywania obrazków dla umiejętności (moc)
-function getPowerImage(card) {
-    // Specjalne przypadki dla konkretnych kart
-    const specialCases = {
-        "000": { "grzybki": "grzybki.webp" }, // Mardroeme
-        "003": { "porz": "porz.webp" },      // Pożoga
-        "002": { "rog": "rog.webp" }         // Róg dowódcy
-    };
-
-    // Jeśli karta ma numer i umiejętność w specjalnych przypadkach, użyj tego obrazka
-    if (specialCases[card.numer] && specialCases[card.numer][card.moc]) {
-        return specialCases[card.numer][card.moc];
-    }
-
-    // Domyślne obrazki dla każdej umiejętności
-    const defaultImages = {
-        "berserk": "berserk.webp",
-        "deszcz": "deszcz.webp",
-        "grzybki": "igrzybki.webp",
-        "iporz": "iporz.webp",
-        "manek": "manek.webp",
-        "medyk": "medyk.webp",
-        "mgla": "mgla.webp",
-        "morale": "morale.webp",
-        "mroz": "mroz.webp",
-        "niebo": "niebo.webp",
-        "porz": "2porz.webp",
-        "rog": "irog.webp",
-        "szpieg": "szpieg.webp",
-        "sztorm": "sztorm.webp",
-        "wezwanie": "wezwanie.webp",
-        "wezwarniezza": "wezwarniezza.webp",
-        "wiez": "wiz.webp"
-    };
-
-    // Zwróć domyślny obrazek dla umiejętności lub pusty string, jeśli brak
-    return defaultImages[card.moc] || "";
-}
-
-// Funkcja do wyświetlania kart
-function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false) {
-    if (!area) return;
-
-    // Wyczyść obszar przed dodaniem nowych kart
-    while (area.firstChild) {
-        area.removeChild(area.firstChild);
-    }
-
-    // Filtruj karty
-    const filteredCards = cardList.filter(card => {
-        if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-        if (filter === 'all') return true;
-        if (filter === 'miecz') return card.pozycja === 1;
-        if (filter === 'luk') return card.pozycja === 2;
-        if (filter === 'oblezenie') return card.pozycja === 3;
-        if (filter === 'bohater') return card.bohater === true;
-        if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-        if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg', 'manek', 'wezwarniezza'].includes(card.moc);
-        return false;
-    });
-
-    filteredCards.forEach(card => {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'card';
-
-        let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-        if (card.nazwa === "Bies" && playerFaction !== "4") {
-            bannerFaction = playerFaction;
-        }
-
-        // Podstawowy HTML dla karty
-        let html = `
-            <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-            <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-            <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-        `;
-
-        html += `<div class="name">${card.nazwa}</div>`;
-
-        if (isLargeView) {
-            html += `<div class="description">${card.opis || ''}</div>`;
-        }
-
-        if (!card.isKing) {
-            // Sprawdź, czy karta jest kartą pogodową
-            const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-            // Dodaj tło punktów dla kart z punktami lub specjalnych
-            if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'spieg', 'manek', 'wezwarniezza'].includes(card.moc)) {
-                html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-            }
-
-            // Dodaj punkty, jeśli karta je ma
-            if (card.punkty !== undefined) {
-                html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-            }
-
-            // Dodaj obrazek umiejętności, jeśli karta ma moc
-            if (card.moc) {
-                const powerImage = getPowerImage(card);
-                if (powerImage) {
-                    html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                }
-            } else if (card.pozycja === 4) {
-                // Jeśli karta ma pozycję 4 i nie ma innej mocy, użyj zrecznoac.webp
-                html += `<img src="assets/dkarty/zrecznoac.webp" class="power-icon">`;
-            }
-
-            // Dodaj obrazek pozycji, jeśli karta ma pozycję i nie jest kartą pogodową
-            if (card.pozycja && !isWeatherCard) {
-                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-            }
-
-            // Dodaj obrazek bohatera, jeśli karta jest bohaterem
-            if (card.bohater) {
-                html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-            }
-        }
-
-        cardElement.innerHTML = html;
-        area.appendChild(cardElement);
-
-        // Dźwięk przy najechaniu
-        cardElement.addEventListener('mouseover', () => {
-            if (hoverSound) {
-                hoverSound.currentTime = 0;
-                hoverSound.play();
-            }
-        });
-    });
-
-    updatePositionsAndScaling();
-}
-
-// Funkcja do aktualizacji pozycji i skalowania (bez zmian)
-function updatePositionsAndScaling() {
-    const overlay = document.querySelector('.overlay');
-    if (!overlay) return;
-
-    const overlayRect = overlay.getBoundingClientRect();
-    const overlayWidth = overlayRect.width;
-    const overlayHeight = overlayRect.height;
-    const overlayLeft = overlayRect.left;
-    const overlayTop = overlayRect.top;
-
-    const windowAspectRatio = window.innerWidth / window.innerHeight;
-    const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
-
-    let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
-
-    if (windowAspectRatio > guiAspectRatio) {
-        scale = overlayHeight / GUI_HEIGHT;
-        backgroundWidth = GUI_WIDTH * scale;
-        backgroundHeight = overlayHeight;
-        backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-        backgroundTop = overlayTop;
-    } else {
-        scale = overlayWidth / GUI_WIDTH;
-        backgroundWidth = overlayWidth;
-        backgroundHeight = GUI_HEIGHT * scale;
-        backgroundLeft = overlayLeft;
-        backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-    }
-
-    const buttonWidth = 97 * scale;
-    const buttonHeight = 80 * scale;
-
-    const buttons = [
-        { selector: '.button.collection.all', left: 373, top: 354, image: 'assets/wybor/all.webp' },
-        { selector: '.button.collection.mecz', left: 549, top: 356, image: 'assets/wybor/mecz.webp' },
-        { selector: '.button.collection.lok', left: 735, top: 355, image: 'assets/wybor/lok.webp' },
-        { selector: '.button.collection.obl', left: 916, top: 355, image: 'assets/wybor/kapatulta.webp' },
-        { selector: '.button.collection.hero', left: 1098, top: 356, image: 'assets/wybor/boharer.webp' },
-        { selector: '.button.collection.pogoda', left: 1277, top: 351, image: 'assets/wybor/pogoda.webp' },
-        { selector: '.button.collection.specjalne', left: 1459, top: 361, image: 'assets/wybor/inne.webp' },
-        { selector: '.button.deck.all', left: 2297, top: 354, image: 'assets/wybor/all.webp' },
-        { selector: '.button.deck.mecz', left: 2473, top: 356, image: 'assets/wybor/mecz.webp' },
-        { selector: '.button.deck.lok', left: 2659, top: 355, image: 'assets/wybor/lok.webp' },
-        { selector: '.button.deck.obl', left: 2840, top: 355, image: 'assets/wybor/kapatulta.webp' },
-        { selector: '.button.deck.hero', left: 3022, top: 356, image: 'assets/wybor/boharer.webp' },
-        { selector: '.button.deck.pogoda', left: 3201, top: 351, image: 'assets/wybor/pogoda.webp' },
-        { selector: '.button.deck.specjalne', left: 3380, top: 361, image: 'assets/wybor/inne.webp' },
-    ];
-
-    buttons.forEach(({ selector, left, top, image }) => {
-        const button = document.querySelector(selector);
-        if (button) {
-            button.style.width = `${buttonWidth}px`;
-            button.style.height = `${buttonHeight}px`;
-            button.style.left = `${backgroundLeft + left * scale}px`;
-            button.style.top = `${backgroundTop + top * scale}px`;
-            button.style.backgroundImage = `url('${image}')`;
-        }
-    });
-
-    if (collectionArea) {
-        collectionArea.style.width = `${1195 * scale}px`;
-        collectionArea.style.height = `${1449 * scale}px`;
-        collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
-        collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
-        collectionArea.style.padding = `${10 * scale}px`;
-    }
-
-    if (deckArea) {
-        deckArea.style.width = `${1193 * scale}px`;
-        deckArea.style.height = `${1449 * scale}px`;
-        deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
-        deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-        deckArea.style.padding = `${10 * scale}px`; // Poprawiono literówkę z "collectionArea" na "deckArea"
-    }
-
-    const cards = document.querySelectorAll('.card-area .card');
-    cards.forEach(card => {
-        card.style.width = `${350 * scale}px`;
-        card.style.height = `${723 * scale}px`;
-        card.style.margin = `${10 * scale}px`;
-
-        const originalCardWidth = 524;
-        const currentCardWidth = parseFloat(card.style.width);
-        const cardScale = currentCardWidth / originalCardWidth;
-
-        const points = card.querySelector('.points');
-        if (points) {
-            points.style.fontSize = `${80 * cardScale}px`;
-        }
-
-        const name = card.querySelector('.name');
-        if (name) {
-            name.style.fontSize = `${48 * cardScale}px`;
-        }
-
-        const powerIcon = card.querySelector('.power-icon');
-        if (powerIcon) {
-            powerIcon.style.width = `${350 * scale}px`;
-            powerIcon.style.height = `${723 * scale}px`;
-            powerIcon.style.top = '0px';
-            powerIcon.style.left = '0px';
-        }
-
-        const heroIcon = card.querySelector('.hero-icon');
-        if (heroIcon) {
-            heroIcon.style.width = `${310 * cardScale}px`;
-            heroIcon.style.height = `${308 * cardScale}px`;
-            heroIcon.style.top = `${-19 * cardScale}px`;
-            heroIcon.style.left = `${-23 * cardScale}px`;
-        }
-    });
-
-    if (stats) {
-        stats.style.left = `${backgroundLeft + 1935 * scale}px`;
-        stats.style.top = `${backgroundTop + 1152 * scale}px`;
-        stats.style.fontSize = `${16 * scale}px`;
-    }
-
-    const pageLeft = document.querySelector('.page-left');
-    if (pageLeft) {
-        pageLeft.style.width = `${49 * scale}px`;
-        pageLeft.style.height = `${43 * scale}px`;
-        pageLeft.style.left = `${backgroundLeft + 1452 * scale}px`;
-        pageLeft.style.top = `${backgroundTop + 155 * scale}px`;
-        pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
-    }
-
-    const pageRight = document.querySelector('.page-right');
-    if (pageRight) {
-        pageRight.style.width = `${49 * scale}px`;
-        pageRight.style.height = `${43 * scale}px`;
-        pageRight.style.left = `${backgroundLeft + 2338 * scale}px`;
-        pageRight.style.top = `${backgroundTop + 154 * scale}px`;
-        pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
-    }
-
-    pageDots.forEach((dot, index) => {
-        if (dot) {
-            dot.style.width = `${25 * scale}px`;
-            dot.style.height = `${22 * scale}px`;
-            dot.style.left = `${index * 4 * scale}px`;
-        }
-    });
-
-    const factionInfo = document.querySelector('.faction-info');
-    if (factionInfo) {
-        factionInfo.style.left = `${backgroundLeft}px`;
-        factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
-    }
-
-    const factionHeader = document.querySelector('.faction-header');
-    if (factionHeader) {
-        factionHeader.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-        factionHeader.style.top = `0px`;
-        factionHeader.style.transform = `translateX(-50%)`;
-    }
-
-    const factionShield = document.querySelector('.faction-shield');
-    if (factionShield) {
-        factionShield.style.width = `${106 * scale}px`;
-        factionShield.style.height = `${110 * scale}px`;
-    }
-
-    const factionName = document.querySelector('.faction-name');
-    if (factionName) {
-        factionName.style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
-        factionName.style.lineHeight = `${110 * scale}px`;
-    }
-
-    const factionAbility = document.querySelector('.faction-ability');
-    if (factionAbility) {
-        factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
-        factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-        factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
-        factionAbility.style.transform = `translateX(-50%)`;
-    }
-
-    const leaderCard = document.querySelector('.leader-card');
-    if (leaderCard) {
-        leaderCard.style.width = `${259 * scale}px`;
-        leaderCard.style.height = `${490 * scale}px`;
-        leaderCard.style.left = `${backgroundLeft + 1792 * scale}px`;
-        leaderCard.style.top = `${backgroundTop + 539 * scale}px`;
-    }
-
-    const goToGameButton = document.getElementById('goToGameButton');
-    if (goToGameButton) {
-        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        goToGameButton.style.bottom = `${43 * scale}px`;
-        goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
-        goToGameButton.style.fontSize = `${30 * scale}px`;
-        goToGameButton.style.transform = `translateX(-50%)`;
-    }
-}
 
     updatePage();
     updateStats();
