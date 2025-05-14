@@ -126,8 +126,8 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 7.55%; /* 75 px / 993 px */
-    left: 14.31%; /* 75 px / 524 px */
+    top: 7.552870%; /* 75 / 993 */
+    left: 14.312977%; /* 75 / 524 */
     width: 17.94%;
     height: 6.45%;
     line-height: normal;
