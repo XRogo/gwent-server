@@ -10,6 +10,7 @@ const cards = [
         moc: "manek",
         frakcja: "nie",
         ilosc: 3,
+        numer: "001"
     },
 
     {
@@ -21,6 +22,7 @@ const cards = [
         moc: "rog",
         frakcja: "nie",
         ilosc: 3,
+        numer: "002"
     },
 
     {
@@ -32,6 +34,7 @@ const cards = [
         moc: "porz",
         frakcja: "nie",
         ilosc: 3,
+        numer: "003"
     },
 
     {
@@ -43,6 +46,7 @@ const cards = [
         moc: "mroz",
         frakcja: "nie",
         ilosc: 3,
+        numer: "004"
     },
 
     {
@@ -54,6 +58,7 @@ const cards = [
         moc: "mgla",
         frakcja: "nie",
         ilosc: 3,
+        numer: "005"
     },
 
     {
@@ -65,6 +70,7 @@ const cards = [
         moc: "deszcz",
         frakcja: "nie",
         ilosc: 3,
+        numer: "006"
     },
     
     {
@@ -76,6 +82,7 @@ const cards = [
         moc: "niebo",
         frakcja: "nie",
         ilosc: 3,
+        numer: "007"
     },
     
     {
@@ -87,9 +94,10 @@ const cards = [
         moc: "sztorm",
         frakcja: "nie",
         ilosc: 3,
+        numer: "008"
     },
 
-    //neutralne===============================================================================================
+//neutralne=============================================================================================================================================================
 
     {
         nazwa: "Geralt z Rivi",
@@ -103,6 +111,7 @@ const cards = [
         pozycja: 1,
         summon: "Płotka",
         ilosc: 1,
+        numer: "009"
     },
     
     {
@@ -117,6 +126,7 @@ const cards = [
         pozycja: 1,
         summon: "Płotka",
         ilosc: 1,
+        numer: "010"
     },
 
     {
@@ -130,6 +140,7 @@ const cards = [
         punkty: 7,
         pozycja: 2,
         ilosc: 1,
+        numer: "011"
     },
 
     {
@@ -142,6 +153,7 @@ const cards = [
         punkty: 7,
         pozycja: 1,
         ilosc: 1,
+        numer: "012"
     },
 
     {
@@ -155,6 +167,7 @@ const cards = [
         punkty: 7,
         pozycja: 1,
         ilosc: 1,
+        numer: "013"
     },
 
     {
@@ -167,6 +180,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
+        numer: "014"
     },
 
     {
@@ -180,6 +194,7 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
+        numer: "015"
     },
 
     {
@@ -192,6 +207,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "016"
     },
 
     {
@@ -204,6 +220,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "017"
     },
 
     {
@@ -218,6 +235,7 @@ const cards = [
         pozycja: 2,
         summon: "Guanter O'Dim: Cień",
         ilosc: 3,
+        numer: "018"
     },
 
     {
@@ -232,6 +250,7 @@ const cards = [
         pozycja: 3,
         summon: "Guanter O'Dim: Cień",
         ilosc: 1,
+        numer: "019"
     },
 
     {
@@ -244,6 +263,7 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
+        numer: "020"
     },
 
     {
@@ -257,6 +277,7 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 1,
+        numer: "021"
     },
 
     {
@@ -270,8 +291,8 @@ const cards = [
         punkty: 0,
         pozycja: 1,
         ilosc: 1,
+        numer: "022"
     },
-
 
     {
         nazwa: "Krowa",
@@ -285,11 +306,10 @@ const cards = [
         pozycja: 2,
         summon: "Bies",
         ilosc: 1,
+        numer: "023"
     },
 
-    //polnco======================================================================================================
-    //polnco======================================================================================================
-    //polnco======================================================================================================
+    //polnoc==============================================================================================================================================================
 
     {
         nazwa: "Vernon Roche",
@@ -301,6 +321,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "101"
     },
 
     {
@@ -313,6 +334,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "102"
     },
 
     {
@@ -325,6 +347,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "103"
     },
 
     {
@@ -337,6 +360,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "104"
     },
 
     {
@@ -350,6 +374,7 @@ const cards = [
         punkty: 8,
         pozycja: 3,
         ilosc: 2,
+        numer: "105"
     },
 
     {
@@ -362,6 +387,7 @@ const cards = [
         punkty: 6,
         pozycja: 2,
         ilosc: 1,
+        numer: "106"
     },
 
     {
@@ -374,6 +400,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "107"
     },
 
     {
@@ -386,6 +413,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "108"
     },
 
     {
@@ -398,6 +426,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "109"
     },
 
     {
@@ -410,6 +439,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "110"
     },
 
     {
@@ -422,6 +452,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "111"
     },
 
     {
@@ -434,6 +465,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "112"
     },
 
     {
@@ -446,6 +478,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "113"
     },
 
     {
@@ -458,6 +491,7 @@ const cards = [
         punkty: 5,
         pozycja: 2,
         ilosc: 1,
+        numer: "114"
     },
 
     {
@@ -470,6 +504,7 @@ const cards = [
         punkty: 5,
         pozycja: 2,
         ilosc: 1,
+        numer: "115"
     },
 
     {
@@ -483,6 +518,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "116"
     },
 
     {
@@ -496,6 +532,7 @@ const cards = [
         punkty: 5,
         pozycja: 2,
         ilosc: 3,
+        numer: "117"
     },
 
     {
@@ -509,6 +546,7 @@ const cards = [
         punkty: 5,
         pozycja: 3,
         ilosc: 1,
+        numer: "118"
     },
 
     {
@@ -522,6 +560,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "119"
     },
 
     {
@@ -534,6 +573,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
+        numer: "120"
     },
 
     {
@@ -546,6 +586,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
+        numer: "121"
     },
 
     {
@@ -559,6 +600,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 3,
+        numer: "122"
     },
 
     {
@@ -571,6 +613,7 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 1,
+        numer: "123"
     },
 
     {
@@ -584,6 +627,7 @@ const cards = [
         punkty: 1,
         pozycja: 3,
         ilosc: 1,
+        numer: "124"
     },
 
     {
@@ -597,6 +641,7 @@ const cards = [
         punkty: 1,
         pozycja: 1,
         ilosc: 4,
+        numer: "125"
     },
 
     {
@@ -609,6 +654,7 @@ const cards = [
         punkty: 1,
         pozycja: 1,
         ilosc: 1,
+        numer: "126"
     },
 
     {
@@ -621,6 +667,7 @@ const cards = [
         punkty: 1,
         pozycja: 1,
         ilosc: 1,
+        numer: "127"
     },
 
     {
@@ -634,10 +681,11 @@ const cards = [
         punkty: 1,
         pozycja: 3,
         ilosc: 3,
+        numer: "128"
     },
-    //nilftgard===============================================================================================
-    //nilftgard===============================================================================================
-    //nilftgard===============================================================================================
+
+    //nilfgard========================================================================================================================================================
+
     {
         nazwa: "Letho z Gulety",
         karta: "/gwent/assets/karty/nilftgard/letho_z_gulety.webp",
@@ -648,6 +696,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "201"
     },
 
     {
@@ -661,6 +710,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "202"
     },
 
     {
@@ -673,6 +723,7 @@ const cards = [
         punkty: 10,
         pozycja: 3,
         ilosc: 1,
+        numer: "203"
     },
 
     {
@@ -685,6 +736,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "204"
     },
 
     {
@@ -697,6 +749,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "205"
     },
 
     {
@@ -709,6 +762,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "206"
     },
 
     {
@@ -721,9 +775,10 @@ const cards = [
         punkty: 10,
         pozycja: 3,
         ilosc: 1,
+        numer: "207"
     },
     
-    { 
+    {
         nazwa: "Stefan Skellen",
         karta: "/gwent/assets/karty/nilftgard/stefan_skellen.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -734,6 +789,7 @@ const cards = [
         punkty: 9,
         pozycja: 1,
         ilosc: 1,
+        numer: "208"
     },
 
     {
@@ -747,9 +803,10 @@ const cards = [
         punkty: 7,
         pozycja: 1,
         ilosc: 1,
+        numer: "209"
     },
 
-    { 
+    {
         nazwa: "Assire var Anahid",
         karta: "/gwent/assets/karty/nilftgard/assire_var_anachid.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
@@ -759,6 +816,7 @@ const cards = [
         punkty: 6,
         pozycja: 2,
         ilosc: 1,
+        numer: "210"
     },
  
     {
@@ -771,6 +829,7 @@ const cards = [
         punkty: 6,
         pozycja: 2,
         ilosc: 1,
+        numer: "211"
     },
 
     {
@@ -783,6 +842,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
+        numer: "212"
     },
 
     {
@@ -795,6 +855,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "213"
     },
 
     {
@@ -807,10 +868,11 @@ const cards = [
         punkty: 5,
         pozycja: 2,
         ilosc: 1,
+        numer: "214"
     },
 
     {
-        nazwa: "Zerrikańsk Ognisty Skorpion",
+        nazwa: "Zerrikański Ognisty Skorpion",
         karta: "/gwent/assets/karty/nilftgard/zerrikanski_ognisty_skorpion.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
@@ -819,6 +881,7 @@ const cards = [
         punkty: 5,
         pozycja: 3,
         ilosc: 1,
+        numer: "215"
     },
 
     {
@@ -833,6 +896,7 @@ const cards = [
         pozycja: 1,
         summon: "Młody emisariusz",
         ilosc: 1,
+        numer: "216"
     },
 
     {
@@ -847,6 +911,7 @@ const cards = [
         pozycja: 1,
         summon: "Młody emisariusz",
         ilosc: 1,
+        numer: "217"
     },
 
     {
@@ -859,6 +924,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
+        numer: "218"
     },
 
     {
@@ -871,6 +937,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "219"
     },
 
     {
@@ -883,6 +950,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
+        numer: "220"
     },
 
     {
@@ -896,6 +964,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "221"
     },
 
     {
@@ -908,6 +977,7 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
+        numer: "222"
     },
 
     {
@@ -920,6 +990,7 @@ const cards = [
         punkty: 3,
         pozycja: 3,
         ilosc: 3,
+        numer: "223"
     },
 
     {
@@ -932,6 +1003,7 @@ const cards = [
         punkty: 3,
         pozycja: 2,
         ilosc: 1,
+        numer: "224"
     },
 
     {
@@ -945,11 +1017,12 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 4,
+        numer: "225"
     },
 
     {
         nazwa: "Albrich",
-        karta: "/gwent/assets/karty/nilftgard/albrich.webp",
+        karta: "gwent/assets/karty/nilftgard/albrich.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -957,6 +1030,7 @@ const cards = [
         punkty: 2,
         pozycja: 3,
         ilosc: 1,
+        numer: "226"
     },
 
     {
@@ -969,6 +1043,7 @@ const cards = [
         punkty: 2,
         pozycja: 2,
         ilosc: 1,
+        numer: "227"
     },
 
     {
@@ -981,6 +1056,7 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 1,
+        numer: "228"
     },
 
     {
@@ -994,6 +1070,7 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 3,
+        numer: "229"
     },
 
     {
@@ -1007,6 +1084,7 @@ const cards = [
         punkty: 1,
         pozycja: 2,
         ilosc: 1,
+        numer: "230"
     },
 
     {
@@ -1020,6 +1098,7 @@ const cards = [
         punkty: 1,
         pozycja: 2,
         ilosc: 1,
+        numer: "231"
     },
 
     {
@@ -1033,10 +1112,11 @@ const cards = [
         punkty: 0,
         pozycja: 3,
         ilosc: 1,
+        numer: "232"
     },
-    //wiwwiury=============================================================================================================
-    //wiwwiury=============================================================================================================
-    //wiwwiury=============================================================================================================
+
+    //wiwwiury============================================================================================================================================================
+
     {
         nazwa: "Eithné",
         karta: "/gwent/assets/karty/scio'tel/eithne.webp",
@@ -1047,6 +1127,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "301"
     },
 
     {
@@ -1059,6 +1140,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "302"
     },
 
     {
@@ -1072,6 +1154,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "303"
     },
 
     {
@@ -1084,6 +1167,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "304"
     },
     
     {
@@ -1097,6 +1181,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "305"
     },
 
     {
@@ -1110,6 +1195,7 @@ const cards = [
         punkty: 8,
         pozycja: 3,
         ilosc: 1,
+        numer: "306"
     },
 
     {
@@ -1122,6 +1208,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
+        numer: "307"
     },
 
     {
@@ -1134,6 +1221,7 @@ const cards = [
         punkty: 6,
         pozycja: 2,
         ilosc: 1,
+        numer: "308"
     },
 
     {
@@ -1147,6 +1235,7 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
+        numer: "309"
     },
 
     {
@@ -1160,6 +1249,7 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
+        numer: "310"
     },
     
     {
@@ -1173,6 +1263,7 @@ const cards = [
         punkty: 6,
         pozycja: 4,
         ilosc: 1,
+        numer: "311"
     },
 
     {
@@ -1185,8 +1276,9 @@ const cards = [
         frakcja: "3",
         punkty: 6,
         pozycja: 4,
-        summon:"",
+        summon: "",
         ilosc: 1,
+        numer: "312"
     },   
     
     {
@@ -1199,8 +1291,9 @@ const cards = [
         frakcja: "3",
         punkty: 6,
         pozycja: 4,
-        summon:"",
+        summon: "",
         ilosc: 1,
+        numer: "313"
     },   
 
     {
@@ -1213,8 +1306,9 @@ const cards = [
         frakcja: "3",
         punkty: 6,
         pozycja: 4,
-        summon:"",
+        summon: "",
         ilosc: 1,
+        numer: "314"
     },   
     
     {
@@ -1228,6 +1322,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "315"
     }, 
 
     {
@@ -1241,6 +1336,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "316"
     },    
        
     {
@@ -1254,6 +1350,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "317"
     },      
 
     {
@@ -1267,6 +1364,7 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
+        numer: "318"
     },
     
     {
@@ -1280,6 +1378,7 @@ const cards = [
         punkty: 5,
         pozycja: 4,
         ilosc: 1,
+        numer: "319"
     },
 
     {
@@ -1292,6 +1391,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "320"
     },
 
     {
@@ -1304,6 +1404,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "321"
     },
     
     {
@@ -1316,6 +1417,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "322"
     },
     
     {
@@ -1328,6 +1430,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "323"
     },
     
     {
@@ -1340,6 +1443,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "324"
     },
 
     {
@@ -1352,6 +1456,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
+        numer: "325"
     },
        
     {
@@ -1364,6 +1469,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 1,
+        numer: "326"
     },
     
     {
@@ -1377,6 +1483,7 @@ const cards = [
         punkty: 3,
         pozycja: 4,
         ilosc: 1,
+        numer: "327"
     },
 
     {
@@ -1390,6 +1497,7 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
+        numer: "328"
     },
 
     {
@@ -1403,6 +1511,7 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
+        numer: "329"
     }, 
 
     {
@@ -1416,6 +1525,7 @@ const cards = [
         punkty: 3,
         pozycja: 1,
         ilosc: 1,
+        numer: "330"
     },
 
     {
@@ -1428,6 +1538,7 @@ const cards = [
         punkty: 2,
         pozycja: 2, 
         ilosc: 1,
+        numer: "331"
     },
 
     {
@@ -1440,8 +1551,9 @@ const cards = [
         frakcja: "3",
         punkty: 2,
         pozycja: 2,
-        summon:"Elfi harcownik",
+        summon: "Elfi harcownik",
         ilosc: 1,
+        numer: "332"
     },
 
     {
@@ -1454,8 +1566,9 @@ const cards = [
         frakcja: "3",
         punkty: 2,
         pozycja: 2,
-        summon:"Elfi harcownik",
+        summon: "Elfi harcownik",
         ilosc: 1,
+        numer: "333"
     },
 
     {
@@ -1468,8 +1581,9 @@ const cards = [
         frakcja: "3",
         punkty: 2,
         pozycja: 2,
-        summon:"Elfi harcownik",
+        summon: "Elfi harcownik",
         ilosc: 1,
+        numer: "334"
     },
 
     {
@@ -1482,6 +1596,7 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
+        numer: "335"
     },
 
     {
@@ -1495,6 +1610,7 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
+        numer: "336"
     },
 
     {
@@ -1508,6 +1624,7 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
+        numer: "337"
     },
 
     {
@@ -1521,22 +1638,22 @@ const cards = [
         punkty: 0,
         pozycja: 2,
         ilosc: 1,
+        numer: "338"
     },
 
-     // powfory =======================================================================================
-     // powfory =======================================================================================
-     // powfory =======================================================================================
+    // powfory ==========================================================================================================================================================
 
     {
         nazwa: "Draug",
         karta: "/gwent/assets/karty/potwory/draug.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
-        bohater:"true",
+        bohater: "true",
         frakcja: "4",
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "401"
     },
  
     {
@@ -1549,6 +1666,7 @@ const cards = [
         punkty: 10,
         pozycja: 1,
         ilosc: 1,
+        numer: "402"
     },
     
     {
@@ -1561,6 +1679,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,
         ilosc: 1,
+        numer: "403"
     },
 
     {
@@ -1574,6 +1693,7 @@ const cards = [
         punkty: 8,
         pozycja: 4,
         ilosc: 1,
+        numer: "404"
     },
 
     {
@@ -1587,6 +1707,7 @@ const cards = [
         punkty: 7,
         pozycja: 2,
         ilosc: 1,
+        numer: "405"
     },
 
     {
@@ -1599,6 +1720,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "406"
     },
 
     {
@@ -1611,6 +1733,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
+        numer: "407"
     },
 
     {
@@ -1623,6 +1746,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 1,
+        numer: "408"
     },
      
     {
@@ -1635,8 +1759,9 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 3,
-        summon:"Krabopająk",
+        summon: "Krabopająk",
         ilosc: 1,
+        numer: "409"
     },
   
     {
@@ -1649,8 +1774,9 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 1,
-        summon:"Wiedzma: Szepciucha, Wiedzma: Prządka",
+        summon: "Wiedzma: Szepciucha, Wiedzma: Prządka",
         ilosc: 1,
+        numer: "410"
     },
 
     {
@@ -1663,8 +1789,9 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 1,
-        summon:"Wiedzma: Kuchta, Wiedzma: Szepciucha",
+        summon: "Wiedzma: Kuchta, Wiedzma: Szepciucha",
         ilosc: 1,
+        numer: "411"
     },
 
     {
@@ -1677,8 +1804,9 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 1,
-        summon:"Wiedzma: Kuchta, Wiedzma: Prządka",
+        summon: "Wiedzma: Kuchta, Wiedzma: Prządka",
         ilosc: 1,
+        numer: "412"
     },
 
     {
@@ -1691,6 +1819,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "413"
     },              
 
     {
@@ -1703,6 +1832,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "414"
     },
 
     {
@@ -1715,6 +1845,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "415"
     },
 
     {
@@ -1727,6 +1858,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "416"
     },
 
     {
@@ -1739,6 +1871,7 @@ const cards = [
         punkty: 5,
         pozycja: 1,
         ilosc: 1,
+        numer: "417"
     },
 
     {
@@ -1751,6 +1884,7 @@ const cards = [
         punkty: 5,
         pozycja: 3,
         ilosc: 1,
+        numer: "418"
     },
 
     {
@@ -1763,6 +1897,7 @@ const cards = [
         punkty: 5,
         pozycja: 2,
         ilosc: 1,
+        numer: "419"
     },
 
     {
@@ -1775,8 +1910,9 @@ const cards = [
         frakcja: "4",
         punkty: 5,
         pozycja: 1,
-        summon:"",
+        summon: "",
         ilosc: 1,
+        numer: "420"
     },
 
     {
@@ -1789,6 +1925,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "421"
     },
 
     {
@@ -1800,9 +1937,10 @@ const cards = [
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
-        pozycja:1 ,
-        summon:"Krabopająk",
+        pozycja: 1,
+        summon: "Krabopająk",
         ilosc: 1,
+        numer: "422"
     },
 
     {
@@ -1814,9 +1952,10 @@ const cards = [
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
-        pozycja:1 ,
-        summon:"Krabopająk",
+        pozycja: 1,
+        summon: "Krabopająk",
         ilosc: 1,
+        numer: "423"
     },
 
     {
@@ -1828,9 +1967,10 @@ const cards = [
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
-        pozycja:1 ,
-        summon:"Krabopająk",
+        pozycja: 1,
+        summon: "Krabopająk",
         ilosc: 1,
+        numer: "424"
     },
 
     {
@@ -1843,8 +1983,9 @@ const cards = [
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon:"Wampir",
+        summon: "Wampir",
         ilosc: 1,
+        numer: "425"
     },
      
     {
@@ -1857,8 +1998,9 @@ const cards = [
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon:"Wampir",
+        summon: "Wampir",
         ilosc: 1,
+        numer: "426"
     },
      
     {
@@ -1871,8 +2013,9 @@ const cards = [
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon:"Wampir",
+        summon: "Wampir",
         ilosc: 1,
+        numer: "427"
     },
 
     {
@@ -1885,8 +2028,9 @@ const cards = [
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon:"Wampir",
+        summon: "Wampir",
         ilosc: 1,
+        numer: "428"
     },
 
     {
@@ -1895,10 +2039,11 @@ const cards = [
         dkarta: "",
         opis: "Work",
         bohater: false,
-        frakcja: 4,
+        frakcja: "4",
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "429"
     },
     
     {
@@ -1912,6 +2057,7 @@ const cards = [
         punkty: 2,
         pozycja: 4,
         ilosc: 1,
+        numer: "430"
     },     
     
     {
@@ -1924,6 +2070,7 @@ const cards = [
         punkty: 2,
         pozycja: 2,
         ilosc: 1,
+        numer: "431"
     },     
 
     {
@@ -1936,6 +2083,7 @@ const cards = [
         punkty: 2,
         pozycja: 2,
         ilosc: 1,
+        numer: "432"
     },     
     
     {
@@ -1949,6 +2097,7 @@ const cards = [
         punkty: 2,
         pozycja: 4,
         ilosc: 1,
+        numer: "433"
     },     
     
     {
@@ -1961,6 +2110,7 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 1,
+        numer: "434"
     },     
 
     {
@@ -1973,80 +2123,7 @@ const cards = [
         punkty: 2,
         pozycja: 2,
         ilosc: 1,
-    },    
-        
-    {
-        nazwa: "Harpia",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        moc: "zrecznosc",
-        frakcja: "4",
-        punkty: 2,
-        pozycja: 4,
-        ilosc: 1,
-    },     
-    
-    {
-        nazwa: "Kuroliszek",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        frakcja: "4",
-        punkty: 2,
-        pozycja: 2,
-        ilosc: 1,
-    },     
-
-    {
-        nazwa: "Gargulec",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        frakcja: "4",
-        punkty: 2,
-        pozycja: 2,
-        ilosc: 1,
-    },     
-    
-    {
-        nazwa: "Harpia Celaeno",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        moc: "zrecznosc",
-        frakcja: "4",
-        punkty: 2,
-        pozycja: 4,
-        ilosc: 1,
-    },     
-    
-    {
-        nazwa: "Mglak",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        frakcja: "4",
-        punkty: 2,
-        pozycja: 1,
-        ilosc: 1,
-    },     
-
-    {
-        nazwa: "Wiwerna",
-        karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-        opis: "WORK.",
-        bohater: false,
-        frakcja: "4",
-        punkty: 2,
-        pozycja: 2,
-        ilosc: 1,
+        numer: "435"
     },
 
 
@@ -2062,6 +2139,7 @@ const cards = [
         pozycja: 1,
         summon:"Nekker",
         ilosc: 1,
+        numer: "436"
     },
 
     {
@@ -2076,6 +2154,7 @@ const cards = [
         pozycja: 1,
         summon:"Nekker",
         ilosc: 1,
+        numer: "437"
     },
 
     {
@@ -2090,6 +2169,7 @@ const cards = [
         pozycja: 1,
         summon:"Nekker",
         ilosc: 1,
+        numer: "438"
     },    
 
     {
@@ -2104,6 +2184,7 @@ const cards = [
         pozycja: 1,
         summon:"Ghul",
         ilosc: 1,
+        numer: "439"
     },
     
     {
@@ -2118,6 +2199,7 @@ const cards = [
         pozycja: 1,
         summon:"Ghul",
         ilosc: 1,
+        numer: "440"
     },    
     
     {
@@ -2132,6 +2214,7 @@ const cards = [
         pozycja: 1,
         summon:"Ghul",
         ilosc: 1,
+        numer: "441"
     },
     
 //skellige ==============================================
@@ -2149,6 +2232,7 @@ const cards = [
         punkty: 12,
         pozycja: 4,
         ilosc: 1,
+        numer: "501"
     },   
     
     {
@@ -2161,6 +2245,7 @@ const cards = [
         punkty: 10,
         pozycja: 2,          
         ilosc: 1,
+        numer: "502"
     },    
     
     {
@@ -2175,6 +2260,7 @@ const cards = [
         pozycja: 1,
         summon:"",
         ilosc: 1,
+        numer: "503"
     },    
     
     {
@@ -2188,6 +2274,7 @@ const cards = [
         punkty: 8,
         pozycja: 2,
         ilosc: 1,
+        numer: "504"
     },    
     
     {
@@ -2200,6 +2287,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
+        numer: "505"
     },    
     
     {
@@ -2212,6 +2300,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 1,
+        numer: "506"
     },
     
     {
@@ -2225,6 +2314,7 @@ const cards = [
         punkty: 6,
         pozycja: 1,
         ilosc: 3,
+        numer: "507"
     },    
     
     {
@@ -2238,6 +2328,7 @@ const cards = [
         punkty: 6,
         pozycja: 3,
         ilosc: 3,
+        numer: "508"
     },    
     
     {
@@ -2250,6 +2341,7 @@ const cards = [
         punkty: 6,
         pozycja: 5,
         ilosc: 3,
+        numer: "509"
     },    
     
     {
@@ -2263,6 +2355,7 @@ const cards = [
         punkty: 6,
         pozycja: 2,
         ilosc: 1,
+        numer: "510"
     },    
     
     {
@@ -2275,6 +2368,7 @@ const cards = [
         punkty: 4,
         pozycja: 3,
         ilosc: 1,
+        numer: "511"
     },    
     
     {
@@ -2287,6 +2381,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "512"
     },
 
     {
@@ -2299,6 +2394,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "513"
     },    
     
     {
@@ -2311,6 +2407,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "514"
     },    
     
     {
@@ -2325,6 +2422,7 @@ const cards = [
         pozycja: 1,
         summon:"",
         ilosc: 1,
+        numer: "515"
     },
     
     {
@@ -2337,6 +2435,7 @@ const cards = [
         punkty: 4 ,
         pozycja: 1,
         ilosc: 1,
+        numer: "516"
     },    
     
     {
@@ -2349,6 +2448,7 @@ const cards = [
         punkty: 4,
         pozycja: 1, 
         ilosc: 1,
+        numer: "517"
     },    
     
     {
@@ -2362,6 +2462,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 3,
+        numer: "518"
     },
 
     {
@@ -2375,6 +2476,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "519"
     },        
 
     {
@@ -2388,6 +2490,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "520"
     },  
       
     {
@@ -2401,6 +2504,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        numer: "521"
     },  
   
     {
@@ -2414,6 +2518,7 @@ const cards = [
         punkty: 2,
         pozycja: 3,
         ilosc: 1,
+        numer: "522"
     },
 
     {
@@ -2427,6 +2532,7 @@ const cards = [
         punkty: 2,
         pozycja: 1,
         ilosc: 1,
+        numer: "523"
     },
     
     {
@@ -2441,6 +2547,7 @@ const cards = [
         pozycja: 2,
         summon:"",
         ilosc: 3,
+        numer: "524"
     },
     
     {
@@ -2455,23 +2562,12 @@ const cards = [
         pozycja: 1,
         summon:"",
         ilosc: 1,
+        numer: "525"
     },
-    
-//     {
-//     {
-//        nazwa: "",
-//        karta: "/gwent/assets/karty/scio'tel/",
-//        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
-//        opis: "WORK.",
-//        bohater: false,
-//        moc: "",
-//        frakcja: "",
-//        punkty: 2,
-//        pozycja: 2,
-//        summon:"",
-//        ilosc: 1,
-//     },
 
+    //inne===============================================================================================================================================================
+
+    
 ];
 
 export default cards;
