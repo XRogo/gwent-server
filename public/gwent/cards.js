@@ -330,7 +330,7 @@ const cards = [
         karta: "/gwent/assets/karty/polnoc/vernon_rosh.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
-        bohater: false,
+        bohater: true,
         frakcja: "1",
         punkty: 10,
         pozycja: 1,

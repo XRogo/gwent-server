@@ -126,8 +126,8 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 3%; /* Możesz dostosować tę wartość, np. na 3%, 2.5%, itd. */
-    left: 5.34%;
+    top: 3.52%; /* 35 px / 993 px, aby środek liczby był na 75 px */
+    left: 14.31%; /* 75 px / 524 px */
     width: 17.94%;
     height: 6.45%;
     text-align: center;
@@ -135,6 +135,7 @@ body {
     font-size: 80px;
     color: #fff;
     z-index: 11;
+    transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
 }
 
 .card-area .card .name {
@@ -147,7 +148,7 @@ body {
     line-height: normal;
     font-size: 48px;
     font-weight: bold;
-    color: #000;
+    color: #141414;
     z-index: 9;
 }
 
@@ -158,7 +159,7 @@ body {
     width: 482px;
     height: 76px;
     font-size: 18px;
-    color: #000;
+    color: #141414;
     text-align: center;
     display: none;
     z-index: 4;
