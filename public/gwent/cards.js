@@ -2035,8 +2035,8 @@ const cards = [
 
     {
         nazwa: "Endriaga",
-        karta: "",
-        dkarta: "",
+        karta: "/gwent/assets/karty/potwory/endriaga.webp",
+        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "Work",
         bohater: false,
         frakcja: "4",
@@ -2048,7 +2048,7 @@ const cards = [
     
     {
         nazwa: "Harpia",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/harpia.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2062,7 +2062,7 @@ const cards = [
     
     {
         nazwa: "Kuroliszek",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/kuroliszek.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2075,7 +2075,7 @@ const cards = [
 
     {
         nazwa: "Gargulec",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/gargulec.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2088,7 +2088,7 @@ const cards = [
     
     {
         nazwa: "Harpia Celaeno",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/harpia_celaeno.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2102,7 +2102,7 @@ const cards = [
     
     {
         nazwa: "Mglak",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/mglak.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2115,7 +2115,7 @@ const cards = [
 
     {
         nazwa: "Wiwerna",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/wiwerna.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2129,7 +2129,7 @@ const cards = [
 
     {
         nazwa: "Nekker",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/nekker3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2144,7 +2144,7 @@ const cards = [
 
     {
         nazwa: "Nekker",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/nekker2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2159,7 +2159,7 @@ const cards = [
 
     {
         nazwa: "Nekker",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/nekker1.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2174,7 +2174,7 @@ const cards = [
 
     {
         nazwa: "Ghul",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/ghul3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2189,7 +2189,7 @@ const cards = [
     
     {
         nazwa: "Ghul",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/ghul2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2204,7 +2204,7 @@ const cards = [
     
     {
         nazwa: "Ghul",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/ghul1.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2223,7 +2223,7 @@ const cards = [
     
     {
         nazwa: "Olaf",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/olaf.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2237,7 +2237,7 @@ const cards = [
     
     {
         nazwa: "Hjalmar",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/hjalmar.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: true,
@@ -2250,7 +2250,7 @@ const cards = [
     
     {
         nazwa: "Cerys",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/cerys.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2265,7 +2265,7 @@ const cards = [
     
     {
         nazwa: "Myszowór",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/myszowór.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: true,
@@ -2279,7 +2279,7 @@ const cards = [
     
     {
         nazwa: "Lugos Szalony",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/lugos_szalony.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2292,7 +2292,7 @@ const cards = [
     
     {
         nazwa: "Lugos Siny",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/lugos_siny.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2305,7 +2305,7 @@ const cards = [
     
     {
         nazwa: "Wojownik klanu Craite",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/wojownik_klanu_craite.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2319,7 +2319,7 @@ const cards = [
     
     {
         nazwa: "Drakkar wojenny",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/lucznik_klanu_brokvar.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2346,7 +2346,7 @@ const cards = [
     
     {
         nazwa: "Purat klanu Dimun",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/pirat_z_klanu_dimun.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2360,7 +2360,7 @@ const cards = [
     
     {
         nazwa: "Holger Czarna Ręka",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/holger_czarna_reka.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2373,7 +2373,7 @@ const cards = [
     
     {
         nazwa: "Donar an Hindar",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/donar_an_hindar.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2386,7 +2386,7 @@ const cards = [
 
     {
         nazwa: "Udarlyk",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/udarlyk.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2399,7 +2399,7 @@ const cards = [
     
     {
         nazwa: "Svanrige",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/svanrige.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2412,7 +2412,7 @@ const cards = [
     
     {
         nazwa: "Berserk",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/berserk.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2427,7 +2427,7 @@ const cards = [
     
     {
         nazwa: "Płatnerz klanu Torrdaroch",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/platnerz_klanu_tordarroch.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2440,7 +2440,7 @@ const cards = [
     
     {
         nazwa: "Sklad klanu Heymaey",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/skald_klanu_heymaey.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2453,7 +2453,7 @@ const cards = [
     
     {
         nazwa: "Lekki Drakkar",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/lekki_drakkar.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2467,7 +2467,7 @@ const cards = [
 
     {
         nazwa: "Tarczowniczka klanu Drummond",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond1.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2481,7 +2481,7 @@ const cards = [
 
     {
         nazwa: "Tarczowniczka klanu Drummond",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2495,7 +2495,7 @@ const cards = [
       
     {
         nazwa: "Tarczowniczka klanu Drummond",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond3.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2509,7 +2509,7 @@ const cards = [
   
     {
         nazwa: "Draig Bon-Duh",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/draig_bon_dhu.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2523,7 +2523,7 @@ const cards = [
 
     {
         nazwa: "Birna Bran",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/birna_bran.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2537,7 +2537,7 @@ const cards = [
     
     {
         nazwa: "Młody berserk",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/mlody_berserker.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2552,7 +2552,7 @@ const cards = [
     
     {
         nazwa: "Kambi",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/kambi.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2567,7 +2567,39 @@ const cards = [
 
     //inne===============================================================================================================================================================
 
+    {
+        nazwa: "Hemdal",
+        karta: "/gwent/assets/karty/Skellige/hemdal.webp",
+        dkarta: "/gwent/assets/dkarty/6/hemdal.webp",
+        opis: '"Kiedy nadejdzie Czas Białego Mrozu Hemdall wezwie nas do walki."',
+        bohater: true,
+        punkty: 11,
+        pozycja: 1,
+        numer: "601"
+    },   
     
+    {
+        nazwa: "Przemieniony Vildkaarl",
+        karta: "/gwent/assets/karty/Skellige/kambi.webp",
+        dkarta: "/gwent/assets/dkarty/6/berserk.webp",
+        opis: "Raz w życiu widziałem jak walczą... I więcej nie chce.",
+        bohater: false,
+        moc: "morale",
+        punkty: 14,
+        pozycja: 1,
+        numer: "502"
+    },    
+    
+    {
+        nazwa: "Przemieniony Młody Vildkaarl",
+        karta: "/gwent/assets/karty/Skellige/kambi.webp",
+        dkarta: "/gwent/assets/dkarty/6/berserk2.webp",
+        opis: "Arrrgh!",
+        bohater: false,
+        moc: "wiez",
+        punkty: 8,
+        pozycja: 2,
+        numer: "603"
+    },
 ];
-
 export default cards;
