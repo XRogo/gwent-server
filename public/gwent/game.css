@@ -126,16 +126,15 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 3.52%; /* 35 px / 993 px, aby środek liczby był na 75 px */
+    top: 7.55%; /* 75 px / 993 px */
     left: 14.31%; /* 75 px / 524 px */
     width: 17.94%;
     height: 6.45%;
-    text-align: center;
     line-height: normal;
     font-size: 80px;
     color: #fff;
     z-index: 11;
-    transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
+    transform: translate(-50%, -50%); /* Wyśrodkowanie w poziomie i pionie */
 }
 
 .card-area .card .name {
