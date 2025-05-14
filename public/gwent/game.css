@@ -135,6 +135,9 @@ body {
     color: #fff;
     z-index: 11;
     transform: translate(-50%, -50%); /* Wyśrodkowanie w poziomie i pionie */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .card-area .card .name {
