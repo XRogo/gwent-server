@@ -109,7 +109,7 @@ const cards = [
         frakcja: "nie",
         punkty: 15,
         pozycja: 1,
-        summon: "Płotka",
+        summon: "020",
         ilosc: 1,
         numer: "009"
     },
@@ -124,7 +124,7 @@ const cards = [
         frakcja: "nie",
         punkty: 15,
         pozycja: 1,
-        summon: "Płotka",
+        summon: "020",
         ilosc: 1,
         numer: "010"
     },
@@ -233,7 +233,7 @@ const cards = [
         frakcja: "nie",
         punkty: 4,
         pozycja: 2,
-        summon: "Guanter O'Dim: Cień",
+        summon: "018",
         ilosc: 3,
         numer: "018"
     },
@@ -248,7 +248,7 @@ const cards = [
         frakcja: "nie",
         punkty: 2,
         pozycja: 3,
-        summon: "Guanter O'Dim: Cień",
+        summon: "018",
         ilosc: 1,
         numer: "019"
     },
@@ -304,7 +304,7 @@ const cards = [
         frakcja: "nie",
         punkty: 0,
         pozycja: 2,
-        summon: "Bies",
+        summon: "407",
         ilosc: 1,
         numer: "023"
     },
@@ -894,7 +894,7 @@ const cards = [
         frakcja: "2",
         punkty: 5,
         pozycja: 1,
-        summon: "Młody emisariusz",
+        summon: "217",
         ilosc: 1,
         numer: "216"
     },
@@ -909,7 +909,7 @@ const cards = [
         frakcja: "2",
         punkty: 5,
         pozycja: 1,
-        summon: "Młody emisariusz",
+        summon: "216",
         ilosc: 1,
         numer: "217"
     },
@@ -989,7 +989,7 @@ const cards = [
         frakcja: "2",
         punkty: 3,
         pozycja: 3,
-        ilosc: 3,
+        ilosc: 1,
         numer: "223"
     },
 
