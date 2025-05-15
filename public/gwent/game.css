@@ -67,18 +67,21 @@ body {
 }
 
 .card-area {
-    position: absolute;
-    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    width: 1194px; /* Stała szerokość obszaru */
+    height: 1449px; /* Stała wysokość obszaru */
     padding: 0;
-    box-sizing: border-box;
 }
 
 .card-area .card {
-    display: inline-block;
-    position: relative;
-    width: 524px;
-    height: 993px;
-    overflow: visible;
+    width: calc(100% / 6); /* 1/6 szerokości, czyli 199 px */
+    height: calc(100% / 2); /* 1/2 wysokości, czyli 724.5 px */
+    margin: 0; /* Brak odstępów */
+    background-size: cover; /* Wypełnienie tła */
+    background-position: center;
 }
 
 .card-area .card .card-image,
