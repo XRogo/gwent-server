@@ -121,7 +121,7 @@ body {
     left: 14.312977%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 5vmin; /* Skalowalna wielkość tekstu */
+    font-size: 50vmin; /* Skalowalna wielkość tekstu */
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
@@ -146,7 +146,7 @@ body {
     left: 20.992366%;
     width: 76.335878%;
     text-align: center;
-    font-size: 3vmin; /* Skalowalna wielkość tekstu */
+    font-size: 30vmin; /* Skalowalna wielkość tekstu */
     color: #333333;
     z-index: 11;
 }
