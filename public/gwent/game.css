@@ -116,7 +116,7 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 7.552870%;
+    top: 7.2%;
     left: 13.5%;
     width: 23.61%;
     height: 8.84%;
@@ -131,12 +131,8 @@ body {
 }
 
 .card-area .card .hero-icon {
-    position: absolute;
-    top: -1.912386%;
-    left: -4.389313%;
-    width: 59.160305%;
-    height: 31.017121%;
-    z-index: 12; /* Niższy z-index niż .points */
+    object-fit: none;
+    z-index: 12;
 }
 
 .card-area .card .name {
