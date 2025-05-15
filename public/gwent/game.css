@@ -8,6 +8,11 @@
     src: url('assets/fonts/PFDinTextCondPro-Bold.ttf') format('truetype');
 }
 
+@font-face {
+    font-family: 'Cinzel';
+    src: url('assets/fonts/Cinzel-Regular.ttf') format('truetype');
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -72,18 +77,16 @@ body {
     height: 100%;
     padding: 0;
     box-sizing: border-box;
-    overflow-y: scroll; /* Włącza przewijanie */
-    -ms-overflow-style: none; /* Ukrywa suwak w Edge */
-    scrollbar-width: none; /* Ukrywa suwak w Firefox */
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-/* Ukrywa suwak w przeglądarkach WebKit (Chrome, Safari) */
 .card-area::-webkit-scrollbar {
     display: none;
 }
 
 .card-area .card {
-    display: inline-block;
     position: relative;
     background-size: cover;
     background-position: center;
@@ -93,7 +96,8 @@ body {
 .card-area .card .beton,
 .card-area .card .faction-banner,
 .card-area .card .position-icon,
-.card-area .card .points-bg {
+.card-area .card .points-bg,
+.card-area .card .power-icon {
     position: absolute;
     top: 0;
     left: 0;
@@ -109,28 +113,17 @@ body {
 .card-area .card .faction-banner { z-index: 3; }
 .card-area .card .points-bg { z-index: 4; }
 .card-area .card .position-icon { z-index: 6; }
-
-.card-area .card .power-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: top left;
-    z-index: 10;
-}
+.card-area .card .power-icon { z-index: 10; object-fit: contain; object-position: top left; }
 
 .card-area .card .points {
     position: absolute;
-    top: 7.2%;
-    left: 13.5%;
-    width: 23.61%;
-    height: 8.84%;
-    line-height: normal;
-    font-size: 80px;
+    top: 7.552870%;    /* 75 / 993 */
+    left: 14.312977%;  /* 75 / 524 */
+    width: 17.94%;     /* Oryginalna szerokość w % */
+    height: 6.45%;     /* Oryginalna wysokość w % */
+    font-size: 15.267%;/* 80 / 524 */
     color: #fff;
-    z-index: 13; /* Wyższy z-index niż .hero-icon */
+    z-index: 13;
     transform: translate(-50%, -50%);
     display: flex;
     justify-content: center;
@@ -138,28 +131,35 @@ body {
 }
 
 .card-area .card .hero-icon {
+    position: absolute;
+    top: -1.912386%;   /* -19 / 993 */
+    left: -4.389313%;  /* -23 / 524 */
+    width: 59.160305%; /* 310 / 524 */
+    height: 31.017121%;/* 308 / 993 */
     object-fit: none;
     z-index: 12;
 }
 
 .card-area .card .name {
     position: absolute;
-    top: 77.54%; /* 770 / 993 - poniżej 770 px */
-    left: 20.99%; /* 110 / 524 */
-    width: 76.34%; /* (510 - 110) / 524 */
+    top: 77.542799%;   /* 770 / 993 */
+    left: 20.992366%;  /* 110 / 524 */
+    width: 76.335878%; /* (510 - 110) / 524 */
+    font-size: 9.16%;  /* 48 / 524 */
     text-align: center;
-    color: #141414; /* Czarny kolor */
-    font-weight: bold; /* Dodajemy pogrubienie */
+    color: #141414;
+    font-family: "Cinzel", serif;
+    font-weight: bold;
     z-index: 11;
 }
 
 .card-area .card .description {
     position: absolute;
-    top: 899px;
-    left: 18px;
-    width: 482px;
-    height: 76px;
-    font-size: 18px;
+    top: 90.533837%;   /* 899 / 993 */
+    left: 3.435115%;   /* 18 / 524 */
+    width: 92.129771%; /* 482 / 524 */
+    height: 7.653575%; /* 76 / 993 */
+    font-size: 3.435115%; /* 18 / 524 */
     color: #141414;
     text-align: center;
     display: none;

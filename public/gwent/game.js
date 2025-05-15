@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             collectionArea.style.height = `${1449 * scale}px`;
             collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
             collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
-            collectionArea.style.padding = `${0}px`; // Usunięto padding
+            collectionArea.style.padding = `${0}px`;
         }
 
         if (deckArea) {
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             deckArea.style.height = `${1449 * scale}px`;
             deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
             deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-            deckArea.style.padding = `${0}px`; // Usunięto padding
+            deckArea.style.padding = `${0}px`;
         }
 
         const cards = document.querySelectorAll('.card-area .card');
@@ -138,53 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.gridTemplateColumns = 'repeat(3, 1fr)';
             area.style.gridTemplateRows = 'repeat(2, 1fr)';
             area.style.gap = '0';
-            area.style.overflowY = 'scroll'; // Włącza przewijanie
+            area.style.overflowY = 'scroll';
         });
 
         cards.forEach(card => {
-            card.style.width = `${398 * scale}px`; // 1194 / 3
-            card.style.height = `${724.5 * scale}px`; // 1449 / 2
+            card.style.width = '100%';  // Karta wypełnia całą kolumnę
+            card.style.height = '100%'; // Karta wypełnia cały rząd
             card.style.margin = '0';
-
-            const originalCardWidth = 524;
-            const currentCardWidth = parseFloat(card.style.width);
-            const cardScale = currentCardWidth / originalCardWidth;
 
             const points = card.querySelector('.points');
             if (points) {
-                points.style.fontSize = `${80 * cardScale}px`;
+                points.style.fontSize = '15.267%'; // 80 / 524 (procent szerokości oryginalnej karty)
             }
 
             const name = card.querySelector('.name');
             if (name) {
-                name.style.fontSize = `${48 * cardScale}px`;
-            }
-
-            const powerIcon = card.querySelector('.power-icon');
-            if (powerIcon) {
-                powerIcon.style.width = `${398 * scale}px`;
-                powerIcon.style.height = `${724.5 * scale}px`;
-                powerIcon.style.top = '0px';
-                powerIcon.style.left = '0px';
-            }
-
-            const heroIcon = card.querySelector('.hero-icon');
-            if (heroIcon) {
-                const originalCardWidth = 524;
-                const currentCardWidth = parseFloat(card.style.width);
-                const cardScale = currentCardWidth / originalCardWidth;
-
-                // Zakładamy, że oryginalne wymiary bohater.webp to 310 px x 308 px
-                // Jeśli są inne, zmień te wartości na rzeczywiste wymiary obrazka
-                const heroOriginalWidth = 310; // Zmień na rzeczywistą szerokość bohater.webp
-                const heroOriginalHeight = 308; // Zmień na rzeczywistą wysokość bohater.webp
-
-                heroIcon.style.width = `${heroOriginalWidth * cardScale}px`;
-                heroIcon.style.height = `${heroOriginalHeight * cardScale}px`;
-                heroIcon.style.top = `${-19 * cardScale}px`;
-                heroIcon.style.left = `${-23 * cardScale}px`;
-                heroIcon.style.position = 'absolute';
-                heroIcon.style.zIndex = '12';
+                name.style.fontSize = '9.16%'; // 48 / 524 (procent szerokości oryginalnej karty)
             }
         });
 
