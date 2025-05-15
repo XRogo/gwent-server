@@ -171,14 +171,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const heroIcon = card.querySelector('.hero-icon');
             if (heroIcon) {
                 const originalCardWidth = 524;
-               const currentCardWidth = parseFloat(card.style.width);
+                const currentCardWidth = parseFloat(card.style.width);
                 const cardScale = currentCardWidth / originalCardWidth;
-            
-                // Ustawiamy wymiary obrazka w skali 1:1 względem oryginalnej karty, przeskalowane przez cardScale
-                heroIcon.style.width = `${310 * cardScale}px`;  // 310 px na oryginalnej karcie
-                heroIcon.style.height = `${308 * cardScale}px`; // 308 px na oryginalnej karcie
-                heroIcon.style.top = `${-19 * cardScale}px`;    // -19 px na oryginalnej karcie
-                heroIcon.style.left = `${-23 * cardScale}px`;   // -23 px na oryginalnej karcie
+
+                // Zakładamy, że oryginalne wymiary bohater.webp to 310 px x 308 px
+                // Jeśli są inne, zmień te wartości na rzeczywiste wymiary obrazka
+                const heroOriginalWidth = 310; // Zmień na rzeczywistą szerokość bohater.webp
+                const heroOriginalHeight = 308; // Zmień na rzeczywistą wysokość bohater.webp
+
+                heroIcon.style.width = `${heroOriginalWidth * cardScale}px`;
+                heroIcon.style.height = `${heroOriginalHeight * cardScale}px`;
+                heroIcon.style.top = `${-19 * cardScale}px`;
+                heroIcon.style.left = `${-23 * cardScale}px`;
                 heroIcon.style.position = 'absolute';
                 heroIcon.style.zIndex = '12';
             }
