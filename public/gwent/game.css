@@ -67,18 +67,23 @@ body {
 }
 
 .card-area {
-    position: absolute;
-    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    width: 100%; /* Dopasowanie do szerokości nadanej w game.js */
+    height: 100%; /* Dopasowanie do wysokości nadanej w game.js */
     padding: 0;
     box-sizing: border-box;
+    overflow: hidden; /* Zapobiega wychodzeniu kart poza obszar */
 }
 
 .card-area .card {
-    display: inline-block;
-    position: relative;
-    width: 524px;
-    height: 993px;
-    overflow: visible;
+    width: calc(100% / 6); /* 1/6 szerokości obszaru */
+    height: calc(100% / 2); /* 1/2 wysokości obszaru */
+    margin: 0; /* Brak odstępów */
+    background-size: cover;
+    background-position: center;
 }
 
 .card-area .card .card-image,
