@@ -1,69 +1,31 @@
-@font-face {
-    font-family: 'PFDinTextCondPro';
-    src: url('assets/fonts/PFDinTextCondPro-Regular.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'PFDinTextCondPro-Bold';
-    src: url('assets/fonts/PFDinTextCondPro-Bold.ttf') format('truetype');
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #000;
-    overflow: hidden;
-    height: 100vh;
-    font-family: 'PFDinTextCondPro', sans-serif;
-}
-
-.background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: url('assets/wybor/hmory.webp') repeat-x;
-    background-size: 100% auto;
-    animation: moveBackground 192s linear infinite;
-    z-index: 1;
-}
-
-@keyframes moveBackground {
-    0% { background-position: 0 0; }
-    100% { background-position: -3840px 0; }
-}
-
 .overlay {
-    position: absolute;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: url('assets/wybor/gui.webp') no-repeat center;
-    background-size: contain;
-    background-position: center;
-    z-index: 2;
-}
-
-.content {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-}
-
-.button {
-    position: absolute;
-    cursor: pointer;
+    background-image: url('assets/gui.webp');
     background-size: contain;
     background-repeat: no-repeat;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    background-position: center;
 }
 
-.button:hover {
-    opacity: 1;
+#cardSelectionScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
-.button.active {
-    opacity: 1;
+#gameScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
 }
 
 .card-area {
@@ -82,36 +44,96 @@ body {
     background-position: center;
 }
 
-.card-area .card .card-image,
-.card-area .card .beton,
-.card-area .card .faction-banner,
-.card-area .card .position-icon,
+.card-area .card .card-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+}
+
+.card-area .card .beton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 2;
+}
+
+.card-area .card .faction-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 3;
+}
+
 .card-area .card .points-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: contain;
-    background-repeat: no-repeat;
-    z-index: 1;
+    background-size: cover;
+    background-position: center;
+    z-index: 4;
 }
 
-.card-area .card .card-image { z-index: 1; }
-.card-area .card .beton { z-index: 2; }
-.card-area .card .faction-banner { z-index: 3; }
-.card-area .card .points-bg { z-index: 4; }
-.card-area .card .position-icon { z-index: 6; }
-
-.card-area .card .hero-icon {
+.card-area .card .points {
     position: absolute;
-    top: -19px;
-    left: -23px;
-    width: 310px;
-    height: 308px;
-    object-fit: contain;
-    object-position: top left;
-    z-index: 7;
+    top: 11.041966%; /* 10.351966% + 0.690% (dla nowej wysokości 724.5 px) */
+    left: 20.100221%; /* 18.844221% + 1.256% (dla nowej szerokości 398 px) */
+    width: 23.61%; /* Proporcjonalna szerokość */
+    height: 8.84%; /* Proporcjonalna wysokość */
+    line-height: normal;
+    font-size: 80px;
+    color: #000; /* Domyślnie czarny, nadpisywany w game.js dla bohaterów */
+    z-index: 11;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-area .card .name {
+    position: absolute;
+    top: 80%; /* Poniżej 770 px w oryginalnej skali (993 px), dostosowane do nowej wysokości (724.5 px) */
+    left: 29.40%; /* 117 px w oryginalnej skali (524 px) */
+    width: 70.60%; /* 510 px w oryginalnej skali (524 px) */
+    text-align: center;
+    color: #000; /* Poprawka na czarny */
+    font-family: "Cinzel", serif;
+    z-index: 11;
+}
+
+.card-area .card .description {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    width: 90%;
+    color: #fff;
+    font-family: "Cinzel", serif;
+    z-index: 11;
+}
+
+.card-area .card .position-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 5;
 }
 
 .card-area .card .power-icon {
@@ -120,153 +142,103 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    object-position: top left;
-    z-index: 10;
+    z-index: 6;
 }
 
-.card-area .card .points {
+.card-area .card .hero-icon {
     position: absolute;
-    top: 7%; /* 75 / 993 */
-    left: 14%; /* 75 / 524 */
-    width: 17.94%;
-    height: 6.45%;
-    line-height: normal;
-    font-size: 80px;
-    color: #fff;
-    z-index: 11;
-    transform: translate(-50%, -50%); /* Wyśrodkowanie w poziomie i pionie */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    top: -2.6225%; /* -19 / 724.5 (dla nowej wysokości) */
+    left: -5.7789%; /* -23 / 398 (dla nowej szerokości) */
+    width: 77.889447%; /* 310 / 398 */
+    height: 42.511733%; /* 308 / 724.5 */
+    z-index: 12;
 }
 
-.card-area .card .name {
+.button {
     position: absolute;
-    top: 85%; /* Dostosowane, aby nazwa była blisko dołu */
-    left: 0;
-    width: 100%;
-    text-align: center;
-    color: #fff;
-    font-family: "Cinzel", serif;
-    z-index: 11;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
 }
 
-.card-area .card .description {
-    position: absolute;
-    top: 899px;
-    left: 18px;
-    width: 482px;
-    height: 76px;
-    font-size: 18px;
-    color: #141414;
-    text-align: center;
-    display: none;
-    z-index: 4;
-}
-
-.card-area .card.large .description {
-    display: block;
+.button.active {
+    background-image: url('assets/wybor/active.webp') !important;
 }
 
 .stats {
     position: absolute;
     color: #fff;
-    font-family: 'PFDinTextCondPro', sans-serif;
+    font-family: "Cinzel", serif;
 }
 
-.page-left, .page-right {
+.page-left,
+.page-right {
     position: absolute;
+    background-size: cover;
+    background-position: center;
     cursor: pointer;
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.page-left:hover, .page-right:hover {
-    opacity: 1;
 }
 
 .page-indicators {
     position: absolute;
     display: flex;
+    gap: 4px;
 }
 
 .page-dot {
-    position: absolute;
-    background: url('assets/wybor/strona.webp');
-    background-size: contain;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    opacity: 0;
+    background-image: url('assets/wybor/dot.webp');
+    background-size: cover;
+    background-position: center;
 }
 
 .page-dot.active {
-    opacity: 1;
-    filter: brightness(1.5);
+    background-image: url('assets/wybor/dot_active.webp');
 }
 
 .faction-info {
     position: absolute;
-    display: block;
     width: 100%;
-    margin: 0;
+    text-align: center;
 }
 
 .faction-header {
     position: absolute;
+    width: 100%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    margin: 0;
+    align-items: center;
 }
 
 .faction-shield {
-    object-fit: contain;
-    margin: 0;
+    position: relative;
 }
 
 .faction-name {
+    position: absolute;
+    width: 100%;
+    text-align: center;
     color: #fff;
-    font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-left: 10px;
-    margin-top: 0;
-    margin-bottom: 0;
+    font-family: "Cinzel", serif;
 }
 
 .faction-ability {
     position: absolute;
-    color: #b48b42;
-    white-space: normal;
-    text-align: center;
-    margin: 0;
     width: 100%;
-    box-sizing: border-box;
+    text-align: center;
+    color: #fff;
+    font-family: "Cinzel", serif;
 }
 
 .leader-card {
     position: absolute;
-    background: url('assets/dkarty/beton.webp');
-    background-size: contain;
-    background-repeat: no-repeat;
 }
 
 #goToGameButton {
     position: absolute;
-    cursor: pointer;
-    z-index: 4;
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
     border: none;
-    border-radius: 5px;
-    max-width: 300px;
-    max-height: 60px;
-    box-sizing: border-box;
-}
-
-.game-content {
-    color: #fff;
-    text-align: center;
-    padding: 20px;
+    cursor: pointer;
+    font-family: "Cinzel", serif;
 }
