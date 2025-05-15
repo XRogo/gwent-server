@@ -21,21 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "W trzeciej rundzie dwie przypadkowe karty ze stosu kart odrzuconych wracają na stół." },
     ];
 
-    // Nowa funkcja getPowerImage
     function getPowerImage(card) {
-        // Specjalne przypadki dla konkretnych kart
         const specialCases = {
-            "000": { "grzybki": "grzybki.webp" }, // Mardroeme
-            "003": { "porz": "porz.webp" },      // Pożoga
-            "002": { "rog": "rog.webp" }         // Róg dowódcy
+            "000": { "grzybki": "grzybki.webp" },
+            "003": { "porz": "porz.webp" },
+            "002": { "rog": "rog.webp" }
         };
 
-        // Jeśli karta ma numer i umiejętność w specjalnych przypadkach, użyj tego obrazka
         if (specialCases[card.numer] && specialCases[card.numer][card.moc]) {
             return specialCases[card.numer][card.moc];
         }
 
-        // Domyślne obrazki dla każdej umiejętności
         const defaultImages = {
             "berserk": "berserk.webp",
             "deszcz": "deszcz.webp",
@@ -56,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             "wiez": "wiz.webp"
         };
 
-        // Zwróć domyślny obrazek dla umiejętności lub pusty string, jeśli brak
         return defaultImages[card.moc] || "";
     }
 
@@ -125,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             collectionArea.style.height = `${1449 * scale}px`;
             collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
             collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
-            collectionArea.style.padding = `${10 * scale}px`;
+            collectionArea.style.padding = `${0}px`; // Usunięto padding
         }
 
         if (deckArea) {
@@ -133,54 +128,62 @@ document.addEventListener('DOMContentLoaded', () => {
             deckArea.style.height = `${1449 * scale}px`;
             deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
             deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-            collectionArea.style.padding = `${10 * scale}px`;
+            deckArea.style.padding = `${0}px`; // Usunięto padding
         }
 
         const cards = document.querySelectorAll('.card-area .card');
-const cardAreas = document.querySelectorAll('.card-area');
-cardAreas.forEach(area => {
-    area.style.display = 'grid';
-    area.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    area.style.gridTemplateRows = 'repeat(2, 1fr)';
-    area.style.gap = '0';
-    area.style.overflowY = 'auto';
-});
+        const cardAreas = document.querySelectorAll('.card-area');
+        cardAreas.forEach(area => {
+            area.style.display = 'grid';
+            area.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            area.style.gridTemplateRows = 'repeat(2, 1fr)';
+            area.style.gap = '0';
+            area.style.overflowY = 'auto';
+        });
 
-cards.forEach(card => {
-    card.style.width = `${398 * scale}px`;
-    card.style.height = `${724.5 * scale}px`;
-    card.style.margin = '0';
+        cards.forEach(card => {
+            card.style.width = `${398 * scale}px`; // 1194 / 3
+            card.style.height = `${724.5 * scale}px`; // 1449 / 2
+            card.style.margin = '0';
 
-    const originalCardWidth = 524;
-    const currentCardWidth = parseFloat(card.style.width);
-    const cardScale = currentCardWidth / originalCardWidth;
+            const originalCardWidth = 524;
+            const currentCardWidth = parseFloat(card.style.width);
+            const cardScale = currentCardWidth / originalCardWidth;
 
-    const points = card.querySelector('.points');
-    if (points) {
-        points.style.fontSize = `${80 * cardScale}px`;
-    }
+            const points = card.querySelector('.points');
+            if (points) {
+                points.style.fontSize = `${80 * cardScale}px`;
+            }
 
-    const name = card.querySelector('.name');
-    if (name) {
-        name.style.fontSize = `${48 * cardScale}px`;
-    }
+            const name = card.querySelector('.name');
+            if (name) {
+                name.style.fontSize = `${48 * cardScale}px`;
+            }
 
-    const powerIcon = card.querySelector('.power-icon');
-    if (powerIcon) {
-        powerIcon.style.width = `${398 * scale}px`;
-        powerIcon.style.height = `${724.5 * scale}px`;
-        powerIcon.style.top = '0px';
-        powerIcon.style.left = '0px';
-    }
+            const powerIcon = card.querySelector('.power-icon');
+            if (powerIcon) {
+                powerIcon.style.width = `${398 * scale}px`;
+                powerIcon.style.height = `${724.5 * scale}px`;
+                powerIcon.style.top = '0px';
+                powerIcon.style.left = '0px';
+            }
 
-    const heroIcon = card.querySelector('.hero-icon');
-    if (heroIcon) {
-        heroIcon.style.width = `${310 * cardScale}px`;
-        heroIcon.style.height = `${308 * cardScale}px`;
-        heroIcon.style.top = `${-19 * cardScale}px`;
-        heroIcon.style.left = `${-23 * cardScale}px`;
-    }
-});
+            const heroIcon = card.querySelector('.hero-icon');
+            if (heroIcon) {
+                const originalCardWidth = 524;
+                const originalCardHeight = 993;
+                const currentCardWidth = parseFloat(card.style.width);
+                const cardScale = currentCardWidth / originalCardWidth;
+
+                heroIcon.style.width = `${310 * cardScale}px`;
+                heroIcon.style.height = `${308 * cardScale}px`;
+                heroIcon.style.top = `${-19 * cardScale}px`;
+                heroIcon.style.left = `${-23 * cardScale}px`;
+                heroIcon.style.position = 'absolute';
+                heroIcon.style.zIndex = '12';
+            }
+        });
+
         if (stats) {
             stats.style.left = `${backgroundLeft + 1935 * scale}px`;
             stats.style.top = `${backgroundTop + 1152 * scale}px`;
@@ -270,12 +273,10 @@ cards.forEach(card => {
     function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false) {
         if (!area) return;
 
-        // Wyczyść obszar przed dodaniem nowych kart
         while (area.firstChild) {
             area.removeChild(area.firstChild);
         }
 
-        // Filtruj karty
         const filteredCards = cardList.filter(card => {
             if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
             if (filter === 'all') return true;
@@ -297,7 +298,6 @@ cards.forEach(card => {
                 bannerFaction = playerFaction;
             }
 
-            // Podstawowy HTML dla karty
             let html = `
                 <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
                 <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
@@ -311,20 +311,16 @@ cards.forEach(card => {
             }
 
             if (!card.isKing) {
-                // Sprawdź, czy karta jest kartą pogodową
                 const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
 
-                // Dodaj tło punktów dla kart z punktami lub specjalnych
                 if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
                     html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
                 }
 
-                // Dodaj punkty, jeśli karta je ma
                 if (card.punkty !== undefined) {
                     html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
                 }
 
-                // Dodaj obrazek umiejętności, jeśli karta ma moc
                 if (card.moc) {
                     const powerImage = getPowerImage(card);
                     if (powerImage) {
@@ -332,9 +328,7 @@ cards.forEach(card => {
                     }
                 }
 
-                // Dodaj obrazek pozycji, jeśli karta ma pozycję i nie jest kartą pogodową
                 if (card.pozycja && !isWeatherCard) {
-                    // Jeśli pozycja to 4 i karta nie ma innej mocy, użyj zrecznoac.webp
                     if (card.pozycja === 4 && !card.moc) {
                         html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
                     } else {
@@ -342,7 +336,6 @@ cards.forEach(card => {
                     }
                 }
 
-                // Dodaj obrazek bohatera, jeśli karta jest bohaterem
                 if (card.bohater) {
                     html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
                 }
@@ -351,7 +344,6 @@ cards.forEach(card => {
             cardElement.innerHTML = html;
             area.appendChild(cardElement);
 
-            // Dźwięk przy najechaniu
             cardElement.addEventListener('mouseover', () => {
                 if (hoverSound) {
                     hoverSound.currentTime = 0;
