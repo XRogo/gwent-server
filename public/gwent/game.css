@@ -137,7 +137,6 @@ body {
     width: 76.34%; /* (510 - 110) / 524 */
     text-align: center;
     color: #000; /* Czarny kolor */
-    font-family: "Cinzel", serif;
     z-index: 11;
 }
 
