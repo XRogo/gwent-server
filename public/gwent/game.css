@@ -71,27 +71,14 @@ body {
     flex-wrap: wrap;
     justify-content: space-between;
     align-content: space-between;
-    width: 1194px; /* Stała szerokość obszaru */
-    height: 1449px; /* Stała wysokość obszaru */
     padding: 0;
+    box-sizing: border-box;
 }
 
 .card-area .card {
-    width: calc(100% / 6); /* 199 px */
-    height: 0;
-    padding-bottom: calc((100% / 6) * (723 / 350)); /* Proporcja 723/350 */
-    position: relative;
-    margin: 0;
-}
-
-.card-area .card > div {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
+    width: calc(100% / 6); /* 199 px przy szerokości 1194 px */
+    height: calc(100% / 2); /* 724.5 px przy wysokości 1449 px */
+    margin: 0; /* Brak odstępów */
 }
 
 .card-area .card .card-image,

@@ -138,41 +138,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cards = document.querySelectorAll('.card-area .card');
         cards.forEach(card => {
-            card.style.width = `${350 * scale}px`;
-            card.style.height = `${723 * scale}px`;
-            card.style.margin = `${10 * scale}px`;
+         card.style.width = `${199 * scale}px`; // 1194 / 6
+         card.style.height = `${724.5 * scale}px`; // 1449 / 2
+         card.style.margin = `0`; // Brak odstępów
 
-            const originalCardWidth = 524;
-            const currentCardWidth = parseFloat(card.style.width);
-            const cardScale = currentCardWidth / originalCardWidth;
+    const originalCardWidth = 524;
+    const currentCardWidth = parseFloat(card.style.width);
+    const cardScale = currentCardWidth / originalCardWidth;
 
-            const points = card.querySelector('.points');
-            if (points) {
-                points.style.fontSize = `${80 * cardScale}px`; // Nowy rozmiar czcionki
-            }
+    const points = card.querySelector('.points');
+    if (points) {
+        points.style.fontSize = `${80 * cardScale}px`;
+    }
 
-            const name = card.querySelector('.name');
-            if (name) {
-                name.style.fontSize = `${48 * cardScale}px`; // Nowy rozmiar czcionki
-            }
+    const name = card.querySelector('.name');
+    if (name) {
+        name.style.fontSize = `${48 * cardScale}px`;
+    }
 
-            const powerIcon = card.querySelector('.power-icon');
-            if (powerIcon) {
-                powerIcon.style.width = `${350 * scale}px`;
-                powerIcon.style.height = `${723 * scale}px`;
-                powerIcon.style.top = '0px';
-                powerIcon.style.left = '0px';
-            }
+    const powerIcon = card.querySelector('.power-icon');
+    if (powerIcon) {
+        powerIcon.style.width = `${199 * scale}px`;
+        powerIcon.style.height = `${724.5 * scale}px`;
+        powerIcon.style.top = '0px';
+        powerIcon.style.left = '0px';
+    }
 
-            const heroIcon = card.querySelector('.hero-icon');
-            if (heroIcon) {
-                heroIcon.style.width = `${310 * cardScale}px`;
-                heroIcon.style.height = `${308 * cardScale}px`;
-                heroIcon.style.top = `${-19 * cardScale}px`;
-                heroIcon.style.left = `${-23 * cardScale}px`;
-            }
-        });
-
+    const heroIcon = card.querySelector('.hero-icon');
+    if (heroIcon) {
+        heroIcon.style.width = `${310 * cardScale}px`;
+        heroIcon.style.height = `${308 * cardScale}px`;
+        heroIcon.style.top = `${-19 * cardScale}px`;
+        heroIcon.style.left = `${-23 * cardScale}px`;
+    }
+});
         if (stats) {
             stats.style.left = `${backgroundLeft + 1935 * scale}px`;
             stats.style.top = `${backgroundTop + 1152 * scale}px`;
