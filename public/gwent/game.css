@@ -143,16 +143,13 @@ body {
 
 .card-area .card .name {
     position: absolute;
-    top: 70%; /* Możesz dostosować tę wartość, np. na 74%, 73%, itd. */
-    left: 22.14%;
-    width: 75%;
-    height: 12.39%;
+    top: 85%; /* Dostosowane, aby nazwa była blisko dołu */
+    left: 0;
+    width: 100%;
     text-align: center;
-    line-height: normal;
-    font-size: 48px;
-    font-weight: bold;
-    color: #141414;
-    z-index: 9;
+    color: #fff;
+    font-family: "Cinzel", serif;
+    z-index: 11;
 }
 
 .card-area .card .description {

@@ -139,20 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const cards = document.querySelectorAll('.card-area .card');
 const cardAreas = document.querySelectorAll('.card-area');
 cardAreas.forEach(area => {
-    area.style.display = 'grid';              // Używamy siatki CSS
-    area.style.gridTemplateColumns = 'repeat(3, 1fr)'; // 3 kolumny
-    area.style.gridTemplateRows = 'repeat(2, 1fr)';    // 2 rzędy
-    area.style.gap = '0';                     // Bez odstępów między kartami
-    area.style.overflowY = 'auto';            // Przewijanie w pionie
+    area.style.display = 'grid';
+    area.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    area.style.gridTemplateRows = 'repeat(2, 1fr)';
+    area.style.gap = '0';
+    area.style.overflowY = 'auto';
 });
 
 cards.forEach(card => {
-    card.style.width = `${398 * scale}px`;    // Szerokość karty
-    card.style.height = `${724.5 * scale}px`; // Wysokość karty
-    card.style.margin = '0';                  // Bez marginesów
+    card.style.width = `${398 * scale}px`;
+    card.style.height = `${724.5 * scale}px`;
+    card.style.margin = '0';
 
-    // Skalowanie tekstu i ikon w zależności od skali karty
-    const originalCardWidth = 524; // Oryginalna szerokość karty
+    const originalCardWidth = 524;
     const currentCardWidth = parseFloat(card.style.width);
     const cardScale = currentCardWidth / originalCardWidth;
 
