@@ -116,18 +116,27 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 7.552870%; /* 75 / 993 */
-    left: 14.312977%; /* 75 / 524 */
-    width: 23.61%; /* Proporcjonalna szerokość */
-    height: 8.84%; /* Proporcjonalna wysokość */
+    top: 7.552870%;
+    left: 13%;
+    width: 23.61%;
+    height: 8.84%;
     line-height: normal;
     font-size: 80px;
-    color: #fff; /* Kolor jest ok, jak napisałeś */
-    z-index: 11;
+    color: #fff;
+    z-index: 13; /* Wyższy z-index niż .hero-icon */
     transform: translate(-50%, -50%);
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.card-area .card .hero-icon {
+    position: absolute;
+    top: -1.912386%;
+    left: -4.389313%;
+    width: 59.160305%;
+    height: 31.017121%;
+    z-index: 12; /* Niższy z-index niż .points */
 }
 
 .card-area .card .name {
@@ -136,7 +145,8 @@ body {
     left: 20.99%; /* 110 / 524 */
     width: 76.34%; /* (510 - 110) / 524 */
     text-align: center;
-    color: #000; /* Czarny kolor */
+    color: #141414; /* Czarny kolor */
+    font-weight: bold; /* Dodajemy pogrubienie */
     z-index: 11;
 }
 
