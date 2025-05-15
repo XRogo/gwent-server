@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.gridTemplateColumns = 'repeat(3, 1fr)';
             area.style.gridTemplateRows = 'repeat(2, 1fr)';
             area.style.gap = '0';
-            area.style.overflowY = 'auto';
+            area.style.overflowY = 'scroll'; // Włącza przewijanie
         });
 
         cards.forEach(card => {

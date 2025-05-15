@@ -72,7 +72,14 @@ body {
     height: 100%;
     padding: 0;
     box-sizing: border-box;
-    overflow-y: auto; /* Włącza przewijanie w pionie */
+    overflow-y: scroll; /* Włącza przewijanie */
+    -ms-overflow-style: none; /* Ukrywa suwak w Edge */
+    scrollbar-width: none; /* Ukrywa suwak w Firefox */
+}
+
+/* Ukrywa suwak w przeglądarkach WebKit (Chrome, Safari) */
+.card-area::-webkit-scrollbar {
+    display: none;
 }
 
 .card-area .card {
