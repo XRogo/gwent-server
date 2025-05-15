@@ -133,29 +133,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cards = document.querySelectorAll('.card-area .card');
         const cardAreas = document.querySelectorAll('.card-area');
+
         cardAreas.forEach(area => {
             area.style.display = 'grid';
             area.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            area.style.gridTemplateRows = 'repeat(2, 1fr)';
+            const cardCount = area.querySelectorAll('.card').length;
+            const rows = Math.ceil(cardCount / 3);
+           // Ustawiamy wysokość rzędu tak, aby 2 rzędy zajmowały 100% wysokości
+            area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%`; // Każdy rząd to 50% wysokości .card-area
             area.style.gap = '0';
             area.style.overflowY = 'scroll';
         });
 
         cards.forEach(card => {
-            card.style.width = '100%';  // Karta wypełnia całą kolumnę
-            card.style.height = '100%'; // Karta wypełnia cały rząd
+            card.style.width = '100%';
+            card.style.height = '100%';
             card.style.margin = '0';
-
-            const points = card.querySelector('.points');
-            if (points) {
-                points.style.fontSize = '15.267%'; // 80 / 524 (procent szerokości oryginalnej karty)
-            }
-
-            const name = card.querySelector('.name');
-            if (name) {
-                name.style.fontSize = '9.16%'; // 48 / 524 (procent szerokości oryginalnej karty)
-            }
         });
+
 
         if (stats) {
             stats.style.left = `${backgroundLeft + 1935 * scale}px`;

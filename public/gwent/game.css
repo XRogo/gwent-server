@@ -117,11 +117,11 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 7.552870%;    /* 75 / 993 */
-    left: 14.312977%;  /* 75 / 524 */
-    width: 17.94%;     /* Oryginalna szerokość w % */
-    height: 6.45%;     /* Oryginalna wysokość w % */
-    font-size: 15.267%;/* 80 / 524 */
+    top: 7.552870%;
+    left: 14.312977%;
+    width: 23.61%;
+    height: 8.84%;
+    font-size: 5vmin; /* Skalowalna wielkość tekstu */
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
@@ -142,14 +142,13 @@ body {
 
 .card-area .card .name {
     position: absolute;
-    top: 77.542799%;   /* 770 / 993 */
-    left: 20.992366%;  /* 110 / 524 */
-    width: 76.335878%; /* (510 - 110) / 524 */
-    font-size: 9.16%;  /* 48 / 524 */
+    top: 77.542799%;
+    left: 20.992366%;
+    width: 76.335878%;
     text-align: center;
-    color: #141414;
+    font-size: 3vmin; /* Skalowalna wielkość tekstu */
+    color: #000;
     font-family: "Cinzel", serif;
-    font-weight: bold;
     z-index: 11;
 }
 
