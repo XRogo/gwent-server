@@ -137,12 +137,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const cards = document.querySelectorAll('.card-area .card');
-cards.forEach(card => {
-    card.style.width = `${199 * scale}px`; // 1194 / 6
-    card.style.height = `${724.5 * scale}px`; // 1449 / 2
-    card.style.margin = `0`; // Brak odstępów
+const cardAreas = document.querySelectorAll('.card-area');
+cardAreas.forEach(area => {
+    area.style.display = 'grid';              // Używamy siatki CSS
+    area.style.gridTemplateColumns = 'repeat(3, 1fr)'; // 3 kolumny
+    area.style.gridTemplateRows = 'repeat(2, 1fr)';    // 2 rzędy
+    area.style.gap = '0';                     // Bez odstępów między kartami
+    area.style.overflowY = 'auto';            // Przewijanie w pionie
+});
 
-    const originalCardWidth = 524;
+cards.forEach(card => {
+    card.style.width = `${398 * scale}px`;    // Szerokość karty
+    card.style.height = `${724.5 * scale}px`; // Wysokość karty
+    card.style.margin = '0';                  // Bez marginesów
+
+    // Skalowanie tekstu i ikon w zależności od skali karty
+    const originalCardWidth = 524; // Oryginalna szerokość karty
     const currentCardWidth = parseFloat(card.style.width);
     const cardScale = currentCardWidth / originalCardWidth;
 
@@ -158,7 +168,7 @@ cards.forEach(card => {
 
     const powerIcon = card.querySelector('.power-icon');
     if (powerIcon) {
-        powerIcon.style.width = `${199 * scale}px`;
+        powerIcon.style.width = `${398 * scale}px`;
         powerIcon.style.height = `${724.5 * scale}px`;
         powerIcon.style.top = '0px';
         powerIcon.style.left = '0px';
