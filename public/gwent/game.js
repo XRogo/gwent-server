@@ -137,6 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const cards = document.querySelectorAll('.card-area .card');
+const cardAreas = document.querySelectorAll('.card-area');
+cardAreas.forEach(area => {
+    area.style.display = 'grid'; // Używamy CSS Grid zamiast Flexbox
+    area.style.gridTemplateColumns = 'repeat(6, 1fr)'; // 6 kolumn
+    area.style.gridTemplateRows = 'repeat(2, 1fr)'; // 2 rzędy
+    area.style.gap = '0'; // Brak odstępów między kartami
+});
+
 cards.forEach(card => {
     card.style.width = `${199 * scale}px`; // 1194 / 6
     card.style.height = `${724.5 * scale}px`; // 1449 / 2
@@ -167,9 +175,9 @@ cards.forEach(card => {
     const heroIcon = card.querySelector('.hero-icon');
     if (heroIcon) {
         heroIcon.style.width = `${310 * cardScale}px`;
-        heroIcon.style.height = `${308 * cardScale}px`;
-        heroIcon.style.top = `${-19 * cardScale}px`;
-        heroIcon.style.left = `${-23 * cardScale}px`;
+        powerIcon.style.height = `${308 * cardScale}px`;
+        powerIcon.style.top = `${-19 * cardScale}px`;
+        powerIcon.style.left = `${-23 * cardScale}px`;
     }
 });
         if (stats) {
