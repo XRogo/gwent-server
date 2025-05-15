@@ -139,8 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.gridTemplateColumns = 'repeat(3, 1fr)';
             const cardCount = area.querySelectorAll('.card').length;
             const rows = Math.ceil(cardCount / 3);
-           // Ustawiamy wysokość rzędu tak, aby 2 rzędy zajmowały 100% wysokości
-            area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%`; // Każdy rząd to 50% wysokości .card-area
+            area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%)`;
             area.style.gap = '0';
             area.style.overflowY = 'scroll';
         });
@@ -149,8 +148,37 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.width = '100%';
             card.style.height = '100%';
             card.style.margin = '0';
-        });
 
+            // Dynamiczne skalowanie tekstu w procentach
+            const points = card.querySelector('.points');
+            if (points) {
+                points.style.fontSize = '10%'; // 10% szerokości karty
+            }
+
+            const name = card.querySelector('.name');
+            if (name) {
+                name.style.fontSize = '6%'; // 6% szerokości karty
+            }
+
+            // Poprawa pozycji ikony bohatera (tylko pozycja, wymiary w CSS)
+            const heroIcon = card.querySelector('.hero-icon');
+            if (heroIcon) {
+                heroIcon.style.top = `${-1.912386}%`; // -19 / 993
+                heroIcon.style.left = `${-4.389313}%`; // -23 / 524
+                heroIcon.style.position = 'absolute';
+                heroIcon.style.zIndex = '12';
+            }
+
+            // Ustawienie ikony mocy (jeśli istnieje)
+            const powerIcon = card.querySelector('.power-icon');
+            if (powerIcon) {
+                powerIcon.style.width = '100%';
+                powerIcon.style.height = '100%';
+                powerIcon.style.top = '0';
+                powerIcon.style.left = '0';
+                powerIcon.style.position = 'absolute';
+            }
+        });
 
         if (stats) {
             stats.style.left = `${backgroundLeft + 1935 * scale}px`;
