@@ -90,6 +90,7 @@ body {
     position: relative;
     background-size: cover;
     background-position: center;
+    font-size: 100%;
 }
 
 .card-area .card .card-image,
