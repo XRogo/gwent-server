@@ -14,7 +14,7 @@
 }
 
 html {
-    font-size: 1vw; /* Bazowy rozmiar czcionki */
+    font-size: 1vw; /* Fallback */
 }
 
 body {
@@ -88,6 +88,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: 50%;
+    gap: 0;
 }
 
 .card-area::-webkit-scrollbar {
@@ -103,7 +104,7 @@ body {
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
-    overflow: hidden;
+    aspect-ratio: 524 / 993;
 }
 
 .card-area .card .card-image,
@@ -131,11 +132,11 @@ body {
 
 .card-area .card .points {
     position: absolute;
-    top: 7.552870%;
-    left: 14.312977%;
+    top: 8%;
+    left: 18%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 1.5rem;
+    font-size: 2vw;
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
@@ -146,8 +147,8 @@ body {
 
 .card-area .card .hero-icon {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -1.912386%;
+    left: -4.389313%;
     width: 59.160305%;
     height: 31.017121%;
     object-fit: contain;
@@ -156,11 +157,11 @@ body {
 
 .card-area .card .name {
     position: absolute;
-    top: 77.542799%;
+    top: 78%;
     left: 50%;
     width: 76.335878%;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.2vw;
     color: #333333;
     font-weight: bold;
     z-index: 11;

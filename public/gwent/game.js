@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cardAreas.forEach(area => {
             area.style.display = 'grid';
             area.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            const cardCount = area.querySelectorAll('.card').length;
             area.style.gridAutoRows = '50%';
             area.style.gap = '0';
             area.style.overflowY = 'scroll';
@@ -151,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.margin = '0';
             card.style.padding = '0';
             card.style.boxSizing = 'border-box';
+            card.style.aspectRatio = '524 / 993';
 
             const heroIcon = card.querySelector('.hero-icon');
             if (heroIcon) {
@@ -205,8 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const factionShield = document.querySelector('.faction-shield');
         if (factionShield) {
-            factionShield.style.width = `${(106 / GUI_WIDTH) * backgroundWidth}px`;
-            factionShield.style.height = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
+            factionShield.style.width = `${106 * scale}px`;
+            factionShield.style.height = `${110 * scale}px`;
         }
 
         const factionName = document.querySelector('.faction-name');
