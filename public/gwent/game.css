@@ -71,11 +71,16 @@ body {
     opacity: 1;
 }
 
+html {
+    font-size: 1vw; /* Bazowy rozmiar czcionki zależny od szerokości viewportu */
+}
+
 .card-area {
     position: absolute;
     width: 100%;
     height: 100%;
     padding: 0;
+    margin: 0;
     box-sizing: border-box;
     overflow-y: scroll;
     -ms-overflow-style: none;
@@ -84,15 +89,20 @@ body {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.card-area::-webkit-scrollbar {
-    display: none;
-}
-
 .card-area .card {
     position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     background-size: cover;
     background-position: center;
-    min-height: 50%; /* Minimalna wysokość karty */
+    min-height: 50%;
+    overflow: hidden; /* Zapobiega wychodzeniu zawartości */
+}
+.card-area::-webkit-scrollbar {
+    display: none;
 }
 
 .card-area .card .card-image,
@@ -124,7 +134,7 @@ body {
     left: 14.312977%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 1.5vw; /* Proporcjonalny rozmiar względem viewportu */
+    font-size: 1.5rem; /* Proporcjonalny rozmiar względem viewportu */
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
@@ -135,11 +145,11 @@ body {
 
 .card-area .card .hero-icon {
     position: absolute;
-    top: -1.912386%;   /* -19 / 993 */
-    left: -4.389313%;  /* -23 / 524 */
-    width: 59.160305%; /* 310 / 524 */
-    height: 31.017121%;/* 308 / 993 */
-    object-fit: contain; /* Zmieniamy na contain, aby obrazek nie był rozciągany */
+    top: -1.912386%;
+    left: -8%; /* Zwiększamy przesunięcie w lewo, aby skorygować pozycję */
+    width: 59.160305%;
+    height: 31.017121%;
+    object-fit: contain;
     z-index: 12;
 }
 
@@ -149,7 +159,7 @@ body {
     left: 20.992366%;
     width: 76.335878%;
     text-align: center;
-    font-size: 1vw; /* Proporcjonalny rozmiar względem viewportu */
+    font-size: 1rem; /* Proporcjonalny rozmiar względem viewportu */
     color: #333333;
     z-index: 11;
 }
