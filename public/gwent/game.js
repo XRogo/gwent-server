@@ -132,33 +132,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const cards = document.querySelectorAll('.card-area .card');
-        const cardAreas = document.querySelectorAll('.card-area');
+const cardAreas = document.querySelectorAll('.card-area');
 
-        cardAreas.forEach(area => {
-           area.style.display = 'grid';
-           area.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            const cardCount = area.querySelectorAll('.card').length;
-            const rows = Math.ceil(cardCount / 3);
-            area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%)`;
-            area.style.gap = '0';
-            area.style.overflowY = 'scroll';
-        });
+cardAreas.forEach(area => {
+    area.style.display = 'grid';
+    area.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    const cardCount = area.querySelectorAll('.card').length;
+    const rows = Math.ceil(cardCount / 3);
+    area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%)`;
+    area.style.gap = '0';
+    area.style.overflowY = 'scroll';
+});
 
-        cards.forEach(card => {
-            card.style.width = '100%';
-            card.style.height = '100%';
-            card.style.margin = '0';
+cards.forEach(card => {
+    card.style.width = '100%';
+    card.style.height = '100%';
+    card.style.margin = '0';
 
-            const points = card.querySelector('.points');
-            if (points) {
-                points.style.fontSize = '10%'; // 10% szerokości karty
-            }
+    const points = card.querySelector('.points');
+    if (points) {
+        points.style.fontSize = '8%'; // 8% szerokości karty
+    }
 
-            const name = card.querySelector('.name');
-            if (name) {
-                name.style.fontSize = '6%'; // 6% szerokości karty
-            }
-        });
+    const name = card.querySelector('.name');
+    if (name) {
+        name.style.fontSize = '5%'; // 5% szerokości karty
+    }
+});
 
         if (stats) {
             stats.style.left = `${backgroundLeft + 1935 * scale}px`;
