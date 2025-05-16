@@ -151,12 +151,12 @@ cards.forEach(card => {
 
     const points = card.querySelector('.points');
     if (points) {
-        points.style.fontSize = '8%'; // 8% szerokości karty
+        points.style.fontSize = '10%'; // 8% szerokości karty
     }
 
     const name = card.querySelector('.name');
     if (name) {
-        name.style.fontSize = '5%'; // 5% szerokości karty
+        name.style.fontSize = '10%'; // 5% szerokości karty
     }
 });
 
