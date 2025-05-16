@@ -121,7 +121,7 @@ body {
     left: 14.312977%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 20vw !important; /* Skalowalna wielkość tekstu */
+    font-size: 20vw; /* Skalowalna wielkość tekstu */
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
