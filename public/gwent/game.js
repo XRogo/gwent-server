@@ -84,118 +84,112 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
         }
 
-        const buttonWidth = 97 * scale;
-        const buttonHeight = 80 * scale;
-
+        // Ustawianie przycisków w procentach
         const buttons = [
-            { selector: '.button.collection.all', left: 373, top: 354, image: 'assets/wybor/all.webp' },
-            { selector: '.button.collection.mecz', left: 549, top: 356, image: 'assets/wybor/mecz.webp' },
-            { selector: '.button.collection.lok', left: 735, top: 355, image: 'assets/wybor/lok.webp' },
-            { selector: '.button.collection.obl', left: 916, top: 355, image: 'assets/wybor/kapatulta.webp' },
-            { selector: '.button.collection.hero', left: 1098, top: 356, image: 'assets/wybor/boharer.webp' },
-            { selector: '.button.collection.pogoda', left: 1277, top: 351, image: 'assets/wybor/pogoda.webp' },
-            { selector: '.button.collection.specjalne', left: 1459, top: 361, image: 'assets/wybor/inne.webp' },
-            { selector: '.button.deck.all', left: 2297, top: 354, image: 'assets/wybor/all.webp' },
-            { selector: '.button.deck.mecz', left: 2473, top: 356, image: 'assets/wybor/mecz.webp' },
-            { selector: '.button.deck.lok', left: 2659, top: 355, image: 'assets/wybor/lok.webp' },
-            { selector: '.button.deck.obl', left: 2840, top: 355, image: 'assets/wybor/kapatulta.webp' },
-            { selector: '.button.deck.hero', left: 3022, top: 356, image: 'assets/wybor/boharer.webp' },
-            { selector: '.button.deck.pogoda', left: 3201, top: 351, image: 'assets/wybor/pogoda.webp' },
-            { selector: '.button.deck.specjalne', left: 3380, top: 361, image: 'assets/wybor/inne.webp' },
+            { selector: '.button.collection.all', left: 9.713542, top: 16.388889, image: 'assets/wybor/all.webp' }, // 373/3840, 354/2160
+            { selector: '.button.collection.mecz', left: 14.322917, top: 16.481481, image: 'assets/wybor/mecz.webp' },
+            { selector: '.button.collection.lok', left: 19.140625, top: 16.435185, image: 'assets/wybor/lok.webp' },
+            { selector: '.button.collection.obl', left: 23.854167, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
+            { selector: '.button.collection.hero', left: 28.593750, top: 16.481481, image: 'assets/wybor/boharer.webp' },
+            { selector: '.button.collection.pogoda', left: 33.281250, top: 16.250000, image: 'assets/wybor/pogoda.webp' },
+            { selector: '.button.collection.specjalne', left: 38.020833, top: 16.712963, image: 'assets/wybor/inne.webp' },
+            { selector: '.button.deck.all', left: 59.869792, top: 16.388889, image: 'assets/wybor/all.webp' },
+            { selector: '.button.deck.mecz', left: 64.401042, top: 16.481481, image: 'assets/wybor/mecz.webp' },
+            { selector: '.button.deck.lok', left: 69.218750, top: 16.435185, image: 'assets/wybor/lok.webp' },
+            { selector: '.button.deck.obl', left: 73.958333, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
+            { selector: '.button.deck.hero', left: 78.697917, top: 16.481481, image: 'assets/wybor/boharer.webp' },
+            { selector: '.button.deck.pogoda', left: 83.390625, top: 16.250000, image: 'assets/wybor/pogoda.webp' },
+            { selector: '.button.deck.specjalne', left: 88.020833, top: 16.712963, image: 'assets/wybor/inne.webp' },
         ];
 
         buttons.forEach(({ selector, left, top, image }) => {
             const button = document.querySelector(selector);
             if (button) {
-                button.style.width = `${buttonWidth}px`;
-                button.style.height = `${buttonHeight}px`;
-                button.style.left = `${backgroundLeft + left * scale}px`;
-                button.style.top = `${backgroundTop + top * scale}px`;
+                button.style.width = `${(97 / GUI_WIDTH) * 100}%`;
+                button.style.height = `${(80 / GUI_HEIGHT) * 100}%`;
+                button.style.left = `${backgroundLeft + (left * backgroundWidth) / 100}px`;
+                button.style.top = `${backgroundTop + (top * backgroundHeight) / 100}px`;
                 button.style.backgroundImage = `url('${image}')`;
             }
         });
 
         if (collectionArea) {
-            collectionArea.style.width = `${1195 * scale}px`;
-            collectionArea.style.height = `${1449 * scale}px`;
-            collectionArea.style.left = `${backgroundLeft + 366 * scale}px`;
-            collectionArea.style.top = `${backgroundTop + 491 * scale}px`;
-            collectionArea.style.padding = `${0}px`;
+            collectionArea.style.width = `${(1195 / GUI_WIDTH) * 100}%`;
+            collectionArea.style.height = `${(1449 / GUI_HEIGHT) * 100}%`;
+            collectionArea.style.left = `${backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth}px`;
+            collectionArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
+            collectionArea.style.padding = '0';
         }
 
         if (deckArea) {
-            deckArea.style.width = `${1193 * scale}px`;
-            deckArea.style.height = `${1449 * scale}px`;
-            deckArea.style.left = `${backgroundLeft + 2291 * scale}px`;
-            deckArea.style.top = `${backgroundTop + 491 * scale}px`;
-            deckArea.style.padding = `${0}px`;
+            deckArea.style.width = `${(1193 / GUI_WIDTH) * 100}%`;
+            deckArea.style.height = `${(1449 / GUI_HEIGHT) * 100}%`;
+            deckArea.style.left = `${backgroundLeft + (2291 / GUI_WIDTH) * backgroundWidth}px`;
+            deckArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
+            deckArea.style.padding = '0';
         }
 
         const cards = document.querySelectorAll('.card-area .card');
-const cardAreas = document.querySelectorAll('.card-area');
+        const cardAreas = document.querySelectorAll('.card-area');
 
-cardAreas.forEach(area => {
-    area.style.display = 'grid';
-    area.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    const cardCount = area.querySelectorAll('.card').length;
-    const rows = Math.ceil(cardCount / 3);
-    area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%)`;
-    area.style.gap = '0';
-    area.style.overflowY = 'scroll';
-});
+        cardAreas.forEach(area => {
+            area.style.display = 'grid';
+            area.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            const cardCount = area.querySelectorAll('.card').length;
+            const rows = Math.ceil(cardCount / 3);
+            area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%)`;
+            area.style.gap = '0';
+            area.style.overflowY = 'scroll';
+        });
 
-cards.forEach(card => {
-    card.style.width = '100%';
-    card.style.height = '100%';
-    card.style.margin = '0';
+        cards.forEach(card => {
+            card.style.width = '100%';
+            card.style.height = '100%';
+            card.style.margin = '0';
 
-    const points = card.querySelector('.points');
-    if (points) {
-        points.style.fontSize = '10%'; // 8% szerokości karty
-    }
-
-    const name = card.querySelector('.name');
-    if (name) {
-        name.style.fontSize = '10%'; // 5% szerokości karty
-    }
-});
+            const heroIcon = card.querySelector('.hero-icon');
+            if (heroIcon) {
+                heroIcon.style.position = 'absolute';
+                heroIcon.style.zIndex = '12';
+            }
+        });
 
         if (stats) {
-            stats.style.left = `${backgroundLeft + 1935 * scale}px`;
-            stats.style.top = `${backgroundTop + 1152 * scale}px`;
-            stats.style.fontSize = `${16 * scale}px`;
+            stats.style.left = `${backgroundLeft + (1935 / GUI_WIDTH) * backgroundWidth}px`;
+            stats.style.top = `${backgroundTop + (1152 / GUI_HEIGHT) * backgroundHeight}px`;
+            stats.style.fontSize = `${(16 / GUI_WIDTH) * backgroundWidth}px`;
         }
 
         const pageLeft = document.querySelector('.page-left');
         if (pageLeft) {
-            pageLeft.style.width = `${49 * scale}px`;
-            pageLeft.style.height = `${43 * scale}px`;
-            pageLeft.style.left = `${backgroundLeft + 1452 * scale}px`;
-            pageLeft.style.top = `${backgroundTop + 155 * scale}px`;
+            pageLeft.style.width = `${(49 / GUI_WIDTH) * 100}%`;
+            pageLeft.style.height = `${(43 / GUI_HEIGHT) * 100}%`;
+            pageLeft.style.left = `${backgroundLeft + (1452 / GUI_WIDTH) * backgroundWidth}px`;
+            pageLeft.style.top = `${backgroundTop + (155 / GUI_HEIGHT) * backgroundHeight}px`;
             pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
         }
 
         const pageRight = document.querySelector('.page-right');
         if (pageRight) {
-            pageRight.style.width = `${49 * scale}px`;
-            pageRight.style.height = `${43 * scale}px`;
-            pageRight.style.left = `${backgroundLeft + 2338 * scale}px`;
-            pageRight.style.top = `${backgroundTop + 154 * scale}px`;
+            pageRight.style.width = `${(49 / GUI_WIDTH) * 100}%`;
+            pageRight.style.height = `${(43 / GUI_HEIGHT) * 100}%`;
+            pageRight.style.left = `${backgroundLeft + (2338 / GUI_WIDTH) * backgroundWidth}px`; // Poprawka: zmieniono pageLeft na pageRight
+            pageRight.style.top = `${backgroundTop + (154 / GUI_HEIGHT) * backgroundHeight}px`;
             pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
         }
 
         pageDots.forEach((dot, index) => {
             if (dot) {
-                dot.style.width = `${25 * scale}px`;
-                dot.style.height = `${22 * scale}px`;
-                dot.style.left = `${index * 4 * scale}px`;
+                dot.style.width = `${(25 / GUI_WIDTH) * 100}%`;
+                dot.style.height = `${(22 / GUI_HEIGHT) * 100}%`;
+                dot.style.left = `${index * (4 / GUI_WIDTH) * backgroundWidth}px`;
             }
         });
 
         const factionInfo = document.querySelector('.faction-info');
         if (factionInfo) {
             factionInfo.style.left = `${backgroundLeft}px`;
-            factionInfo.style.top = `${backgroundTop + (174 - 60) * scale}px`;
+            factionInfo.style.top = `${backgroundTop + ((174 - 60) / GUI_HEIGHT) * backgroundHeight}px`;
         }
 
         const factionHeader = document.querySelector('.faction-header');
@@ -207,38 +201,38 @@ cards.forEach(card => {
 
         const factionShield = document.querySelector('.faction-shield');
         if (factionShield) {
-            factionShield.style.width = `${106 * scale}px`;
-            factionShield.style.height = `${110 * scale}px`;
+            factionShield.style.width = `${(106 / GUI_WIDTH) * 100}%`;
+            factionShield.style.height = `${(110 / GUI_HEIGHT) * 100}%`;
         }
 
         const factionName = document.querySelector('.faction-name');
         if (factionName) {
-            factionName.style.fontSize = `${Math.min(48 * scale, 72 * scale)}px`;
-            factionName.style.lineHeight = `${110 * scale}px`;
+            factionName.style.fontSize = `${Math.min((48 / GUI_WIDTH) * backgroundWidth, (72 / GUI_WIDTH) * backgroundWidth)}px`;
+            factionName.style.lineHeight = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
         }
 
         const factionAbility = document.querySelector('.faction-ability');
         if (factionAbility) {
-            factionAbility.style.fontSize = `${Math.min(29 * scale, 43 * scale)}px`;
+            factionAbility.style.fontSize = `${Math.min((29 / GUI_WIDTH) * backgroundWidth, (43 / GUI_WIDTH) * backgroundWidth)}px`;
             factionAbility.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-            factionAbility.style.top = `${(276 - (174 - 60)) * scale}px`;
+            factionAbility.style.top = `${((276 - (174 - 60)) / GUI_HEIGHT) * backgroundHeight}px`;
             factionAbility.style.transform = `translateX(-50%)`;
         }
 
         const leaderCard = document.querySelector('.leader-card');
         if (leaderCard) {
-            leaderCard.style.width = `${259 * scale}px`;
-            leaderCard.style.height = `${490 * scale}px`;
-            leaderCard.style.left = `${backgroundLeft + 1792 * scale}px`;
-            leaderCard.style.top = `${backgroundTop + 539 * scale}px`;
+            leaderCard.style.width = `${(259 / GUI_WIDTH) * 100}%`;
+            leaderCard.style.height = `${(490 / GUI_HEIGHT) * 100}%`;
+            leaderCard.style.left = `${backgroundLeft + (1792 / GUI_WIDTH) * backgroundWidth}px`;
+            leaderCard.style.top = `${backgroundTop + (539 / GUI_HEIGHT) * backgroundHeight}px`;
         }
 
         const goToGameButton = document.getElementById('goToGameButton');
         if (goToGameButton) {
             goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-            goToGameButton.style.bottom = `${43 * scale}px`;
-            goToGameButton.style.padding = `${10 * scale}px ${20 * scale}px`;
-            goToGameButton.style.fontSize = `${30 * scale}px`;
+            goToGameButton.style.bottom = `${(43 / GUI_HEIGHT) * backgroundHeight}px`;
+            goToGameButton.style.padding = `${(10 / GUI_HEIGHT) * backgroundHeight}px ${(20 / GUI_WIDTH) * backgroundWidth}px`;
+            goToGameButton.style.fontSize = `${(30 / GUI_WIDTH) * backgroundWidth}px`;
             goToGameButton.style.transform = `translateX(-50%)`;
         }
     }
