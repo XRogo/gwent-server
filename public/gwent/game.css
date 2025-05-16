@@ -13,6 +13,10 @@
     src: url('assets/fonts/Cinzel-Regular.ttf') format('truetype');
 }
 
+html {
+    font-size: 1vw; /* Bazowy rozmiar czcionki */
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -71,10 +75,6 @@ body {
     opacity: 1;
 }
 
-html {
-    font-size: 1vw; /* Bazowy rozmiar czcionki zależny od szerokości viewportu */
-}
-
 .card-area {
     position: absolute;
     width: 100%;
@@ -87,6 +87,11 @@ html {
     scrollbar-width: none;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 50%;
+}
+
+.card-area::-webkit-scrollbar {
+    display: none;
 }
 
 .card-area .card {
@@ -98,11 +103,7 @@ html {
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
-    min-height: 50%;
-    overflow: hidden; /* Zapobiega wychodzeniu zawartości */
-}
-.card-area::-webkit-scrollbar {
-    display: none;
+    overflow: hidden;
 }
 
 .card-area .card .card-image,
@@ -134,7 +135,7 @@ html {
     left: 14.312977%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 1.5rem; /* Proporcjonalny rozmiar względem viewportu */
+    font-size: 1.5rem;
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
@@ -145,8 +146,8 @@ html {
 
 .card-area .card .hero-icon {
     position: absolute;
-    top: -1.912386%;
-    left: -8%; /* Zwiększamy przesunięcie w lewo, aby skorygować pozycję */
+    top: 0;
+    left: 0;
     width: 59.160305%;
     height: 31.017121%;
     object-fit: contain;
@@ -156,21 +157,23 @@ html {
 .card-area .card .name {
     position: absolute;
     top: 77.542799%;
-    left: 20.992366%;
+    left: 50%;
     width: 76.335878%;
     text-align: center;
-    font-size: 1rem; /* Proporcjonalny rozmiar względem viewportu */
+    font-size: 1rem;
     color: #333333;
+    font-weight: bold;
     z-index: 11;
+    transform: translateX(-50%);
 }
 
 .card-area .card .description {
     position: absolute;
-    top: 90.533837%;   /* 899 / 993 */
-    left: 3.435115%;   /* 18 / 524 */
-    width: 92.129771%; /* 482 / 524 */
-    height: 7.653575%; /* 76 / 993 */
-    font-size: 3.435115%; /* 18 / 524 */
+    top: 90.533837%;
+    left: 3.435115%;
+    width: 92.129771%;
+    height: 7.653575%;
+    font-size: 3.435115%;
     color: #333333;
     text-align: center;
     display: none;

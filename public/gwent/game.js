@@ -84,9 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
         }
 
-        // Ustawianie przycisków w procentach
         const buttons = [
-            { selector: '.button.collection.all', left: 9.713542, top: 16.388889, image: 'assets/wybor/all.webp' }, // 373/3840, 354/2160
+            { selector: '.button.collection.all', left: 9.713542, top: 16.388889, image: 'assets/wybor/all.webp' },
             { selector: '.button.collection.mecz', left: 14.322917, top: 16.481481, image: 'assets/wybor/mecz.webp' },
             { selector: '.button.collection.lok', left: 19.140625, top: 16.435185, image: 'assets/wybor/lok.webp' },
             { selector: '.button.collection.obl', left: 23.854167, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
@@ -119,6 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
             collectionArea.style.left = `${backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth}px`;
             collectionArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
             collectionArea.style.padding = '0';
+            collectionArea.style.margin = '0';
+            collectionArea.style.boxSizing = 'border-box';
         }
 
         if (deckArea) {
@@ -127,6 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
             deckArea.style.left = `${backgroundLeft + (2291 / GUI_WIDTH) * backgroundWidth}px`;
             deckArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
             deckArea.style.padding = '0';
+            deckArea.style.margin = '0';
+            deckArea.style.boxSizing = 'border-box';
         }
 
         const cards = document.querySelectorAll('.card-area .card');
@@ -136,20 +139,21 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.display = 'grid';
             area.style.gridTemplateColumns = 'repeat(3, 1fr)';
             const cardCount = area.querySelectorAll('.card').length;
-            const rows = Math.ceil(cardCount / 3);
-            area.style.gridTemplateRows = `repeat(${rows}, ${100 / 2}%)`;
+            area.style.gridAutoRows = '50%';
             area.style.gap = '0';
             area.style.overflowY = 'scroll';
+            area.style.boxSizing = 'border-box';
         });
 
         cards.forEach(card => {
             card.style.width = '100%';
             card.style.height = '100%';
             card.style.margin = '0';
+            card.style.padding = '0';
+            card.style.boxSizing = 'border-box';
 
             const heroIcon = card.querySelector('.hero-icon');
             if (heroIcon) {
-                heroIcon.style.position = 'absolute';
                 heroIcon.style.zIndex = '12';
             }
         });
@@ -173,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pageRight) {
             pageRight.style.width = `${(49 / GUI_WIDTH) * 100}%`;
             pageRight.style.height = `${(43 / GUI_HEIGHT) * 100}%`;
-            pageRight.style.left = `${backgroundLeft + (2338 / GUI_WIDTH) * backgroundWidth}px`; // Poprawka: zmieniono pageLeft na pageRight
+            pageRight.style.left = `${backgroundLeft + (2338 / GUI_WIDTH) * backgroundWidth}px`;
             pageRight.style.top = `${backgroundTop + (154 / GUI_HEIGHT) * backgroundHeight}px`;
             pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
         }
@@ -201,8 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const factionShield = document.querySelector('.faction-shield');
         if (factionShield) {
-            factionShield.style.width = `${(106 / GUI_WIDTH) * 100}%`;
-            factionShield.style.height = `${(110 / GUI_HEIGHT) * 100}%`;
+            factionShield.style.width = `${(106 / GUI_WIDTH) * backgroundWidth}px`;
+            factionShield.style.height = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
         }
 
         const factionName = document.querySelector('.faction-name');
