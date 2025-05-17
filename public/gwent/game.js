@@ -115,13 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
             const COLS = 3;
             const ROWS = 3;
-            // Odstęp 35px względem GUI (4K)
-            const GAP_X = (35 / 1194) * areaWidth; // 1194 = szerokość obszaru kolekcji w 4K
-            const GAP_Y = (35 / 1940) * areaHeight; // 1940 = wysokość obszaru kolekcji w 4K
+            // Odstęp 35px względem 4K tła, liczony względem backgroundWidth/backgroundHeight (czyli tła)
+            const GAP_X = (35 / 3840) * backgroundWidth;
+            const GAP_Y = (35 / 2160) * backgroundHeight;
 
             // Szerokość i wysokość karty tak, by 3 karty + 2 odstępy mieściły się w obszarze
-            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
-            const cardHeight = (areaHeight - 2 * GAP_Y) / ROWS;
+            let cardWidth = (areaWidth - 2 * GAP_X) / COLS;
+            let cardHeight = (areaHeight - 2 * GAP_Y) / ROWS;
+
+            // Twarda granica: nie pozwól, by suma szerokości i odstępów przekroczyła areaWidth
+            cardWidth = Math.max(0, Math.min(cardWidth, areaWidth));
+            cardHeight = Math.max(0, Math.min(cardHeight, areaHeight));
 
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
@@ -142,6 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
                 card.style.flex = `0 0 auto`;
+                // Twarda granica: nie pozwól, by karta wyjechała poza obszar
+                card.style.maxWidth = `${cardWidth}px`;
+                card.style.maxHeight = `${cardHeight}px`;
             });
         }
 
