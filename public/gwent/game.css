@@ -85,10 +85,7 @@ body {
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 50%;
-    gap: 0;
+    display: block; /* Zmieniamy z grid na block, bo ręcznie ustawiamy pozycje */
 }
 
 .card-area::-webkit-scrollbar {
@@ -97,15 +94,21 @@ body {
 
 .card-area .card {
     position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
+    width: calc((100% - 70px * var(--scale)) / 3); /* 3 karty, 2 odstępy (70px w 4K), skalowane */
+    height: calc((100% - 35px * var(--scale)) / 2); /* 2 karty, 1 odstęp (35px w 4K), skalowane */
+    margin: calc(35px * var(--scale) / 2); /* Odstęp między kartami */
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
     aspect-ratio: 524 / 993;
+    display: inline-block; /* Karty w rzędzie obok siebie */
 }
+
+.card-area .card:nth-child(3n+1) {
+    clear: left; /* Nowa linia co 3 karty */
+}
+
+/* Reszta stylów dla kart (np. .card-image, .points) pozostaje bez zmian */
 
 .card-area .card .card-image,
 .card-area .card .beton,
