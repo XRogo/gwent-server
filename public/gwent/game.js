@@ -1,5 +1,8 @@
 import cards from './cards.js';
 
+const GUI_WIDTH = 3840;   // <- podaj tu rzeczywiste wymiary gui.webp
+const GUI_HEIGHT = 2160;  // <- podaj tu rzeczywiste wymiary gui.webp
+
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
     const gameScreen = document.getElementById('gameScreen');
@@ -9,8 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageDots = document.querySelectorAll('.page-dot');
     const hoverSound = document.getElementById('hoverSound');
     let currentPage = 1;
-    const GUI_WIDTH = 3840;
-    const GUI_HEIGHT = 2160;
     let deck = [];
 
     const factions = [
@@ -55,89 +56,48 @@ document.addEventListener('DOMContentLoaded', () => {
         return defaultImages[card.moc] || "";
     }
 
-    function updatePositionsAndScaling() {
-        const overlay = document.querySelector('.overlay');
-        if (!overlay) return;
+    function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
+        const GAP_X = (35 / GUI_WIDTH) * areaWidth;
+        const GAP_Y = (35 / GUI_HEIGHT) * areaHeight;
+        const COLS = 3;
+        const ROWS = 3;
 
-        const overlayRect = overlay.getBoundingClientRect();
-        const overlayWidth = overlayRect.width;
-        const overlayHeight = overlayRect.height;
-        const overlayLeft = overlayRect.left;
-        const overlayTop = overlayRect.top;
+        // szerokość i wysokość karty
+        const cardWidth = (areaWidth - GAP_X * (COLS - 1)) / COLS;
+        const cardHeight = (areaHeight - GAP_Y * (ROWS - 1)) / ROWS;
 
-        const windowAspectRatio = window.innerWidth / window.innerHeight;
-        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+        area.style.left = `${areaLeft}px`;
+        area.style.top = `${areaTop}px`;
+        area.style.width = `${areaWidth}px`;
+        area.style.height = `${areaHeight}px`;
+        area.style.display = 'flex';
+        area.style.flexWrap = 'wrap';
+        area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+        area.style.alignContent = 'flex-start';
+        area.style.justifyContent = 'flex-start';
+        area.style.overflowY = 'auto';
 
-        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
-
-        if (windowAspectRatio > guiAspectRatio) {
-            scale = overlayHeight / GUI_HEIGHT;
-            backgroundWidth = GUI_WIDTH * scale;
-            backgroundHeight = overlayHeight;
-            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-            backgroundTop = overlayTop;
-        } else {
-            scale = overlayWidth / GUI_WIDTH;
-            backgroundWidth = overlayWidth;
-            backgroundHeight = GUI_HEIGHT * scale;
-            backgroundLeft = overlayLeft;
-            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-        }
-
-        const buttons = [
-            { selector: '.button.collection.all', left: 9.713542, top: 16.388889, image: 'assets/wybor/all.webp' },
-            { selector: '.button.collection.mecz', left: 14.322917, top: 16.481481, image: 'assets/wybor/mecz.webp' },
-            { selector: '.button.collection.lok', left: 19.140625, top: 16.435185, image: 'assets/wybor/lok.webp' },
-            { selector: '.button.collection.obl', left: 23.854167, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
-            { selector: '.button.collection.hero', left: 28.593750, top: 16.481481, image: 'assets/wybor/boharer.webp' },
-            { selector: '.button.collection.pogoda', left: 33.281250, top: 16.250000, image: 'assets/wybor/pogoda.webp' },
-            { selector: '.button.collection.specjalne', left: 38.020833, top: 16.712963, image: 'assets/wybor/inne.webp' },
-            { selector: '.button.deck.all', left: 59.869792, top: 16.388889, image: 'assets/wybor/all.webp' },
-            { selector: '.button.deck.mecz', left: 64.401042, top: 16.481481, image: 'assets/wybor/mecz.webp' },
-            { selector: '.button.deck.lok', left: 69.218750, top: 16.435185, image: 'assets/wybor/lok.webp' },
-            { selector: '.button.deck.obl', left: 73.958333, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
-            { selector: '.button.deck.hero', left: 78.697917, top: 16.481481, image: 'assets/wybor/boharer.webp' },
-            { selector: '.button.deck.pogoda', left: 83.390625, top: 16.250000, image: 'assets/wybor/pogoda.webp' },
-            { selector: '.button.deck.specjalne', left: 88.020833, top: 16.712963, image: 'assets/wybor/inne.webp' },
-        ];
-
-        buttons.forEach(({ selector, left, top, image }) => {
-            const button = document.querySelector(selector);
-            if (button) {
-                button.style.width = `${(97 / GUI_WIDTH) * 100}%`;
-                button.style.height = `${(80 / GUI_HEIGHT) * 100}%`;
-                button.style.left = `${backgroundLeft + (left * backgroundWidth) / 100}px`;
-                button.style.top = `${backgroundTop + (top * backgroundHeight) / 100}px`;
-                button.style.backgroundImage = `url('${image}')`;
-            }
+        // ustaw rozmiar każdej karty
+        area.querySelectorAll('.card').forEach(card => {
+            card.style.width = `${cardWidth}px`;
+            card.style.height = `${cardHeight}px`;
+            card.style.margin = '0';
+            card.style.padding = '0';
+            card.style.boxSizing = 'border-box';
         });
+    }
 
-        function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
-            // 3 kolumny, 3 rzędy, odstęp 35px względem 3840x2160
-            const GAP_X = (35 / 3840) * areaWidth;
-            const GAP_Y = (35 / 2160) * areaHeight;
-            const COLS = 3;
-            const ROWS = 3;
+    function updatePositionsAndScaling() {
+        const background = document.querySelector('.background');
+        const collectionArea = document.querySelector('.card-area.collection');
+        const deckArea = document.querySelector('.card-area.deck');
 
-            // szerokość karty = (obszar - 2*gap) / 3
-            const cardWidth = (areaWidth - GAP_X * (COLS - 1)) / COLS;
-            const cardHeight = (areaHeight - GAP_Y * (ROWS - 1)) / ROWS;
-
-            area.style.left = `${areaLeft}px`;
-            area.style.top = `${areaTop}px`;
-            area.style.width = `${areaWidth}px`;
-            area.style.height = `${areaHeight}px`;
-            area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-
-            // ustaw rozmiar każdej karty
-            area.querySelectorAll('.card').forEach(card => {
-                card.style.width = `${cardWidth}px`;
-                card.style.height = `${cardHeight}px`;
-                card.style.margin = '0';
-                card.style.padding = '0';
-                card.style.boxSizing = 'border-box';
-            });
-        }
+        // Pobierz aktualny rozmiar GUI na stronie
+        const backgroundRect = background.getBoundingClientRect();
+        const backgroundLeft = backgroundRect.left;
+        const backgroundTop = backgroundRect.top;
+        const backgroundWidth = backgroundRect.width;
+        const backgroundHeight = backgroundRect.height;
 
         if (collectionArea) {
             updateCardArea(
@@ -153,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deckArea,
                 backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
-                (1194 / GUI_WIDTH) * backgroundWidth, // 3484-2290=1194
+                (1194 / GUI_WIDTH) * backgroundWidth,
                 (1940 / GUI_HEIGHT) * backgroundHeight
             );
         }
