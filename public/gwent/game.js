@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const COLS = 3;
             const ROWS = 3;
             // Odstęp 35px względem GUI (4K)
-            const GAP_X = (35 / GUI_WIDTH) * backgroundWidth;
-            const GAP_Y = (35 / GUI_HEIGHT) * backgroundHeight;
+            const GAP_X = (35 / 1194) * areaWidth; // 1194 = szerokość obszaru kolekcji w 4K
+            const GAP_Y = (35 / 1940) * areaHeight; // 1940 = wysokość obszaru kolekcji w 4K
 
             // Szerokość i wysokość karty tak, by 3 karty + 2 odstępy mieściły się w obszarze
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
