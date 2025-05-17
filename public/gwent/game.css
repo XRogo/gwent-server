@@ -76,26 +76,35 @@ body {
 }
 
 .card-area {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 równe kolumny */
-    overflow-y: scroll; /* Scrollowanie w pionie */
-    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
-    scrollbar-width: none; /* Ukrycie scrollbarów w Firefox */
+    box-sizing: border-box;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 50%;
+    gap: 0;
 }
 
 .card-area::-webkit-scrollbar {
-    display: none; /* Ukrycie scrollbarów w Chrome/Safari */
+    display: none;
 }
 
 .card-area .card {
+    position: relative;
     width: 100%;
-    height: auto;
-    aspect-ratio: 524 / 993; /* Proporcje kart */
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     background-size: cover;
     background-position: center;
-    box-sizing: border-box;
+    aspect-ratio: 524 / 993;
 }
 
 .card-area .card .card-image,

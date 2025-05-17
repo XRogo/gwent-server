@@ -158,36 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const collectionArea = document.querySelector('#collectionArea'); // Zakładam ID elementu
-        if (collectionArea) {
-            const areaLeft = backgroundLeft + (366 * scale);
-            const areaTop = backgroundTop + (491 * scale);
-            const areaWidth = 1194 * scale;
-            const areaHeight = 1449 * scale;
-    
-            collectionArea.style.position = 'absolute';
-            collectionArea.style.left = `${areaLeft}px`;
-            collectionArea.style.top = `${areaTop}px`;
-           collectionArea.style.width = `${areaWidth}px`;
-            collectionArea.style.height = `${areaHeight}px`;
-            collectionArea.style.gap = `${35 * scale}px`; // Skalowany odstęp 35px
-        }
-        
-        const deckArea = document.querySelector('#deckArea'); // Zakładam ID elementu
-        if (deckArea) {
-            const areaLeft = backgroundLeft + (2290 * scale);
-            const areaTop = backgroundTop + (491 * scale);
-            const areaWidth = 1194 * scale;
-            const areaHeight = 1449 * scale;
-    
-            deckArea.style.position = 'absolute';
-            deckArea.style.left = `${areaLeft}px`;
-            deckArea.style.top = `${areaTop}px`;
-            deckArea.style.width = `${areaWidth}px`;
-            deckArea.style.height = `${areaHeight}px`;
-           deckArea.style.gap = `${35 * scale}px`; // Skalowany odstęp 35px
-        }
-        
         if (stats) {
             stats.style.left = `${backgroundLeft + (1935 / GUI_WIDTH) * backgroundWidth}px`;
             stats.style.top = `${backgroundTop + (1152 / GUI_HEIGHT) * backgroundHeight}px`;
