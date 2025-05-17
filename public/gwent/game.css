@@ -75,6 +75,7 @@ body {
     opacity: 1;
 }
 
+/* Obszary kart */
 .card-area {
     position: absolute;
     width: 100%;
@@ -85,32 +86,57 @@ body {
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    display: block; /* Zmieniamy z grid na block, bo ręcznie ustawiamy pozycje */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 karty w rzędzie */
+    grid-auto-rows: auto; /* Wiersze dopasowane do zawartości */
+    gap: calc(35 / 3840 * 100vw); /* Odstęp 35px względem tła 4K, skalowany */
 }
 
 .card-area::-webkit-scrollbar {
     display: none;
 }
 
+/* Karty */
 .card-area .card {
     position: relative;
-    width: calc((100% - 70px * var(--scale)) / 3); /* 3 karty, 2 odstępy (70px w 4K), skalowane */
-    height: calc((100% - 35px * var(--scale)) / 2); /* 2 karty, 1 odstęp (35px w 4K), skalowane */
-    margin: calc(35px * var(--scale) / 2); /* Odstęp między kartami */
+    width: 100%; /* Karta wypełnia całą dostępną szerokość komórki */
+    height: 0; /* Ustawiamy proporcje za pomocą padding-bottom */
+    padding-bottom: 189.5%; /* Proporcje 524/993 ≈ 0.5277, więc 100% * (993/524) ≈ 189.5% */
+    margin: 0;
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
-    aspect-ratio: 524 / 993;
-    display: inline-block; /* Karty w rzędzie obok siebie */
 }
 
-.card-area .card:nth-child(3n+1) {
-    clear: left; /* Nowa linia co 3 karty */
+/* Elementy wewnątrz kart (nazwa, punkty) */
+.card-area .card .name {
+    position: absolute;
+    top: 78%;
+    left: 50%;
+    width: 76.335878%;
+    text-align: center;
+    font-size: 2.5%; /* Skalowanie w % szerokości karty */
+    color: #333333;
+    font-weight: bold;
+    z-index: 11;
+    transform: translateX(-50%);
 }
 
-/* Reszta stylów dla kart (np. .card-image, .points) pozostaje bez zmian */
+.card-area .card .points {
+    position: absolute;
+    top: 8%;
+    left: 18%;
+    width: 23.61%;
+    height: 8.84%;
+    font-size: 5%; /* Skalowanie w % szerokości karty */
+    color: #fff;
+    z-index: 13;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-.card-area .card .card-image,
 .card-area .card .beton,
 .card-area .card .faction-banner,
 .card-area .card .position-icon,
