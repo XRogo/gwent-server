@@ -56,58 +56,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePositionsAndScaling() {
-    const overlay = document.querySelector('.overlay');
-    if (!overlay) return;
+        const overlay = document.querySelector('.overlay');
+        if (!overlay) return;
 
-    const overlayRect = overlay.getBoundingClientRect();
-    const overlayWidth = overlayRect.width;
-    const overlayHeight = overlayRect.height;
-    const overlayLeft = overlayRect.left;
-    const overlayTop = overlayRect.top;
+        const overlayRect = overlay.getBoundingClientRect();
+        const overlayWidth = overlayRect.width;
+        const overlayHeight = overlayRect.height;
+        const overlayLeft = overlayRect.left;
+        const overlayTop = overlayRect.top;
 
-    const windowAspectRatio = window.innerWidth / window.innerHeight;
-    const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
 
-    let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
 
-    if (windowAspectRatio > guiAspectRatio) {
-        scale = overlayHeight / GUI_HEIGHT;
-        backgroundWidth = GUI_WIDTH * scale;
-        backgroundHeight = overlayHeight;
-        backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-        backgroundTop = overlayTop;
-    } else {
-        scale = overlayWidth / GUI_WIDTH;
-        backgroundWidth = overlayWidth;
-        backgroundHeight = GUI_HEIGHT * scale;
-        backgroundLeft = overlayLeft;
-        backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-    }
-
-    // Ustawienie dla kolekcji kart
-    if (collectionArea) {
-        collectionArea.style.left = `${backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth}px`;
-        collectionArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
-        collectionArea.style.width = `${(1560 - 366) * scale}px`; // 1194 px skalowane
-        collectionArea.style.height = `${(1940 - 491) * scale}px`; // 1449 px skalowane
-    }
-
-    // Ustawienie dla talii kart
-    if (deckArea) {
-        deckArea.style.left = `${backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth}px`;
-        deckArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
-        deckArea.style.width = `${(3484 - 2290) * scale}px`; // 1194 px skalowane
-        deckArea.style.height = `${(1940 - 491) * scale}px`; // 1449 px skalowane
-    }
-
-    // Obliczenie i ustawienie odstępów między kartami
-    const gap = 35 * scale;
-    if (collectionArea) {
-        collectionArea.style.setProperty('--gap', `${gap}px`);
-    }
-    if (deckArea) {
-        deckArea.style.setProperty('--gap', `${gap}px`);
-    }
+        if (windowAspectRatio > guiAspectRatio) {
+            scale = overlayHeight / GUI_HEIGHT;
+            backgroundWidth = GUI_WIDTH * scale;
+            backgroundHeight = overlayHeight;
+            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+            backgroundTop = overlayTop;
+        } else {
+            scale = overlayWidth / GUI_WIDTH;
+            backgroundWidth = overlayWidth;
+            backgroundHeight = GUI_HEIGHT * scale;
+            backgroundLeft = overlayLeft;
+            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
+        }
 
         const buttons = [
             { selector: '.button.collection.all', left: 9.713542, top: 16.388889, image: 'assets/wybor/all.webp' },

@@ -77,30 +77,35 @@ body {
 
 .card-area {
     position: absolute;
+    width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    overflow-y: scroll; /* Włącza przewijanie w pionie */
-    -ms-overflow-style: none; /* Ukrywa scrollbar w IE */
-    scrollbar-width: none; /* Ukrywa scrollbar w Firefox */
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 kolumny o równej szerokości */
-    grid-auto-rows: auto; /* Wysokość rzędów dostosowana do zawartości */
-    gap: var(--gap); /* Odstępy między kartami ustawione dynamicznie */
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 50%;
+    gap: 0;
 }
 
 .card-area::-webkit-scrollbar {
-    display: none; /* Ukrywa scrollbar w Chrome/Safari */
+    display: none;
 }
 
 .card-area .card {
     position: relative;
-    width: 100%; /* Karta wypełnia szerokość komórki siatki */
-    aspect-ratio: 524 / 993; /* Zachowuje proporcje kart */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     background-size: cover;
     background-position: center;
+    aspect-ratio: 524 / 993;
 }
-
 
 .card-area .card .card-image,
 .card-area .card .beton,
@@ -131,7 +136,7 @@ body {
     left: 18%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 10%; /* Skaluje się względem szerokości karty */
+    font-size: 2vw;
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
@@ -156,7 +161,7 @@ body {
     left: 50%;
     width: 76.335878%;
     text-align: center;
-    font-size: 5%; /* Skaluje się względem szerokości karty */
+    font-size: 1.2vw;
     color: #333333;
     font-weight: bold;
     z-index: 11;
