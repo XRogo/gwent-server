@@ -75,7 +75,6 @@ body {
     opacity: 1;
 }
 
-/* Obszary kart */
 .card-area {
     position: absolute;
     width: 100%;
@@ -87,56 +86,28 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 karty w rzędzie */
-    grid-auto-rows: auto; /* Wiersze dopasowane do zawartości */
-    gap: calc(35 / 3840 * 100vw); /* Odstęp 35px względem tła 4K, skalowany */
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 50%;
+    gap: 0;
 }
 
 .card-area::-webkit-scrollbar {
     display: none;
 }
 
-/* Karty */
 .card-area .card {
     position: relative;
-    width: 100%; /* Karta wypełnia całą dostępną szerokość komórki */
-    height: 0; /* Ustawiamy proporcje za pomocą padding-bottom */
-    padding-bottom: 189.5%; /* Proporcje 524/993 ≈ 0.5277, więc 100% * (993/524) ≈ 189.5% */
+    width: 100%;
+    height: 100%;
     margin: 0;
+    padding: 0;
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
+    aspect-ratio: 524 / 993;
 }
 
-/* Elementy wewnątrz kart (nazwa, punkty) */
-.card-area .card .name {
-    position: absolute;
-    top: 78%;
-    left: 50%;
-    width: 76.335878%;
-    text-align: center;
-    font-size: 2.5%; /* Skalowanie w % szerokości karty */
-    color: #333333;
-    font-weight: bold;
-    z-index: 11;
-    transform: translateX(-50%);
-}
-
-.card-area .card .points {
-    position: absolute;
-    top: 8%;
-    left: 18%;
-    width: 23.61%;
-    height: 8.84%;
-    font-size: 5%; /* Skalowanie w % szerokości karty */
-    color: #fff;
-    z-index: 13;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
+.card-area .card .card-image,
 .card-area .card .beton,
 .card-area .card .faction-banner,
 .card-area .card .position-icon,
