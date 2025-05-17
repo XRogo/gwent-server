@@ -113,13 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
  
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
-            // 3 kolumny, 3 rzędy, odstęp 35px względem 3840x2160
-            const GAP_X = (35 / 3840) * areaWidth;
-            const GAP_Y = (35 / 2160) * areaHeight;
             const COLS = 3;
             const ROWS = 3;
+            // Odstęp 35px względem GUI (stały względem 3840x2160)
+            const GAP_X = (35 / 3840) * backgroundWidth;
+            const GAP_Y = (35 / 2160) * backgroundHeight;
 
-            // szerokość karty = (obszar - 2*gap) / 3
+            // Szerokość i wysokość karty tak, by 3 karty + 2 odstępy mieściły się w obszarze
             const cardWidth = (areaWidth - GAP_X * (COLS - 1)) / COLS;
             const cardHeight = (areaHeight - GAP_Y * (ROWS - 1)) / ROWS;
 
@@ -127,15 +127,21 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
             area.style.height = `${areaHeight}px`;
+            area.style.display = 'flex';
+            area.style.flexWrap = 'wrap';
+            area.style.alignContent = 'flex-start';
+            area.style.justifyContent = 'flex-start';
+            area.style.overflowY = 'auto';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
 
-            // ustaw rozmiar każdej karty
+            // Ustaw rozmiar każdej karty
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
                 card.style.height = `${cardHeight}px`;
                 card.style.margin = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
+                card.style.flex = `0 0 auto`;
             });
         }
 
