@@ -112,24 +112,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        if (collectionArea) {
-            collectionArea.style.width = `${(1195 / GUI_WIDTH) * 100}%`;
-            collectionArea.style.height = `${(1449 / GUI_HEIGHT) * 100}%`;
-            collectionArea.style.left = `${backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth}px`;
-            collectionArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
-            collectionArea.style.padding = '0';
-            collectionArea.style.margin = '0';
-            collectionArea.style.boxSizing = 'border-box';
+        function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
+            // 3 kolumny, 3 rzędy, odstęp 35px względem 3840x2160
+            const GAP_X = (35 / 3840) * areaWidth;
+            const GAP_Y = (35 / 2160) * areaHeight;
+            const COLS = 3;
+            const ROWS = 3;
+
+            // szerokość karty = (obszar - 2*gap) / 3
+            const cardWidth = (areaWidth - GAP_X * (COLS - 1)) / COLS;
+            const cardHeight = (areaHeight - GAP_Y * (ROWS - 1)) / ROWS;
+
+            area.style.left = `${areaLeft}px`;
+            area.style.top = `${areaTop}px`;
+            area.style.width = `${areaWidth}px`;
+            area.style.height = `${areaHeight}px`;
+            area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+
+            // ustaw rozmiar każdej karty
+            area.querySelectorAll('.card').forEach(card => {
+                card.style.width = `${cardWidth}px`;
+                card.style.height = `${cardHeight}px`;
+                card.style.margin = '0';
+                card.style.padding = '0';
+                card.style.boxSizing = 'border-box';
+            });
         }
 
+        if (collectionArea) {
+            updateCardArea(
+                collectionArea,
+                backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth,
+                backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
+                (1560 / GUI_WIDTH) * backgroundWidth,
+                (1940 / GUI_HEIGHT) * backgroundHeight
+            );
+        }
         if (deckArea) {
-            deckArea.style.width = `${(1193 / GUI_WIDTH) * 100}%`;
-            deckArea.style.height = `${(1449 / GUI_HEIGHT) * 100}%`;
-            deckArea.style.left = `${backgroundLeft + (2291 / GUI_WIDTH) * backgroundWidth}px`;
-            deckArea.style.top = `${backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight}px`;
-            deckArea.style.padding = '0';
-            deckArea.style.margin = '0';
-            deckArea.style.boxSizing = 'border-box';
+            updateCardArea(
+                deckArea,
+                backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
+                backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
+                (1194 / GUI_WIDTH) * backgroundWidth, // 3484-2290=1194
+                (1940 / GUI_HEIGHT) * backgroundHeight
+            );
         }
 
         const cards = document.querySelectorAll('.card-area .card');
