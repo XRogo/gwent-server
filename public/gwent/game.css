@@ -159,11 +159,11 @@ body {
 
 .card-area .card .name {
     position: absolute;
-    left: 21.76%;   /* 114/524 jeśli szerokość karty to 524px */
+    left: 21.76%;   /* 114/524 */
     width: 76.34%;  /* (515-114)/524 */
-    top: 75.9%;     /* 754/993 jeśli wysokość karty to 993px */
+    top: 76%;       /* 754/993 */
     text-align: center;
-    font-size: clamp(12px, 7.5%, 2.8vw); /* skalowanie względem szerokości karty */
+    font-size: 8.4%; /* ~44px przy 524px szerokości karty, skaluje się z kartą */
     color: #333;
     font-weight: bold;
     z-index: 11;
