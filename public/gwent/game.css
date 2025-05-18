@@ -82,7 +82,8 @@ body {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    overflow-y: scroll;
+    overflow-y: auto;
+    max-height: 100%; /* JS ustawia dokładną wysokość */
     -ms-overflow-style: none;
     scrollbar-width: none;
     display: flex;
