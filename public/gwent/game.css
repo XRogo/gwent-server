@@ -107,6 +107,8 @@ body {
     background-size: cover;
     background-position: center;
     aspect-ratio: 524 / 993;
+    font-size: 44px; /* bazowy rozmiar dla 524px szerokości karty */
+    font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
 }
 
 .card-area .card .card-image,
@@ -163,7 +165,7 @@ body {
     width: 76.34%;  /* (515-114)/524 */
     top: 76%;       /* 754/993 */
     text-align: center;
-    font-size: 8.4%; /* ~44px przy 524px szerokości karty, skaluje się z kartą */
+    font-size: 1em; /* 1em = 44px przy 524px szerokości karty */
     color: #333;
     font-weight: bold;
     z-index: 11;

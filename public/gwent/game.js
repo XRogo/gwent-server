@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.flex = `0 0 ${cardWidth}px`;
                 card.style.height = 'auto';
                 card.style.maxWidth = `${cardWidth}px`;
+                card.style.fontSize = `${cardWidth / 12}px`; // 524/44 ≈ 12
             });
         }
 
