@@ -580,6 +580,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('DOMContentLoaded', () => {
     const fade = document.getElementById('fadeScreen');
+    const joinSound = document.getElementById('joinSound');
+    if (joinSound) {
+        joinSound.currentTime = 0;
+        joinSound.play().catch(()=>{});
+    }
     if (fade) {
         setTimeout(() => {
             fade.style.opacity = '0';
