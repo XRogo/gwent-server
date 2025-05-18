@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
                 ((1560 - 366) / GUI_WIDTH) * backgroundWidth,
-                (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
+                (1940 / 2160) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
         if (deckArea) {
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
                 ((3484 - 2290) / GUI_WIDTH) * backgroundWidth,
-                (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
+                (1940 / 2160) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
 
