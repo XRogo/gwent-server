@@ -261,7 +261,7 @@ body {
 
 .faction-ability {
     position: absolute;
-    color: #b48b42;
+    color: #b9a385;
     white-space: normal;
     text-align: center;
     margin: 0;
@@ -308,7 +308,7 @@ body {
 
 .card-area .card .ilosc-text {
     position: absolute;
-    top: 90.4%;      /* poniżej nazwy, możesz dostosować */
+    top: 91.4%;      /* poniżej nazwy, możesz dostosować */
     left: 17%;       /* 89px przy szerokości 524px ≈ 17% */
     color: #5a451f;
     font-size: 1.2em;  /* jak nazwa */
