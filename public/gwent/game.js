@@ -422,8 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         const specialCount = deck.filter(c => typeof c.punkty !== 'number').length;
                         if ((isUnitCard && unitCount < 22) || (!isUnitCard && specialCount < 10)) {
                             deck.push({ ...card });
+                            if (addCardSound) {
+                                addCardSound.currentTime = 0;
+                                addCardSound.play().catch(()=>{});
+                            }
                             displayDeck();
-                            displayCollection('all'); // <-- DODAJ TO!
+                            displayCollection('all');
                             updateStats();
                         } else {
                             alert('Osiągnięto limit kart w talii.');
@@ -444,8 +448,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const index = deck.findIndex(c => c.nazwa === cardName);
                 if (index !== -1) {
                     deck.splice(index, 1);
+                    if (removeCardSound) {
+                        removeCardSound.currentTime = 0;
+                        removeCardSound.play().catch(()=>{});
+                    }
                     displayDeck();
-                    displayCollection('all'); // <-- DODAJ TO!
+                    displayCollection('all');
                     updateStats();
                 }
             }
