@@ -159,15 +159,22 @@ body {
 
 .card-area .card .name {
     position: absolute;
-    top: 78%;
-    left: 50%;
-    width: 76.335878%;
+    left: 114px;
+    right: calc(100% - 515px);
+    top: 754px;
+    width: calc(515px - 114px);
+    min-width: 0;
+    max-width: 100%;
     text-align: center;
-    font-size: 1.2vw;
-    color: #333333;
+    font-size: clamp(16px, 4vw, 38px); /* skalowanie: min 16px, max 38px, rośnie z kartą */
+    color: #333;
     font-weight: bold;
     z-index: 11;
-    transform: translateX(-50%);
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.1;
+    padding: 0 4px;
+    transform: none;
 }
 
 .card-area .card .description {
