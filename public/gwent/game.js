@@ -549,9 +549,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pobierz audio
     // const hoverSound = document.getElementById('hoverSound');
 
-    // Funkcja do odtwarzania dźwięku (resetuje jeśli już gra)
+    // Funkcja do odtwarzania dźwięku klikania, pozwala na nakładanie się dźwięków
     function playHoverSound() {
-        // Tworzy nowy obiekt Audio za każdym razem, więc dźwięki się nakładają
         const sound = new Audio('assets/klik.mp3');
         sound.play().catch(()=>{});
     }
