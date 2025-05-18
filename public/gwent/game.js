@@ -115,12 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
             const COLS = 3;
             const ROWS = 3;
-            const GAP_X = (35 / 3840) * backgroundWidth;
-            const GAP_Y = (35 / 2160) * backgroundHeight;
+            // Odstęp 35px względem szerokości obszaru (czyli areaWidth)
+            const GAP_X = (35 / 1194) * areaWidth; // 1194 to szerokość obszaru kolekcji w 4K
+            const GAP_Y = (35 / 1940) * areaHeight; // wysokość zostaw jak było, bo jest OK
 
             // Szerokość i wysokość karty: 3 karty + 2 odstępy = areaWidth
-            const cardWidth = (areaWidth - (COLS - 1) * GAP_X) / COLS;
-            const cardHeight = (areaHeight - (ROWS - 1) * GAP_Y) / ROWS;
+            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
+            const cardHeight = (areaHeight - 2 * GAP_Y) / ROWS;
 
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
@@ -136,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
                 card.style.height = `${cardHeight}px`;
-                card.style.flex = `0 0 ${cardWidth}px`; // Wymuś szerokość, nie pozwól rosnąć
+                card.style.flex = `0 0 ${cardWidth}px`;
                 card.style.margin = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
