@@ -446,6 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (index !== -1) {
                     deck.splice(index, 1);
                     displayDeck();
+                    displayCollection('all'); // <-- DODAJ TO!
                     updateStats();
                 }
             }
