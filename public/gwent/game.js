@@ -287,9 +287,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `<div class="name">${card.nazwa}</div>`;
 
-            const countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+            // Wylicz ile tej karty jest już w talii
+            let countInDeck = 0;
+            if (Array.isArray(deck)) {
+                countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+            }
+            // Wylicz ile zostało w kolekcji
             const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-            html += `<div class="ilosc-text">X${available}</div>`;
+
+            // Dodaj tekst tylko jeśli karta ma pole ilosc
+            if (typeof card.ilosc === 'number') {
+                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
+            }
 
             if (isLargeView) {
                 html += `<div class="description">${card.opis || ''}</div>`;
