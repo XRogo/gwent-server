@@ -100,7 +100,7 @@ const cards = [
     {
         nazwa: "Mardroeme",
         karta: "/gwent/assets/karty/niezalerzne/mardroeme.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/000.webp",
         opis: "WORK.",
         bohater: false,
         moc: "grzybki",

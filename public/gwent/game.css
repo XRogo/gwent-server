@@ -305,3 +305,17 @@ body {
     z-index: 5; /* nad beton/bbeton, pod punkty i inne ikony */
     pointer-events: none; /* żeby nie blokowało interakcji */
 }
+
+.card-area .card .ilosc-text {
+    position: absolute;
+    top: 90.4%;      /* poniżej nazwy, możesz dostosować */
+    left: 17%;       /* 89px przy szerokości 524px ≈ 17% */
+    color: #5a451f;
+    font-size: 1.2em;  /* jak nazwa */
+    font-family: 'PFDinTextCondPro', sans-serif;
+    font-weight: normal;
+    z-index: 20;
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 0 1px 2px #fff8, 0 0 2px #fff4;
+}

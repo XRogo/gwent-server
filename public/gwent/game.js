@@ -287,6 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `<div class="name">${card.nazwa}</div>`;
 
+            const countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+            const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
+            html += `<div class="ilosc-text">X${available}</div>`;
+
             if (isLargeView) {
                 html += `<div class="description">${card.opis || ''}</div>`;
             }
