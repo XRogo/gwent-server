@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const COLS = 3;
             // Odstęp 35px względem tła (4K)
             const GAP_X = (35 / 3840) * backgroundWidth;
+            const GAP_Y = (35 / 2160) * backgroundHeight; // <-- dodaj pionowy odstęp
 
             // Szerokość karty: 3 karty + 2 odstępy = areaWidth
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
@@ -130,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.overflowY = 'auto';
-            area.style.gap = `0px ${GAP_X}px`;
+            area.style.gap = `${GAP_Y}px ${GAP_X}px`; // <-- gap pionowy i poziomy
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
