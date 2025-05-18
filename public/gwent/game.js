@@ -556,7 +556,9 @@ document.addEventListener('DOMContentLoaded', () => {
         deck.forEach(card => {
             if (!map.has(card.nazwa)) {
                 const count = deck.filter(c => c.nazwa === card.nazwa).length;
-                map.set(card.nazwa, { ...card, iloscWTalii: count });
+                if (count > 0) { // tylko jeśli są w talii
+                    map.set(card.nazwa, { ...card, iloscWTalii: count });
+                }
             }
         });
         return Array.from(map.values());
