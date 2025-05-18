@@ -355,7 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayDeck() {
-        displayCards('all', deckArea, factions[currentPage - 1].id, deck);
+        const grouped = groupDeck(deck);
+        displayCards('all', deckArea, factions[currentPage - 1].id, grouped);
     }
 
     function displayCollection(filter) {
@@ -548,4 +549,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updatePage();
     updateStats();
+
+    function groupDeck(deck) {
+        const grouped = [];
+        const map = new Map();
+        deck.forEach(card => {
+            if (!map.has(card.nazwa)) {
+                const count = deck.filter(c => c.nazwa === card.nazwa).length;
+                map.set(card.nazwa, { ...card, iloscWTalii: count });
+            }
+        });
+        return Array.from(map.values());
+    }
 });
