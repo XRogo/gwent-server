@@ -424,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if ((isUnitCard && unitCount < 22) || (!isUnitCard && specialCount < 10)) {
                             deck.push({ ...card });
                             displayDeck();
+                            displayCollection('all'); // <-- DODAJ TO!
                             updateStats();
                         } else {
                             alert('Osiągnięto limit kart w talii.');
