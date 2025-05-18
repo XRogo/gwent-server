@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const iloscLayer = document.createElement('img');
             iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/ilosc.webp'; // ścieżka do pliku
+            iloscLayer.src = 'assets/dkarty/ilosc.webp'; // ścieżka do pliku
             cardElement.appendChild(iloscLayer);
 
             cardElement.addEventListener('mouseover', () => {
