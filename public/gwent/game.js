@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.removeChild(area.firstChild);
         }
 
-        const filteredCards = cardList.filter(card => {
+        let filteredCards = cardList.filter(card => {
             if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
             if (filter === 'all') return true;
             if (filter === 'miecz') return card.pozycja === 1;
@@ -269,6 +269,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
             return false;
         });
+
+        // DODAJ TO: ukryj karty z ilością 0 w kolekcji
+        if (area === collectionArea) {
+            filteredCards = filteredCards.filter(card => {
+                let countInDeck = 0;
+                if (Array.isArray(deck)) {
+                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                }
+                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
+                return available > 0;
+            });
+        }
 
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
