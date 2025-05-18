@@ -1744,7 +1744,7 @@ const cards = [
     {
         nazwa: "Żywiołak ognia",
         karta: "/gwent/assets/karty/potwory/zywiolak_ognia.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/4/408.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1772,7 +1772,7 @@ const cards = [
     {
         nazwa: "Wiedzma: Kuchta",
         karta: "/gwent/assets/karty/potwory/wiedzma_kuchta.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/4/410.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1787,7 +1787,7 @@ const cards = [
     {
         nazwa: "Wiedzma: Prządka",
         karta: "/gwent/assets/karty/potwory/",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty//4/411.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1802,7 +1802,7 @@ const cards = [
     {
         nazwa: "Wiedzma: Szepciucha",
         karta: "/gwent/assets/karty/potwory/wiedzma_przadka.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty//4/412.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
