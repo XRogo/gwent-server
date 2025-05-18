@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 areaLeft,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
                 areaWidth,
-                (1750 / GUI_HEIGHT) * backgroundHeight // np. 1750 zamiast 1940
+                (1000 / GUI_HEIGHT) * backgroundHeight // np. 1750 zamiast 1940
             );
         }
         if (deckArea) {
