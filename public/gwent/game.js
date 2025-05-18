@@ -299,25 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `<div class="name">${card.nazwa}</div>`;
 
-            // Wylicz ile tej karty jest już w talii
-            let countInDeck = 0;
-            if (Array.isArray(deck)) {
-                countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-            }
-            // Wylicz ile zostało w kolekcji
-            const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-
-            // Dodaj tekst tylko jeśli karta ma pole ilosc
-            if (typeof card.ilosc === 'number') {
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            // DeckArea: pokazuj liczbę kopii w talii (iloscWTalii)
+            // Licznik ilości kart - tylko JEDEN licznik w zależności od widoku
             if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                // W talii: pokazuj tylko liczbę kart w talii
                 html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
             } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                // W kolekcji: pokazuj ile zostało do dodania
                 let countInDeck = 0;
                 if (Array.isArray(deck)) {
                     countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
