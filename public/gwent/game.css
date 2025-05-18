@@ -140,7 +140,7 @@ body {
     left: 18%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 400%; /* 44px przy 524px szerokości karty, skaluje się z kartą */
+    font-size: 340%; /* 44px przy 524px szerokości karty, skaluje się z kartą */
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
