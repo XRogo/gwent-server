@@ -325,6 +325,11 @@ document.addEventListener('DOMContentLoaded', () => {
             cardElement.innerHTML = html;
             area.appendChild(cardElement);
 
+            const iloscLayer = document.createElement('img');
+            iloscLayer.className = 'ilosc-layer';
+            iloscLayer.src = 'assets/ilosc.webp'; // ścieżka do pliku
+            cardElement.appendChild(iloscLayer);
+
             cardElement.addEventListener('mouseover', () => {
                 if (hoverSound) {
                     hoverSound.currentTime = 0;

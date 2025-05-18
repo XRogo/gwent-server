@@ -1772,7 +1772,7 @@ const cards = [
     {
         nazwa: "Wiedzma: Kuchta",
         karta: "/gwent/assets/karty/potwory/wiedzma_kuchta.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/410.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
