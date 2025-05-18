@@ -137,10 +137,10 @@ body {
 .card-area .card .points {
     position: absolute;
     top: 8%;
-    left: 12%;
+    left: 15%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 200%; /* 44px przy 524px szerokości karty, skaluje się z kartą */
+    font-size: 220%; /* 44px przy 524px szerokości karty, skaluje się z kartą */
     color: #fff;
     z-index: 13;
     transform: translate(-50%, -50%);
