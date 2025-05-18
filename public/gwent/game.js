@@ -114,33 +114,32 @@ document.addEventListener('DOMContentLoaded', () => {
  
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
             const COLS = 3;
-            const ROWS = 3;
+            // Odstęp 35px względem tła (4K)
             const GAP_X = (35 / 3840) * backgroundWidth;
-            const GAP_Y = (35 / 2160) * backgroundHeight;
 
+            // Szerokość karty: 3 karty + 2 odstępy = areaWidth
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
-            const cardHeight = (areaHeight - 2 * GAP_Y) / ROWS;
 
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
             area.style.height = `${areaHeight}px`;
+            area.style.maxHeight = `${areaHeight}px`;
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.overflowY = 'auto';
-            area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+            area.style.gap = `0px ${GAP_X}px`;
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
-                card.style.height = `${cardHeight}px`;
-                card.style.flex = `0 0 ${cardWidth}px`;
                 card.style.margin = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
+                card.style.flex = `0 0 ${cardWidth}px`;
+                card.style.height = 'auto'; // wysokość ustala aspect-ratio w CSS
                 card.style.maxWidth = `${cardWidth}px`;
-                card.style.maxHeight = `${cardHeight}px`;
             });
         }
 
