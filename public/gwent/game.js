@@ -314,10 +314,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // DeckArea: pokazuj liczbę kopii w talii (iloscWTalii)
             if (area === deckArea && typeof card.iloscWTalii === 'number') {
+                // W talii: pokazuj tylko liczbę kart w talii
                 html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            }
-            // CollectionArea: pokazuj ile zostało w kolekcji
-            else if (area === collectionArea && typeof card.ilosc === 'number') {
+            } else if (area === collectionArea && typeof card.ilosc === 'number') {
+                // W kolekcji: pokazuj ile zostało do dodania
                 let countInDeck = 0;
                 if (Array.isArray(deck)) {
                     countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
