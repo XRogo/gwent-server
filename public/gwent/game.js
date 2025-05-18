@@ -506,6 +506,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Pobierz audio
+    // const hoverSound = document.getElementById('hoverSound');
+
+    // Funkcja do odtwarzania dźwięku (resetuje jeśli już gra)
+    function playHoverSound() {
+        if (!hoverSound) return;
+        hoverSound.currentTime = 0;
+        hoverSound.play();
+    }
+
+    // Najechanie na kartę
+    document.addEventListener('mouseover', function(e) {
+        if (e.target.classList.contains('card')) {
+            playHoverSound();
+        }
+    });
+
+    // Zmiana strony (przy kliknięciu na .page-left lub .page-right)
+    document.querySelectorAll('.page-left, .page-right, .page-dot').forEach(btn => {
+        btn.addEventListener('click', playHoverSound);
+    });
+
     updatePage();
     updateStats();
 });
