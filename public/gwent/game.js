@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const COLS = 3;
             const GAP_X = (35 / 3840) * backgroundWidth;
             const GAP_Y = (35 / 2160) * backgroundHeight;
-
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
             area.style.left = `${areaLeft}px`;
@@ -124,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.width = `${areaWidth}px`;
             area.style.height = `${areaHeight}px`;
             area.style.maxHeight = `${areaHeight}px`;
-            area.style.overflowY = 'auto'; // <-- wymuś scroll
+            area.style.overflowY = 'auto';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
@@ -143,12 +142,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (collectionArea) {
+            const areaLeft = backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth;
+            const areaWidth = ((1560 - 366) / GUI_WIDTH) * backgroundWidth;
+            collectionArea.style.left = `${areaLeft}px`;
+            collectionArea.style.width = `${areaWidth}px`;
             updateCardArea(
                 collectionArea,
-                backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth,
+                areaLeft,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
-                ((1560 - 366) / GUI_WIDTH) * backgroundWidth,
-                (1940 / 2160) * backgroundHeight // <-- TO JEST DOBRZE!
+                areaWidth,
+                (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
         if (deckArea) {
@@ -157,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
                 ((3484 - 2290) / GUI_WIDTH) * backgroundWidth,
-                (1940 / 2160) * backgroundHeight // <-- TO JEST DOBRZE!
+                (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
 
