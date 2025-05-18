@@ -577,3 +577,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(map.values());
     }
 });
+
+window.addEventListener('DOMContentLoaded', () => {
+    const fade = document.getElementById('fadeScreen');
+    if (fade) {
+        setTimeout(() => {
+            fade.style.opacity = '0';
+            setTimeout(() => fade.style.display = 'none', 600);
+        }, 50);
+    }
+});
