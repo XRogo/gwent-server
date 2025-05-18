@@ -312,6 +312,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
             }
 
+            // DeckArea: pokazuj liczbę kopii w talii (iloscWTalii)
+            if (area === deckArea && typeof card.iloscWTalii === 'number') {
+                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
+            }
+            // CollectionArea: pokazuj ile zostało w kolekcji
+            else if (area === collectionArea && typeof card.ilosc === 'number') {
+                let countInDeck = 0;
+                if (Array.isArray(deck)) {
+                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                }
+                const available = card.ilosc - countInDeck;
+                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
+            }
+
             if (isLargeView) {
                 html += `<div class="description">${card.opis || ''}</div>`;
             }
