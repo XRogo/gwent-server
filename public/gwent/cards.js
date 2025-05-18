@@ -88,7 +88,7 @@ const cards = [
     {
         nazwa: "Skelligijski sztorm",
         karta: "/gwent/assets/karty/niezalerzne/skelligijski_sztorm.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/008.webp",
         opis: '"To nie jest zwykła burza. To gniew bogów."',
         bohater: false,
         moc: "sztorm",
@@ -116,7 +116,7 @@ const cards = [
     {
         nazwa: "Geralt z Rivi",
         karta: "/gwent/assets/karty/niezalerzne/geralt_z_rivi.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/009.webp",
         opis: '"Jeżeli mam wybierać pomiędzy jednym złem a drugim, to wole nie wybierać wcale."',
         bohater: true,
         moc: "wezwanie",
@@ -131,7 +131,7 @@ const cards = [
     {
         nazwa: "Ciri",
         karta: "/gwent/assets/karty/ciri.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/010.webp",
         opis: '"Wiesz, kiedy bajki przestają być bajkami? Kiedy ludzie zaczynają w nie wierzyć."',
         bohater: true,
         moc: "wezwanie",
@@ -146,7 +146,7 @@ const cards = [
     {
         nazwa: "Yennefer z Vengerbergu",
         karta: "/gwent/assets/niezalerzne/yenneder_z_vengerbergu.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/011.webp",
         opis: '"Odziana w kompozycje czerni i bieli, przywodziła na myśl grudniowy poranek".',
         bohater: true,
         moc: "medyk",
@@ -160,7 +160,7 @@ const cards = [
     {
         nazwa: "Triss Merigold",
         karta: "/gwent/assets/niezalerzne/triss_merigold.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/012.webp",
         opis: '"Potrafię o siebie zadbać. Wierz mi"',
         bohater: true,
         frakcja: "nie",
@@ -173,7 +173,7 @@ const cards = [
     {
         nazwa: "Villentretenmerth",
         karta: "/gwent/assets/karty/niezalerzne/villentretenmerth.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/013.webp",
         opis: '"Było w tym stworzeniu coś pełnego niewysławionej gracji".',
         bohater: false,
         moc: "iporz",
@@ -187,7 +187,7 @@ const cards = [
     {
         nazwa: "Vesemir",
         karta: "/gwent/assets/karty/niezalerzne/vesemir.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/014.webp",
         opis: '"Gdy cie mają wieszać, poproś o wode. Nie wiadomo co może sie zdarzyć zanim przyniosą".',
         bohater: false,
         frakcja: "nie",
@@ -200,7 +200,7 @@ const cards = [
     {
         nazwa: "Olgierd von Everec",
         karta: "/gwent/assets/karty/niezalerzne/olgierd_von_everec.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/014.webp",
         opis: '"Teraz przynajmniej wiesz, że łatwo nie trace głowy"',
         bohater: false,
         moc: "morale",
@@ -214,7 +214,7 @@ const cards = [
     {
         nazwa: "Zoltan Chivay",
         karta: "/gwent/assets/karty/niezalerzne/zoltan_chivay.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/016.webp",
         opis: '"Lubie czynić dobro. Zwłaszcza dla siebie i mego bezpośredniego otocznia"',
         bohater: false,
         frakcja: "nie",
@@ -227,7 +227,7 @@ const cards = [
     {
         nazwa: "Emiel Regis Rohellec Terzieff",
         karta: "/gwent/assets/karty/niezalerzne/emirl_regis_rohellec_terzieff.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/017.webp",
         opis: '"Uchodzę, delikatnie mówiąc, za potwora. Za krwiożercze monstrum".',
         bohater: false,
         frakcja: "nie",
@@ -240,7 +240,7 @@ const cards = [
     {
         nazwa: "Guanter O'Dim: Cień",
         karta: "/gwent/assets/karty/niezalerzne/gaunter_o'dim_cien.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/018.webp",
         opis: '"Bój sie nie ciemnosci, a światła"',
         bohater: false,
         moc: "wezwanie",
@@ -255,7 +255,7 @@ const cards = [
     {
         nazwa: "Guanter O'Dim",
         karta: "/gwent/assets/karty/niezalerzne/gaunter_o'dim.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/019.webp",
         opis: "Życzenia twe zawsze spełni z ochotą, da ci brylant i srebro, i złoto",
         bohater: false,
         moc: "wezwanie",
@@ -270,7 +270,7 @@ const cards = [
     {
         nazwa: "Płotka",
         karta: "/gwent/assets/niezalerzne/plotka.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/020.webp",
         opis: "Płotka! Potrzebuję cie!",
         bohater: false,
         frakcja: "nie",
@@ -283,7 +283,7 @@ const cards = [
     {
         nazwa: "Jaskier",
         karta: "/gwent/assets/karty/niezalerzne/jaskier.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/021.webp",
         opis: '"Julian Alfred Pankratz wicehrabia de Lettenhove. Dla przyjaciół - Jaskier".',
         bohater: false,
         moc: "rog",
@@ -297,7 +297,7 @@ const cards = [
     {
         nazwa: "Tajemniczy elf",
         karta: "/gwent/assets/karty/niezalerzne/tajemniczy_elf.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/022.webp",
         opis: '"WORK."',
         bohater: true,
         moc: "szpieg",
@@ -311,7 +311,7 @@ const cards = [
     {
         nazwa: "Krowa",
         karta: "/gwent/assets/karty/niezalerzne/krowa.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/1/023.webp",
         opis: '"Muuu!"',
         bohater: false,
         moc: "wezwarniezza",
