@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 collectionArea,
                 backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
-                (1560 / GUI_WIDTH) * backgroundWidth,
+                ((1560 - 366) / GUI_WIDTH) * backgroundWidth, // <-- poprawka!
                 (1940 / GUI_HEIGHT) * backgroundHeight
             );
         }
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deckArea,
                 backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
-                (1194 / GUI_WIDTH) * backgroundWidth, // 3484-2290=1194
+                ((3484 - 2290) / GUI_WIDTH) * backgroundWidth, // <-- poprawka!
                 (1940 / GUI_HEIGHT) * backgroundHeight
             );
         }
