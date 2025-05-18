@@ -551,9 +551,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Funkcja do odtwarzania dźwięku (resetuje jeśli już gra)
     function playHoverSound() {
-        if (!hoverSound) return;
-        hoverSound.currentTime = 0;
-        hoverSound.play();
+        // Tworzy nowy obiekt Audio za każdym razem, więc dźwięki się nakładają
+        const sound = new Audio('assets/klik.mp3');
+        sound.play().catch(()=>{});
     }
 
     // Najechanie na kartę
