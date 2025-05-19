@@ -118,6 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_Y = (35 / 2160) * backgroundHeight;
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
+            console.log('cardWidth', cardWidth, 'areaWidth', areaWidth, 'GAP_X', GAP_X);
+
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
