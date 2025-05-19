@@ -82,9 +82,8 @@ body {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    overflow-x: hidden !important; /* blokuje scroll w poziomie */
+    overflow-x: visible !important; /* pozwól na wychodzenie na boki */
     overflow-y: auto;
-    clip-path: inset(0px 0px 40px 0px); /* 40px od dołu, reszta 0 */
     max-height: 100%; /* JS ustawia dokładną wysokość */
     -ms-overflow-style: none;
     scrollbar-width: none;
