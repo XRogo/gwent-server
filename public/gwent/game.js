@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-            area.style.padding = `${GAP_Y * 2}px ${GAP_X * 2}px 0 ${GAP_X * 2}px`;
+            area.style.padding = `${GAP_Y + 20}px ${GAP_X + 20}px 0 ${GAP_X + 20}px`;
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
