@@ -353,13 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
             iloscLayer.className = 'ilosc-layer';
             iloscLayer.src = 'assets/dkarty/ilosc.webp'; // ścieżka do pliku
             cardElement.appendChild(iloscLayer);
-
-            cardElement.addEventListener('mouseover', () => {
-                if (hoverSound) {
-                    hoverSound.currentTime = 0;
-                    hoverSound.play();
-                }
-            });
         });
 
         updatePositionsAndScaling();
