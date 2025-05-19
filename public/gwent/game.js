@@ -143,25 +143,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (collectionArea) {
-            const areaLeft = backgroundLeft + (346 / GUI_WIDTH) * backgroundWidth;
-            const areaWidth = ((1580 - 346) / GUI_WIDTH) * backgroundWidth;
+            const areaLeft = backgroundLeft + (346 / GUI_WIDTH) * backgroundWidth - 20;
+            const areaWidth = ((1580 - 346) / GUI_WIDTH) * backgroundWidth + 40;
             collectionArea.style.left = `${areaLeft}px`;
             collectionArea.style.width = `${areaWidth}px`;
             updateCardArea(
                 collectionArea,
                 areaLeft,
-                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
+                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight - 20,
                 areaWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight // wysokość
+                (1470 / GUI_HEIGHT) * backgroundHeight + 20 // wysokość
             );
         }
         if (deckArea) {
+            const areaLeft = backgroundLeft + (2270 / GUI_WIDTH) * backgroundWidth - 20;
+            const areaWidth = ((3504 - 2270) / GUI_WIDTH) * backgroundWidth + 40;
             updateCardArea(
                 deckArea,
-                backgroundLeft + (2270 / GUI_WIDTH) * backgroundWidth,
-                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
-                ((3504 - 2270) / GUI_WIDTH) * backgroundWidth,
-                (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
+                areaLeft,
+                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight - 20,
+                areaWidth,
+                (1940 / GUI_HEIGHT) * backgroundHeight + 20
             );
         }
 
