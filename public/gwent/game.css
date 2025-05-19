@@ -341,4 +341,8 @@ body {
     object-fit: contain;
     transition: opacity 0.2s;
     opacity: 1;
+    display: block;
+    /* Dodane tło i ramka do testów, możesz usunąć */
+    /* border: 2px solid red; */
+    /* background: rgba(255,0,0,0.1); */
 }
