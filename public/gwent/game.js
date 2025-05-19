@@ -118,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_Y = (35 / 2160) * backgroundHeight;
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
-            // Dodajemy padding taki jak gap, ale dodatkowo +gap z lewej, prawej i góry
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
@@ -130,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-            area.style.padding = `${GAP_Y + 20}px ${GAP_X + 20}px 0 ${GAP_X + 20}px`;
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
@@ -145,27 +143,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (collectionArea) {
-            const areaLeft = backgroundLeft + (346 / GUI_WIDTH) * backgroundWidth - 20;
-            const areaWidth = ((1580 - 346) / GUI_WIDTH) * backgroundWidth + 40;
+            const areaLeft = backgroundLeft + (346 / GUI_WIDTH) * backgroundWidth;
+            const areaWidth = ((1580 - 346) / GUI_WIDTH) * backgroundWidth;
             collectionArea.style.left = `${areaLeft}px`;
             collectionArea.style.width = `${areaWidth}px`;
             updateCardArea(
                 collectionArea,
                 areaLeft,
-                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight - 20,
+                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
                 areaWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight + 20 // wysokość
+                (1470 / GUI_HEIGHT) * backgroundHeight // wysokość
             );
         }
         if (deckArea) {
-            const areaLeft = backgroundLeft + (2270 / GUI_WIDTH) * backgroundWidth - 20;
-            const areaWidth = ((3504 - 2270) / GUI_WIDTH) * backgroundWidth + 40;
             updateCardArea(
                 deckArea,
-                areaLeft,
-                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight - 20,
-                areaWidth,
-                (1940 / GUI_HEIGHT) * backgroundHeight + 20
+                backgroundLeft + (2270 / GUI_WIDTH) * backgroundWidth,
+                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
+                ((3504 - 2270) / GUI_WIDTH) * backgroundWidth,
+                (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
 
