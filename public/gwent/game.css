@@ -82,7 +82,7 @@ body {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    overflow-x: visible !important; /* pozwól na wychodzenie na boki */
+    overflow-x: hidden !important; /* blokuje scroll w poziomie */
     overflow-y: auto;
     max-height: 100%; /* JS ustawia dokładną wysokość */
     -ms-overflow-style: none;
@@ -111,6 +111,7 @@ body {
     font-size: 44px; /* bazowy rozmiar dla 524px szerokości karty */
     font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
     z-index: auto;
+    overflow: visible !important; /* POZWÓL NA WYCHODZENIE WARSTW POZA KARTĘ */
 }
 
 .card-area .card .card-hover-bg {
