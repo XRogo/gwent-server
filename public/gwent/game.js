@@ -550,8 +550,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Najechanie na kartę
     document.addEventListener('mouseover', function(e) {
+        // Dodajemy poświatę tylko jeśli nie istnieje
         if (e.target.classList.contains('card')) {
-            // Dodaj podświetlenie pod kartę
             if (!e.target.querySelector('.card-hover-bg')) {
                 const hoverBg = document.createElement('img');
                 hoverBg.className = 'card-hover-bg';
@@ -562,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Usuwanie podświetlenia po zjechaniu myszką
+    // Usuwanie poświaty po zjechaniu myszką
     document.addEventListener('mouseout', function(e) {
         if (e.target.classList.contains('card')) {
             const hoverBg = e.target.querySelector('.card-hover-bg');
