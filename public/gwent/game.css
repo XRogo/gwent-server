@@ -77,9 +77,11 @@ body {
 
 .card-area {
     position: absolute;
-    width: 100vw;
-    height: 100%;
-    padding: 0;
+    left: -20px;
+    top: -20px;
+    width: calc(100vw + 40px);
+    height: calc(100% + 20px);
+    padding: 0 20px 0 20px;
     margin: 0;
     box-sizing: border-box;
     overflow-x: hidden !important; /* blokuje scroll w poziomie */
@@ -114,6 +116,7 @@ body {
     font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
     z-index: auto;
     overflow: visible !important; /* POZWÓL NA WYCHODZENIE WARSTW POZA KARTĘ */
+    margin-top: 20px;
 }
 
 .card-area .card .card-hover-bg {
