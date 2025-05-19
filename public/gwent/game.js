@@ -344,6 +344,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (card.bohater) {
                     html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
                 }
+                // Dodaj warstwę poświaty, ale domyślnie ukrytą (będzie pokazywana na hover przez JS)
+                html += `<img src="assets/podsw.webp" class="card-hover-bg" style="display:none;z-index:0;">`;
             }
 
             cardElement.innerHTML = html;
