@@ -108,8 +108,6 @@ body {
     background-size: cover;
     background-position: center;
     aspect-ratio: 524 / 993;
-    font-size: 44px; /* bazowy rozmiar dla 524px szerokości karty */
-    font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
     z-index: auto;
     overflow: visible !important; /* POZWÓL NA WYCHODZENIE WARSTW POZA KARTĘ */
 }
