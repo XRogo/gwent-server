@@ -118,8 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_Y = (35 / 2160) * backgroundHeight;
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
-            console.log('cardWidth', cardWidth, 'areaWidth', areaWidth, 'GAP_X', GAP_X);
-
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
@@ -131,12 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-
-            // Dodaj padding z góry i boków taki jak gap
-            area.style.paddingTop = `${GAP_Y}px`;
-            area.style.paddingLeft = `${GAP_X}px`;
-            area.style.paddingRight = `${GAP_X}px`;
-            area.style.paddingBottom = `0px`; // od dołu nie dodajemy
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
@@ -151,8 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (collectionArea) {
-            const areaLeft = backgroundLeft + (331 / GUI_WIDTH) * backgroundWidth;
-            const areaWidth = ((1591 - 331) / GUI_WIDTH) * backgroundWidth;
+            const areaLeft = backgroundLeft + (346 / GUI_WIDTH) * backgroundWidth;
+            const areaWidth = ((1580 - 346) / GUI_WIDTH) * backgroundWidth;
             collectionArea.style.left = `${areaLeft}px`;
             collectionArea.style.width = `${areaWidth}px`;
             updateCardArea(
@@ -166,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deckArea) {
             updateCardArea(
                 deckArea,
-                backgroundLeft + (2255 / GUI_WIDTH) * backgroundWidth,
+                backgroundLeft + (2270 / GUI_WIDTH) * backgroundWidth,
                 backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
-                ((3519 - 2270) / GUI_WIDTH) * backgroundWidth,
+                ((3504 - 2270) / GUI_WIDTH) * backgroundWidth,
                 (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
