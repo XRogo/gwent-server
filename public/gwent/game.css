@@ -82,18 +82,17 @@ body {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    overflow-x: hidden !important; /* blokuje scroll w poziomie */
+    overflow-x: hidden !important;
     overflow-y: auto;
     max-height: 100%;
     -ms-overflow-style: none;
     scrollbar-width: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0; /* gap ustawiamy z JS */
+    gap: 0;
     align-content: flex-start;
     justify-content: flex-start;
-    /* Dodaj clipping tylko od dołu, a boki i góra widoczne */
-    clip-path: inset(0px -100vw 40px 0px); /* pozwól wychodzić na prawo */
+    clip-path: inset(0px -100vw 40px -100vw); /* pozwól wychodzić na boki i górę, ucina od dołu */
 }
 
 .card-area::-webkit-scrollbar {
@@ -107,9 +106,9 @@ body {
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
-    aspect-ratio: 524 / 993;
     z-index: auto;
-    overflow: visible !important; /* POZWÓL NA WYCHODZENIE WARSTW POZA KARTĘ */
+    overflow: visible !important;
+    /* aspect-ratio usunięte, JS ustawia rozmiar */
 }
 
 .card-area .card .card-hover-bg {
@@ -151,20 +150,29 @@ body {
 }
 
 .card-area .card .ilosc-layer {
-    z-index: 5 !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 5 !important; /* nad beton/bbeton, pod punkty i inne ikony */
+    pointer-events: none; /* żeby nie blokowało interakcji */
 }
 
-.card-area .card .name {
+.card-area .card .name,
+.card-area .card .points,
+.card-area .card .description,
+.card-area .card .ilosc-text {
     z-index: 11 !important;
     position: absolute;
-    left: 21.76%;   /* 114/524 */
-    width: 76.34%;  /* (515-114)/524 */
-    top: 76%;       /* 754/993 */
+    left: 21.76%;
+    width: 76.34%;
+    top: 76%;
     text-align: center;
-    font-size: 1.2em; /* 1em = 44px przy 524px szerokości karty */
+    font-size: 1em !important; /* JS ustawia font-size */
     color: #333;
     font-weight: bold;
-    z-index: 11;
     white-space: normal;
     word-break: break-word;
     line-height: 1.1;
@@ -179,9 +187,8 @@ body {
     left: 14.5%;
     width: 23.61%;
     height: 8.84%;
-    font-size: 220%; /* 44px przy 524px szerokości karty, skaluje się z kartą */
+    font-size: 1em !important; /* JS ustawia font-size */
     color: #fff;
-    z-index: 13;
     transform: translate(-50%, -50%);
     display: flex;
     justify-content: center;
@@ -196,7 +203,6 @@ body {
     width: 59.160305%;
     height: 31.017121%;
     object-fit: contain;
-    z-index: 12;
 }
 
 .card-area .card .description {
@@ -205,7 +211,7 @@ body {
     left: 3%;
     width: 92.129771%;
     height: 7.653575%;
-    font-size: 3.435115%;
+    font-size: 1em !important; /* JS ustawia font-size */
     color: #333333;
     text-align: center;
     display: none;
