@@ -111,20 +111,6 @@ body {
     font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
 }
 
-.card-area .card .card-hover-bg { z-index: 0; }
-.card-area .card .card-image { z-index: 1; }
-.card-area .card .beton { z-index: 2; }
-.card-area .card .faction-banner { z-index: 3; }
-.card-area .card .points-bg { z-index: 4; }
-.card-area .card .ilosc-layer { z-index: 5; }
-.card-area .card .position-icon { z-index: 6; }
-.card-area .card .description { z-index: 7; }
-.card-area .card .power-icon { z-index: 10; }
-.card-area .card .hero-icon { z-index: 12; }
-.card-area .card .name { z-index: 11; }
-.card-area .card .points { z-index: 13; }
-.card-area .card .ilosc-text { z-index: 20; }
-
 .card-area .card .card-image,
 .card-area .card .beton,
 .card-area .card .faction-banner,
@@ -343,7 +329,7 @@ body {
     top: -1.1%;
     width: 140%;
     height: 102.2%;
-    z-index: 200;
+    z-index: 0; /* NAJNIŻSZA warstwa w .card */
     pointer-events: none;
     object-fit: contain;
     opacity: 1;
