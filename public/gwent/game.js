@@ -344,8 +344,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (card.bohater) {
                     html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
                 }
-                // Dodaj warstwę poświaty, ale domyślnie ukrytą (będzie pokazywana na hover przez JS)
-                html += `<img src="assets/dkarty/podsw.webp" class="card-hover-bg" style="display:none;z-index:0;">`;
             }
 
             cardElement.innerHTML = html;
@@ -355,6 +353,18 @@ document.addEventListener('DOMContentLoaded', () => {
             iloscLayer.className = 'ilosc-layer';
             iloscLayer.src = 'assets/dkarty/ilosc.webp'; // ścieżka do pliku
             cardElement.appendChild(iloscLayer);
+
+            const hoverBg = document.createElement('img');
+            hoverBg.className = 'card-hover-bg';
+            hoverBg.src = 'assets/podsw.webp';
+            hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
+            hoverBg.style.position = 'absolute';
+            hoverBg.style.left = '-20%';
+            hoverBg.style.top = '-1.1%';
+            hoverBg.style.width = '140%';
+            hoverBg.style.height = '102.2%';
+            hoverBg.style.pointerEvents = 'none';
+            cardElement.appendChild(hoverBg);
         });
 
         updatePositionsAndScaling();
@@ -552,9 +562,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Najechanie na kartę
     document.addEventListener('mouseover', function(e) {
+        // Dodajemy poświatę tylko jeśli nie istnieje
         if (e.target.classList.contains('card')) {
-            const hoverBg = e.target.querySelector('.card-hover-bg');
-            if (hoverBg) hoverBg.style.display = 'block';
+            if (!e.target.querySelector('.card-hover-bg')) {
+                const hoverBg = document.createElement('img');
+                hoverBg.className = 'card-hover-bg';
+                hoverBg.src = 'assets/podsw.webp';
+                hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
+                hoverBg.style.position = 'absolute';
+                hoverBg.style.left = '-20%';
+                hoverBg.style.top = '-1.1%';
+                hoverBg.style.width = '140%';
+                hoverBg.style.height = '102.2%';
+                hoverBg.style.pointerEvents = 'none';
+                e.target.appendChild(hoverBg);
+            }
             playHoverSound();
         }
     });
@@ -563,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseout', function(e) {
         if (e.target.classList.contains('card')) {
             const hoverBg = e.target.querySelector('.card-hover-bg');
-            if (hoverBg) hoverBg.style.display = 'none';
+            if (hoverBg) hoverBg.remove();
         }
     });
 
