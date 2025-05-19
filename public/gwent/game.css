@@ -109,6 +109,19 @@ body {
     aspect-ratio: 524 / 993;
     font-size: 44px; /* bazowy rozmiar dla 524px szerokości karty */
     font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
+    z-index: auto;
+}
+
+.card-area .card .card-hover-bg {
+    position: absolute;
+    left: -20%;
+    top: -1.1%;
+    width: 140%;
+    height: 102.2%;
+    z-index: 0;
+    pointer-events: none;
+    object-fit: contain;
+    opacity: 1;
 }
 
 .card-area .card .card-image,
@@ -321,16 +334,4 @@ body {
     opacity: 1;
     pointer-events: none;
     transition: opacity 0.5s ease;
-}
-
-.card-area .card .card-hover-bg {
-    position: absolute;
-    left: -20%;
-    top: -1.1%;
-    width: 140%;
-    height: 102.2%;
-    z-index: 0; /* NAJNIŻSZA warstwa w .card */
-    pointer-events: none;
-    object-fit: contain;
-    opacity: 1;
 }
