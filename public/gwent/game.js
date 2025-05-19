@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const hoverBg = document.createElement('img');
             hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/podsw.webp';
+            hoverBg.src = 'assets/dkarty/podsw.webp';
             hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
             hoverBg.style.position = 'absolute';
             hoverBg.style.left = '-20%';
