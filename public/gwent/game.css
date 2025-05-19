@@ -322,7 +322,7 @@ body {
 
 #fadeScreen {
     position: fixed;
-    z-index: 9999;
+    z-index: 0;
     left: 0; top: 0; width: 100vw; height: 100vh;
     background: radial-gradient(ellipse at center, #111 0%, #000 100%);
     opacity: 1;
