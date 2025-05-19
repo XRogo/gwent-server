@@ -558,13 +558,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Najechanie na kartę
     document.addEventListener('mouseover', function(e) {
         if (e.target.classList.contains('card')) {
+            // Dodaj podświetlenie pod kartę
+            if (!e.target.querySelector('.card-hover-bg')) {
+                const hoverBg = document.createElement('img');
+                hoverBg.className = 'card-hover-bg';
+                hoverBg.src = 'assets/podsw.webp';
+                e.target.insertBefore(hoverBg, e.target.firstChild);
+            }
             playHoverSound();
         }
     });
 
-    // Zmiana strony (przy kliknięciu na .page-left lub .page-right)
-    document.querySelectorAll('.page-left, .page-right, .page-dot').forEach(btn => {
-        btn.addEventListener('click', playHoverSound);
+    // Usuwanie podświetlenia po zjechaniu myszką
+    document.addEventListener('mouseout', function(e) {
+        if (e.target.classList.contains('card')) {
+            const hoverBg = e.target.querySelector('.card-hover-bg');
+            if (hoverBg) hoverBg.remove();
+        }
     });
 
     updatePage();

@@ -329,3 +329,16 @@ body {
     pointer-events: none;
     transition: opacity 0.5s ease;
 }
+
+.card-area .card .card-hover-bg {
+    position: absolute;
+    left: -7%;
+    top: -10.4%;
+    width: 120%;
+    height: 120%;
+    z-index: 0;
+    pointer-events: none;
+    object-fit: contain;
+    transition: opacity 0.2s;
+    opacity: 1;
+}
