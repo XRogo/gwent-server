@@ -124,20 +124,30 @@ body {
     opacity: 1;
 }
 
-.card-area .card .card-image,
-.card-area .card .beton,
-.card-area .card .faction-banner,
-.card-area .card .position-icon,
-.card-area .card .points-bg,
-.card-area .card .power-icon {
+.card-area .card .card-image {
     position: absolute;
+    z-index: 2;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-size: contain;
     background-repeat: no-repeat;
-    z-index: 1;
+}
+
+.card-area .card .beton,
+.card-area .card .faction-banner,
+.card-area .card .position-icon,
+.card-area .card .points-bg,
+.card-area .card .power-icon {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .card-area .card .points {
