@@ -552,14 +552,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Najechanie na kartę
     document.addEventListener('mouseover', function(e) {
-        // Dodajemy poświatę tylko jeśli nie istnieje
         if (e.target.classList.contains('card')) {
-            if (!e.target.querySelector('.card-hover-bg')) {
-                const hoverBg = document.createElement('img');
-                hoverBg.className = 'card-hover-bg';
-                hoverBg.src = 'assets/podsw.webp';
-                e.target.insertBefore(hoverBg, e.target.firstChild);
-            }
+            const hoverBg = e.target.querySelector('.card-hover-bg');
+            if (hoverBg) hoverBg.style.display = 'block';
             playHoverSound();
         }
     });
@@ -568,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseout', function(e) {
         if (e.target.classList.contains('card')) {
             const hoverBg = e.target.querySelector('.card-hover-bg');
-            if (hoverBg) hoverBg.remove();
+            if (hoverBg) hoverBg.style.display = 'none';
         }
     });
 
