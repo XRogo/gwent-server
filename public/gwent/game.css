@@ -82,7 +82,7 @@ body {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    overflow-x: visible;
+    overflow-x: visible !important; /* pozwól na wychodzenie na boki */
     overflow-y: auto;
     max-height: 100%; /* JS ustawia dokładną wysokość */
     -ms-overflow-style: none;
@@ -92,9 +92,6 @@ body {
     gap: 0; /* gap ustawiamy z JS */
     align-content: flex-start;
     justify-content: flex-start;
-    /* POZWÓL NA WYCHODZENIE POŚWIATY/BOHATERA POZA GÓRĘ, LEWO, PRAWO */
-    clip-path: inset(0px 0px 0px 0px);
-    /* overflow-x: visible; overflow-y: auto; już powyżej */
 }
 
 .card-area::-webkit-scrollbar {
