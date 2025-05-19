@@ -118,7 +118,7 @@ body {
     top: -1.1%;
     width: 140%;
     height: 102.2%;
-    z-index: 0;
+    z-index: 0 !important;
     pointer-events: none;
     object-fit: contain;
     opacity: 1;
@@ -126,7 +126,7 @@ body {
 
 .card-area .card .card-image {
     position: absolute;
-    z-index: 2;
+    z-index: 2 !important;
     top: 0;
     left: 0;
     width: 100%;
@@ -141,7 +141,7 @@ body {
 .card-area .card .points-bg,
 .card-area .card .power-icon {
     position: absolute;
-    z-index: 3;
+    z-index: 3 !important;
     top: 0;
     left: 0;
     width: 100%;
@@ -150,7 +150,30 @@ body {
     background-repeat: no-repeat;
 }
 
+.card-area .card .ilosc-layer {
+    z-index: 5 !important;
+}
+
+.card-area .card .name {
+    z-index: 11 !important;
+    position: absolute;
+    left: 21.76%;   /* 114/524 */
+    width: 76.34%;  /* (515-114)/524 */
+    top: 76%;       /* 754/993 */
+    text-align: center;
+    font-size: 1.2em; /* 1em = 44px przy 524px szerokości karty */
+    color: #333;
+    font-weight: bold;
+    z-index: 11;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.1;
+    padding: 0 4px;
+    transform: none;
+}
+
 .card-area .card .points {
+    z-index: 13 !important;
     position: absolute;
     top: 7.8%;
     left: 14.5%;
@@ -166,6 +189,7 @@ body {
 }
 
 .card-area .card .hero-icon {
+    z-index: 12 !important;
     position: absolute;
     top: -1.912386%;
     left: -4.389313%;
@@ -173,23 +197,6 @@ body {
     height: 31.017121%;
     object-fit: contain;
     z-index: 12;
-}
-
-.card-area .card .name {
-    position: absolute;
-    left: 21.76%;   /* 114/524 */
-    width: 76.34%;  /* (515-114)/524 */
-    top: 76%;       /* 754/993 */
-    text-align: center;
-    font-size: 1.2em; /* 1em = 44px przy 524px szerokości karty */
-    color: #333;
-    font-weight: bold;
-    z-index: 11;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.1;
-    padding: 0 4px;
-    transform: none;
 }
 
 .card-area .card .description {
@@ -318,7 +325,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    z-index: 5; /* nad beton/bbeton, pod punkty i inne ikony */
+    z-index: 5 !important; /* nad beton/bbeton, pod punkty i inne ikony */
     pointer-events: none; /* żeby nie blokowało interakcji */
 }
 
