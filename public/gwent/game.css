@@ -99,7 +99,16 @@ body {
 
 .card-area .card {
     position: relative;
-    /* NIE ustawiaj tu z-index! */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+    aspect-ratio: 524 / 993;
+    font-size: 44px; /* bazowy rozmiar dla 524px szerokości karty */
+    font-size: calc(100vw / 12); /* 524/44 ≈ 12 */
 }
 
 .card-area .card .card-hover-bg { z-index: 0; }
