@@ -130,6 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
 
+            // Dodaj padding z góry i boków taki jak gap
+            area.style.paddingTop = `${GAP_Y}px`;
+            area.style.paddingLeft = `${GAP_X}px`;
+            area.style.paddingRight = `${GAP_X}px`;
+            area.style.paddingBottom = `0px`; // od dołu nie dodajemy
+
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
                 card.style.margin = '0';
