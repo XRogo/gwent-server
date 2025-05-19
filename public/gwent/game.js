@@ -113,26 +113,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
  
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
-            const COLS = 3;
-            const GAP_X = (35 / 3840) * backgroundWidth;
-            const GAP_Y = (35 / 2160) * backgroundHeight;
-            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
-
-            area.style.left = `${areaLeft}px`;
-            area.style.top = `${areaTop}px`;
-            area.style.width = `${areaWidth}px`;
-            area.style.height = `${areaHeight}px`;
-            area.style.maxHeight = `${areaHeight}px`;
+            // Dodajemy marginesy na górze, lewo i prawo (20px), nie zmieniamy areaHeight
+            const MARGIN = 20;
+            area.style.left = `${areaLeft - MARGIN}px`;
+            area.style.top = `${areaTop - MARGIN}px`;
+            area.style.width = `${areaWidth + 2 * MARGIN}px`;
+            area.style.height = `${areaHeight + MARGIN}px`;
+            area.style.maxHeight = `${areaHeight + MARGIN}px`;
             area.style.overflowY = 'auto';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
-            area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+            // gap zostaje jak było
 
             area.querySelectorAll('.card').forEach(card => {
-                card.style.width = `${cardWidth}px`;
-                card.style.margin = '0';
+                card.style.margin = `${MARGIN}px ${MARGIN}px 0 ${MARGIN}px`;
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
                 card.style.flex = `0 0 ${cardWidth}px`;
