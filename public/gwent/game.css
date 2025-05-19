@@ -332,10 +332,10 @@ body {
 
 .card-area .card .card-hover-bg {
     position: absolute;
-    left: -20%;
-    top: -1.1%;
-    width: 140%;
-    height: 102.2%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     z-index: 0;
     pointer-events: none;
     object-fit: contain;
