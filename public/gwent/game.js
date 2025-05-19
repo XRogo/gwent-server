@@ -113,22 +113,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
  
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
-            // Dodajemy marginesy na górze, lewo i prawo (20px), nie zmieniamy areaHeight
-            const MARGIN = 20;
-            area.style.left = `${areaLeft - MARGIN}px`;
-            area.style.top = `${areaTop - MARGIN}px`;
-            area.style.width = `${areaWidth + 2 * MARGIN}px`;
-            area.style.height = `${areaHeight + MARGIN}px`;
-            area.style.maxHeight = `${areaHeight + MARGIN}px`;
+            const COLS = 3;
+            const GAP_X = (35 / 3840) * backgroundWidth;
+            const GAP_Y = (35 / 2160) * backgroundHeight;
+            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
+
+            area.style.left = `${areaLeft}px`;
+            area.style.top = `${areaTop}px`;
+            area.style.width = `${areaWidth}px`;
+            area.style.height = `${areaHeight}px`;
+            area.style.maxHeight = `${areaHeight}px`;
             area.style.overflowY = 'auto';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
-            // gap zostaje jak było
+            area.style.gap = `${GAP_Y}px ${GAP_X}px`;
 
             area.querySelectorAll('.card').forEach(card => {
-                card.style.margin = `${MARGIN}px ${MARGIN}px 0 ${MARGIN}px`;
+                card.style.width = `${cardWidth}px`;
+                card.style.margin = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
                 card.style.flex = `0 0 ${cardWidth}px`;
@@ -139,24 +143,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (collectionArea) {
-            const areaLeft = backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth;
-            const areaWidth = ((1560 - 366) / GUI_WIDTH) * backgroundWidth;
+            const areaLeft = backgroundLeft + (346 / GUI_WIDTH) * backgroundWidth;
+            const areaWidth = ((1580 - 346) / GUI_WIDTH) * backgroundWidth;
             collectionArea.style.left = `${areaLeft}px`;
             collectionArea.style.width = `${areaWidth}px`;
             updateCardArea(
                 collectionArea,
                 areaLeft,
-                backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
+                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
                 areaWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight // np. 1750 zamiast 1940
+                (1470 / GUI_HEIGHT) * backgroundHeight // wysokość
             );
         }
         if (deckArea) {
             updateCardArea(
                 deckArea,
-                backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
-                backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
-                ((3484 - 2290) / GUI_WIDTH) * backgroundWidth,
+                backgroundLeft + (2270 / GUI_WIDTH) * backgroundWidth,
+                backgroundTop + (471 / GUI_HEIGHT) * backgroundHeight,
+                ((3504 - 2270) / GUI_WIDTH) * backgroundWidth,
                 (1940 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
             );
         }
