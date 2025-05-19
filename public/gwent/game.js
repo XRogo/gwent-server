@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_Y = (35 / 2160) * backgroundHeight;
             const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
+            // Dodajemy padding taki jak gap, ale dodatkowo +gap z lewej, prawej i góry
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-            area.style.padding = `${GAP_Y}px ${GAP_X}px 0 ${GAP_X}px`;
+            area.style.padding = `${GAP_Y * 2}px ${GAP_X * 2}px 0 ${GAP_X * 2}px`;
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
