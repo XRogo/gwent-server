@@ -116,23 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const COLS = 3;
             const GAP_X = (35 / 3840) * backgroundWidth;
             const GAP_Y = (35 / 2160) * backgroundHeight;
+            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
-            // Dodajemy dodatkową przerwę od lewej i prawej (GAP_X), od góry (GAP_Y)
-            area.style.left = `${areaLeft + GAP_X}px`;
-            area.style.top = `${areaTop + GAP_Y}px`;
-            area.style.width = `${areaWidth - 2 * GAP_X}px`;
-            area.style.height = `${areaHeight - GAP_Y}px`;
-            area.style.maxHeight = `${areaHeight - GAP_Y}px`;
-
+            area.style.left = `${areaLeft}px`;
+            area.style.top = `${areaTop}px`;
+            area.style.width = `${areaWidth}px`;
+            area.style.height = `${areaHeight}px`;
+            area.style.maxHeight = `${areaHeight}px`;
             area.style.overflowY = 'auto';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-
-            // Przelicznik do skalowania kart
-            const cardWidth = ((areaWidth - 2 * GAP_X) / COLS - GAP_X) * CARD_SCALE;
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
