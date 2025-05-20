@@ -116,13 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const COLS = 3;
             const GAP_X = (35 / 3840) * backgroundWidth;
             const GAP_Y = (35 / 2160) * backgroundHeight;
-            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
-            area.style.left = `${areaLeft}px`;
-            area.style.top = `${areaTop}px`;
-            area.style.width = `${areaWidth}px`;
-            area.style.height = `${areaHeight}px`;
-            area.style.maxHeight = `${areaHeight}px`;
+            // Dodajemy dodatkową przerwę od lewej i prawej (GAP_X), od góry (GAP_Y)
+            area.style.left = `${areaLeft + GAP_X}px`;
+            area.style.top = `${areaTop + GAP_Y}px`;
+            area.style.width = `${areaWidth - 2 * GAP_X}px`;
+            area.style.height = `${areaHeight - GAP_Y}px`;
+            area.style.maxHeight = `${areaHeight - GAP_Y}px`;
+
             area.style.overflowY = 'auto';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
@@ -130,15 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
 
+            // Przelicznik do skalowania kart
+            const totalGaps = COLS + 1;
+            const availableWidth = areaWidth - totalGaps * GAP_X;
+            const cardWidth = (availableWidth / COLS) * CARD_SCALE;
+            const cardMargin = (GAP_X * (1 - CARD_SCALE)) / 2;
+
+            // Ustaw marginesy boczne, żeby karty były wycentrowane w "przegródkach"
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
-                card.style.margin = '0';
+                card.style.marginLeft = `${GAP_X / 2}px`;
+                card.style.marginRight = `${GAP_X / 2}px`;
+                card.style.marginTop = '0';
+                card.style.marginBottom = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
                 card.style.flex = `0 0 ${cardWidth}px`;
                 card.style.height = 'auto';
                 card.style.maxWidth = `${cardWidth}px`;
-                card.style.fontSize = `${cardWidth / 12}px`; // 524/44 ≈ 12
+                card.style.fontSize = `${cardWidth / 12}px`;
             });
         }
 
