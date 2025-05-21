@@ -116,11 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const COLS = 3;
             const GAP_X = (35 / 3840) * backgroundWidth;
             const GAP_Y = (35 / 2160) * backgroundHeight;
-            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
+            // Dodajemy gap po lewej i prawej stronie (np. 35px w przeliczeniu na skalę)
+            const SIDE_GAP = GAP_X; // gap taki sam jak między kartami
+            const cardWidth = (areaWidth - 2 * SIDE_GAP - (COLS - 1) * GAP_X) / COLS;
 
-            area.style.left = `${areaLeft}px`;
+            area.style.left = `${areaLeft + SIDE_GAP}px`;
             area.style.top = `${areaTop}px`;
-            area.style.width = `${areaWidth}px`;
+            area.style.width = `${areaWidth - 2 * SIDE_GAP}px`;
             area.style.height = `${areaHeight}px`;
             area.style.maxHeight = `${areaHeight}px`;
             area.style.overflowY = 'auto';
@@ -138,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.flex = `0 0 ${cardWidth}px`;
                 card.style.height = 'auto';
                 card.style.maxWidth = `${cardWidth}px`;
-                card.style.fontSize = `${cardWidth / 12}px`; // 524/44 ≈ 12
+                card.style.fontSize = `${cardWidth / 12}px`;
             });
         }
 
