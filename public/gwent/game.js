@@ -114,54 +114,57 @@ document.addEventListener('DOMContentLoaded', () => {
  
         function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
             const COLS = 3;
+            const ROWS = 3;
+            // Odstęp 35px względem 4K tła
             const GAP_X = (35 / 3840) * backgroundWidth;
             const GAP_Y = (35 / 2160) * backgroundHeight;
-            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
+
+            // Szerokość i wysokość karty tak, by 3 karty + 2 odstępy mieściły się w obszarze
+            let cardWidth = (areaWidth - 2 * GAP_X) / COLS;
+            let cardHeight = (areaHeight - 2 * GAP_Y) / ROWS;
+
+            // Twarde ograniczenie: nie pozwól, by suma szerokości i odstępów przekroczyła areaWidth
+            cardWidth = Math.max(0, Math.min(cardWidth, areaWidth / COLS));
+            cardHeight = Math.max(0, Math.min(cardHeight, areaHeight / ROWS));
 
             area.style.left = `${areaLeft}px`;
             area.style.top = `${areaTop}px`;
             area.style.width = `${areaWidth}px`;
             area.style.height = `${areaHeight}px`;
-            area.style.maxHeight = `${areaHeight}px`;
-            area.style.overflowY = 'auto';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
+            area.style.overflowY = 'auto';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
 
+            // Ustaw rozmiar każdej karty
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
+                card.style.height = `${cardHeight}px`;
                 card.style.margin = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
-                card.style.flex = `0 0 ${cardWidth}px`;
-                card.style.height = 'auto';
-                card.style.maxWidth = `${cardWidth}px`;
-                card.style.fontSize = `${cardWidth / 12}px`; // 524/44 ≈ 12
+                card.style.flex = `0 0 auto`;
             });
         }
 
         if (collectionArea) {
-            const areaLeft = backgroundLeft + (331 / GUI_WIDTH) * backgroundWidth;
-            const areaWidth = ((1597 - 331) / GUI_WIDTH) * backgroundWidth;
-            collectionArea.style.left = `${areaLeft}px`;
-            collectionArea.style.width = `${areaWidth}px`;
             updateCardArea(
                 collectionArea,
-                areaLeft,
-                backgroundTop + (457 / GUI_HEIGHT) * backgroundHeight,
-                areaWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight // wysokość
+                backgroundLeft + (366 / GUI_WIDTH) * backgroundWidth,
+                backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
+                (1560 / GUI_WIDTH) * backgroundWidth,
+                (1940 / GUI_HEIGHT) * backgroundHeight
             );
         }
         if (deckArea) {
             updateCardArea(
                 deckArea,
-                backgroundLeft + (2255 / GUI_WIDTH) * backgroundWidth,
-                backgroundTop + (457 / GUI_HEIGHT) * backgroundHeight,
-                ((3519 - 2255) / GUI_WIDTH) * backgroundWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
+                backgroundLeft + (2290 / GUI_WIDTH) * backgroundWidth,
+                backgroundTop + (491 / GUI_HEIGHT) * backgroundHeight,
+                (1194 / GUI_WIDTH) * backgroundWidth, // 3484-2290=1194
+                (1940 / GUI_HEIGHT) * backgroundHeight
             );
         }
 
@@ -258,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
             area.removeChild(area.firstChild);
         }
 
-        let filteredCards = cardList.filter(card => {
+        const filteredCards = cardList.filter(card => {
             if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
             if (filter === 'all') return true;
             if (filter === 'miecz') return card.pozycja === 1;
@@ -270,139 +273,74 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         });
 
-        // DODAJ TO: ukryj karty z ilością 0 w kolekcji
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+        filteredCards.forEach(card => {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+
+            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
+            if (card.nazwa === "Bies" && playerFaction !== "4") {
+                bannerFaction = playerFaction;
+            }
+
+            let html = `
+                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
+                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
+                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
+            `;
+
+            html += `<div class="name">${card.nazwa}</div>`;
+
+            if (isLargeView) {
+                html += `<div class="description">${card.opis || ''}</div>`;
+            }
+
+            if (!card.isKing) {
+                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+
+                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
+                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
                 }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
 
-        // Dodaj przerwa.webp po lewej i prawej stronie każdego rzędu
-        const ROWS = Math.ceil(filteredCards.length / 3);
-        for (let row = 0; row < ROWS; row++) {
-            // Dodaj przerwę po lewej
-            const leftSpacer = document.createElement('img');
-            leftSpacer.src = 'assets/dkarty/przerwa.webp';
-            leftSpacer.style.width = '35px';
-            leftSpacer.style.height = '35px';
-            leftSpacer.style.flex = '0 0 35px';
-            leftSpacer.style.margin = '0';
-            leftSpacer.style.padding = '0';
-            leftSpacer.style.display = 'inline-block';
-            area.appendChild(leftSpacer);
+                if (card.punkty !== undefined) {
+                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
+                }
 
-            // Dodaj 3 karty w tym rzędzie
-            for (let col = 0; col < 3; col++) {
-                const idx = row * 3 + col;
-                if (idx < filteredCards.length) {
-                    const card = filteredCards[idx];
-                    const cardElement = document.createElement('div');
-                    cardElement.className = 'card';
-
-                    let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-                    if (card.nazwa === "Bies" && playerFaction !== "4") {
-                        bannerFaction = playerFaction;
+                if (card.moc) {
+                    const powerImage = getPowerImage(card);
+                    if (powerImage) {
+                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
                     }
+                }
 
-                    let html = `
-                        <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                        <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                        <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-                    `;
-
-                    html += `<div class="name">${card.nazwa}</div>`;
-
-                    // Licznik ilości kart - tylko JEDEN licznik w zależności od widoku
-                    if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                        html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-                    } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                        let countInDeck = 0;
-                        if (Array.isArray(deck)) {
-                            countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                        }
-                        const available = card.ilosc - countInDeck;
-                        html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
+                if (card.pozycja && !isWeatherCard) {
+                    if (card.pozycja === 4 && !card.moc) {
+                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
+                    } else {
+                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
                     }
+                }
 
-                    if (isLargeView) {
-                        html += `<div class="description">${card.opis || ''}</div>`;
-                    }
-
-                    if (!card.isKing) {
-                        const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                        if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                            html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                        }
-
-                        if (card.punkty !== undefined) {
-                            html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                        }
-
-                        if (card.moc) {
-                            const powerImage = getPowerImage(card);
-                            if (powerImage) {
-                                html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                            }
-                        }
-
-                        if (card.pozycja && !isWeatherCard) {
-                            if (card.pozycja === 4 && !card.moc) {
-                                html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                            } else {
-                                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                            }
-                        }
-
-                        if (card.bohater) {
-                            html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                        }
-                    }
-
-                    cardElement.innerHTML = html;
-                    area.appendChild(cardElement);
-
-                    const iloscLayer = document.createElement('img');
-                    iloscLayer.className = 'ilosc-layer';
-                    iloscLayer.src = 'assets/dkarty/ilosc.webp'; // ścieżka do pliku
-                    cardElement.appendChild(iloscLayer);
-
-                    const hoverBg = document.createElement('img');
-                    hoverBg.className = 'card-hover-bg';
-                    hoverBg.src = 'assets/dkarty/podsw.webp';
-                    hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
-                    hoverBg.style.position = 'absolute';
-                    hoverBg.style.left = '-20%';
-                    hoverBg.style.top = '-1.1%';
-                    hoverBg.style.width = '140%';
-                    hoverBg.style.height = '102.2%';
-                    hoverBg.style.pointerEvents = 'none';
-                    cardElement.appendChild(hoverBg);
+                if (card.bohater) {
+                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
                 }
             }
-            // Dodaj przerwę po prawej
-            const rightSpacer = document.createElement('img');
-            rightSpacer.src = 'assets/dkarty/przerwa.webp';
-            rightSpacer.style.width = '35px';
-            rightSpacer.style.height = '35px';
-            rightSpacer.style.flex = '0 0 35px';
-            rightSpacer.style.margin = '0';
-            rightSpacer.style.padding = '0';
-            rightSpacer.style.display = 'inline-block';
-            area.appendChild(rightSpacer);
-        }
+
+            cardElement.innerHTML = html;
+            area.appendChild(cardElement);
+
+            cardElement.addEventListener('mouseover', () => {
+                if (hoverSound) {
+                    hoverSound.currentTime = 0;
+                    hoverSound.play();
+                }
+            });
+        });
 
         updatePositionsAndScaling();
     }
 
     function displayDeck() {
-        const grouped = groupDeck(deck);
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped);
+        displayCards('all', deckArea, factions[currentPage - 1].id, deck);
     }
 
     function displayCollection(filter) {
@@ -457,12 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const specialCount = deck.filter(c => typeof c.punkty !== 'number').length;
                         if ((isUnitCard && unitCount < 22) || (!isUnitCard && specialCount < 10)) {
                             deck.push({ ...card });
-                            if (addCardSound) {
-                                addCardSound.currentTime = 0;
-                                addCardSound.play().catch(()=>{});
-                            }
                             displayDeck();
-                            displayCollection('all');
                             updateStats();
                         } else {
                             alert('Osiągnięto limit kart w talii.');
@@ -483,12 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const index = deck.findIndex(c => c.nazwa === cardName);
                 if (index !== -1) {
                     deck.splice(index, 1);
-                    if (removeCardSound) {
-                        removeCardSound.currentTime = 0;
-                        removeCardSound.play().catch(()=>{});
-                    }
                     displayDeck();
-                    displayCollection('all');
                     updateStats();
                 }
             }
@@ -581,73 +509,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Pobierz audio
-    // const hoverSound = document.getElementById('hoverSound');
-
-    // Funkcja do odtwarzania dźwięku klikania, pozwala na nakładanie się dźwięków
-    function playHoverSound() {
-        const sound = new Audio('assets/klik.mp3');
-        sound.play().catch(()=>{});
-    }
-
-    // Najechanie na kartę
-    document.addEventListener('mouseover', function(e) {
-        // Dodajemy poświatę tylko jeśli nie istnieje
-        if (e.target.classList.contains('card')) {
-            if (!e.target.querySelector('.card-hover-bg')) {
-                const hoverBg = document.createElement('img');
-                hoverBg.className = 'card-hover-bg';
-                hoverBg.src = 'assets/podsw.webp';
-                hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
-                hoverBg.style.position = 'absolute';
-                hoverBg.style.left = '-20%';
-                hoverBg.style.top = '-1.1%';
-                hoverBg.style.width = '140%';
-                hoverBg.style.height = '102.2%';
-                hoverBg.style.pointerEvents = 'none';
-                e.target.appendChild(hoverBg);
-            }
-            playHoverSound();
-        }
-    });
-
-    // Usuwanie poświaty po zjechaniu myszką
-    document.addEventListener('mouseout', function(e) {
-        if (e.target.classList.contains('card')) {
-            const hoverBg = e.target.querySelector('.card-hover-bg');
-            if (hoverBg) hoverBg.remove();
-        }
-    });
-
     updatePage();
     updateStats();
-
-    function groupDeck(deck) {
-        const grouped = [];
-        const map = new Map();
-        deck.forEach(card => {
-            if (!map.has(card.nazwa)) {
-                const count = deck.filter(c => c.nazwa === card.nazwa).length;
-                if (count > 0) { // tylko jeśli są w talii
-                    map.set(card.nazwa, { ...card, iloscWTalii: count });
-                }
-            }
-        });
-        return Array.from(map.values());
-    }
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-    const fade = document.getElementById('fadeScreen');
-    const joinSound = document.getElementById('joinSound');
-    if (joinSound) {
-        joinSound.currentTime = 0;
-        joinSound.play().catch(()=>{});
-    }
-    if (fade) {
-        setTimeout(() => {
-            fade.style.opacity = '0';
-            setTimeout(() => fade.style.display = 'none', 600);
-        }, 50);
-    }
 });
