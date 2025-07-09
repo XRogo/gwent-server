@@ -437,13 +437,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const countInDeck = deck.filter(c => c.numer === card.numer).length;
                     if (countInDeck < card.ilosc) {
                         const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-                        // SUMUJ wszystkie pogodowe w talii (blokuj przy próbie dodania 11.)
-                        const weatherCount = deck.filter(c => ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc)).length;
-                        if (isWeather) {
-                            console.log('Pogodowych w talii:', weatherCount, 'Dodajesz:', card.nazwa, card.moc);
+                        // SUMUJ wszystkie karty specjalne z limitem 10
+                        const specialLimitTypes = ['mroz', 'mgla', 'deszcz', 'sztorm', 'rog', 'porz', 'manek'];
+                        const isSpecialLimited = specialLimitTypes.includes(card.moc);
+                        const specialCount = deck.filter(c => specialLimitTypes.includes(c.moc)).length;
+                        if (isSpecialLimited) {
+                            console.log('Specjalnych w talii:', specialCount, 'Dodajesz:', card.nazwa, card.moc);
                         }
-                        if (isWeather && weatherCount >= 10) {
-                            alert('Możesz mieć maksymalnie 10 kart pogodowych w talii!');
+                        if (isSpecialLimited && specialCount >= 10) {
+                            alert('Możesz mieć maksymalnie 10 kart specjalnych (mroz, mgla, deszcz, sztorm, rog, porzoga, manekin) w talii!');
                             return;
                         }
                         deck.push({ ...card });
