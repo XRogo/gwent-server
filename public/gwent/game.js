@@ -432,14 +432,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardElement = event.target.closest('.card');
             if (cardElement) {
                 const cardName = cardElement.querySelector('.name').textContent;
-                const card = cards.find(c => c.nazwa === cardName);
+                // Pobierz numer karty z obrazka (unikalny dla duplikatów)
+                const cardObj = Array.from(cards).find(c => c.nazwa === cardName && cardElement.querySelector('.card-image').style.backgroundImage.includes(c.dkarta));
+                const card = cardObj || cards.find(c => c.nazwa === cardName);
                 if (card) {
-                    const countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                    const countInDeck = deck.filter(c => c.nazwa === card.nazwa && c.numer === card.numer).length;
                     if (countInDeck < card.ilosc) {
                         const isUnitCard = typeof card.punkty === 'number';
-                        const unitCount = deck.filter(c => typeof c.punkty === 'number').length;
-                        const specialCount = deck.filter(c => typeof c.punkty !== 'number').length;
-                        // Usuwamy limit 22 kart jednostek i 10 specjalnych, zostaje tylko limit minimalny przy przejściu do gry
+                        const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+                        const weatherCount = deck.filter(c => ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc)).length;
+                        if (isWeather && weatherCount >= 10) {
+                            alert('Możesz mieć maksymalnie 10 kart pogodowych w talii!');
+                            return;
+                        }
                         deck.push({ ...card });
                         if (addCardSound) {
                             addCardSound.currentTime = 0;
@@ -607,14 +612,49 @@ document.addEventListener('DOMContentLoaded', () => {
         const grouped = [];
         const map = new Map();
         deck.forEach(card => {
-            if (!map.has(card.nazwa)) {
-                const count = deck.filter(c => c.nazwa === card.nazwa).length;
-                if (count > 0) { // tylko jeśli są w talii
-                    map.set(card.nazwa, { ...card, iloscWTalii: count });
+            const key = card.nazwa + '|' + (card.numer || '');
+            if (!map.has(key)) {
+                const count = deck.filter(c => c.nazwa === card.nazwa && c.numer === card.numer).length;
+                if (count > 0) {
+                    map.set(key, { ...card, iloscWTalii: count });
                 }
             }
         });
         return Array.from(map.values());
+    }
+
+    if (collectionArea) {
+        collectionArea.addEventListener('click', (event) => {
+            const cardElement = event.target.closest('.card');
+            if (cardElement) {
+                const cardName = cardElement.querySelector('.name').textContent;
+                // Pobierz numer karty z obrazka (unikalny dla duplikatów)
+                const cardObj = Array.from(cards).find(c => c.nazwa === cardName && cardElement.querySelector('.card-image').style.backgroundImage.includes(c.dkarta));
+                const card = cardObj || cards.find(c => c.nazwa === cardName);
+                if (card) {
+                    const countInDeck = deck.filter(c => c.nazwa === card.nazwa && c.numer === card.numer).length;
+                    if (countInDeck < card.ilosc) {
+                        const isUnitCard = typeof card.punkty === 'number';
+                        const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+                        const weatherCount = deck.filter(c => ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc)).length;
+                        if (isWeather && weatherCount >= 10) {
+                            alert('Możesz mieć maksymalnie 10 kart pogodowych w talii!');
+                            return;
+                        }
+                        deck.push({ ...card });
+                        if (addCardSound) {
+                            addCardSound.currentTime = 0;
+                            addCardSound.play().catch(()=>{});
+                        }
+                        displayDeck();
+                        displayCollection('all');
+                        updateStats();
+                    } else {
+                        alert('Nie ma więcej kopii tej karty do dodania.');
+                    }
+                }
+            }
+        });
     }
 });
 
