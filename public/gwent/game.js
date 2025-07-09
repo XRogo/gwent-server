@@ -253,12 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayDeck() {
         const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
         displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
     }
 
     function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
         displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
     }
 
@@ -314,8 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
             } else if (area === collectionArea && typeof card.ilosc === 'number') {
                 let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (Array.isArray(deckArg)) {
+                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
                 }
                 const available = card.ilosc - countInDeck;
                 html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
@@ -382,1035 +380,258 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayDeck() {
         const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
         displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
     }
 
     function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
         displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
     }
 
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
+    function updateStats() {
+        if (!stats) return;
 
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
-        }
+        const totalCards = deck.length;
+        const unitCards = deck.filter(card => typeof card.punkty === 'number').length;
+        const specialCards = totalCards - unitCards;
+        const totalStrength = deck.reduce((sum, card) => sum + (typeof card.punkty === 'number' ? card.punkty : 0), 0);
+        const heroCards = deck.filter(card => card.bohater).length;
 
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
+        const totalCardsEl = stats.querySelector('.total-cards');
+        const unitCardsEl = stats.querySelector('.unit-cards');
+        const specialCardsEl = stats.querySelector('.special-cards');
+        const totalStrengthEl = stats.querySelector('.total-strength');
+        const heroCardsEl = stats.querySelector('.hero-cards');
+
+        if (totalCardsEl) totalCardsEl.textContent = totalCards;
+        if (unitCardsEl) unitCardsEl.textContent = `${unitCards}/22`;
+        if (specialCardsEl) specialCardsEl.textContent = `${specialCards}/10`;
+        if (totalStrengthEl) totalStrengthEl.textContent = totalStrength;
+        if (heroCardsEl) heroCardsEl.textContent = heroCards;
+    }
+
+    const goToGameButton = document.getElementById('goToGameButton');
+    if (goToGameButton) {
+        goToGameButton.addEventListener('click', () => {
+            // Licz tylko karty walki (z punktami, ale nie pogodowe)
+            const unitCards = deck.filter(card => {
+                const isUnit = typeof card.punkty === 'number';
+                const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+                return isUnit && !isWeather;
+            }).length;
+            if (unitCards < 22) {
+                alert('Talia musi mieć co najmniej 22 karty walki (nie licząc pogodowych)!');
+                return;
+            }
+            if (cardSelectionScreen) cardSelectionScreen.style.display = 'none';
+            if (gameScreen) gameScreen.style.display = 'block';
         });
+    }
 
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
-
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
+    if (collectionArea) {
+        collectionArea.addEventListener('click', (event) => {
+            const cardElement = event.target.closest('.card');
+            if (cardElement) {
+                const cardName = cardElement.querySelector('.name').textContent;
+                const card = cards.find(c => c.nazwa === cardName);
+                if (card) {
+                    const countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                    if (countInDeck < card.ilosc) {
+                        const isUnitCard = typeof card.punkty === 'number';
+                        const unitCount = deck.filter(c => typeof c.punkty === 'number').length;
+                        const specialCount = deck.filter(c => typeof c.punkty !== 'number').length;
+                        if ((isUnitCard && unitCount < 22) || (!isUnitCard && specialCount < 10)) {
+                            deck.push({ ...card });
+                            if (addCardSound) {
+                                addCardSound.currentTime = 0;
+                                addCardSound.play().catch(()=>{});
+                            }
+                            displayDeck();
+                            displayCollection('all'); // odśwież kolekcję po dodaniu
+                            updateStats();
+                        } else {
+                            alert('Osiągnięto limit kart w talii.');
+                        }
                     } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+                        alert('Nie ma więcej kopii tej karty do dodania.');
                     }
                 }
+            }
+        });
+    }
 
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
+    if (deckArea) {
+        deckArea.addEventListener('click', (event) => {
+            const cardElement = event.target.closest('.card');
+            if (cardElement) {
+                const cardName = cardElement.querySelector('.name').textContent;
+                const index = deck.findIndex(c => c.nazwa === cardName);
+                if (index !== -1) {
+                    deck.splice(index, 1);
+                    if (removeCardSound) {
+                        removeCardSound.currentTime = 0;
+                        removeCardSound.play().catch(()=>{});
+                    }
+                    displayDeck();
+                    displayCollection('all'); // odśwież kolekcję po usunięciu
+                    updateStats();
                 }
             }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
         });
-
-        updatePositionsAndScaling();
     }
 
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
+    const pageLeft = document.querySelector('.page-left');
+    if (pageLeft) {
+        pageLeft.addEventListener('click', () => {
+            currentPage = (currentPage - 2 + factions.length) % factions.length + 1;
+            updatePage();
+        });
     }
 
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
+    const pageRight = document.querySelector('.page-right');
+    if (pageRight) {
+        pageRight.addEventListener('click', () => {
+            currentPage = currentPage % factions.length + 1;
+            updatePage();
+        });
     }
 
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
+    function updatePage() {
+        const faction = factions[currentPage - 1];
+        const factionName = document.querySelector('.faction-name');
+        const factionShield = document.querySelector('.faction-shield');
+        const factionAbility = document.querySelector('.faction-ability');
+        const leaderCard = document.querySelector('.leader-card');
 
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
+        if (factionName) factionName.textContent = faction.name;
+        if (factionShield) factionShield.src = faction.shield;
+        if (factionAbility) factionAbility.textContent = faction.ability;
+
+        pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
+
+        if (leaderCard) {
+            leaderCard.innerHTML = `<img src="assets/dkarty/lider_${faction.id}.webp" style="width: 100%; height: 100%;">`;
         }
 
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
+        const baseLeft = 1850;
+        const spacing = 26;
+        const topPosition = 208;
+        const overlay = document.querySelector('.overlay');
+        if (!overlay) return;
 
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
+        const overlayRect = overlay.getBoundingClientRect();
+        const overlayWidth = overlayRect.width;
+        const overlayHeight = overlayRect.height;
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+        let scale, backgroundLeft, backgroundTop;
+        if (windowAspectRatio > guiAspectRatio) {
+            scale = overlayHeight / GUI_HEIGHT;
+            backgroundLeft = overlayRect.left + (overlayWidth - (GUI_WIDTH * scale)) / 2;
+            backgroundTop = overlayRect.top;
+        } else {
+            scale = overlayWidth / GUI_WIDTH;
+            backgroundLeft = overlayRect.left;
+            backgroundTop = overlayRect.top + (overlayHeight - (GUI_HEIGHT * scale)) / 2;
+        }
+        const marginCompensation = (currentPage - 1) * (10 * scale);
+        const leftPosition = baseLeft + (currentPage - 1) * spacing - marginCompensation;
+        const pageIndicators = document.querySelector('.page-indicators');
+        if (pageIndicators) {
+            pageIndicators.style.left = `${backgroundLeft + leftPosition * scale}px`;
+            pageIndicators.style.top = `${backgroundTop + topPosition * scale}px`;
         }
 
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
+        document.querySelectorAll('.button.collection').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.button.deck').forEach(btn => btn.classList.remove('active'));
+        const btnCollectionAll = document.querySelector('.button.collection.all');
+        const btnDeckAll = document.querySelector('.button.deck.all');
+        if (btnCollectionAll) btnCollectionAll.classList.add('active');
+        if (btnDeckAll) btnDeckAll.classList.add('active');
+        displayCollection('all');
+        displayDeck();
+    }
 
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
+    document.querySelectorAll('.button').forEach(button => {
+        button.addEventListener('click', () => {
+            const area = button.classList.contains('collection') ? collectionArea : deckArea;
+            const section = button.classList.contains('collection') ? 'collection' : 'deck';
+            document.querySelectorAll(`.button.${section}`).forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            if (area === collectionArea) {
+                displayCollection(button.dataset.filter);
+            } else {
+                displayCards(button.dataset.filter, deckArea, factions[currentPage - 1].id, deck);
             }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                }
-            }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
         });
+    });
 
-        updatePositionsAndScaling();
+    // Pobierz audio
+    // const hoverSound = document.getElementById('hoverSound');
+
+    // Funkcja do odtwarzania dźwięku klikania, pozwala na nakładanie się dźwięków
+    function playHoverSound() {
+        const sound = new Audio('assets/klik.mp3');
+        sound.play().catch(()=>{});
     }
 
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
-    }
-
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
-    }
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
-
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
+    // Najechanie na kartę
+    document.addEventListener('mouseover', function(e) {
+        // Dodajemy poświatę tylko jeśli nie istnieje
+        if (e.target.classList.contains('card')) {
+            if (!e.target.querySelector('.card-hover-bg')) {
+                const hoverBg = document.createElement('img');
+                hoverBg.className = 'card-hover-bg';
+                hoverBg.src = 'assets/podsw.webp';
+                hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
+                hoverBg.style.position = 'absolute';
+                hoverBg.style.left = '-20%';
+                hoverBg.style.top = '-1.1%';
+                hoverBg.style.width = '140%';
+                hoverBg.style.height = '102.2%';
+                hoverBg.style.pointerEvents = 'none';
+                e.target.appendChild(hoverBg);
+            }
+            playHoverSound();
         }
+    });
 
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
-
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
+    // Usuwanie poświaty po zjechaniu myszką
+    document.addEventListener('mouseout', function(e) {
+        if (e.target.classList.contains('card')) {
+            const hoverBg = e.target.querySelector('.card-hover-bg');
+            if (hoverBg) hoverBg.remove();
         }
+    });
 
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
+    updatePage();
+    updateStats();
 
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
+    function groupDeck(deck) {
+        const grouped = [];
+        const map = new Map();
+        deck.forEach(card => {
+            if (!map.has(card.nazwa)) {
+                const count = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (count > 0) { // tylko jeśli są w talii
+                    map.set(card.nazwa, { ...card, iloscWTalii: count });
                 }
             }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
         });
-
-        updatePositionsAndScaling();
+        return Array.from(map.values());
     }
+});
 
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
+window.addEventListener('DOMContentLoaded', () => {
+    const fade = document.getElementById('fadeScreen');
+    const joinSound = document.getElementById('joinSound');
+    if (joinSound) {
+        joinSound.currentTime = 0;
+        joinSound.play().catch(()=>{});
     }
-
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
-    }
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
-
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
-        }
-
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
-
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
-
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                }
-            }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
-        });
-
-        updatePositionsAndScaling();
-    }
-
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
-    }
-
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
-    }
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
-
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
-        }
-
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
-
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
-
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                }
-            }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
-        });
-
-        updatePositionsAndScaling();
-    }
-
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
-    }
-
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
-    }
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
-
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
-        }
-
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
-
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
-
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                }
-            }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
-        });
-
-        updatePositionsAndScaling();
-    }
-
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
-    }
-
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
-    }
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
-
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
-        }
-
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
-
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
-
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                }
-            }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
-        });
-
-        updatePositionsAndScaling();
-    }
-
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
-    }
-
-    function displayCollection(filter) {
-        // Przekazujemy oryginalny deck jako deckArg do liczenia dostępnych kart
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
-    }
-
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
-        if (!area) return;
-
-        while (area.firstChild) {
-            area.removeChild(area.firstChild);
-        }
-
-        let filteredCards = cardList.filter(card => {
-            if (card.frakcja !== playerFaction && card.frakcja !== "nie") return false;
-            if (filter === 'all') return true;
-            if (filter === 'miecz') return card.pozycja === 1;
-            if (filter === 'luk') return card.pozycja === 2;
-            if (filter === 'oblezenie') return card.pozycja === 3;
-            if (filter === 'bohater') return card.bohater === true;
-            if (filter === 'pogoda') return ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-            if (filter === 'specjalne') return ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
-            return false;
-        });
-
-        if (area === collectionArea) {
-            filteredCards = filteredCards.filter(card => {
-                let countInDeck = 0;
-                if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
-                return available > 0;
-            });
-        }
-
-        filteredCards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-
-            let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-            if (card.nazwa === "Bies" && playerFaction !== "4") {
-                bannerFaction = playerFaction;
-            }
-
-            let html = `
-                <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
-                <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
-            `;
-
-            html += `<div class="name">${card.nazwa}</div>`;
-
-            // Licznik ilości kart
-            if (area === deckArea && typeof card.iloscWTalii === 'number') {
-                html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
-            } else if (area === collectionArea && typeof card.ilosc === 'number') {
-                let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
-                }
-                const available = card.ilosc - countInDeck;
-                html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
-            }
-
-            if (isLargeView) {
-                html += `<div class="description">${card.opis || ''}</div>`;
-            }
-
-            if (!card.isKing) {
-                const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-
-                if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
-                    html += `<div class="points-bg" style="background-image: url('assets/dkarty/punkty.webp');"></div>`;
-                }
-
-
-
-                if (card.punkty !== undefined) {
-                    html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
-                }
-
-                if (card.moc) {
-                    const powerImage = getPowerImage(card);
-                    if (powerImage) {
-                        html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-                    }
-                }
-
-                if (card.pozycja && !isWeatherCard) {
-                    if (card.pozycja === 4 && !card.moc) {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-                    } else {
-                        html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
-                    }
-                }
-
-                if (card.bohater) {
-                    html += `<img src="assets/dkarty/bohater.webp" class="hero-icon">`;
-                }
-            }
-
-            cardElement.innerHTML = html;
-            area.appendChild(cardElement);
-
-            const iloscLayer = document.createElement('img');
-            iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
-        });
-
-        updatePositionsAndScaling();
+    if (fade) {
+        setTimeout(() => {
+            fade.style.opacity = '0';
+            setTimeout(() => fade.style.display = 'none', 600);
+        }, 50);
     }
 });
