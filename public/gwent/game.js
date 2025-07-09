@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 addCardSound.play().catch(()=>{});
                             }
                             displayDeck();
-                            displayCollection('all');
+                            displayCollection('all'); // odśwież kolekcję po dodaniu
                             updateStats();
                         } else {
                             alert('Osiągnięto limit kart w talii.');
@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         removeCardSound.play().catch(()=>{});
                     }
                     displayDeck();
-                    displayCollection('all');
+                    displayCollection('all'); // odśwież kolekcję po usunięciu
                     updateStats();
                 }
             }
