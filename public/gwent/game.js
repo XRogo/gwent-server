@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `<div class="name">${card.nazwa}</div>`;
 
-            // Licznik ilości kart - tylko JEDEN licznik w zależności od widoku
+            // Licznik ilości kart
             if (area === deckArea && typeof card.iloscWTalii === 'number') {
                 html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
             } else if (area === collectionArea && typeof card.ilosc === 'number') {
@@ -351,13 +351,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const iloscLayer = document.createElement('img');
             iloscLayer.className = 'ilosc-layer';
-            iloscLayer.src = 'assets/dkarty/ilosc.webp'; // ścieżka do pliku
+            iloscLayer.src = 'assets/dkarty/ilosc.webp';
             cardElement.appendChild(iloscLayer);
 
             const hoverBg = document.createElement('img');
             hoverBg.className = 'card-hover-bg';
             hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200; // NAJWYŻSZA warstwa
+            hoverBg.style.zIndex = 200;
             hoverBg.style.position = 'absolute';
             hoverBg.style.left = '-20%';
             hoverBg.style.top = '-1.1%';
