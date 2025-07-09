@@ -438,26 +438,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (countInDeck < card.ilosc) {
                         const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
                         // SUMUJ wszystkie karty specjalne z limitem 10
-                        const specialLimitTypes = ['mroz', 'mgla', 'deszcz', 'sztorm', 'rog', 'porz', 'manek'];
+                        const specialLimitTypes = ['mroz', 'mgla', 'deszcz', 'sztorm', 'rog', 'porz', 'manek', 'niebo'];
                         const isSpecialLimited = specialLimitTypes.includes(card.moc);
                         const specialCount = deck.filter(c => specialLimitTypes.includes(c.moc)).length;
                         if (isSpecialLimited) {
                             console.log('Specjalnych w talii:', specialCount, 'Dodajesz:', card.nazwa, card.moc);
                         }
                         if (isSpecialLimited && specialCount >= 10) {
-                            alert('Możesz mieć maksymalnie 10 kart specjalnych (mroz, mgla, deszcz, sztorm, rog, porzoga, manekin) w talii!');
+                            alert('Możesz mieć maksymalnie 10 kart specjalnych (mroz, mgla, deszcz, sztorm, rog, porzoga, manekin, niebo) w talii!');
                             return;
                         }
-                        deck.push({ ...card });
-                        if (addCardSound) {
-                            addCardSound.currentTime = 0;
-                            addCardSound.play().catch(()=>{});
+                        // Poprawka: licz kopie po numerze, nie po nazwie
+                        const countInDeck = deck.filter(c => c.numer === card.numer).length;
+                        if (countInDeck < card.ilosc) {
+                            deck.push({ ...card });
+                            if (addCardSound) {
+                                addCardSound.currentTime = 0;
+                                addCardSound.play().catch(()=>{});
+                            }
+                            displayDeck();
+                            displayCollection('all');
+                            updateStats();
+                        } else {
+                            alert('Nie ma więcej kopii tej karty do dodania.');
                         }
-                        displayDeck();
-                        displayCollection('all');
-                        updateStats();
-                    } else {
-                        alert('Nie ma więcej kopii tej karty do dodania.');
                     }
                 }
             }
