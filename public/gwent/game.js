@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+            cardElement.setAttribute('data-numer', card.numer);
 
             let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
             if (card.nazwa === "Bies" && playerFaction !== "4") {
@@ -431,8 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
         collectionArea.addEventListener('click', (event) => {
             const cardElement = event.target.closest('.card');
             if (cardElement) {
-                const cardName = cardElement.querySelector('.name').textContent;
-                const card = cards.find(c => c.nazwa === cardName && cardElement.querySelector('.card-image').style.backgroundImage.includes(c.dkarta));
+                const cardNumer = cardElement.getAttribute('data-numer');
+                const card = cards.find(c => c.numer === cardNumer);
                 if (card) {
                     // SUMUJ wszystkie karty specjalne z limitem 10
                     const specialLimitTypes = ['mroz', 'mgla', 'deszcz', 'sztorm', 'rog', 'porz', 'manek', 'niebo'];
