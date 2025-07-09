@@ -432,11 +432,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardElement = event.target.closest('.card');
             if (cardElement) {
                 const cardName = cardElement.querySelector('.name').textContent;
+                // Pobierz numer karty z obiektu cards (po nazwie i pozycjach w DOM)
                 const card = cards.find(c => c.nazwa === cardName && cardElement.querySelector('.card-image').style.backgroundImage.includes(c.dkarta));
                 if (card) {
+                    // Sprawdź ile tej konkretnej karty (po numerze) jest już w talii
                     const countInDeck = deck.filter(c => c.numer === card.numer).length;
-                    if (countInDeck < card.ilosc) {
-                        // Limit pogodowych: max 10 (mroz, mgla, deszcz, sztorm, niebo)
+                    if (countInDeck < (typeof card.ilosc === 'number' ? card.ilosc : 1)) {
+                        // Limit pogodowych: suma wszystkich <= 10
                         const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
                         const weatherCount = deck.filter(c => ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc)).length;
                         if (isWeather && weatherCount >= 10) {
@@ -614,10 +616,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const grouped = [];
         const map = new Map();
         deck.forEach(card => {
-            if (!map.has(card.numer)) {
-                const count = deck.filter(c => c.numer === card.numer).length;
-                if (count > 0) {
-                    map.set(card.numer, { ...card, iloscWTalii: count });
+            if (!map.has(card.nazwa)) {
+                const count = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (count > 0) { // tylko jeśli są w talii
+                    map.set(card.nazwa, { ...card, iloscWTalii: count });
                 }
             }
         });
