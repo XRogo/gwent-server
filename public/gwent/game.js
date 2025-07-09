@@ -436,8 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (card) {
                     const countInDeck = deck.filter(c => c.numer === card.numer).length;
                     if (countInDeck < card.ilosc) {
-                        // Limit pogodowych: max 10 (suma wszystkich kart pogodowych)
                         const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+                        // SUMUJ wszystkie pogodowe w talii
                         const weatherCount = deck.filter(c => ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc)).length;
                         if (isWeather && weatherCount >= 10) {
                             alert('Możesz mieć maksymalnie 10 kart pogodowych w talii!');
@@ -614,10 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const grouped = [];
         const map = new Map();
         deck.forEach(card => {
-            if (!map.has(card.numer)) {
-                const count = deck.filter(c => c.numer === card.numer).length;
-                if (count > 0) {
-                    map.set(card.numer, { ...card, iloscWTalii: count });
+            if (!map.has(card.nazwa)) {
+                const count = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (count > 0) { // tylko jeśli są w talii
+                    map.set(card.nazwa, { ...card, iloscWTalii: count });
                 }
             }
         });
