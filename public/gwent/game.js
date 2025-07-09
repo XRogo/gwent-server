@@ -251,7 +251,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
 
-    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false) {
+    function displayDeck() {
+        const grouped = groupDeck(deck);
+        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
+    }
+
+    function displayCollection(filter) {
+        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
+    }
+
+    function displayCards(filter = 'all', area = collectionArea, playerFaction = "nie", cardList = cards, isLargeView = false, deckArg = deck) {
         if (!area) return;
 
         while (area.firstChild) {
@@ -270,12 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         });
 
-        // DODAJ TO: ukryj karty z ilością 0 w kolekcji
         if (area === collectionArea) {
             filteredCards = filteredCards.filter(card => {
                 let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (Array.isArray(deckArg)) {
+                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
                 }
                 const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
                 return available > 0;
@@ -304,8 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="ilosc-text">x${card.iloscWTalii}</div>`;
             } else if (area === collectionArea && typeof card.ilosc === 'number') {
                 let countInDeck = 0;
-                if (Array.isArray(deck)) {
-                    countInDeck = deck.filter(c => c.nazwa === card.nazwa).length;
+                if (Array.isArray(deckArg)) {
+                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
                 }
                 const available = card.ilosc - countInDeck;
                 html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
@@ -372,11 +380,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayDeck() {
         const grouped = groupDeck(deck);
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped);
+        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
     }
 
     function displayCollection(filter) {
-        displayCards(filter, collectionArea, factions[currentPage - 1].id);
+        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
     }
 
     function updateStats() {
