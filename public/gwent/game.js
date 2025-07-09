@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (area === collectionArea && typeof card.ilosc === 'number') {
                 let countInDeck = 0;
                 if (Array.isArray(deckArg)) {
-                    countInDeck = deckArg.filter(c => c.nazwa === card.nazwa).length;
+                    countInDeck = deckArg.filter(c => c.numer === card.numer).length;
                 }
                 const available = card.ilosc - countInDeck;
                 html += `<div class="ilosc-text">x${available > 0 ? available : 0}</div>`;
