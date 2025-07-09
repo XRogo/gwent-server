@@ -616,10 +616,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const grouped = [];
         const map = new Map();
         deck.forEach(card => {
-            if (!map.has(card.nazwa)) {
-                const count = deck.filter(c => c.nazwa === card.nazwa).length;
+            if (!map.has(card.numer)) {
+                const count = deck.filter(c => c.numer === card.numer).length;
                 if (count > 0) { // tylko jeśli są w talii
-                    map.set(card.nazwa, { ...card, iloscWTalii: count });
+                    map.set(card.numer, { ...card, iloscWTalii: count });
                 }
             }
         });
