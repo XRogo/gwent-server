@@ -435,12 +435,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cardNumer = cardElement.getAttribute('data-numer');
                 const card = cards.find(c => c.numer === cardNumer);
                 if (card) {
-                    // SUMUJ wszystkie karty specjalne z limitem 10
-                    const specialLimitTypes = ['mroz', 'mgla', 'deszcz', 'sztorm', 'rog', 'porz', 'manek', 'niebo'];
-                    const isSpecialLimited = specialLimitTypes.includes(card.moc);
-                    const specialCount = deck.filter(c => specialLimitTypes.includes(c.moc)).length;
+                    // SUMUJ wszystkie karty specjalne z limitem 10 (po numerach)
+                    const specialLimitNumbers = ['001','002','003','004','005','006','007','008','000'];
+                    const isSpecialLimited = specialLimitNumbers.includes(card.numer);
+                    const specialCount = deck.filter(c => specialLimitNumbers.includes(c.numer)).length;
                     if (isSpecialLimited && specialCount >= 10) {
-                        alert('Możesz mieć maksymalnie 10 kart specjalnych (mroz, mgla, deszcz, sztorm, rog, porzoga, manekin, niebo) w talii!');
+                        alert('Możesz mieć maksymalnie 10 kart specjalnych (pogodowe, manekin, róg, pożoga, grzybki) w talii!');
                         return;
                     }
                     // Licz kopie po numerze
