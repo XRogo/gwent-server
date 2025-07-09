@@ -439,18 +439,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         const isUnitCard = typeof card.punkty === 'number';
                         const unitCount = deck.filter(c => typeof c.punkty === 'number').length;
                         const specialCount = deck.filter(c => typeof c.punkty !== 'number').length;
-                        if ((isUnitCard && unitCount < 22) || (!isUnitCard && specialCount < 10)) {
-                            deck.push({ ...card });
-                            if (addCardSound) {
-                                addCardSound.currentTime = 0;
-                                addCardSound.play().catch(()=>{});
-                            }
-                            displayDeck();
-                            displayCollection('all'); // odśwież kolekcję po dodaniu
-                            updateStats();
-                        } else {
-                            alert('Osiągnięto limit kart w talii.');
+                        // Usuwamy limit 22 kart jednostek i 10 specjalnych, zostaje tylko limit minimalny przy przejściu do gry
+                        deck.push({ ...card });
+                        if (addCardSound) {
+                            addCardSound.currentTime = 0;
+                            addCardSound.play().catch(()=>{});
                         }
+                        displayDeck();
+                        displayCollection('all');
+                        updateStats();
                     } else {
                         alert('Nie ma więcej kopii tej karty do dodania.');
                     }
