@@ -404,8 +404,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const goToGameButton = document.getElementById('goToGameButton');
     if (goToGameButton) {
         goToGameButton.addEventListener('click', () => {
-            if (deck.length < 10) {
-                alert('Talia musi mieć co najmniej 10 kart!');
+            // Licz tylko karty walki (z punktami, ale nie pogodowe)
+            const unitCards = deck.filter(card => {
+                const isUnit = typeof card.punkty === 'number';
+                const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+                return isUnit && !isWeather;
+            }).length;
+            if (unitCards < 22) {
+                alert('Talia musi mieć co najmniej 22 karty walki (nie licząc pogodowych)!');
                 return;
             }
             if (cardSelectionScreen) cardSelectionScreen.style.display = 'none';
@@ -592,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePage();
     updateStats();
 
-    function groupDeck(deck) {
+    function groupDeck(deck) {ew
         const grouped = [];
         const map = new Map();
         deck.forEach(card => {
