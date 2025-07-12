@@ -64,7 +64,7 @@ function startTimer() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Możesz tu załadować deck z localStorage lub przekazać z lobby
+    // Odczytaj talię z localStorage
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
     renderUI();
     startTimer();

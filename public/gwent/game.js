@@ -413,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const goToGameButton = document.getElementById('goToGameButton');
     if (goToGameButton) {
         goToGameButton.addEventListener('click', () => {
+            localStorage.setItem('deck', JSON.stringify(deck));
             const fade = document.getElementById('fadeScreen');
             if (fade) {
                 fade.style.opacity = '1';
