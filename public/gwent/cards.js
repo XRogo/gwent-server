@@ -130,7 +130,7 @@ const cards = [
     
     {
         nazwa: "Ciri",
-        karta: "/gwent/assets/karty/ciri.webp",
+        karta: "/gwent/assets/karty/niezalerzne/ciri.webp",
         dkarta: "/gwent/assets/dkarty/1/010.webp",
         opis: '"Wiesz, kiedy bajki przestają być bajkami? Kiedy ludzie zaczynają w nie wierzyć."',
         bohater: true,
@@ -145,7 +145,7 @@ const cards = [
 
     {
         nazwa: "Yennefer z Vengerbergu",
-        karta: "/gwent/assets/niezalerzne/yenneder_z_vengerbergu.webp",
+        karta: "/gwent/assets/karty/niezalerzne/yenneder_z_vengerbergu.webp",
         dkarta: "/gwent/assets/dkarty/1/011.webp",
         opis: '"Odziana w kompozycje czerni i bieli, przywodziła na myśl grudniowy poranek".',
         bohater: true,
@@ -159,7 +159,7 @@ const cards = [
 
     {
         nazwa: "Triss Merigold",
-        karta: "/gwent/assets/niezalerzne/triss_merigold.webp",
+        karta: "/gwent/assets/karty/niezalerzne/triss.webp",
         dkarta: "/gwent/assets/dkarty/1/012.webp",
         opis: '"Potrafię o siebie zadbać. Wierz mi"',
         bohater: true,
