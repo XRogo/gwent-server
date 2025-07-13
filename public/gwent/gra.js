@@ -65,7 +65,6 @@ function startTimer() {
 
 document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
-    // Stały rozmiar karty względem planszy 4K
     const areaLeft = 1163;
     const areaTop = 1691;
     const areaRight = 3018;
@@ -78,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
     const scale = overlay.offsetWidth / 3839;
-    // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
     cardsArea.style.left = `${areaLeft * scale}px`;
@@ -87,21 +85,25 @@ document.addEventListener('DOMContentLoaded', () => {
     cardsArea.style.height = `${areaHeight * scale}px`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
-    // Wylicz przesunięcie kart
     let gap = cardGap * scale;
     let overlayCardWidth = cardWidth * scale;
     let overlayCardHeight = cardHeight * scale;
-    let maxCardsNoOverlap = Math.floor((areaWidth + cardGap) / (cardWidth + cardGap));
     let totalWidth;
     if (deck.length <= 10) {
         totalWidth = deck.length * overlayCardWidth + (deck.length - 1) * gap;
     } else {
+        // Nakładanie kart, gap ujemny
         gap = ((areaWidth * scale) - overlayCardWidth) / (deck.length - 1);
+        if (gap > overlayCardWidth) gap = overlayCardWidth;
         if (gap < 0) gap = 0;
         totalWidth = deck.length * overlayCardWidth + (deck.length - 1) * gap;
+        if (totalWidth > areaWidth * scale) {
+            // Jeśli całość wyjeżdża, gap ujemny
+            gap = ((areaWidth * scale) - overlayCardWidth) / (deck.length - 1);
+        }
     }
-    // Wyśrodkuj karty względem obszaru
-    let startX = ((areaWidth * scale) - totalWidth) / 2;
+    // Wyśrodkuj karty względem obszaru, nie pozwól wyjechać na lewo
+    let startX = Math.max(0, ((areaWidth * scale) - totalWidth) / 2);
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.dkarta;
