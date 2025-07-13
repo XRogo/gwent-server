@@ -65,7 +65,7 @@ function startTimer() {
 
 document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
-    // Stały rozmiar karty względem planszy
+    // Stały rozmiar karty względem planszy 4K
     const areaLeft = 1163;
     const areaTop = 1691;
     const areaRight = 3018;
@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!overlay) return;
     const scaleX = overlay.offsetWidth / 3839;
     const scaleY = overlay.offsetHeight / 2159;
+
     // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
@@ -88,24 +89,36 @@ document.addEventListener('DOMContentLoaded', () => {
     cardsArea.style.height = `${areaHeight * scaleY}px`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
+
     // Wylicz przesunięcie kart
     let gap = cardGap;
-    const maxCards = Math.floor((areaWidth + gap) / (cardWidth + gap));
-    if (deck.length > maxCards) {
-        gap = ((areaWidth - cardWidth) / (deck.length - 1));
+    let overlayCardWidth = cardWidth * scaleX;
+    let overlayCardHeight = cardHeight * scaleY;
+    let maxCardsNoOverlap = Math.floor((areaWidth + gap) / (cardWidth + gap));
+    let totalWidth;
+
+    if (deck.length <= 10) {
+        gap = cardGap * scaleX;
+        totalWidth = deck.length * overlayCardWidth + (deck.length - 1) * gap;
+    } else {
+        // Nakładanie kart
+        gap = ((areaWidth * scaleX) - overlayCardWidth) / (deck.length - 1);
         if (gap < 0) gap = 0;
+        totalWidth = deck.length * overlayCardWidth + (deck.length - 1) * gap;
+        // Jeśli karty się nie mieszczą, gap będzie ujemny i karty będą się nakładać
     }
+
     // Wyśrodkuj karty względem obszaru
-    const totalWidth = deck.length * cardWidth + (deck.length - 1) * gap;
-    let startX = (areaWidth - totalWidth) / 2;
+    let startX = ((areaWidth * scaleX) - totalWidth) / 2;
+
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.dkarta;
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = `${(startX + i * (cardWidth + gap)) * scaleX}px`;
-        cardDiv.style.top = `0px`;
-        cardDiv.style.width = `${cardWidth * scaleX}px`;
-        cardDiv.style.height = `${cardHeight * scaleY}px`;
+        cardDiv.style.left = `${startX + i * (overlayCardWidth + gap)}px`;
+        cardDiv.style.top = `${((areaHeight * scaleY) - overlayCardHeight) / 2}px`;
+        cardDiv.style.width = `${overlayCardWidth}px`;
+        cardDiv.style.height = `${overlayCardHeight}px`;
         cardDiv.style.zIndex = 10 + i;
         cardsArea.appendChild(cardDiv);
     });
