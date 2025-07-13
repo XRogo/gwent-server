@@ -65,51 +65,49 @@ function startTimer() {
 
 document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
-    // Stały rozmiar karty względem planszy 4K
+    // Stały rozmiar karty względem planszy
     const areaLeft = 1163;
     const areaTop = 1691;
     const areaRight = 3018;
     const areaBottom = 1932;
     const areaWidth = areaRight - areaLeft;
     const areaHeight = areaBottom - areaTop;
-    const cardWidth = 180; // px względem planszy
-    const cardHeight = 240; // px względem planszy
-    const cardGap = 6; // px względem planszy
+    const cardWidth = 180;
+    const cardHeight = 240;
+    const cardGap = 6;
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
-    const overlayRect = overlay.getBoundingClientRect();
-    const scaleX = overlayRect.width / 3839;
-    const scaleY = overlayRect.height / 2159;
-    // Wylicz ile kart się mieści
-    const maxCards = Math.floor((areaWidth + cardGap) / (cardWidth + cardGap));
-    let gap = cardGap;
-    if (deck.length > maxCards) {
-        // Nachodzenie kart
-        gap = ((areaWidth - cardWidth) / (deck.length - 1));
-        if (gap < 0) gap = 0;
-    }
-    // Wyśrodkuj karty
-    const totalWidth = deck.length * cardWidth + (deck.length - 1) * gap;
-    let startX = areaLeft + (areaWidth - totalWidth) / 2;
+    const scaleX = overlay.offsetWidth / 3839;
+    const scaleY = overlay.offsetHeight / 2159;
     // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
-    cardsArea.style.left = `${overlayRect.left + startX * scaleX}px`;
-    cardsArea.style.top = `${overlayRect.top + areaTop * scaleY}px`;
+    cardsArea.style.left = `${areaLeft * scaleX + overlay.offsetLeft}px`;
+    cardsArea.style.top = `${areaTop * scaleY + overlay.offsetTop}px`;
     cardsArea.style.width = `${areaWidth * scaleX}px`;
     cardsArea.style.height = `${areaHeight * scaleY}px`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
+    // Wylicz przesunięcie kart
+    let gap = cardGap;
+    const maxCards = Math.floor((areaWidth + gap) / (cardWidth + gap));
+    if (deck.length > maxCards) {
+        gap = ((areaWidth - cardWidth) / (deck.length - 1));
+        if (gap < 0) gap = 0;
+    }
+    // Wyśrodkuj karty względem obszaru
+    const totalWidth = deck.length * cardWidth + (deck.length - 1) * gap;
+    let startX = (areaWidth - totalWidth) / 2;
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.dkarta;
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = `${(i * (cardWidth + gap)) * scaleX}px`;
+        cardDiv.style.left = `${(startX + i * (cardWidth + gap)) * scaleX}px`;
         cardDiv.style.top = `0px`;
         cardDiv.style.width = `${cardWidth * scaleX}px`;
         cardDiv.style.height = `${cardHeight * scaleY}px`;
         cardDiv.style.zIndex = 10 + i;
         cardsArea.appendChild(cardDiv);
     });
-    document.body.appendChild(cardsArea);
+    overlay.appendChild(cardsArea);
 });
