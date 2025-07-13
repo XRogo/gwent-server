@@ -10,7 +10,7 @@ body {
     position: absolute;
     width: 100vw;
     height: 100vh;
-    background: url('assets/wybor/plansza.webp') no-repeat center;
+    background: url('assets/asety/plansza.webp') no-repeat center;
     background-size: contain;
     z-index: 2;
 }
