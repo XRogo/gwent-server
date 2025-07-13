@@ -79,14 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardGap = 6;
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
-    const overlayRect = overlay.getBoundingClientRect();
-    const scaleX = overlayRect.width / GUI_WIDTH;
-    const scaleY = overlayRect.height / GUI_HEIGHT;
+    const scaleX = overlay.offsetWidth / GUI_WIDTH;
+    const scaleY = overlay.offsetHeight / GUI_HEIGHT;
     // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
-    cardsArea.style.left = `${areaLeft * scaleX + overlayRect.left}px`;
-    cardsArea.style.top = `${areaTop * scaleY + overlayRect.top}px`;
+    cardsArea.style.left = `${areaLeft * scaleX}px`;
+    cardsArea.style.top = `${areaTop * scaleY}px`;
     cardsArea.style.width = `${areaWidth * scaleX}px`;
     cardsArea.style.height = `${areaHeight * scaleY}px`;
     cardsArea.style.pointerEvents = 'none';
@@ -117,5 +116,5 @@ document.addEventListener('DOMContentLoaded', () => {
         cardDiv.style.objectFit = 'contain';
         cardsArea.appendChild(cardDiv);
     });
-    document.body.appendChild(cardsArea);
+    overlay.appendChild(cardsArea);
 });
