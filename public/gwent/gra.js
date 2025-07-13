@@ -66,6 +66,6 @@ function startTimer() {
 document.addEventListener('DOMContentLoaded', () => {
     // Odczytaj talię z localStorage
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
-    renderUI();
-    startTimer();
+    // Wyświetl tylko planszę, bez UI wyboru i odliczania
+    // (overlay jest już w HTML)
 });
