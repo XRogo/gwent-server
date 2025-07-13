@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
-    cardsArea.style.left = `${areaLeft * scaleX + overlay.offsetLeft}px`;
-    cardsArea.style.top = `${areaTop * scaleY + overlay.offsetTop}px`;
+    cardsArea.style.left = `${areaLeft * scaleX}px`;
+    cardsArea.style.top = `${areaTop * scaleY}px`;
     cardsArea.style.width = `${areaWidth * scaleX}px`;
     cardsArea.style.height = `${areaHeight * scaleY}px`;
     cardsArea.style.pointerEvents = 'none';
