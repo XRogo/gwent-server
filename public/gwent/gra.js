@@ -79,39 +79,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardGap = 6;
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
-    const scaleX = overlay.offsetWidth / GUI_WIDTH;
-    const scaleY = overlay.offsetHeight / GUI_HEIGHT;
+    // Procentowe pozycjonowanie względem overlay
+    const leftPercent = areaLeft / GUI_WIDTH * 100;
+    const topPercent = areaTop / GUI_HEIGHT * 100;
+    const widthPercent = areaWidth / GUI_WIDTH * 100;
+    const heightPercent = areaHeight / GUI_HEIGHT * 100;
     // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
-    cardsArea.style.left = `${areaLeft * scaleX}px`;
-    cardsArea.style.top = `${areaTop * scaleY}px`;
-    cardsArea.style.width = `${areaWidth * scaleX}px`;
-    cardsArea.style.height = `${areaHeight * scaleY}px`;
+    cardsArea.style.left = `${leftPercent}%`;
+    cardsArea.style.top = `${topPercent}%`;
+    cardsArea.style.width = `${widthPercent}%`;
+    cardsArea.style.height = `${heightPercent}%`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
+    cardsArea.style.display = 'flex';
+    cardsArea.style.alignItems = 'center';
+    cardsArea.style.justifyContent = 'center';
     // Wylicz przesunięcie kart
-    let gap = cardGap * scaleX;
-    let cardScaledWidth = cardWidth * scaleX;
-    let cardScaledHeight = cardHeight * scaleY;
-    let totalWidth;
+    let gapPx = cardGap;
+    let cardScaledWidth = cardWidth;
+    let cardScaledHeight = cardHeight;
     if (deck.length <= 10) {
-        totalWidth = deck.length * cardScaledWidth + (deck.length - 1) * gap;
+        gapPx = cardGap;
     } else {
-        gap = ((areaWidth * scaleX) - cardScaledWidth) / (deck.length - 1);
-        if (gap < 0) gap = 0;
-        totalWidth = deck.length * cardScaledWidth + (deck.length - 1) * gap;
+        gapPx = ((areaWidth - cardWidth) / (deck.length - 1));
+        if (gapPx < 0) gapPx = 0;
     }
+    // Przelicz na procent szerokości overlay
+    const gapPercent = gapPx / areaWidth * 100;
+    const cardWidthPercent = cardScaledWidth / areaWidth * 100;
+    const cardHeightPercent = cardScaledHeight / areaHeight * 100;
     // Wyśrodkuj karty względem obszaru
-    let startX = ((areaWidth * scaleX) - totalWidth) / 2;
+    let totalWidthPercent = deck.length * cardWidthPercent + (deck.length - 1) * gapPercent;
+    let startPercent = (100 - totalWidthPercent) / 2;
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.dkarta;
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = `${startX + i * (cardScaledWidth + gap)}px`;
-        cardDiv.style.top = `${((areaHeight * scaleY) - cardScaledHeight) / 2}px`;
-        cardDiv.style.width = `${cardScaledWidth}px`;
-        cardDiv.style.height = `${cardScaledHeight}px`;
+        cardDiv.style.left = `${startPercent + i * (cardWidthPercent + gapPercent)}%`;
+        cardDiv.style.top = `${(100 - cardHeightPercent) / 2}%`;
+        cardDiv.style.width = `${cardWidthPercent}%`;
+        cardDiv.style.height = `${cardHeightPercent}%`;
         cardDiv.style.zIndex = 10 + i;
         cardDiv.style.objectFit = 'contain';
         cardsArea.appendChild(cardDiv);
