@@ -269,7 +269,7 @@ const cards = [
 
     {
         nazwa: "Płotka",
-        karta: "/gwent/assets/niezalerzne/plotka.webp",
+        karta: "/gwent/assets/karty/niezalerzne/plotka.webp",
         dkarta: "/gwent/assets/dkarty/1/020.webp",
         opis: "Płotka! Potrzebuję cie!",
         bohater: false,

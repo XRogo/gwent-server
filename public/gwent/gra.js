@@ -63,8 +63,10 @@ function startTimer() {
     }, 1000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    deck = JSON.parse(localStorage.getItem('deck') || '[]');
+function renderCards() {
+    // Usuń poprzedni kontener kart jeśli istnieje
+    const old = document.getElementById('cardsArea');
+    if (old) old.remove();
     // Obszar na planszy 4K
     const GUI_WIDTH = 3839;
     const GUI_HEIGHT = 2159;
@@ -95,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const areaH = areaHeight * scale;
     // Kontener na karty
     const cardsArea = document.createElement('div');
+    cardsArea.id = 'cardsArea';
     cardsArea.style.position = 'absolute';
     cardsArea.style.left = `${areaL}px`;
     cardsArea.style.top = `${areaT}px`;
@@ -108,18 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let cardH = cardHeight * scale;
     let gap = cardGap * scale;
     let maxCards = Math.floor((areaW + gap) / (cardW + gap));
-    let overlap = false;
     let realGap = gap;
     if (deck.length > maxCards) {
-        overlap = true;
         realGap = (areaW - cardW) / (deck.length - 1);
         if (realGap < 0) realGap = 0;
     }
-    // Wyśrodkuj karty względem obszaru
     let totalWidth = deck.length * cardW + (deck.length - 1) * realGap;
     let startX = (areaW - totalWidth) / 2;
-    if (overlap && totalWidth > areaW) {
-        // Jeśli karty się nie mieszczą, gap ujemny, karty nachodzą się
+    if (totalWidth > areaW) {
         realGap = (areaW - cardW) / (deck.length - 1);
         totalWidth = deck.length * cardW + (deck.length - 1) * realGap;
         startX = 0;
@@ -139,4 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
         cardsArea.appendChild(cardDiv);
     });
     overlay.appendChild(cardsArea);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    deck = JSON.parse(localStorage.getItem('deck') || '[]');
+    renderCards();
+    window.addEventListener('resize', renderCards);
 });
