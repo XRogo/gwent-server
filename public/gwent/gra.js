@@ -93,34 +93,28 @@ document.addEventListener('DOMContentLoaded', () => {
     cardsArea.style.height = `${heightPercent}%`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
-    cardsArea.style.display = 'block';
-    // Wylicz przesunięcie kart
-    let gapPx = cardGap;
-    let cardScaledWidth = cardWidth;
-    let cardScaledHeight = cardHeight;
-    if (deck.length <= 10) {
-        gapPx = cardGap;
-    } else {
-        gapPx = ((areaWidth - cardWidth) / (deck.length - 1));
-        if (gapPx < 0) gapPx = 0;
+    cardsArea.style.display = 'flex';
+    cardsArea.style.alignItems = 'center';
+    cardsArea.style.justifyContent = 'center';
+    // Wylicz rozmiar i odstęp kart w % obszaru
+    let cardW = cardWidth / areaWidth * 100;
+    let cardH = cardHeight / areaHeight * 100;
+    let gap = cardGap / areaWidth * 100;
+    if (deck.length > 10) {
+        gap = ((areaWidth - cardWidth) / (deck.length - 1)) / areaWidth * 100;
+        if (gap < 0) gap = 0;
     }
-    // Przelicz na procent szerokości overlay
-    const gapPercent = gapPx / areaWidth * 100;
-    const cardWidthPercent = cardScaledWidth / areaWidth * 100;
-    const cardHeightPercent = cardScaledHeight / areaHeight * 100;
-    // Wyśrodkuj karty względem obszaru
-    let totalWidthPercent = deck.length * cardWidthPercent + (deck.length - 1) * gapPercent;
-    let startPercent = (100 - totalWidthPercent) / 2;
+    cardsArea.style.gap = `${gap}%`;
+    // Karty
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.dkarta;
-        cardDiv.style.position = 'absolute';
-        cardDiv.style.left = `${startPercent + i * (cardWidthPercent + gapPercent)}%`;
-        cardDiv.style.top = `${(100 - cardHeightPercent) / 2}%`;
-        cardDiv.style.width = `${cardWidthPercent}%`;
-        cardDiv.style.height = `${cardHeightPercent}%`;
-        cardDiv.style.zIndex = 10 + i;
+        cardDiv.style.width = `${cardW}%`;
+        cardDiv.style.height = `${cardH}%`;
+        cardDiv.style.aspectRatio = '3/4';
         cardDiv.style.objectFit = 'contain';
+        cardDiv.style.flex = `0 0 ${cardW}%`;
+        cardDiv.style.zIndex = 10 + i;
         cardsArea.appendChild(cardDiv);
     });
     overlay.appendChild(cardsArea);
