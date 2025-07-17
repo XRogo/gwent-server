@@ -1036,7 +1036,7 @@ const cards = [
 
     {
         nazwa: "Albrich",
-        karta: "gwent/assets/karty/nilftgard/albrich.webp",
+        karta: "/gwent/assets/karty/nilftgard/albrich.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1307,7 +1307,7 @@ const cards = [
 
     {
         nazwa: "Zwiadowca z Dol Blathanna",
-        karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna2.webp-",
+        karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna2.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -1786,7 +1786,7 @@ const cards = [
 
     {
         nazwa: "Wiedzma: Prządka",
-        karta: "/gwent/assets/karty/potwory/",
+        karta: "/gwent/assets/karty/potwory/wiedzma_przadka.webp",
         dkarta: "/gwent/assets/dkarty/4/411.webp",
         opis: "WORK.",
         bohater: false,
@@ -1801,7 +1801,7 @@ const cards = [
 
     {
         nazwa: "Wiedzma: Szepciucha",
-        karta: "/gwent/assets/karty/potwory/wiedzma_przadka.webp",
+        karta: "/gwent/assets/karty/potwory/wiedzma_szepciucha.webp",
         dkarta: "/gwent/assets/dkarty/4/412.webp",
         opis: "WORK.",
         bohater: false,

@@ -64,10 +64,8 @@ function startTimer() {
 }
 
 function renderCards() {
-    // Usuń poprzedni kontener kart jeśli istnieje
     const old = document.getElementById('cardsArea');
     if (old) old.remove();
-    // Obszar na planszy 4K
     const GUI_WIDTH = 3839;
     const GUI_HEIGHT = 2159;
     const areaLeft = 1163;
@@ -81,7 +79,6 @@ function renderCards() {
     const cardGap = 6;
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
-    // Wylicz rzeczywiste wymiary planszy w overlay (background-size: contain)
     const overlayRect = overlay.getBoundingClientRect();
     const overlayW = overlayRect.width;
     const overlayH = overlayRect.height;
@@ -90,12 +87,10 @@ function renderCards() {
     const boardH = GUI_HEIGHT * scale;
     const boardLeft = (overlayW - boardW) / 2;
     const boardTop = (overlayH - boardH) / 2;
-    // Obszar na karty względem planszy
     const areaL = areaLeft * scale + boardLeft;
     const areaT = areaTop * scale + boardTop;
     const areaW = areaWidth * scale;
     const areaH = areaHeight * scale;
-    // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.id = 'cardsArea';
     cardsArea.style.position = 'absolute';
@@ -106,23 +101,21 @@ function renderCards() {
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
     cardsArea.style.display = 'block';
-    // Wylicz rozmiar i odstęp kart w px względem planszy
     let cardW = cardWidth * scale;
     let cardH = cardHeight * scale;
     let gap = cardGap * scale;
     let maxCards = Math.floor((areaW + gap) / (cardW + gap));
     let realGap = gap;
-    if (deck.length > maxCards) {
-        realGap = (areaW - cardW) / (deck.length - 1);
-        if (realGap < 0) realGap = 0;
+    let overlap = false;
+    if (deck.length > 1) {
+        let totalWidth = deck.length * cardW + (deck.length - 1) * gap;
+        if (totalWidth > areaW) {
+            // gap ujemny, karty nachodzą się, ostatnia karta kończy się na prawej krawędzi
+            realGap = (areaW - cardW) / (deck.length - 1);
+            overlap = true;
+        }
     }
-    let totalWidth = deck.length * cardW + (deck.length - 1) * realGap;
-    let startX = (areaW - totalWidth) / 2;
-    if (totalWidth > areaW) {
-        realGap = (areaW - cardW) / (deck.length - 1);
-        totalWidth = deck.length * cardW + (deck.length - 1) * realGap;
-        startX = 0;
-    }
+    let startX = 0;
     // Karty
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
