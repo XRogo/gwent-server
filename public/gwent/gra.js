@@ -93,9 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cardsArea.style.height = `${heightPercent}%`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
-    cardsArea.style.display = 'flex';
-    cardsArea.style.alignItems = 'center';
-    cardsArea.style.justifyContent = 'center';
+    cardsArea.style.display = 'block';
     // Wylicz przesunięcie kart
     let gapPx = cardGap;
     let cardScaledWidth = cardWidth;
