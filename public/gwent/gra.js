@@ -79,41 +79,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardGap = 6;
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
-    // Procentowe pozycjonowanie względem overlay
-    const leftPercent = areaLeft / GUI_WIDTH * 100;
-    const topPercent = areaTop / GUI_HEIGHT * 100;
-    const widthPercent = areaWidth / GUI_WIDTH * 100;
-    const heightPercent = areaHeight / GUI_HEIGHT * 100;
+    // Wylicz rzeczywiste wymiary planszy w overlay (background-size: contain)
+    const overlayRect = overlay.getBoundingClientRect();
+    const overlayW = overlayRect.width;
+    const overlayH = overlayRect.height;
+    const scale = Math.min(overlayW / GUI_WIDTH, overlayH / GUI_HEIGHT);
+    const boardW = GUI_WIDTH * scale;
+    const boardH = GUI_HEIGHT * scale;
+    const boardLeft = (overlayW - boardW) / 2;
+    const boardTop = (overlayH - boardH) / 2;
+    // Obszar na karty względem planszy
+    const areaL = areaLeft * scale + boardLeft;
+    const areaT = areaTop * scale + boardTop;
+    const areaW = areaWidth * scale;
+    const areaH = areaHeight * scale;
     // Kontener na karty
     const cardsArea = document.createElement('div');
     cardsArea.style.position = 'absolute';
-    cardsArea.style.left = `${leftPercent}%`;
-    cardsArea.style.top = `${topPercent}%`;
-    cardsArea.style.width = `${widthPercent}%`;
-    cardsArea.style.height = `${heightPercent}%`;
+    cardsArea.style.left = `${areaL}px`;
+    cardsArea.style.top = `${areaT}px`;
+    cardsArea.style.width = `${areaW}px`;
+    cardsArea.style.height = `${areaH}px`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
     cardsArea.style.display = 'flex';
     cardsArea.style.alignItems = 'center';
     cardsArea.style.justifyContent = 'center';
-    // Wylicz rozmiar i odstęp kart w % obszaru
-    let cardW = cardWidth / areaWidth * 100;
-    let cardH = cardHeight / areaHeight * 100;
-    let gap = cardGap / areaWidth * 100;
+    // Wylicz rozmiar i odstęp kart w px
+    let cardW = cardWidth * scale;
+    let cardH = cardHeight * scale;
+    let gap = cardGap * scale;
+    let totalWidth = deck.length * cardW + (deck.length - 1) * gap;
     if (deck.length > 10) {
-        gap = ((areaWidth - cardWidth) / (deck.length - 1)) / areaWidth * 100;
+        gap = ((areaW - cardW) / (deck.length - 1));
         if (gap < 0) gap = 0;
+        totalWidth = deck.length * cardW + (deck.length - 1) * gap;
+        if (totalWidth > areaW) {
+            gap = (areaW - cardW) / (deck.length - 1);
+            if (gap < 0) gap = 0;
+        }
     }
-    cardsArea.style.gap = `${gap}%`;
+    cardsArea.style.gap = `${gap}px`;
     // Karty
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.dkarta;
-        cardDiv.style.width = `${cardW}%`;
-        cardDiv.style.height = `${cardH}%`;
+        cardDiv.style.width = `${cardW}px`;
+        cardDiv.style.height = `${cardH}px`;
         cardDiv.style.aspectRatio = '3/4';
         cardDiv.style.objectFit = 'contain';
-        cardDiv.style.flex = `0 0 ${cardW}%`;
+        cardDiv.style.flex = `0 0 ${cardW}px`;
         cardDiv.style.zIndex = 10 + i;
         cardsArea.appendChild(cardDiv);
     });
