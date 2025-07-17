@@ -2322,7 +2322,7 @@ const cards = [
     
     {
         nazwa: "Drakkar wojenny",
-        karta: "/gwent/assets/karty/Skellige/lucznik_klanu_brokvar.webp",
+        karta: "/gwent/assets/karty/Skellige/drakkar_wojenny.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,
@@ -2336,7 +2336,7 @@ const cards = [
     
     {
         nazwa: "Łucznik klanu Brokvar",
-        karta: "/gwent/assets/karty/Skellige/",
+        karta: "/gwent/assets/karty/Skellige/lucznik_klanu_brokvar.webp",
         dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
         opis: "WORK.",
         bohater: false,

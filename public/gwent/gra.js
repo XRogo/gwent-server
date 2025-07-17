@@ -104,19 +104,25 @@ function renderCards() {
     let cardW = cardWidth * scale;
     let cardH = cardHeight * scale;
     let gap = cardGap * scale;
-    let maxCards = Math.floor((areaW + gap) / (cardW + gap));
+    let n = deck.length;
     let realGap = gap;
-    let overlap = false;
-    if (deck.length > 1) {
-        let totalWidth = deck.length * cardW + (deck.length - 1) * gap;
-        if (totalWidth > areaW) {
-            // gap ujemny, karty nachodzą się, ostatnia karta kończy się na prawej krawędzi
-            realGap = (areaW - cardW) / (deck.length - 1);
-            overlap = true;
-        }
-    }
     let startX = 0;
-    // Karty
+    if (n > 1) {
+        let totalWidth = n * cardW + (n - 1) * gap;
+        if (totalWidth > areaW) {
+            // gap tak, by ostatnia karta kończyła się na prawej krawędzi
+            realGap = (areaW - n * cardW) / (n - 1);
+            startX = 0;
+        } else {
+            // wyśrodkuj
+            realGap = gap;
+            totalWidth = n * cardW + (n - 1) * realGap;
+            startX = (areaW - totalWidth) / 2;
+        }
+    } else {
+        // jedna karta - wyśrodkuj
+        startX = (areaW - cardW) / 2;
+    }
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
         cardDiv.src = card.karta;
