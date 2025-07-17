@@ -102,33 +102,39 @@ document.addEventListener('DOMContentLoaded', () => {
     cardsArea.style.height = `${areaH}px`;
     cardsArea.style.pointerEvents = 'none';
     cardsArea.style.zIndex = 20;
-    cardsArea.style.display = 'flex';
-    cardsArea.style.alignItems = 'center';
-    cardsArea.style.justifyContent = 'center';
-    // Wylicz rozmiar i odstęp kart w px
+    cardsArea.style.display = 'block';
+    // Wylicz rozmiar i odstęp kart w px względem planszy
     let cardW = cardWidth * scale;
     let cardH = cardHeight * scale;
     let gap = cardGap * scale;
-    let totalWidth = deck.length * cardW + (deck.length - 1) * gap;
-    if (deck.length > 10) {
-        gap = ((areaW - cardW) / (deck.length - 1));
-        if (gap < 0) gap = 0;
-        totalWidth = deck.length * cardW + (deck.length - 1) * gap;
-        if (totalWidth > areaW) {
-            gap = (areaW - cardW) / (deck.length - 1);
-            if (gap < 0) gap = 0;
-        }
+    let maxCards = Math.floor((areaW + gap) / (cardW + gap));
+    let overlap = false;
+    let realGap = gap;
+    if (deck.length > maxCards) {
+        overlap = true;
+        realGap = (areaW - cardW) / (deck.length - 1);
+        if (realGap < 0) realGap = 0;
     }
-    cardsArea.style.gap = `${gap}px`;
+    // Wyśrodkuj karty względem obszaru
+    let totalWidth = deck.length * cardW + (deck.length - 1) * realGap;
+    let startX = (areaW - totalWidth) / 2;
+    if (overlap && totalWidth > areaW) {
+        // Jeśli karty się nie mieszczą, gap ujemny, karty nachodzą się
+        realGap = (areaW - cardW) / (deck.length - 1);
+        totalWidth = deck.length * cardW + (deck.length - 1) * realGap;
+        startX = 0;
+    }
     // Karty
     deck.forEach((card, i) => {
         const cardDiv = document.createElement('img');
-        cardDiv.src = card.dkarta;
+        cardDiv.src = card.karta;
+        cardDiv.style.position = 'absolute';
+        cardDiv.style.left = `${startX + i * (cardW + realGap)}px`;
+        cardDiv.style.top = `${(areaH - cardH) / 2}px`;
         cardDiv.style.width = `${cardW}px`;
         cardDiv.style.height = `${cardH}px`;
-        cardDiv.style.aspectRatio = '3/4';
         cardDiv.style.objectFit = 'contain';
-        cardDiv.style.flex = `0 0 ${cardW}px`;
+        cardDiv.style.aspectRatio = '3/4';
         cardDiv.style.zIndex = 10 + i;
         cardsArea.appendChild(cardDiv);
     });
