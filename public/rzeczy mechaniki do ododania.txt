@@ -1,0 +1,50 @@
+wszystkie pozoycje podane są w rozdzielczości 4k (3837, 2158)
+
+pozycja twojich kart                1163,1691 x 3018, 1932
+
+
+pozycja kart oblężnicze przeciwnika 1412, 29    x 3021, 268
+pozycja kart łuczników przeciwnika  1412, 294   x 3021, 533
+pozycja kart piechoty przeciwnika   1412, 565   x 3021, 804
+
+pozycja twojich kart piechoty       1412, 863   x 3021, 1102
+pozycja twojich kart łuczników      1412, 1129  x 3021, 1368
+pozycja twojich kart oblężnicze     1412, 1407  x 3021, 1646
+
+poycje rogów dowódcy w tej samej lini co karty tylko przesunięte do szerokości 1182 - 1361
+
+
+kupka kary trupów 3111, 1680
+Jeśli kart odpadnie z planszy albo po końcu rundy trafia na tą kupke karty nakaładać sie na siebie z przesunięciem 2 px w góre i w lewo 
+
+
+karty które są w grze ale nie są w tali gry  (tzn leśli graczy wybierze 30 kart ta gra mu wylosuje 10 i ta reszta trafia na tą kupke )
+potem te karty mogą trafić na plansze np za pomocą kart wezwania/ szpiegów...
+twoja pozycja 3457, 1654 
+pozycja przeciwnika 3457, 131
+jeśli grzcz / przeciwnik wybierze frakcje 
+1 urzyj gwent-server\public\gwent\assets\asety\polnoc.webp
+2 urzyj gwent-server\public\gwent\assets\asety\nilftgard_rewers.webp
+3 urzyj gwent-server\public\gwent\assets\asety\scoia'tel_rewers.webp
+4 urzyj gwent-server\public\gwent\assets\asety\potwory_rewers.webp
+5 urzyj gwent-server\public\gwent\assets\asety\skelige_rewers.webp
+
+w obszarze dla 
+gracza 3487, 1889 x 3587, 1963
+przeciwnika 3483, 358 x 358, 433
+ ma sie znajdować ilość kart które są na tej kupce (obszar ma być wypełniony czarnym kolorem z kryciem na 90%)
+czcionka ma być gwent-server\public\gwent\assets\fonts ta co tu sie znajduje pogrubiona i kolor c7a76e
+
+
+wygląd powiększenia kart jeśli gracz nacisnie (prawy myszy) na karte podczas wybieranie lub gry zostanie aktywowany ta funkcja pojawią sie duże karyw w pozycjach
+karta -2  468, 444 x 899, 1261
+karta -1  1040, 444 x 1563, 1436
+karta 0 1617, 456 x 2222, 1609
+karta 1 2274, 444 x 2799, 1436
+karta 2 2938, 444 x  3371, 1261
+przyczym karta środek to ta której informacje pojawiają sie w okieniku na pozycjij 1356, 1661 gwent-server\public\gwent\assets\asety\infor.webp i nad tym na wysokości 1735 ma znajdować sie 
+nazwa mocy która będzi podana w moce.js a na wysokości 1814 będzie opis mocy i w lewym górnym ronu ma sie pojawiać ikona mocy 
+ 
+maja sie wyświetlać 5 kart 2 poprzednie (-2 , -1) środkowa (0) i 2 następne (1,2) ma korzystać z dużych kart oraz do dużych kart na dola ma dodać opis ma być możliwośc zmieniania kart w tym wyborze za pomocą sstrzałek lewo prawo 
+pod główną (środkową (0)) kartą ma zanjdować sie podsw.webp i nad ma pulsować podsw2.webp tzn. przeźroczystość na 100% 2s przeźroczystość 10% 2s przeźroczystość 100%...
+funkcjie i wygląd tej funkcji mają być opisane w powiek.css i powiek.js 
