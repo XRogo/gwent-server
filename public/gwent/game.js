@@ -526,12 +526,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
 
-        // Wyświetl wybranego dowódcę w slocie na lidera
+        // Wyświetl tylko jednego dowódcę w slocie lidera
         if (leaderCard) {
             leaderCard.innerHTML = '';
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
-            // Wybrany dowódca lub pierwszy z listy
-            const selected = window.selectedLeader && window.selectedLeader.frakcja === faction.id ? window.selectedLeader : leaders[0];
+            const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
                 const div = document.createElement('div');
                 div.className = 'leader-card-item';
@@ -543,10 +542,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.style.alignItems = 'center';
                 div.style.justifyContent = 'center';
                 div.style.cursor = 'pointer';
-                div.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    showPowiek(leaders, leaders.indexOf(selected), 'leaders');
-                };
                 // Beton pod kartą
                 const beton = document.createElement('div');
                 beton.className = 'beton';
@@ -729,6 +724,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.renderLeaders = renderLeaders;
+
+    // Obsługa klawisza 'x' do wyboru dowódcy
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'x' || e.key === 'X') {
+            const faction = factions[currentPage - 1];
+            const leaders = krole.filter(krol => krol.frakcja === faction.id);
+            showPowiek(leaders, 0, 'leaders');
+            // Po wyborze dowódcy w powiek.js ustaw selectedLeader i odśwież panel
+            window.selectedLeaderCallback = function(krol) {
+                selectedLeader = krol;
+                updatePage();
+            };
+        }
+    });
 });
 
 window.addEventListener('DOMContentLoaded', () => {
