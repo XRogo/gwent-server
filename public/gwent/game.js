@@ -1,4 +1,5 @@
 import cards from './cards.js';
+import { krole } from './krole.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
@@ -635,6 +636,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return Array.from(map.values());
     }
+
+    function renderLeaders(leaders, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        leaders.forEach((krol, i) => {
+            const div = document.createElement('div');
+            div.className = 'leader-card';
+            div.style.display = 'inline-block';
+            div.style.margin = '12px';
+            div.style.textAlign = 'center';
+            div.style.cursor = 'pointer';
+            div.onclick = () => {
+                window.selectedLeader = krol;
+                // Możesz dodać podgląd powiększenia lub callback
+            };
+            const img = document.createElement('img');
+            img.src = krol.dkarta;
+            img.style.width = '180px';
+            img.style.height = '240px';
+            img.style.objectFit = 'contain';
+            img.style.borderRadius = '12px';
+            img.style.boxShadow = '0 0 16px #000';
+            div.appendChild(img);
+            const nameDiv = document.createElement('div');
+            nameDiv.innerText = krol.nazwa;
+            nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+            nameDiv.style.fontWeight = 'bold';
+            nameDiv.style.color = '#c7a76e';
+            nameDiv.style.fontSize = '1.2em';
+            nameDiv.style.marginTop = '8px';
+            div.appendChild(nameDiv);
+            container.appendChild(div);
+        });
+    }
+
+    window.renderLeaders = renderLeaders;
 });
 
 window.addEventListener('DOMContentLoaded', () => {

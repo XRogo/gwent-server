@@ -1,14 +1,17 @@
 // Podgląd powiększenia kart
 import moce from './moce.js';
+import { krole } from './krole.js';
 
 let powiekIndex = 0;
 let powiekDeck = [];
 let powiekActive = false;
+let powiekMode = 'cards'; // 'cards' lub 'leaders'
 
-function showPowiek(deck, index) {
+function showPowiek(deck, index, mode = 'cards') {
     powiekDeck = deck;
     powiekIndex = index;
     powiekActive = true;
+    powiekMode = mode;
     renderPowiek();
 }
 
@@ -44,6 +47,8 @@ function renderPowiek() {
     ];
     const scaleW = window.innerWidth / 3837;
     const scaleH = window.innerHeight / 2158;
+    // Animacja przesuwania
+    overlay.classList.add('powiek-anim');
     // Karty
     for(let i=-2;i<=2;i++){
         const idx = powiekIndex+i;
@@ -52,19 +57,20 @@ function renderPowiek() {
         const pos = positions[i+2];
         const cardDiv = document.createElement('img');
         cardDiv.className = 'powiek-card';
-        cardDiv.src = card.karta;
+        cardDiv.src = powiekMode==='leaders'?card.dkarta:card.karta;
         cardDiv.style.position = 'absolute';
         cardDiv.style.left = (pos.left*scaleW)+'px';
         cardDiv.style.top = (pos.top*scaleH)+'px';
         cardDiv.style.width = (pos.width*scaleW)+'px';
         cardDiv.style.height = (pos.height*scaleH)+'px';
         cardDiv.style.zIndex = i===0?100:50;
+        cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         overlay.appendChild(cardDiv);
         // Opis pod dużą kartą
         if(i===0){
             const opisDiv = document.createElement('div');
             opisDiv.className = 'powiek-opis';
-            opisDiv.innerText = card.opis||'';
+            opisDiv.innerText = powiekMode==='leaders'?card.nazwa:(card.opis||'');
             opisDiv.style.position = 'absolute';
             opisDiv.style.left = (pos.left*scaleW)+'px';
             opisDiv.style.top = ((pos.top+pos.height-60)*scaleH)+'px';
@@ -76,61 +82,63 @@ function renderPowiek() {
             overlay.appendChild(opisDiv);
         }
     }
-    // Okienko info
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'powiek-info';
-    infoDiv.style.position = 'absolute';
-    infoDiv.style.left = (1356*scaleW)+'px';
-    infoDiv.style.top = (1661*scaleH)+'px';
-    infoDiv.style.width = (inforW=866*scaleW)+'px';
-    infoDiv.style.height = (inforH=74*scaleH)+'px';
-    infoDiv.style.background = `url('/gwent/assets/asety/infor.webp')`;
-    infoDiv.style.backgroundSize = 'cover';
-    infoDiv.style.zIndex = 120;
-    overlay.appendChild(infoDiv);
-    // Ikona mocy
-    const card = powiekDeck[powiekIndex];
-    if(card&&card.moc){
-        const moc = moce[card.moc];
-        if(moc&&moc.ikona){
-            const ikonaDiv = document.createElement('img');
-            ikonaDiv.className = 'powiek-ikona';
-            ikonaDiv.src = moc.ikona;
-            ikonaDiv.style.position = 'absolute';
-            ikonaDiv.style.left = (1356*scaleW)+'px';
-            ikonaDiv.style.top = (1661*scaleH)+'px';
-            ikonaDiv.style.width = (64*scaleW)+'px';
-            ikonaDiv.style.height = (64*scaleH)+'px';
-            ikonaDiv.style.zIndex = 130;
-            overlay.appendChild(ikonaDiv);
+    // Okienko info (tylko dla kart)
+    if(powiekMode==='cards'){
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'powiek-info';
+        infoDiv.style.position = 'absolute';
+        infoDiv.style.left = (1356*scaleW)+'px';
+        infoDiv.style.top = (1661*scaleH)+'px';
+        infoDiv.style.width = (inforW=866*scaleW)+'px';
+        infoDiv.style.height = (inforH=74*scaleH)+'px';
+        infoDiv.style.background = `url('/gwent/assets/asety/infor.webp')`;
+        infoDiv.style.backgroundSize = 'cover';
+        infoDiv.style.zIndex = 120;
+        overlay.appendChild(infoDiv);
+        // Ikona mocy
+        const card = powiekDeck[powiekIndex];
+        if(card&&card.moc){
+            const moc = moce[card.moc];
+            if(moc&&moc.ikona){
+                const ikonaDiv = document.createElement('img');
+                ikonaDiv.className = 'powiek-ikona';
+                ikonaDiv.src = moc.ikona;
+                ikonaDiv.style.position = 'absolute';
+                ikonaDiv.style.left = (1356*scaleW)+'px';
+                ikonaDiv.style.top = (1661*scaleH)+'px';
+                ikonaDiv.style.width = (64*scaleW)+'px';
+                ikonaDiv.style.height = (64*scaleH)+'px';
+                ikonaDiv.style.zIndex = 130;
+                overlay.appendChild(ikonaDiv);
+            }
+            // Nazwa mocy
+            const nazwaDiv = document.createElement('div');
+            nazwaDiv.className = 'powiek-nazwa';
+            nazwaDiv.innerText = moc.nazwa||'';
+            nazwaDiv.style.position = 'absolute';
+            nazwaDiv.style.left = (1356*scaleW)+'px';
+            nazwaDiv.style.top = (1735*scaleH)+'px';
+            nazwaDiv.style.width = (inforW)+'px';
+            nazwaDiv.style.textAlign = 'center';
+            nazwaDiv.style.color = '#c7a76e';
+            nazwaDiv.style.fontWeight = 'bold';
+            nazwaDiv.style.fontSize = (36*scaleW)+'px';
+            nazwaDiv.style.zIndex = 131;
+            overlay.appendChild(nazwaDiv);
+            // Opis mocy
+            const opisDiv = document.createElement('div');
+            opisDiv.className = 'powiek-moc-opis';
+            opisDiv.innerText = moc.opis||'';
+            opisDiv.style.position = 'absolute';
+            opisDiv.style.left = (1356*scaleW)+'px';
+            opisDiv.style.top = (1814*scaleH)+'px';
+            opisDiv.style.width = (inforW)+'px';
+            opisDiv.style.textAlign = 'center';
+            opisDiv.style.color = '#fff';
+            opisDiv.style.fontSize = (28*scaleW)+'px';
+            opisDiv.style.zIndex = 132;
+            overlay.appendChild(opisDiv);
         }
-        // Nazwa mocy
-        const nazwaDiv = document.createElement('div');
-        nazwaDiv.className = 'powiek-nazwa';
-        nazwaDiv.innerText = moc.nazwa||'';
-        nazwaDiv.style.position = 'absolute';
-        nazwaDiv.style.left = (1356*scaleW)+'px';
-        nazwaDiv.style.top = (1735*scaleH)+'px';
-        nazwaDiv.style.width = (inforW)+'px';
-        nazwaDiv.style.textAlign = 'center';
-        nazwaDiv.style.color = '#c7a76e';
-        nazwaDiv.style.fontWeight = 'bold';
-        nazwaDiv.style.fontSize = (36*scaleW)+'px';
-        nazwaDiv.style.zIndex = 131;
-        overlay.appendChild(nazwaDiv);
-        // Opis mocy
-        const opisDiv = document.createElement('div');
-        opisDiv.className = 'powiek-moc-opis';
-        opisDiv.innerText = moc.opis||'';
-        opisDiv.style.position = 'absolute';
-        opisDiv.style.left = (1356*scaleW)+'px';
-        opisDiv.style.top = (1814*scaleH)+'px';
-        opisDiv.style.width = (inforW)+'px';
-        opisDiv.style.textAlign = 'center';
-        opisDiv.style.color = '#fff';
-        opisDiv.style.fontSize = (28*scaleW)+'px';
-        opisDiv.style.zIndex = 132;
-        overlay.appendChild(opisDiv);
     }
     // Pod główną kartą podsw.webp
     const podsw = document.createElement('img');
@@ -155,7 +163,7 @@ function renderPowiek() {
     podsw2.style.zIndex = 141;
     podsw2.style.animation = 'powiek-pulse 4s infinite';
     overlay.appendChild(podsw2);
-    // Strzałki lewo/prawo
+    // Strzałki lewo/prawo z animacją
     const leftArrow = document.createElement('div');
     leftArrow.className = 'powiek-arrow powiek-arrow-left';
     leftArrow.innerText = '<';
@@ -180,15 +188,34 @@ function renderPowiek() {
     rightArrow.style.cursor = 'pointer';
     rightArrow.onclick = (e)=>{e.stopPropagation();if(powiekIndex<powiekDeck.length-1){powiekIndex++;renderPowiek();}};
     overlay.appendChild(rightArrow);
+    // Wybór dowódców
+    if(powiekMode==='leaders'){
+        overlay.onclick = null;
+        // Po kliknięciu prawego na dowódcę wybierz go
+        overlay.oncontextmenu = function(e){
+            e.preventDefault();
+            const idx = powiekIndex;
+            const krol = powiekDeck[idx];
+            if(krol){
+                window.selectedLeader = krol;
+                hidePowiek();
+            }
+        };
+    }
 }
 
-// Obsługa prawego kliknięcia na kartę
+// Obsługa prawego kliknięcia na kartę lub dowódcę
 window.addEventListener('contextmenu', function(e){
     const cardEl = e.target.closest('.card, .powiek-card');
     if(cardEl&&cardEl.dataset&&cardEl.dataset.index){
         e.preventDefault();
         // deck i index muszą być przekazane z logiki gry
-        showPowiek(window.deckForPowiek||[],parseInt(cardEl.dataset.index));
+        showPowiek(window.deckForPowiek||[],parseInt(cardEl.dataset.index),'cards');
+    }
+    // Wybór dowódców przez przycisk 'x'
+    if(e.target.classList.contains('leader-card-x')){
+        e.preventDefault();
+        showPowiek(krole,0,'leaders');
     }
 });
 

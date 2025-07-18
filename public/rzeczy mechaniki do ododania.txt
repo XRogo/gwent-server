@@ -47,4 +47,7 @@ nazwa mocy która będzi podana w moce.js a na wysokości 1814 będzie opis mocy
  
 maja sie wyświetlać 5 kart 2 poprzednie (-2 , -1) środkowa (0) i 2 następne (1,2) ma korzystać z dużych kart oraz do dużych kart na dola ma dodać opis ma być możliwośc zmieniania kart w tym wyborze za pomocą sstrzałek lewo prawo 
 pod główną (środkową (0)) kartą ma zanjdować sie podsw.webp i nad ma pulsować podsw2.webp tzn. przeźroczystość na 100% 2s przeźroczystość 10% 2s przeźroczystość 100%...
-funkcjie i wygląd tej funkcji mają być opisane w powiek.css i powiek.js 
+funkcjie i wygląd tej funkcji mają być opisane w powiek.css i powiek.js (jeśli nie ma 5 kart to nie wyświetlaj brakujących) (zmiana kart za pomocą strzałek ma być płynna i karta z stltu -1/1 ma płynnie zmienić sie w karte 0 a w miejsce karty -2 ma wejść następna w kolejności)
+
+
+wybór dowódców obdywa sie za pomocą przycisku "x" po naciśnięciu akwywóje sie powiększenie będą tam do wyboróu karty dowódców budowa barty ma być podobna co do dkarty ma być wyśwlitlana obraz karty beton i nazwa karty (opisy królów są w \gwent\krole.js (nie ma narazie opisu funkci dlatego że nie ma odpowiednich mechanik do wprowadzania ich)) po kilknięciu prawym ma sie aktywować wybór odwódców
