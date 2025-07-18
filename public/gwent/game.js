@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_HEIGHT = 2160;
     let deck = [];
 
+    let selectedLeader = null;
+
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
         { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Jeśli rozgrywka zakończy się remisem, to ty odnosisz zwycięstwo." },
@@ -731,13 +733,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const faction = factions[currentPage - 1];
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             showPowiek(leaders, 0, 'leaders');
-            // Po wyborze dowódcy w powiek.js ustaw selectedLeader i odśwież panel
             window.selectedLeaderCallback = function(krol) {
                 selectedLeader = krol;
                 updatePage();
             };
         }
     });
+
+    // Obsługa prawego kliknięcia na kartę w kolekcji
+    if (collectionArea) {
+        collectionArea.addEventListener('contextmenu', function(e) {
+            const cardEl = e.target.closest('.card');
+            if(cardEl) {
+                e.preventDefault();
+                const numer = cardEl.getAttribute('data-numer');
+                const idx = cards.findIndex(c => c.numer === numer);
+                if(idx !== -1) showPowiek(cards, idx, 'cards');
+            }
+        });
+    }
+    // Obsługa prawego kliknięcia na kartę w talii
+    if (deckArea) {
+        deckArea.addEventListener('contextmenu', function(e) {
+            const cardEl = e.target.closest('.card');
+            if(cardEl) {
+                e.preventDefault();
+                const numer = cardEl.getAttribute('data-numer');
+                const idx = deck.findIndex(c => c.numer === numer);
+                if(idx !== -1) showPowiek(deck, idx, 'cards');
+            }
+        });
+    }
 });
 
 window.addEventListener('DOMContentLoaded', () => {
