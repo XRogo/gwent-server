@@ -1,5 +1,5 @@
 // Podgląd powiększenia kart
-import moce from './moce.js';
+import * as moce from './moce.js';
 import { krole } from './krole.js';
 
 let powiekIndex = 0;
