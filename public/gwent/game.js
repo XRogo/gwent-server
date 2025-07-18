@@ -1,5 +1,6 @@
 import cards from './cards.js';
 import { krole } from './krole.js';
+import { showPowiek } from './powiek.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
@@ -525,39 +526,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
 
-        // Wyświetlanie liderów z krole.js dla wybranej frakcji
+        // Wyświetl wybranego dowódcę w slocie na lidera
         if (leaderCard) {
             leaderCard.innerHTML = '';
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
-            leaders.forEach((krol, i) => {
+            // Wybrany dowódca lub pierwszy z listy
+            const selected = window.selectedLeader && window.selectedLeader.frakcja === faction.id ? window.selectedLeader : leaders[0];
+            if (selected) {
                 const div = document.createElement('div');
                 div.className = 'leader-card-item';
-                div.style.display = 'inline-block';
-                div.style.margin = '12px';
-                div.style.textAlign = 'center';
+                div.style.position = 'relative';
+                div.style.width = '100%';
+                div.style.height = '100%';
+                div.style.display = 'flex';
+                div.style.flexDirection = 'column';
+                div.style.alignItems = 'center';
+                div.style.justifyContent = 'center';
                 div.style.cursor = 'pointer';
-                div.onclick = () => {
-                    window.selectedLeader = krol;
-                    // Możesz dodać podgląd powiększenia lub callback
+                div.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    showPowiek(leaders, leaders.indexOf(selected), 'leaders');
                 };
+                // Beton pod kartą
+                const beton = document.createElement('div');
+                beton.className = 'beton';
+                beton.style.position = 'absolute';
+                beton.style.left = '0';
+                beton.style.top = '0';
+                beton.style.width = '100%';
+                beton.style.height = '100%';
+                beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+                beton.style.backgroundSize = 'cover';
+                beton.style.zIndex = '1';
+                div.appendChild(beton);
+                // Karta dowódcy
                 const img = document.createElement('img');
-                img.src = krol.dkarta;
-                img.style.width = '180px';
-                img.style.height = '240px';
+                img.src = selected.dkarta;
+                img.style.width = '80%';
+                img.style.height = '80%';
                 img.style.objectFit = 'contain';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
+                img.style.zIndex = '2';
+                img.style.position = 'relative';
                 div.appendChild(img);
+                // Nazwa dowódcy
                 const nameDiv = document.createElement('div');
-                nameDiv.innerText = krol.nazwa;
+                nameDiv.innerText = selected.nazwa;
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#c7a76e';
                 nameDiv.style.fontSize = '1.2em';
                 nameDiv.style.marginTop = '8px';
+                nameDiv.style.zIndex = '3';
+                nameDiv.style.position = 'relative';
                 div.appendChild(nameDiv);
                 leaderCard.appendChild(div);
-            });
+            }
         }
 
         const baseLeft = 1850;

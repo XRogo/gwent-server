@@ -10,7 +10,7 @@ const krole = [
         ////////////////////////////////////////////////////////////////////
         nazwa: "Foltest Król Temerii",
         karta: "/gwent/assets/karty/polnoc/foltest1.webp",
-        dkarta: "/gwent/assets/dkarty/krue/1001.webp",
+        dkarta: "/gwent/assets/dkarty/kure/1001.webp",
         opis: "Przecież to naturalne, że brat darzy miłością swoją siostrę.",
         frakcja: "1",
         numer: "1001",
