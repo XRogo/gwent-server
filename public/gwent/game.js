@@ -525,8 +525,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
 
+        // Wyświetlanie liderów z krole.js dla wybranej frakcji
         if (leaderCard) {
-            leaderCard.innerHTML = `<img src="assets/dkarty/lider_${faction.id}.webp" style="width: 100%; height: 100%;">`;
+            leaderCard.innerHTML = '';
+            const leaders = krole.filter(krol => krol.frakcja === faction.id);
+            leaders.forEach((krol, i) => {
+                const div = document.createElement('div');
+                div.className = 'leader-card-item';
+                div.style.display = 'inline-block';
+                div.style.margin = '12px';
+                div.style.textAlign = 'center';
+                div.style.cursor = 'pointer';
+                div.onclick = () => {
+                    window.selectedLeader = krol;
+                    // Możesz dodać podgląd powiększenia lub callback
+                };
+                const img = document.createElement('img');
+                img.src = krol.dkarta;
+                img.style.width = '180px';
+                img.style.height = '240px';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '12px';
+                img.style.boxShadow = '0 0 16px #000';
+                div.appendChild(img);
+                const nameDiv = document.createElement('div');
+                nameDiv.innerText = krol.nazwa;
+                nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+                nameDiv.style.fontWeight = 'bold';
+                nameDiv.style.color = '#c7a76e';
+                nameDiv.style.fontSize = '1.2em';
+                nameDiv.style.marginTop = '8px';
+                div.appendChild(nameDiv);
+                leaderCard.appendChild(div);
+            });
         }
 
         const baseLeft = 1850;

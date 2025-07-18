@@ -1,5 +1,7 @@
 // Nowy plik gra.js - logika wyboru kart i startu gry
 import cards from './cards.js';
+import { showPowiek } from './powiek.js';
+import { krole } from './krole.js';
 
 let deck = [];
 let timer = null;
@@ -134,6 +136,12 @@ function renderCards() {
         cardDiv.style.objectFit = 'contain';
         cardDiv.style.aspectRatio = '3/4';
         cardDiv.style.zIndex = 10 + i;
+        cardDiv.className = 'card';
+        cardDiv.dataset.index = i;
+        cardDiv.oncontextmenu = (e) => {
+            e.preventDefault();
+            showPowiek(deck, i, 'cards');
+        };
         cardsArea.appendChild(cardDiv);
     });
     overlay.appendChild(cardsArea);
@@ -190,7 +198,8 @@ function renderRow(cards, rowKey) {
     cards.forEach((card,i)=>{
         const cardDiv = document.createElement('img');
         cardDiv.src = card.karta;
-        cardDiv.className = 'row-card';
+        cardDiv.className = 'row-card card';
+        cardDiv.dataset.index = i;
         cardDiv.style.position = 'absolute';
         cardDiv.style.left = (startX + i * (cardW + realGap))+'px';
         cardDiv.style.top = ((areaH-cardH)/2)+'px';
@@ -199,6 +208,10 @@ function renderRow(cards, rowKey) {
         cardDiv.style.objectFit = 'contain';
         cardDiv.style.aspectRatio = '3/4';
         cardDiv.style.zIndex = 10+i;
+        cardDiv.oncontextmenu = (e) => {
+            e.preventDefault();
+            showPowiek(cards, i, 'cards');
+        };
         rowDiv.appendChild(cardDiv);
     });
     overlay.appendChild(rowDiv);
@@ -277,10 +290,54 @@ function renderExtraPile(cards, isPlayer) {
     overlay.appendChild(pileDiv);
 }
 
+function renderLeaders() {
+    const overlay = document.querySelector('.overlay');
+    if (!overlay) return;
+    const leadersArea = document.createElement('div');
+    leadersArea.className = 'leaders-area';
+    leadersArea.style.position = 'absolute';
+    leadersArea.style.left = '50%';
+    leadersArea.style.top = '10%';
+    leadersArea.style.transform = 'translateX(-50%)';
+    leadersArea.style.zIndex = 100;
+    leadersArea.style.display = 'flex';
+    leadersArea.style.gap = '32px';
+    krole.forEach((krol, i) => {
+        const div = document.createElement('div');
+        div.className = 'leader-card';
+        div.style.display = 'flex';
+        div.style.flexDirection = 'column';
+        div.style.alignItems = 'center';
+        div.style.cursor = 'pointer';
+        div.oncontextmenu = (e) => {
+            e.preventDefault();
+            showPowiek(krole, i, 'leaders');
+        };
+        const img = document.createElement('img');
+        img.src = krol.dkarta;
+        img.style.width = '180px';
+        img.style.height = '240px';
+        img.style.objectFit = 'contain';
+        img.style.borderRadius = '12px';
+        img.style.boxShadow = '0 0 16px #000';
+        div.appendChild(img);
+        const nameDiv = document.createElement('div');
+        nameDiv.innerText = krol.nazwa;
+        nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+        nameDiv.style.fontWeight = 'bold';
+        nameDiv.style.color = '#c7a76e';
+        nameDiv.style.fontSize = '1.2em';
+        nameDiv.style.marginTop = '8px';
+        div.appendChild(nameDiv);
+        leadersArea.appendChild(div);
+    });
+    overlay.appendChild(leadersArea);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
     renderCards();
     window.addEventListener('resize', renderCards);
 });
 
-export { renderRow, renderRog, renderExtraPile };
+export { renderRow, renderRog, renderExtraPile, renderLeaders };
