@@ -534,51 +534,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                const div = document.createElement('div');
-                div.className = 'leader-card-item';
-                div.style.position = 'relative';
-                div.style.width = '100%';
-                div.style.height = '100%';
-                div.style.display = 'flex';
-                div.style.flexDirection = 'column';
-                div.style.alignItems = 'center';
-                div.style.justifyContent = 'center';
-                div.style.cursor = 'pointer';
-                // Beton pod kartą
-                const beton = document.createElement('div');
-                beton.className = 'beton';
-                beton.style.position = 'absolute';
-                beton.style.left = '0';
-                beton.style.top = '0';
-                beton.style.width = '100%';
-                beton.style.height = '100%';
-                beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-                beton.style.backgroundSize = 'cover';
-                beton.style.zIndex = '1';
-                div.appendChild(beton);
+                // Jeden beton jako tło (nie duplikuj)
+                leaderCard.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+                leaderCard.style.backgroundSize = 'cover';
+                leaderCard.style.position = 'relative';
                 // Karta dowódcy
                 const img = document.createElement('img');
                 img.src = selected.dkarta;
-                img.style.width = '80%';
-                img.style.height = '80%';
+                img.style.position = 'absolute';
+                img.style.left = '50%';
+                img.style.top = '50%';
+                img.style.transform = 'translate(-50%, -60%)';
+                img.style.width = '70%';
+                img.style.height = 'auto';
                 img.style.objectFit = 'contain';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
                 img.style.zIndex = '2';
-                img.style.position = 'relative';
-                div.appendChild(img);
+                leaderCard.appendChild(img);
                 // Nazwa dowódcy
                 const nameDiv = document.createElement('div');
                 nameDiv.innerText = selected.nazwa;
+                nameDiv.style.position = 'absolute';
+                nameDiv.style.left = '50%';
+                nameDiv.style.top = '80%';
+                nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#c7a76e';
-                nameDiv.style.fontSize = '1.2em';
-                nameDiv.style.marginTop = '8px';
+                nameDiv.style.fontSize = '1em';
+                nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
-                nameDiv.style.position = 'relative';
-                div.appendChild(nameDiv);
-                leaderCard.appendChild(div);
+                leaderCard.appendChild(nameDiv);
             }
         }
 
