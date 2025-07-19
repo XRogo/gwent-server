@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Podgląd dowódców po naciśnięciu X
     let previewActive = false;
     let previewDiv = null;
-    document.addEventListener('keydown', function(e) {
+    window.addEventListener('keydown', function(e) {
         if ((e.key === 'x' || e.key === 'X') && !previewActive) {
             const factionId = localStorage.getItem('faction') || '1';
             let leaders = krole.filter(krol => krol.frakcja === factionId);
@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Podgląd dowódców aktywowany');
         }
     });
-    document.addEventListener('contextmenu', function(e) {
+    window.addEventListener('contextmenu', function(e) {
         if (previewActive && previewDiv) {
             e.preventDefault();
             previewDiv.remove();
