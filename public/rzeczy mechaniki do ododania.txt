@@ -36,7 +36,7 @@ przeciwnika 3483, 358 x 358, 433
 czcionka ma być gwent-server\public\gwent\assets\fonts ta co tu sie znajduje pogrubiona i kolor c7a76e
 
 
-wygląd powiększenia kart jeśli gracz nacisnie (prawy myszy) na karte podczas wybieranie lub gry zostanie aktywowany ta funkcja pojawią sie duże karyw w pozycjach
+wygląd powiększenia kart jeśli gracz nacisnie (prawy myszy){w tym przypadku x} na karte podczas wybieranie lub gry zostanie aktywowany ta funkcja pojawią sie duże karyw w pozycjach
 karta -2  468, 444 x 899, 1261
 karta -1  1040, 444 x 1563, 1436
 karta 0 1617, 456 x 2222, 1609
@@ -55,3 +55,5 @@ wybór dowódców obdywa sie za pomocą przycisku "x" po naciśnięciu akwywóje
 
 pozycaj któla wybor 
 1792, 538 x 2051, 1029
+
+Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są skalowane względem gui.webp, a karta dowódcy wypełnia ten obszar proporcjonalnie (object-fit: contain), z betonem i nazwą."

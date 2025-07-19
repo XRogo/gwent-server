@@ -47,7 +47,6 @@ function renderPowiek() {
     ];
     const scaleW = window.innerWidth / 3837;
     const scaleH = window.innerHeight / 2158;
-    // Animacja przesuwania
     overlay.classList.add('powiek-anim');
     // Karty
     for(let i=-2;i<=2;i++){
@@ -55,9 +54,8 @@ function renderPowiek() {
         if(idx<0||idx>=powiekDeck.length) continue;
         const card = powiekDeck[idx];
         const pos = positions[i+2];
-        const cardDiv = document.createElement('img');
+        const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card';
-        cardDiv.src = powiekMode==='leaders'?card.dkarta:card.karta;
         cardDiv.style.position = 'absolute';
         cardDiv.style.left = (pos.left*scaleW)+'px';
         cardDiv.style.top = (pos.top*scaleH)+'px';
@@ -65,7 +63,46 @@ function renderPowiek() {
         cardDiv.style.height = (pos.height*scaleH)+'px';
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
-        overlay.appendChild(cardDiv);
+        // Obraz karty
+        const img = document.createElement('img');
+        img.src = powiekMode==='leaders'?card.dkarta:card.karta;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.borderRadius = '12px';
+        img.style.boxShadow = '0 0 16px #000';
+        img.style.position = 'absolute';
+        img.style.left = '0';
+        img.style.top = '0';
+        cardDiv.appendChild(img);
+        // Beton i nazwa dla leaders
+        if(powiekMode==='leaders'){
+            const beton = document.createElement('div');
+            beton.className = 'beton';
+            beton.style.position = 'absolute';
+            beton.style.left = '0';
+            beton.style.top = '0';
+            beton.style.width = '100%';
+            beton.style.height = '100%';
+            beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+            beton.style.backgroundSize = 'cover';
+            beton.style.backgroundRepeat = 'no-repeat';
+            beton.style.zIndex = '1';
+            cardDiv.appendChild(beton);
+            const nameDiv = document.createElement('div');
+            nameDiv.innerText = card.nazwa;
+            nameDiv.style.position = 'absolute';
+            nameDiv.style.left = '50%';
+            nameDiv.style.top = '90%';
+            nameDiv.style.transform = 'translateX(-50%)';
+            nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+            nameDiv.style.fontWeight = 'bold';
+            nameDiv.style.color = '#474747';
+            nameDiv.style.fontSize = '2em';
+            nameDiv.style.textAlign = 'center';
+            nameDiv.style.zIndex = '3';
+            cardDiv.appendChild(nameDiv);
+        }
         // Opis pod dużą kartą
         if(i===0){
             const opisDiv = document.createElement('div');
@@ -81,64 +118,7 @@ function renderPowiek() {
             opisDiv.style.zIndex = 110;
             overlay.appendChild(opisDiv);
         }
-    }
-    // Okienko info (tylko dla kart)
-    if(powiekMode==='cards'){
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'powiek-info';
-        infoDiv.style.position = 'absolute';
-        infoDiv.style.left = (1356*scaleW)+'px';
-        infoDiv.style.top = (1661*scaleH)+'px';
-        infoDiv.style.width = (inforW=866*scaleW)+'px';
-        infoDiv.style.height = (inforH=74*scaleH)+'px';
-        infoDiv.style.background = `url('/gwent/assets/asety/infor.webp')`;
-        infoDiv.style.backgroundSize = 'cover';
-        infoDiv.style.zIndex = 120;
-        overlay.appendChild(infoDiv);
-        // Ikona mocy
-        const card = powiekDeck[powiekIndex];
-        if(card&&card.moc){
-            const moc = moce[card.moc];
-            if(moc&&moc.ikona){
-                const ikonaDiv = document.createElement('img');
-                ikonaDiv.className = 'powiek-ikona';
-                ikonaDiv.src = moc.ikona;
-                ikonaDiv.style.position = 'absolute';
-                ikonaDiv.style.left = (1356*scaleW)+'px';
-                ikonaDiv.style.top = (1661*scaleH)+'px';
-                ikonaDiv.style.width = (64*scaleW)+'px';
-                ikonaDiv.style.height = (64*scaleH)+'px';
-                ikonaDiv.style.zIndex = 130;
-                overlay.appendChild(ikonaDiv);
-            }
-            // Nazwa mocy
-            const nazwaDiv = document.createElement('div');
-            nazwaDiv.className = 'powiek-nazwa';
-            nazwaDiv.innerText = moc.nazwa||'';
-            nazwaDiv.style.position = 'absolute';
-            nazwaDiv.style.left = (1356*scaleW)+'px';
-            nazwaDiv.style.top = (1735*scaleH)+'px';
-            nazwaDiv.style.width = (inforW)+'px';
-            nazwaDiv.style.textAlign = 'center';
-            nazwaDiv.style.color = '#c7a76e';
-            nazwaDiv.style.fontWeight = 'bold';
-            nazwaDiv.style.fontSize = (36*scaleW)+'px';
-            nazwaDiv.style.zIndex = 131;
-            overlay.appendChild(nazwaDiv);
-            // Opis mocy
-            const opisDiv = document.createElement('div');
-            opisDiv.className = 'powiek-moc-opis';
-            opisDiv.innerText = moc.opis||'';
-            opisDiv.style.position = 'absolute';
-            opisDiv.style.left = (1356*scaleW)+'px';
-            opisDiv.style.top = (1814*scaleH)+'px';
-            opisDiv.style.width = (inforW)+'px';
-            opisDiv.style.textAlign = 'center';
-            opisDiv.style.color = '#fff';
-            opisDiv.style.fontSize = (28*scaleW)+'px';
-            opisDiv.style.zIndex = 132;
-            overlay.appendChild(opisDiv);
-        }
+        overlay.appendChild(cardDiv);
     }
     // Pod główną kartą podsw.webp
     const podsw = document.createElement('img');
