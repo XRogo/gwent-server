@@ -569,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pageLeft.addEventListener('click', () => {
             currentPage = (currentPage - 2 + factions.length) % factions.length + 1;
             updatePage();
+            updateStats();
         });
     }
 
@@ -577,6 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pageRight.addEventListener('click', () => {
             currentPage = currentPage % factions.length + 1;
             updatePage();
+            updateStats();
         });
     }
 
