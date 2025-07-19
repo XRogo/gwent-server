@@ -341,9 +341,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Podgląd dowódców po naciśnięciu X
     let previewActive = false;
     let previewDiv = null;
-    window.addEventListener('keydown', function(e) {
-        console.log('Klawisz:', e.key);
-        if ((e.key === 'x' || e.key === 'X')) {
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'x' || event.key === 'X') {
+            console.log('Naciśnięto klawisz X');
             let factionId = localStorage.getItem('faction');
             let leaders;
             if (factionId) {

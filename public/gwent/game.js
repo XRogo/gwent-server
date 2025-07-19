@@ -588,11 +588,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const factionShield = document.querySelector('.faction-shield');
         const factionAbility = document.querySelector('.faction-ability');
         const leaderCard = document.querySelector('.leader-card');
-        // Pobierz backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop tylko raz na górze pliku
-        // ...znajdź istniejące deklaracje na górze pliku i użyj ich tutaj...
-        // Jeśli są już zdefiniowane w updatePositionsAndScaling, pobierz je przez wywołanie tej funkcji i przekazanie wartości
-        updatePositionsAndScaling();
-        // ...pozostały kod updatePage bez ponownego deklarowania tych zmiennych...
+        // Pobierz backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop
+        const overlay = document.querySelector('.overlay');
+        if (!overlay) return;
+        const overlayRect = overlay.getBoundingClientRect();
+        const overlayWidth = overlayRect.width;
+        const overlayHeight = overlayRect.height;
+        const overlayLeft = overlayRect.left;
+        const overlayTop = overlayRect.top;
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+        if (windowAspectRatio > guiAspectRatio) {
+            scale = overlayHeight / GUI_HEIGHT;
+            backgroundWidth = GUI_WIDTH * scale;
+            backgroundHeight = overlayHeight;
+            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+            backgroundTop = overlayTop;
+        } else {
+            scale = overlayWidth / GUI_WIDTH;
+            backgroundWidth = overlayWidth;
+            backgroundHeight = GUI_HEIGHT * scale;
+            backgroundLeft = overlayLeft;
+            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
+        }
 
         if (factionName) factionName.textContent = faction.name;
         if (factionShield) factionShield.src = faction.shield;
@@ -680,29 +699,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const spacing = 26;
         const topPosition = 208;
         // Dodaj pobieranie backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop
-        const overlay = document.querySelector('.overlay');
-        if (!overlay) return;
-        const overlayRect = overlay.getBoundingClientRect();
-        const overlayWidth = overlayRect.width;
-        const overlayHeight = overlayRect.height;
-        const overlayLeft = overlayRect.left;
-        const overlayTop = overlayRect.top;
-        const windowAspectRatio = window.innerWidth / window.innerHeight;
-        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
-        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
-        if (windowAspectRatio > guiAspectRatio) {
-            scale = overlayHeight / GUI_HEIGHT;
-            backgroundWidth = GUI_WIDTH * scale;
-            backgroundHeight = overlayHeight;
-            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-            backgroundTop = overlayTop;
-        } else {
-            scale = overlayWidth / GUI_WIDTH;
-            backgroundWidth = overlayWidth;
-            backgroundHeight = GUI_HEIGHT * scale;
-            backgroundLeft = overlayLeft;
-            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-        }
         const marginCompensation = (currentPage - 1) * (10 * scale);
         const leftPosition = baseLeft + (currentPage - 1) * spacing - marginCompensation;
         const pageIndicators = document.querySelector('.page-indicators');
