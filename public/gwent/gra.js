@@ -342,6 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let previewActive = false;
     let previewDiv = null;
     window.addEventListener('keydown', function(e) {
+        console.log('Klawisz:', e.key);
         if ((e.key === 'x' || e.key === 'X')) {
             let factionId = localStorage.getItem('faction');
             let leaders;

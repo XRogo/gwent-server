@@ -299,7 +299,7 @@ const krole = [
         //////////////////////////////////////////////////////////
         nazwa: "Król Bran",
         karta: "/gwent/assets/karty/Skellige/bran.webp",
-        dkarta: "/gwent/assets/dkarty/kure/bran.webp",
+        dkarta: "/gwent/assets/dkarty/kure/5001.webp",
         opis: '"Nikt nie zastąpi Brana. Moge jedynie próbować."',
         frakcja: "5",
         numer: "5001",
@@ -313,7 +313,7 @@ const krole = [
         ///////////////////////////////////////////////////////////////////
         nazwa: "Crach an Craite",
         karta: "/gwent/assets/karty/Skellige/crach.webp",
-        dkarta: "/gwent/assets/dkarty/kure/crach.webp",
+        dkarta: "/gwent/assets/dkarty/kure/5002.webp",
         opis: '"Król musi być madry. Król musi cieszyć się szacunkiem. Król miusi mieć jaja".',
         frakcja: "5",
         numer: "5002",

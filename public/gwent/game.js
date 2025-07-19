@@ -588,6 +588,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const factionShield = document.querySelector('.faction-shield');
         const factionAbility = document.querySelector('.faction-ability');
         const leaderCard = document.querySelector('.leader-card');
+        // Pobierz backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop tylko raz na górze pliku
+        // ...znajdź istniejące deklaracje na górze pliku i użyj ich tutaj...
+        // Jeśli są już zdefiniowane w updatePositionsAndScaling, pobierz je przez wywołanie tej funkcji i przekazanie wartości
+        updatePositionsAndScaling();
+        // ...pozostały kod updatePage bez ponownego deklarowania tych zmiennych...
 
         if (factionName) factionName.textContent = faction.name;
         if (factionShield) factionShield.src = faction.shield;
