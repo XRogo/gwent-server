@@ -338,6 +338,61 @@ document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
     renderCards();
     window.addEventListener('resize', renderCards);
+    // Podgląd dowódców po naciśnięciu X
+    let previewActive = false;
+    let previewDiv = null;
+    document.addEventListener('keydown', function(e) {
+        if ((e.key === 'x' || e.key === 'X') && !previewActive) {
+            const factionId = localStorage.getItem('faction') || '1';
+            let leaders = krole.filter(krol => krol.frakcja === factionId);
+            if (factionId === '5') leaders = leaders.slice(0,2); // Skellige tylko 2
+            previewDiv = document.createElement('div');
+            previewDiv.className = 'leader-preview';
+            previewDiv.style.position = 'fixed';
+            previewDiv.style.left = '50%';
+            previewDiv.style.top = '50%';
+            previewDiv.style.transform = 'translate(-50%, -50%)';
+            previewDiv.style.background = 'rgba(0,0,0,0.8)';
+            previewDiv.style.padding = '32px';
+            previewDiv.style.zIndex = '9999';
+            previewDiv.style.display = 'flex';
+            previewDiv.style.gap = '32px';
+            leaders.forEach(krol => {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.flexDirection = 'column';
+                div.style.alignItems = 'center';
+                const img = document.createElement('img');
+                img.src = krol.dkarta;
+                img.style.width = '180px';
+                img.style.height = '240px';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '12px';
+                img.style.boxShadow = '0 0 16px #000';
+                div.appendChild(img);
+                const nameDiv = document.createElement('div');
+                nameDiv.innerText = krol.nazwa;
+                nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+                nameDiv.style.fontWeight = 'bold';
+                nameDiv.style.color = '#c7a76e';
+                nameDiv.style.fontSize = '1.2em';
+                nameDiv.style.marginTop = '8px';
+                div.appendChild(nameDiv);
+                previewDiv.appendChild(div);
+            });
+            document.body.appendChild(previewDiv);
+            previewActive = true;
+            console.log('Podgląd dowódców aktywowany');
+        }
+    });
+    document.addEventListener('contextmenu', function(e) {
+        if (previewActive && previewDiv) {
+            e.preventDefault();
+            previewDiv.remove();
+            previewActive = false;
+            console.log('Podgląd dowódców zamknięty');
+        }
+    });
 });
 
 export { renderRow, renderRog, renderExtraPile, renderLeaders };
