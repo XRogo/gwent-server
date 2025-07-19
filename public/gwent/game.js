@@ -62,6 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePositionsAndScaling() {
         const overlay = document.querySelector('.overlay');
         if (!overlay) return;
+        // Dodaję aktualną frakcję
+        const faction = factions[currentPage - 1];
 
         const overlayRect = overlay.getBoundingClientRect();
         const overlayWidth = overlayRect.width;
