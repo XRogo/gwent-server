@@ -51,3 +51,7 @@ funkcjie i wygląd tej funkcji mają być opisane w powiek.css i powiek.js (jeś
 
 
 wybór dowódców obdywa sie za pomocą przycisku "x" po naciśnięciu akwywóje sie powiększenie będą tam do wyboróu karty dowódców budowa barty ma być podobna co do dkarty ma być wyśwlitlana obraz karty beton i nazwa karty (opisy królów są w \gwent\krole.js (nie ma narazie opisu funkci dlatego że nie ma odpowiednich mechanik do wprowadzania ich)) po kilknięciu prawym ma sie aktywować wybór odwódców
+
+
+pozycaj któla wybor 
+1792, 538 x 2051, 1029

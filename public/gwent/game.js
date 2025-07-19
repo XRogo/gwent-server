@@ -236,10 +236,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const leaderCard = document.querySelector('.leader-card');
         if (leaderCard) {
-            leaderCard.style.width = `${(259 / GUI_WIDTH) * 100}%`;
-            leaderCard.style.height = `${(490 / GUI_HEIGHT) * 100}%`;
-            leaderCard.style.left = `${backgroundLeft + (1792 / GUI_WIDTH) * backgroundWidth}px`;
-            leaderCard.style.top = `${backgroundTop + (539 / GUI_HEIGHT) * backgroundHeight}px`;
+            leaderCard.innerHTML = '';
+            const leaders = krole.filter(krol => krol.frakcja === faction.id);
+            const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
+            if (selected) {
+                // Pozycja dowódcy wg schematu 4K
+                const scaleW = window.innerWidth / 3837;
+                const scaleH = window.innerHeight / 2158;
+                leaderCard.style.position = 'absolute';
+                leaderCard.style.left = (1792*scaleW)+'px';
+                leaderCard.style.top = (538*scaleH)+'px';
+                leaderCard.style.width = ((2051-1792)*scaleW)+'px';
+                leaderCard.style.height = ((1029-538)*scaleH)+'px';
+                leaderCard.style.background = 'none';
+                // Beton
+                const beton = document.createElement('div');
+                beton.className = 'beton';
+                beton.style.position = 'absolute';
+                beton.style.left = '0';
+                beton.style.top = '0';
+                beton.style.width = '100%';
+                beton.style.height = '100%';
+                beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+                beton.style.backgroundSize = 'cover';
+                beton.style.zIndex = '1';
+                leaderCard.appendChild(beton);
+                // Obraz karty
+                const img = document.createElement('img');
+                img.src = selected.dkarta;
+                img.style.position = 'absolute';
+                img.style.left = '50%';
+                img.style.top = '50%';
+                img.style.transform = 'translate(-50%, -50%)';
+                img.style.width = '70%';
+                img.style.height = 'auto';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '12px';
+                img.style.boxShadow = '0 0 16px #000';
+                img.style.zIndex = '2';
+                leaderCard.appendChild(img);
+                // Nazwa dowódcy
+                const nameDiv = document.createElement('div');
+                nameDiv.innerText = selected.nazwa;
+                nameDiv.style.position = 'absolute';
+                nameDiv.style.left = '50%';
+                nameDiv.style.top = ((1029-538-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.transform = 'translateX(-50%)';
+                nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+                nameDiv.style.fontWeight = 'bold';
+                nameDiv.style.color = '#474747';
+                nameDiv.style.fontSize = (32*scaleW)+'px';
+                nameDiv.style.textAlign = 'center';
+                nameDiv.style.zIndex = '3';
+                leaderCard.appendChild(nameDiv);
+            }
         }
 
         const goToGameButton = document.getElementById('goToGameButton');
@@ -534,17 +584,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Jeden beton jako tło (nie duplikuj)
-                leaderCard.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-                leaderCard.style.backgroundSize = 'cover';
-                leaderCard.style.position = 'relative';
-                // Karta dowódcy
+                // Pozycja dowódcy wg schematu 4K
+                const scaleW = window.innerWidth / 3837;
+                const scaleH = window.innerHeight / 2158;
+                leaderCard.style.position = 'absolute';
+                leaderCard.style.left = (1792*scaleW)+'px';
+                leaderCard.style.top = (538*scaleH)+'px';
+                leaderCard.style.width = ((2051-1792)*scaleW)+'px';
+                leaderCard.style.height = ((1029-538)*scaleH)+'px';
+                leaderCard.style.background = 'none';
+                // Beton
+                const beton = document.createElement('div');
+                beton.className = 'beton';
+                beton.style.position = 'absolute';
+                beton.style.left = '0';
+                beton.style.top = '0';
+                beton.style.width = '100%';
+                beton.style.height = '100%';
+                beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+                beton.style.backgroundSize = 'cover';
+                beton.style.zIndex = '1';
+                leaderCard.appendChild(beton);
+                // Obraz karty
                 const img = document.createElement('img');
                 img.src = selected.dkarta;
                 img.style.position = 'absolute';
                 img.style.left = '50%';
                 img.style.top = '50%';
-                img.style.transform = 'translate(-50%, -60%)';
+                img.style.transform = 'translate(-50%, -50%)';
                 img.style.width = '70%';
                 img.style.height = 'auto';
                 img.style.objectFit = 'contain';
@@ -557,12 +624,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = '80%';
+                nameDiv.style.top = ((1029-538-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
-                nameDiv.style.color = '#c7a76e';
-                nameDiv.style.fontSize = '1em';
+                nameDiv.style.color = '#474747';
+                nameDiv.style.fontSize = (32*scaleW)+'px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
