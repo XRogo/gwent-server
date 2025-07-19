@@ -595,6 +595,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
 
+        // Odśwież karty i dowódcę dynamicznie
+        displayCollection('all');
+        displayDeck();
+        updateStats();
+        updatePositionsAndScaling();
+
         // Wyświetl tylko jednego dowódcę w slocie lidera
         if (leaderCard) {
             leaderCard.innerHTML = '';
