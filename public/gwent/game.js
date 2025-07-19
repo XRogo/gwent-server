@@ -242,15 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Pozycja i wymiary wg GUI 4K
-                const guiW = 1001, guiH = 2004;
-                const scaleW = window.innerWidth / 3837;
-                const scaleH = window.innerHeight / 2158;
+                // Statyczny obszar dowódcy
                 leaderCard.style.position = 'absolute';
-                leaderCard.style.left = (1792*scaleW)+'px';
-                leaderCard.style.top = (538*scaleH)+'px';
-                leaderCard.style.width = (guiW*scaleW)+'px';
-                leaderCard.style.height = (guiH*scaleH)+'px';
+                leaderCard.style.left = '1792px';
+                leaderCard.style.top = '538px';
+                leaderCard.style.width = '1001px';
+                leaderCard.style.height = '2004px';
                 leaderCard.style.background = 'none';
                 // Tło
                 const tlo = document.createElement('div');
@@ -295,12 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = (1800*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = '1800px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#474747';
-                nameDiv.style.fontSize = (32*scaleW)+'px';
+                nameDiv.style.fontSize = '32px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
@@ -599,15 +596,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Pozycja i wymiary wg GUI 4K
-                const guiW = 1001, guiH = 2004;
-                const scaleW = window.innerWidth / 3837;
-                const scaleH = window.innerHeight / 2158;
+                // Statyczny obszar dowódcy
                 leaderCard.style.position = 'absolute';
-                leaderCard.style.left = (1792*scaleW)+'px';
-                leaderCard.style.top = (538*scaleH)+'px';
-                leaderCard.style.width = (guiW*scaleW)+'px';
-                leaderCard.style.height = (guiH*scaleH)+'px';
+                leaderCard.style.left = '1792px';
+                leaderCard.style.top = '538px';
+                leaderCard.style.width = '1001px';
+                leaderCard.style.height = '2004px';
                 leaderCard.style.background = 'none';
                 // Tło
                 const tlo = document.createElement('div');
@@ -652,12 +646,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = (1800*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = '1800px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#474747';
-                nameDiv.style.fontSize = (32*scaleW)+'px';
+                nameDiv.style.fontSize = '32px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
