@@ -242,15 +242,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Pozycja dowódcy wg schematu 4K
+                // Pozycja i wymiary wg GUI 4K
+                const guiW = 1001, guiH = 2004;
                 const scaleW = window.innerWidth / 3837;
                 const scaleH = window.innerHeight / 2158;
                 leaderCard.style.position = 'absolute';
                 leaderCard.style.left = (1792*scaleW)+'px';
                 leaderCard.style.top = (538*scaleH)+'px';
-                leaderCard.style.width = ((2051-1792)*scaleW)+'px';
-                leaderCard.style.height = ((1029-538)*scaleH)+'px';
+                leaderCard.style.width = (guiW*scaleW)+'px';
+                leaderCard.style.height = (guiH*scaleH)+'px';
                 leaderCard.style.background = 'none';
+                // Tło
+                const tlo = document.createElement('div');
+                tlo.className = 'leader-bg';
+                tlo.style.position = 'absolute';
+                tlo.style.left = '0';
+                tlo.style.top = '0';
+                tlo.style.width = '100%';
+                tlo.style.height = '100%';
+                tlo.style.background = '#000';
+                tlo.style.opacity = '0.1';
+                tlo.style.zIndex = '0';
+                leaderCard.appendChild(tlo);
                 // Beton
                 const beton = document.createElement('div');
                 beton.className = 'beton';
@@ -260,21 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 beton.style.width = '100%';
                 beton.style.height = '100%';
                 beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-                beton.style.backgroundSize = 'contain';
+                beton.style.backgroundSize = 'cover';
                 beton.style.backgroundRepeat = 'no-repeat';
                 beton.style.zIndex = '1';
                 leaderCard.appendChild(beton);
-                // Obraz karty proporcjonalny jak dkarta
+                // Obraz karty
                 const img = document.createElement('img');
                 img.src = selected.dkarta;
                 img.style.position = 'absolute';
-                img.style.left = '50%';
-                img.style.top = '50%';
-                img.style.transform = 'translate(-50%, -50%)';
-                img.style.width = '80%';
-                img.style.height = 'auto';
-                img.style.maxHeight = '80%';
-                img.style.objectFit = 'contain';
+                img.style.left = '0';
+                img.style.top = '0';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
                 img.style.zIndex = '2';
@@ -284,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = ((1029-538-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = (1800*scaleH)+'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
@@ -588,15 +599,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Pozycja dowódcy wg schematu 4K
+                // Pozycja i wymiary wg GUI 4K
+                const guiW = 1001, guiH = 2004;
                 const scaleW = window.innerWidth / 3837;
                 const scaleH = window.innerHeight / 2158;
                 leaderCard.style.position = 'absolute';
                 leaderCard.style.left = (1792*scaleW)+'px';
                 leaderCard.style.top = (538*scaleH)+'px';
-                leaderCard.style.width = ((2051-1792)*scaleW)+'px';
-                leaderCard.style.height = ((1029-538)*scaleH)+'px';
+                leaderCard.style.width = (guiW*scaleW)+'px';
+                leaderCard.style.height = (guiH*scaleH)+'px';
                 leaderCard.style.background = 'none';
+                // Tło
+                const tlo = document.createElement('div');
+                tlo.className = 'leader-bg';
+                tlo.style.position = 'absolute';
+                tlo.style.left = '0';
+                tlo.style.top = '0';
+                tlo.style.width = '100%';
+                tlo.style.height = '100%';
+                tlo.style.background = '#000';
+                tlo.style.opacity = '0.1';
+                tlo.style.zIndex = '0';
+                leaderCard.appendChild(tlo);
                 // Beton
                 const beton = document.createElement('div');
                 beton.className = 'beton';
@@ -606,21 +630,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 beton.style.width = '100%';
                 beton.style.height = '100%';
                 beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-                beton.style.backgroundSize = 'contain';
+                beton.style.backgroundSize = 'cover';
                 beton.style.backgroundRepeat = 'no-repeat';
                 beton.style.zIndex = '1';
                 leaderCard.appendChild(beton);
-                // Obraz karty proporcjonalny jak dkarta
+                // Obraz karty
                 const img = document.createElement('img');
                 img.src = selected.dkarta;
                 img.style.position = 'absolute';
-                img.style.left = '50%';
-                img.style.top = '50%';
-                img.style.transform = 'translate(-50%, -50%)';
-                img.style.width = '80%';
-                img.style.height = 'auto';
-                img.style.maxHeight = '80%';
-                img.style.objectFit = 'contain';
+                img.style.left = '0';
+                img.style.top = '0';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
                 img.style.zIndex = '2';
@@ -630,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = ((1029-538-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = (1800*scaleH)+'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
