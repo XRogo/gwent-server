@@ -34,6 +34,7 @@ function renderPowiek() {
     overlay.style.height = '100vh';
     overlay.style.zIndex = 9999;
     overlay.style.pointerEvents = 'auto';
+    overlay.style.background = 'rgba(0,0,0,0.7)'; // poszarzenie tła
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
 
