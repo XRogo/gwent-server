@@ -338,33 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
     renderCards();
     window.addEventListener('resize', renderCards);
-    // Podgląd dowódców po naciśnięciu X
-    let previewActive = false;
-    let previewDiv = null;
-    window.addEventListener('keydown', function(event) {
-        if (event.key === 'x' || event.key === 'X') {
-            console.log('Naciśnięto klawisz X');
-            let factionId = localStorage.getItem('faction');
-            let leaders;
-            if (factionId) {
-                leaders = krole.filter(krol => krol.frakcja === factionId);
-                if (factionId === '5') leaders = leaders.slice(0,2);
-            } else {
-                leaders = krole.slice(0,5); // fallback: 5 pierwszych
-            }
-            if (leaders.length === 0) return;
-            showPowiek(leaders, 0, 'leaders');
-            console.log('Podgląd dowódców aktywowany');
-        }
-    });
-    window.addEventListener('contextmenu', function(e) {
-        if (previewActive && previewDiv) {
-            e.preventDefault();
-            previewDiv.remove();
-            previewActive = false;
-            console.log('Podgląd dowódców zamknięty');
-        }
-    });
 });
 
 export { renderRow, renderRog, renderExtraPile, renderLeaders };
