@@ -757,6 +757,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    displayCollection('all');
+    displayDeck();
     updatePage();
     updateStats();
 
