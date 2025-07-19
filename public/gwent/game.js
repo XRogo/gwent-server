@@ -242,12 +242,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Statyczny obszar dowódcy
+                // Skalowanie względem GUI (gui.webp)
+                const guiLeft = 1792, guiTop = 538, guiW = 2051-1792, guiH = 1029-538;
+                const scaleW = backgroundWidth / GUI_WIDTH;
+                const scaleH = backgroundHeight / GUI_HEIGHT;
                 leaderCard.style.position = 'absolute';
-                leaderCard.style.left = '1792px';
-                leaderCard.style.top = '538px';
-                leaderCard.style.width = '1001px';
-                leaderCard.style.height = '2004px';
+                leaderCard.style.left = (backgroundLeft + guiLeft*scaleW)+'px';
+                leaderCard.style.top = (backgroundTop + guiTop*scaleH)+'px';
+                leaderCard.style.width = (guiW*scaleW)+'px';
+                leaderCard.style.height = (guiH*scaleH)+'px';
                 leaderCard.style.background = 'none';
                 // Tło
                 const tlo = document.createElement('div');
@@ -282,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.style.top = '0';
                 img.style.width = '100%';
                 img.style.height = '100%';
-                img.style.objectFit = 'cover';
+                img.style.objectFit = 'contain';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
                 img.style.zIndex = '2';
@@ -292,12 +295,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = '1800px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = ((guiH-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#474747';
-                nameDiv.style.fontSize = '32px';
+                nameDiv.style.fontSize = (32*scaleW)+'px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
@@ -596,12 +599,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
-                // Statyczny obszar dowódcy
+                // Skalowanie względem GUI (gui.webp)
+                const guiLeft = 1792, guiTop = 538, guiW = 2051-1792, guiH = 1029-538;
+                const scaleW = backgroundWidth / GUI_WIDTH;
+                const scaleH = backgroundHeight / GUI_HEIGHT;
                 leaderCard.style.position = 'absolute';
-                leaderCard.style.left = '1792px';
-                leaderCard.style.top = '538px';
-                leaderCard.style.width = '1001px';
-                leaderCard.style.height = '2004px';
+                leaderCard.style.left = (backgroundLeft + guiLeft*scaleW)+'px';
+                leaderCard.style.top = (backgroundTop + guiTop*scaleH)+'px';
+                leaderCard.style.width = (guiW*scaleW)+'px';
+                leaderCard.style.height = (guiH*scaleH)+'px';
                 leaderCard.style.background = 'none';
                 // Tło
                 const tlo = document.createElement('div');
@@ -636,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.style.top = '0';
                 img.style.width = '100%';
                 img.style.height = '100%';
-                img.style.objectFit = 'cover';
+                img.style.objectFit = 'contain';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
                 img.style.zIndex = '2';
@@ -646,12 +652,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = '1800px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = ((guiH-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#474747';
-                nameDiv.style.fontSize = '32px';
+                nameDiv.style.fontSize = (32*scaleW)+'px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
