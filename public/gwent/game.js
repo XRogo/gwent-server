@@ -674,23 +674,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const baseLeft = 1850;
         const spacing = 26;
         const topPosition = 208;
+        // Dodaj pobieranie backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop
         const overlay = document.querySelector('.overlay');
         if (!overlay) return;
-
         const overlayRect = overlay.getBoundingClientRect();
         const overlayWidth = overlayRect.width;
         const overlayHeight = overlayRect.height;
+        const overlayLeft = overlayRect.left;
+        const overlayTop = overlayRect.top;
         const windowAspectRatio = window.innerWidth / window.innerHeight;
         const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
-        let scale, backgroundLeft, backgroundTop;
+        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
         if (windowAspectRatio > guiAspectRatio) {
             scale = overlayHeight / GUI_HEIGHT;
-            backgroundLeft = overlayRect.left + (overlayWidth - (GUI_WIDTH * scale)) / 2;
-            backgroundTop = overlayRect.top;
+            backgroundWidth = GUI_WIDTH * scale;
+            backgroundHeight = overlayHeight;
+            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+            backgroundTop = overlayTop;
         } else {
             scale = overlayWidth / GUI_WIDTH;
-            backgroundLeft = overlayRect.left;
-            backgroundTop = overlayRect.top + (overlayHeight - (GUI_HEIGHT * scale)) / 2;
+            backgroundWidth = overlayWidth;
+            backgroundHeight = GUI_HEIGHT * scale;
+            backgroundLeft = overlayLeft;
+            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
         }
         const marginCompensation = (currentPage - 1) * (10 * scale);
         const leftPosition = baseLeft + (currentPage - 1) * spacing - marginCompensation;
