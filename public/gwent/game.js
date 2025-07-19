@@ -260,18 +260,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 beton.style.width = '100%';
                 beton.style.height = '100%';
                 beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-                beton.style.backgroundSize = 'cover';
+                beton.style.backgroundSize = 'contain';
+                beton.style.backgroundRepeat = 'no-repeat';
                 beton.style.zIndex = '1';
                 leaderCard.appendChild(beton);
-                // Obraz karty
+                // Obraz karty proporcjonalny jak dkarta
                 const img = document.createElement('img');
                 img.src = selected.dkarta;
                 img.style.position = 'absolute';
                 img.style.left = '50%';
                 img.style.top = '50%';
                 img.style.transform = 'translate(-50%, -50%)';
-                img.style.width = '70%';
+                img.style.width = '80%';
                 img.style.height = 'auto';
+                img.style.maxHeight = '80%';
                 img.style.objectFit = 'contain';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
@@ -604,18 +606,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 beton.style.width = '100%';
                 beton.style.height = '100%';
                 beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-                beton.style.backgroundSize = 'cover';
+                beton.style.backgroundSize = 'contain';
+                beton.style.backgroundRepeat = 'no-repeat';
                 beton.style.zIndex = '1';
                 leaderCard.appendChild(beton);
-                // Obraz karty
+                // Obraz karty proporcjonalny jak dkarta
                 const img = document.createElement('img');
                 img.src = selected.dkarta;
                 img.style.position = 'absolute';
                 img.style.left = '50%';
                 img.style.top = '50%';
                 img.style.transform = 'translate(-50%, -50%)';
-                img.style.width = '70%';
+                img.style.width = '80%';
                 img.style.height = 'auto';
+                img.style.maxHeight = '80%';
                 img.style.objectFit = 'contain';
                 img.style.borderRadius = '12px';
                 img.style.boxShadow = '0 0 16px #000';
