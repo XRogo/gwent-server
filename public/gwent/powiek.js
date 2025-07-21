@@ -22,7 +22,7 @@ function hidePowiek() {
 }
 
 function renderPowiek() {
-    hidePowiek();
+    // NIE wywołuj hidePowiek() tutaj!
     if (!powiekActive || powiekDeck.length === 0) {
         console.log('Brak aktywacji lub pusty deck:', powiekActive, powiekDeck);
         return;
