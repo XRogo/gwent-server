@@ -23,7 +23,10 @@ function hidePowiek() {
 
 function renderPowiek() {
     hidePowiek();
-    if (!powiekActive || powiekDeck.length === 0) return;
+    if (!powiekActive || powiekDeck.length === 0) {
+        console.log('Brak aktywacji lub pusty deck:', powiekActive, powiekDeck);
+        return;
+    }
     const overlay = document.createElement('div');
     overlay.id = 'powiekOverlay';
     overlay.className = 'powiek-overlay';
@@ -34,9 +37,19 @@ function renderPowiek() {
     overlay.style.height = '100vh';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
-    overlay.style.background = 'rgba(0,0,0,0.7)'; // poszarzenie tła
+    overlay.style.background = 'rgba(0,0,0,0.7)';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
+    // TEST: dodaj tekst do overlay
+    const testDiv = document.createElement('div');
+    testDiv.textContent = 'POWIEK TEST';
+    testDiv.style.position = 'absolute';
+    testDiv.style.left = '50%';
+    testDiv.style.top = '10%';
+    testDiv.style.color = '#fff';
+    testDiv.style.fontSize = '48px';
+    testDiv.style.zIndex = 100000;
+    overlay.appendChild(testDiv);
 
     // Pozycje kart w 4K
     const positions = [
