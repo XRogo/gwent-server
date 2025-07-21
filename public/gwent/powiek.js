@@ -27,12 +27,12 @@ function renderPowiek() {
     const overlay = document.createElement('div');
     overlay.id = 'powiekOverlay';
     overlay.className = 'powiek-overlay';
-    overlay.style.position = 'absolute';
+    overlay.style.position = 'fixed';
     overlay.style.left = '0';
     overlay.style.top = '0';
     overlay.style.width = '100vw';
     overlay.style.height = '100vh';
-    overlay.style.zIndex = 9999;
+    overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
     overlay.style.background = 'rgba(0,0,0,0.7)'; // poszarzenie tła
     overlay.onclick = hidePowiek;
