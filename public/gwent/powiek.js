@@ -79,7 +79,6 @@ function renderPowiek() {
         cardDiv.style.height = (pos.height*scaleH)+'px';
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
-        cardDiv.style.aspectRatio = '524/993';
         cardDiv.style.overflow = 'visible';
         // Beton/bbeton
         const beton = document.createElement('div');
@@ -106,7 +105,6 @@ function renderPowiek() {
         img.style.borderRadius = '12px';
         img.style.boxShadow = '0 0 16px #000';
         img.style.zIndex = '2';
-        img.style.aspectRatio = '524/993';
         cardDiv.appendChild(img);
         // Pasek frakcji
         const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
@@ -132,7 +130,7 @@ function renderPowiek() {
             pointsDiv.style.left = '14.5%';
             pointsDiv.style.width = '23.61%';
             pointsDiv.style.height = '8.84%';
-            pointsDiv.style.fontSize = (cardDiv.offsetWidth/12)+'px';
+            pointsDiv.style.fontSize = '2em';
             pointsDiv.style.color = '#fff';
             pointsDiv.style.zIndex = '13';
             pointsDiv.style.display = 'flex';
@@ -176,7 +174,7 @@ function renderPowiek() {
         nameDiv.style.width = '76.34%';
         nameDiv.style.top = '76%';
         nameDiv.style.textAlign = 'center';
-        nameDiv.style.fontSize = (cardDiv.offsetWidth/44)+'px';
+        nameDiv.style.fontSize = '1.2em';
         nameDiv.style.color = '#333';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = '11';
@@ -200,32 +198,32 @@ function renderPowiek() {
             opisDiv.style.fontSize = (32*scaleW)+'px';
             opisDiv.style.zIndex = 110;
             overlay.appendChild(opisDiv);
+            // Podsw.webp tylko pod środkową kartą
+            const podsw = document.createElement('img');
+            podsw.src = '/gwent/assets/asety/podsw.webp';
+            podsw.className = 'powiek-podsw';
+            podsw.style.position = 'absolute';
+            podsw.style.left = (pos.left*scaleW)+'px';
+            podsw.style.top = ((pos.top+pos.height)*scaleH)+'px';
+            podsw.style.width = (pos.width*scaleW)+'px';
+            podsw.style.height = (60*scaleH)+'px';
+            podsw.style.zIndex = 140;
+            overlay.appendChild(podsw);
+            // Nad główną kartą podsw2.webp z animacją pulsowania
+            const podsw2 = document.createElement('img');
+            podsw2.src = '/gwent/assets/asety/podsw2.webp';
+            podsw2.className = 'powiek-podsw2';
+            podsw2.style.position = 'absolute';
+            podsw2.style.left = (pos.left*scaleW)+'px';
+            podsw2.style.top = (pos.top*scaleH)+'px';
+            podsw2.style.width = (pos.width*scaleW)+'px';
+            podsw2.style.height = (60*scaleH)+'px';
+            podsw2.style.zIndex = 141;
+            podsw2.style.animation = 'powiek-pulse 4s infinite';
+            overlay.appendChild(podsw2);
         }
         overlay.appendChild(cardDiv);
     }
-    // Pod główną kartą podsw.webp
-    const podsw = document.createElement('img');
-    podsw.src = '/gwent/assets/asety/podsw.webp';
-    podsw.className = 'powiek-podsw';
-    podsw.style.position = 'absolute';
-    podsw.style.left = (1617*scaleW)+'px';
-    podsw.style.top = (1609*scaleH)+'px';
-    podsw.style.width = (605*scaleW)+'px';
-    podsw.style.height = (120*scaleH)+'px';
-    podsw.style.zIndex = 140;
-    overlay.appendChild(podsw);
-    // Nad główną kartą podsw2.webp z animacją pulsowania
-    const podsw2 = document.createElement('img');
-    podsw2.src = '/gwent/assets/asety/podsw2.webp';
-    podsw2.className = 'powiek-podsw2';
-    podsw2.style.position = 'absolute';
-    podsw2.style.left = (1617*scaleW)+'px';
-    podsw2.style.top = (456*scaleH)+'px';
-    podsw2.style.width = (605*scaleW)+'px';
-    podsw2.style.height = (120*scaleH)+'px';
-    podsw2.style.zIndex = 141;
-    podsw2.style.animation = 'powiek-pulse 4s infinite';
-    overlay.appendChild(podsw2);
     // Strzałki lewo/prawo z animacją
     const leftArrow = document.createElement('div');
     leftArrow.className = 'powiek-arrow powiek-arrow-left';
