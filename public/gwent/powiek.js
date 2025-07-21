@@ -106,31 +106,43 @@ function renderPowiek() {
         img.style.boxShadow = '0 0 16px #000';
         img.style.zIndex = '2';
         cardDiv.appendChild(img);
-        // Pasek frakcji
-        const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
-        const bannerDiv = document.createElement('div');
-        bannerDiv.className = 'faction-banner';
-        bannerDiv.style.position = 'absolute';
-        bannerDiv.style.left = '0';
-        bannerDiv.style.top = '0';
-        bannerDiv.style.width = '100%';
-        bannerDiv.style.height = '100%';
-        bannerDiv.style.backgroundImage = `url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}')`;
-        bannerDiv.style.backgroundSize = 'cover';
-        bannerDiv.style.backgroundRepeat = 'no-repeat';
-        bannerDiv.style.zIndex = '3';
-        cardDiv.appendChild(bannerDiv);
+        // Pasek frakcji tylko dla zwykłych kart
+        if(powiekMode !== 'leaders'){
+            const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
+            const bannerDiv = document.createElement('div');
+            bannerDiv.className = 'faction-banner';
+            bannerDiv.style.position = 'absolute';
+            bannerDiv.style.left = '0';
+            bannerDiv.style.top = '0';
+            bannerDiv.style.width = '100%';
+            bannerDiv.style.height = '100%';
+            bannerDiv.style.backgroundImage = `url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}')`;
+            bannerDiv.style.backgroundSize = 'cover';
+            bannerDiv.style.backgroundRepeat = 'no-repeat';
+            bannerDiv.style.zIndex = '3';
+            cardDiv.appendChild(bannerDiv);
+        }
         // Punkty
         if(card.punkty !== undefined){
             const pointsDiv = document.createElement('div');
             pointsDiv.className = 'points';
             pointsDiv.innerText = card.punkty;
             pointsDiv.style.position = 'absolute';
-            pointsDiv.style.top = '7.8%';
-            pointsDiv.style.left = '14.5%';
-            pointsDiv.style.width = '23.61%';
-            pointsDiv.style.height = '8.84%';
-            pointsDiv.style.fontSize = '2em';
+            if(powiekMode !== 'leaders'){
+                pointsDiv.style.top = '7.8%';
+                pointsDiv.style.left = '14.5%';
+                pointsDiv.style.width = '23.61%';
+                pointsDiv.style.height = '8.84%';
+                pointsDiv.style.fontSize = (cardDiv.offsetWidth/8)+'px';
+                pointsDiv.style.padding = (cardDiv.offsetWidth/100)+'px';
+            } else {
+                pointsDiv.style.top = '7.8%';
+                pointsDiv.style.left = '14.5%';
+                pointsDiv.style.width = '23.61%';
+                pointsDiv.style.height = '8.84%';
+                pointsDiv.style.fontSize = '2em';
+                pointsDiv.style.padding = '0 4px';
+            }
             pointsDiv.style.color = '#fff';
             pointsDiv.style.zIndex = '13';
             pointsDiv.style.display = 'flex';
@@ -144,10 +156,15 @@ function renderPowiek() {
             powerIcon.className = 'power-icon';
             powerIcon.src = `/gwent/assets/dkarty/${card.moc}.webp`;
             powerIcon.style.position = 'absolute';
+            if(powiekMode !== 'leaders'){
+                powerIcon.style.width = (cardDiv.offsetWidth/5)+'px';
+                powerIcon.style.height = (cardDiv.offsetWidth/5)+'px';
+            } else {
+                powerIcon.style.width = '64px';
+                powerIcon.style.height = '64px';
+            }
             powerIcon.style.left = '0';
             powerIcon.style.top = '0';
-            powerIcon.style.width = '64px';
-            powerIcon.style.height = '64px';
             powerIcon.style.zIndex = '14';
             cardDiv.appendChild(powerIcon);
         }
