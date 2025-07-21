@@ -22,7 +22,9 @@ function hidePowiek() {
 }
 
 function renderPowiek() {
-    // NIE wywołuj hidePowiek() tutaj!
+    // Usuwam poprzedni overlay, jeśli istnieje
+    const oldOverlay = document.getElementById('powiekOverlay');
+    if (oldOverlay) oldOverlay.remove();
     if (!powiekActive || powiekDeck.length === 0) {
         console.log('Brak aktywacji lub pusty deck:', powiekActive, powiekDeck);
         return;
@@ -77,9 +79,22 @@ function renderPowiek() {
         cardDiv.style.height = (pos.height*scaleH)+'px';
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
-        // Obraz karty
+        // Beton zawsze pod obrazkiem
+        const beton = document.createElement('div');
+        beton.className = 'beton';
+        beton.style.position = 'absolute';
+        beton.style.left = '0';
+        beton.style.top = '0';
+        beton.style.width = '100%';
+        beton.style.height = '100%';
+        beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+        beton.style.backgroundSize = 'cover';
+        beton.style.backgroundRepeat = 'no-repeat';
+        beton.style.zIndex = '1';
+        cardDiv.appendChild(beton);
+        // Obraz karty (zawsze dkarta)
         const img = document.createElement('img');
-        img.src = powiekMode==='leaders'?card.dkarta:card.karta;
+        img.src = card.dkarta;
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'contain';
@@ -88,21 +103,10 @@ function renderPowiek() {
         img.style.position = 'absolute';
         img.style.left = '0';
         img.style.top = '0';
+        img.style.zIndex = '2';
         cardDiv.appendChild(img);
-        // Beton i nazwa dla leaders
-        if(powiekMode==='leaders'){
-            const beton = document.createElement('div');
-            beton.className = 'beton';
-            beton.style.position = 'absolute';
-            beton.style.left = '0';
-            beton.style.top = '0';
-            beton.style.width = '100%';
-            beton.style.height = '100%';
-            beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
-            beton.style.backgroundSize = 'cover';
-            beton.style.backgroundRepeat = 'no-repeat';
-            beton.style.zIndex = '1';
-            cardDiv.appendChild(beton);
+        // Nazwa dla leaders i dla zwykłych kart
+        if(powiekMode==='leaders' || powiekMode==='cards'){
             const nameDiv = document.createElement('div');
             nameDiv.innerText = card.nazwa;
             nameDiv.style.position = 'absolute';
@@ -196,6 +200,28 @@ function renderPowiek() {
             }
         };
     }
+    // Obsługa strzałek i scrolla
+    overlay.addEventListener('wheel', function(e){
+        e.preventDefault();
+        if(e.deltaY > 0 && powiekIndex < powiekDeck.length-1){
+            powiekIndex++;
+            renderPowiek();
+        } else if(e.deltaY < 0 && powiekIndex > 0){
+            powiekIndex--;
+            renderPowiek();
+        }
+    });
+    overlay.addEventListener('keydown', function(e){
+        if(e.key === 'ArrowRight' && powiekIndex < powiekDeck.length-1){
+            powiekIndex++;
+            renderPowiek();
+        } else if(e.key === 'ArrowLeft' && powiekIndex > 0){
+            powiekIndex--;
+            renderPowiek();
+        }
+    });
+    overlay.tabIndex = 0;
+    overlay.focus();
 }
 
 // Obsługa prawego kliknięcia na kartę lub dowódcę
