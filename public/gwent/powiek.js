@@ -79,6 +79,8 @@ function renderPowiek() {
         cardDiv.style.height = (pos.height*scaleH)+'px';
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
+        cardDiv.style.aspectRatio = '524/993';
+        cardDiv.style.overflow = 'visible';
         // Beton/bbeton
         const beton = document.createElement('div');
         beton.className = 'beton';
@@ -98,12 +100,13 @@ function renderPowiek() {
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'contain';
-        img.style.borderRadius = '12px';
-        img.style.boxShadow = '0 0 16px #000';
         img.style.position = 'absolute';
         img.style.left = '0';
         img.style.top = '0';
+        img.style.borderRadius = '12px';
+        img.style.boxShadow = '0 0 16px #000';
         img.style.zIndex = '2';
+        img.style.aspectRatio = '524/993';
         cardDiv.appendChild(img);
         // Pasek frakcji
         const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
@@ -129,7 +132,7 @@ function renderPowiek() {
             pointsDiv.style.left = '14.5%';
             pointsDiv.style.width = '23.61%';
             pointsDiv.style.height = '8.84%';
-            pointsDiv.style.fontSize = '220%';
+            pointsDiv.style.fontSize = (cardDiv.offsetWidth/12)+'px';
             pointsDiv.style.color = '#fff';
             pointsDiv.style.zIndex = '13';
             pointsDiv.style.display = 'flex';
@@ -173,7 +176,7 @@ function renderPowiek() {
         nameDiv.style.width = '76.34%';
         nameDiv.style.top = '76%';
         nameDiv.style.textAlign = 'center';
-        nameDiv.style.fontSize = '1.2em';
+        nameDiv.style.fontSize = (cardDiv.offsetWidth/44)+'px';
         nameDiv.style.color = '#333';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = '11';
