@@ -200,7 +200,7 @@ function renderPowiek() {
             overlay.appendChild(opisDiv);
             // Podsw.webp tylko pod środkową kartą
             const podsw = document.createElement('img');
-            podsw.src = '/gwent/assets/asety/podsw.webp';
+            podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.className = 'powiek-podsw';
             podsw.style.position = 'absolute';
             podsw.style.left = (pos.left*scaleW)+'px';
@@ -211,7 +211,7 @@ function renderPowiek() {
             overlay.appendChild(podsw);
             // Nad główną kartą podsw2.webp z animacją pulsowania
             const podsw2 = document.createElement('img');
-            podsw2.src = '/gwent/assets/asety/podsw2.webp';
+            podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.className = 'powiek-podsw2';
             podsw2.style.position = 'absolute';
             podsw2.style.left = (pos.left*scaleW)+'px';
