@@ -66,7 +66,7 @@ const krole = [
         ////////////////////////////////////////////////////////////////
         nazwa: "Foltest Syn Medella",
         karta: "/gwent/assets/karty/polnoc/foltest5.webp",
-        dkarta: "/gwent/assets/dkarty/kurl/1005.webp",
+        dkarta: "/gwent/assets/dkarty/kure/1005.webp",
         opis: '"Ja tu rządę i nie będę się krył po kątach".',
         frakcja: "1",
         numer: "1005",
