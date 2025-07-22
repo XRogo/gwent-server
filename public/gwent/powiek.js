@@ -41,7 +41,8 @@ function renderPowiek() {
     overlay.style.height = '100vh';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
-    overlay.style.background = 'rgba(0,0,0,0.7)';
+    // USUNIĘTO CIEMNE TŁO
+    // overlay.style.background = 'rgba(0,0,0,0.7)';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // TEST: dodaj tekst do overlay
@@ -88,7 +89,7 @@ function renderPowiek() {
         cardDiv.style.left = (pos.left*scaleW+offsetLeft)+'px';
         cardDiv.style.top = (pos.top*scaleH+offsetTop)+'px';
         cardDiv.style.width = (pos.width*scaleW)+'px';
-        cardDiv.style.height = (pos.height*scaleH)+'px';
+        cardDiv.style.height = (pos.height*scaleH+'px');
         console.log('POWIEK CARD:', {left: cardDiv.style.left, top: cardDiv.style.top, width: cardDiv.style.width, height: cardDiv.style.height});
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
