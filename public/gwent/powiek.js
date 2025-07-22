@@ -106,43 +106,31 @@ function renderPowiek() {
         img.style.boxShadow = '0 0 16px #000';
         img.style.zIndex = '2';
         cardDiv.appendChild(img);
-        // Pasek frakcji tylko dla zwykłych kart
-        if(powiekMode !== 'leaders'){
-            const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
-            const bannerDiv = document.createElement('div');
-            bannerDiv.className = 'faction-banner';
-            bannerDiv.style.position = 'absolute';
-            bannerDiv.style.left = '0';
-            bannerDiv.style.top = '0';
-            bannerDiv.style.width = '100%';
-            bannerDiv.style.height = '100%';
-            bannerDiv.style.backgroundImage = `url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}')`;
-            bannerDiv.style.backgroundSize = 'cover';
-            bannerDiv.style.backgroundRepeat = 'no-repeat';
-            bannerDiv.style.zIndex = '3';
-            cardDiv.appendChild(bannerDiv);
-        }
+        // Pasek frakcji
+        const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
+        const bannerDiv = document.createElement('div');
+        bannerDiv.className = 'faction-banner';
+        bannerDiv.style.position = 'absolute';
+        bannerDiv.style.left = '0';
+        bannerDiv.style.top = '0';
+        bannerDiv.style.width = '100%';
+        bannerDiv.style.height = '100%';
+        bannerDiv.style.backgroundImage = `url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}')`;
+        bannerDiv.style.backgroundSize = 'cover';
+        bannerDiv.style.backgroundRepeat = 'no-repeat';
+        bannerDiv.style.zIndex = '3';
+        cardDiv.appendChild(bannerDiv);
         // Punkty
         if(card.punkty !== undefined){
             const pointsDiv = document.createElement('div');
             pointsDiv.className = 'points';
             pointsDiv.innerText = card.punkty;
             pointsDiv.style.position = 'absolute';
-            if(powiekMode !== 'leaders'){
-                pointsDiv.style.top = '7.8%';
-                pointsDiv.style.left = '14.5%';
-                pointsDiv.style.width = '23.61%';
-                pointsDiv.style.height = '8.84%';
-                pointsDiv.style.fontSize = (cardDiv.offsetWidth/8)+'px';
-                pointsDiv.style.padding = (cardDiv.offsetWidth/100)+'px';
-            } else {
-                pointsDiv.style.top = '7.8%';
-                pointsDiv.style.left = '14.5%';
-                pointsDiv.style.width = '23.61%';
-                pointsDiv.style.height = '8.84%';
-                pointsDiv.style.fontSize = '2em';
-                pointsDiv.style.padding = '0 4px';
-            }
+            pointsDiv.style.top = '7.8%';
+            pointsDiv.style.left = '14.5%';
+            pointsDiv.style.width = '23.61%';
+            pointsDiv.style.height = '8.84%';
+            pointsDiv.style.fontSize = '2em';
             pointsDiv.style.color = '#fff';
             pointsDiv.style.zIndex = '13';
             pointsDiv.style.display = 'flex';
@@ -156,15 +144,10 @@ function renderPowiek() {
             powerIcon.className = 'power-icon';
             powerIcon.src = `/gwent/assets/dkarty/${card.moc}.webp`;
             powerIcon.style.position = 'absolute';
-            if(powiekMode !== 'leaders'){
-                powerIcon.style.width = (cardDiv.offsetWidth/5)+'px';
-                powerIcon.style.height = (cardDiv.offsetWidth/5)+'px';
-            } else {
-                powerIcon.style.width = '64px';
-                powerIcon.style.height = '64px';
-            }
             powerIcon.style.left = '0';
             powerIcon.style.top = '0';
+            powerIcon.style.width = '64px';
+            powerIcon.style.height = '64px';
             powerIcon.style.zIndex = '14';
             cardDiv.appendChild(powerIcon);
         }
@@ -174,17 +157,10 @@ function renderPowiek() {
             heroIcon.className = 'hero-icon';
             heroIcon.src = 'assets/dkarty/bohater.webp';
             heroIcon.style.position = 'absolute';
-            if(powiekMode !== 'leaders'){
-                heroIcon.style.top = (-0.019 * cardDiv.offsetHeight) + 'px';
-                heroIcon.style.left = (-0.043 * cardDiv.offsetWidth) + 'px';
-                heroIcon.style.width = (0.59 * cardDiv.offsetWidth) + 'px';
-                heroIcon.style.height = (0.31 * cardDiv.offsetHeight) + 'px';
-            } else {
-                heroIcon.style.top = '-1.9%';
-                heroIcon.style.left = '-4.3%';
-                heroIcon.style.width = '59%';
-                heroIcon.style.height = '31%';
-            }
+            heroIcon.style.top = '-1.9%';
+            heroIcon.style.left = '-4.3%';
+            heroIcon.style.width = '59%';
+            heroIcon.style.height = '31%';
             heroIcon.style.objectFit = 'contain';
             heroIcon.style.zIndex = '12';
             cardDiv.appendChild(heroIcon);
@@ -194,26 +170,18 @@ function renderPowiek() {
         nameDiv.className = 'name';
         nameDiv.innerText = card.nazwa;
         nameDiv.style.position = 'absolute';
-        if(powiekMode !== 'leaders'){
-            nameDiv.style.left = (0.2176 * cardDiv.offsetWidth) + 'px';
-            nameDiv.style.width = (0.7634 * cardDiv.offsetWidth) + 'px';
-            nameDiv.style.top = (0.76 * cardDiv.offsetHeight) + 'px';
-            nameDiv.style.fontSize = (cardDiv.offsetWidth/22)+'px';
-            nameDiv.style.padding = (cardDiv.offsetWidth/100)+'px';
-        } else {
-            nameDiv.style.left = '21.76%';
-            nameDiv.style.width = '76.34%';
-            nameDiv.style.top = '76%';
-            nameDiv.style.fontSize = '1.2em';
-            nameDiv.style.padding = '0 4px';
-        }
+        nameDiv.style.left = '21.76%';
+        nameDiv.style.width = '76.34%';
+        nameDiv.style.top = '76%';
         nameDiv.style.textAlign = 'center';
+        nameDiv.style.fontSize = '1.2em';
         nameDiv.style.color = '#333';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = '11';
         nameDiv.style.whiteSpace = 'normal';
         nameDiv.style.wordBreak = 'break-word';
         nameDiv.style.lineHeight = '1.1';
+        nameDiv.style.padding = '0 4px';
         nameDiv.style.transform = 'none';
         cardDiv.appendChild(nameDiv);
         // Opis pod dużą kartą
