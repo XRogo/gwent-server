@@ -325,9 +325,11 @@ function renderPowiek() {
         powiekBg.style.zIndex = 99998;
         powiekBg.style.pointerEvents = 'none';
         powiekBg.style.objectFit = 'cover';
+        powiekBg.style.opacity = '1';
+        powiekBg.style.filter = 'none';
         document.body.appendChild(powiekBg);
     }
-    // Ustaw overlay jako kontener na powiększenie, nad tłopowiek.webp
+    // Ustaw overlay jako kontener na powiększenie, bez tła
     overlay.style.position = 'absolute';
     overlay.style.left = guiRect.left+'px';
     overlay.style.top = guiRect.top+'px';
@@ -335,6 +337,8 @@ function renderPowiek() {
     overlay.style.height = guiRect.height+'px';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
+    // NIE DODAWAJ TŁA!
+    // overlay.style.background = '';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
 }
