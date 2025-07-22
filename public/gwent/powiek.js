@@ -54,6 +54,13 @@ function renderPowiek() {
     overlay.appendChild(testDiv);
 
     // Pozycje kart w 4K względem planszy/gui
+    const positions = [
+        {left:468,top:444,width:899-468,height:1261-444},
+        {left:1040,top:444,width:1563-1040,height:1436-444},
+        {left:1617,top:456,width:2222-1617,height:1609-456},
+        {left:2274,top:444,width:2799-2274,height:1436-444},
+        {left:2938,top:444,width:3371-2938,height:1261-444}
+    ];
     const gui = document.getElementById('gui') || document.getElementById('plansza');
     let guiRect;
     if(gui && gui.offsetWidth > 0 && gui.offsetHeight > 0) {
