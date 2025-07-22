@@ -80,6 +80,27 @@ function renderPowiek() {
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
+        // 3: obraz dkarty
+        const img = document.createElement('img');
+        img.src = card.dkarta;
+        img.style.position = 'absolute';
+        img.style.left = '0';
+        img.style.top = '0';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.zIndex = '2';
+        cardDiv.appendChild(img);
+        // 4: beton/bbeton
+        const beton = document.createElement('img');
+        beton.src = card.bohater ? 'assets/dkarty/bbeton.webp' : 'assets/dkarty/beton.webp';
+        beton.style.position = 'absolute';
+        beton.style.left = '0';
+        beton.style.top = '0';
+        beton.style.width = '100%';
+        beton.style.height = '100%';
+        beton.style.zIndex = '1';
+        cardDiv.appendChild(beton);
         // 1-2: podsw.webp, podsw2.webp (tylko dla wybranej środkowej karty)
         if(i===0){
             const podsw = document.createElement('img');
@@ -104,27 +125,6 @@ function renderPowiek() {
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
         }
-        // 3: obraz dkarty
-        const img = document.createElement('img');
-        img.src = card.dkarta;
-        img.style.position = 'absolute';
-        img.style.left = '0';
-        img.style.top = '0';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
-        img.style.zIndex = '2';
-        cardDiv.appendChild(img);
-        // 4: beton/bbeton
-        const beton = document.createElement('img');
-        beton.src = card.bohater ? 'assets/dkarty/bbeton.webp' : 'assets/dkarty/beton.webp';
-        beton.style.position = 'absolute';
-        beton.style.left = '0';
-        beton.style.top = '0';
-        beton.style.width = '100%';
-        beton.style.height = '100%';
-        beton.style.zIndex = '1';
-        cardDiv.appendChild(beton);
         // 5: pasek frakcji (nie dla królów)
         if(powiekMode !== 'leaders'){
             const bannerFaction = card.frakcja === "nie" ? (card.frakcjaWybor || '1') : card.frakcja;
@@ -162,7 +162,7 @@ function renderPowiek() {
             pointsBg.style.top = (-21*cardDiv.offsetHeight/992)+'px';
             pointsBg.style.width = (523*cardDiv.offsetWidth/523)+'px';
             pointsBg.style.height = (992*cardDiv.offsetHeight/992)+'px';
-            pointsBg.style.zIndex = '5';
+            pointsBg.style.zIndex = '150';
             cardDiv.appendChild(pointsBg);
             const pointsDiv = document.createElement('div');
             pointsDiv.className = 'points';
@@ -174,7 +174,7 @@ function renderPowiek() {
             pointsDiv.style.height = '8.84%';
             pointsDiv.style.fontSize = '220%';
             pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
-            pointsDiv.style.zIndex = '13';
+            pointsDiv.style.zIndex = '151';
             pointsDiv.style.display = 'flex';
             pointsDiv.style.justifyContent = 'center';
             pointsDiv.style.alignItems = 'center';
