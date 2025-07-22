@@ -53,16 +53,14 @@ function renderPowiek() {
     testDiv.style.zIndex = 100000;
     overlay.appendChild(testDiv);
 
-    // Pozycje kart w 4K
-    const positions = [
-        {left:468,top:444,width:899-468,height:1261-444},
-        {left:1040,top:444,width:1563-1040,height:1436-444},
-        {left:1617,top:456,width:2222-1617,height:1609-456},
-        {left:2274,top:444,width:2799-2274,height:1436-444},
-        {left:2938,top:444,width:3371-2938,height:1261-444}
-    ];
-    const scaleW = window.innerWidth / 3837;
-    const scaleH = window.innerHeight / 2158;
+    // Pozycje kart w 4K względem planszy/gui
+    const gui = document.getElementById('gui') || document.getElementById('plansza');
+    let guiRect = {left:0,top:0,width:window.innerWidth,height:window.innerHeight};
+    if(gui) guiRect = gui.getBoundingClientRect();
+    const scaleW = guiRect.width / 3837;
+    const scaleH = guiRect.height / 2158;
+    const offsetLeft = guiRect.left;
+    const offsetTop = guiRect.top;
     overlay.classList.add('powiek-anim');
     // Karty
     for(let i=-2;i<=2;i++){
@@ -73,8 +71,8 @@ function renderPowiek() {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card';
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = (pos.left*scaleW)+'px';
-        cardDiv.style.top = (pos.top*scaleH)+'px';
+        cardDiv.style.left = (pos.left*scaleW+offsetLeft)+'px';
+        cardDiv.style.top = (pos.top*scaleH+offsetTop)+'px';
         cardDiv.style.width = (pos.width*scaleW)+'px';
         cardDiv.style.height = (pos.height*scaleH)+'px';
         cardDiv.style.zIndex = i===0?100:50;
