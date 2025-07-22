@@ -110,10 +110,7 @@ Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są ska
     } 
     ilość punktów jaka karta ma posiadać 
     kolor warunki 
-      dymyślny (domyślna wartość) jeśli
         bohater: false > 000000
         bohater: true > fcfdfc
-      dodatni 1a760e (więcej niż domyślna wartość)
-      ujemny bd0505 (mniejsza niż domyślna wartość)
- 10 {113,766 x 518,877} Pozycja nazwy karty (nazwa pogrubiona) kolor 474747
+ 10 {113,766 x 518,877} Pozycja nazwy karty [nazwa:] (nazwa pogrubiona) kolor 474747
  10 {obecnie jest dobrze ustawiona pozycja tego nie zmieniaj} liosc koart (x1/x2/x3) kolor 72451f
