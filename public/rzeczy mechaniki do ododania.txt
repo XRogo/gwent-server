@@ -57,3 +57,63 @@ pozycaj któla wybor
 1792, 538 x 2051, 1029
 
 Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są skalowane względem gui.webp, a karta dowódcy wypełnia ten obszar proporcjonalnie (object-fit: contain), z betonem i nazwą."
+
+
+
+ Budowa dkarty warstwowo od dołu (współżędne px liczą 0/-0) wielkości karty 523, 992 {w tym nawiaświ jest pokazywana pozycja} karta tak zbudowana powinna byś dynamicznie skalowana do podanego obszaru wszystkie obrazy jakie są urzywane do budowy karty są tej samwj wielkości nie trzeba ich skalować czy rozciągać 100px na 1 obrazku jest = 100px na wszystkich innych =======================================================================================
+ 1 {-104, -10} (jeśli wybrana) podsw.webp
+ 2 {-104, -10} (jeśli wybrana) podsw2.webp ma pulsować przeźroczystość 100%>10%>100>10%... zamiana z 100 od 10 ma trwać ~1,5s
+ 3 {0, 0} Obraz znajdujący sie w którymś miejscu w folderze dkarty
+ 4 {0, 0} beton.webp/bbeton.webp w zależności czy karta bochater czy nie jeśli 
+     bohater: false > beton.webp
+     bohater: true > bbeton.webp
+ 5 {0, 0} paski frakcji w zależności od tego w jakiej frakcji jest karta (nie dotyczy katr dowódów (krole.js)) 
+     frakcja: "1" > polnoc.webp
+     frakcja: "2" > nilfgaard.webp
+     frakcja: "3" > scoiatael.webp
+     frakcja: "4" > potwory.webp
+     frakcja: "5" > skellige.webp
+ 6 {0, 0} pozycja na jakiej można zagrać karte (piechoty=1, dalekiego zasięgu=2, oblężnicze=3) (nie dotyczy katr dowódów (krole.js))
+     pozycja: 1 > pozycja1.webp
+     pozycja: 2 > pozycja2.webp
+     pozycja: 3 > pozycja3.webp
+     pozycja: 4 > pozycja4.webp
+ 7 {0, 0} punkty okienko dla punktów   (nie dotyczy katr dowódów (krole.js))
+     bohater: false > punkty.webp
+   {-23, -21}
+     bohater: true > bohater.webp
+ 8 {0, 0} okienko pokazujące daną moc karty (nie dotyczy katr dowódów (krole.js))
+     moc: "manek" > manek.webp
+     moc: "rog" > rog.webp
+     moc: "porz" > (dla karty 003 porz.webp) / (dla karty 510 2porz.webp)
+     moc: "mroz" > mroz.webp
+     moc: "mgla" > mgla.webp
+     moc: "deszcz" > deszcz.webp
+     moc: "niebo" > niebo.webp
+     moc: "sztorm" > sztorm.webp
+     moc: "grzybki" > (dla karty 000 grzybki.webp) / (dla karty 504 igrzybki.webp)
+     moc: "wezwanie" > wezwanie.webp
+     moc: "medyk" > medyk.webp
+     moc: "iporz" > iporz.webp
+     moc: "morale" > morale.webp
+     moc: "wiez" > wiz.webp 
+     moc: "szpieg" > szpieg.webp
+     moc: "wezwarniezza" > wezwarniezza.webp
+     moc: "berserk" > berserk.webp
+ 9 {0, 0} ilość pokazuje sie tylko wtedy gdy karty są w wyborze jak nie jest w wyborze to sie nie wyświetla ilosc.webp
+ 10 {9, 879 x 514, 991} obszar na opis karty jeśli w trybie wyponu nie wyświetlaj tylko jeśli powiek lub wybierz do zagrania   kolor 030303
+ 10 { top: 7.8%; 
+      left: 14.5%;
+      width: 23.61%;
+      height: 8.84%;
+      font-size: 220%; /* 44px przy 524px szerokości karty, skaluje się z kartą *
+    } 
+    ilość punktów jaka karta ma posiadać 
+    kolor warunki 
+      dymyślny (domyślna wartość) jeśli
+        bohater: false > 000000
+        bohater: true > fcfdfc
+      dodatni 1a760e (więcej niż domyślna wartość)
+      ujemny bd0505 (mniejsza niż domyślna wartość)
+ 10 {113,766 x 518,877} Pozycja nazwy karty (nazwa pogrubiona) kolor 474747
+ 10 {obecnie jest dobrze ustawiona pozycja tego nie zmieniaj} liosc koart (x1/x2/x3) kolor 72451f
