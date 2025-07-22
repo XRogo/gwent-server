@@ -224,14 +224,14 @@ function renderPowiek() {
             opisDiv.className = 'powiek-opis';
             opisDiv.innerText = card.opis||'';
             opisDiv.style.position = 'absolute';
-            opisDiv.style.left = (pos.left*scaleW)+'px';
-            opisDiv.style.top = ((pos.top+pos.height-60)*scaleH)+'px';
-            opisDiv.style.width = (pos.width*scaleW)+'px';
+            opisDiv.style.left = '0';
+            opisDiv.style.top = (cardDiv.offsetHeight-60)+'px';
+            opisDiv.style.width = cardDiv.offsetWidth+'px';
             opisDiv.style.textAlign = 'center';
             opisDiv.style.color = '#fff';
             opisDiv.style.fontSize = (32*scaleW)+'px';
-            opisDiv.style.zIndex = 110;
-            overlay.appendChild(opisDiv);
+            opisDiv.style.zIndex = 20;
+            cardDiv.appendChild(opisDiv);
         }
         overlay.appendChild(cardDiv);
     }
