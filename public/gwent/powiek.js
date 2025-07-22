@@ -181,23 +181,6 @@ function renderPowiek() {
             pointsDiv.style.alignItems = 'center';
             cardDiv.appendChild(pointsDiv);
         }
-        // 8: okienko mocy (nie dla królów)
-        if(powiekMode !== 'leaders' && card.moc){
-            const mocIcon = document.createElement('img');
-            mocIcon.className = 'power-icon';
-            let mocSrc = `assets/dkarty/${card.moc}.webp`;
-            if(card.moc==='porz' && card.numer==='510') mocSrc = 'assets/dkarty/2porz.webp';
-            if(card.moc==='grzybki' && card.numer==='504') mocSrc = 'assets/dkarty/igrzybki.webp';
-            if(card.moc==='grzybki' && card.numer==='000') mocSrc = 'assets/dkarty/grzybki.webp';
-            mocIcon.src = mocSrc;
-            mocIcon.style.position = 'absolute';
-            mocIcon.style.left = '0';
-            mocIcon.style.top = '0';
-            mocIcon.style.width = '100%';
-            mocIcon.style.height = '100%';
-            mocIcon.style.zIndex = 9;
-            cardDiv.appendChild(mocIcon);
-        }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
         nameDiv.className = 'name';
@@ -224,9 +207,10 @@ function renderPowiek() {
             opisDiv.className = 'powiek-opis';
             opisDiv.innerText = card.opis||'';
             opisDiv.style.position = 'absolute';
-            opisDiv.style.left = '0';
-            opisDiv.style.top = (cardDiv.offsetHeight-60)+'px';
-            opisDiv.style.width = cardDiv.offsetWidth+'px';
+            opisDiv.style.left = (9*cardDiv.offsetWidth/523)+'px';
+            opisDiv.style.top = (879*cardDiv.offsetHeight/992)+'px';
+            opisDiv.style.width = (514*cardDiv.offsetWidth/523)+'px';
+            opisDiv.style.height = (991*cardDiv.offsetHeight/992)+'px';
             opisDiv.style.textAlign = 'center';
             opisDiv.style.color = '#fff';
             opisDiv.style.fontSize = (32*scaleW)+'px';
