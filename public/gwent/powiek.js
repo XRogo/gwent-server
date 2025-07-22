@@ -107,23 +107,23 @@ function renderPowiek() {
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.className = 'powiek-podsw';
             podsw.style.position = 'absolute';
-            podsw.style.left = (pos.left - 104)*scaleW+'px';
-            podsw.style.top = (pos.top - 10)*scaleH+'px';
-            podsw.style.width = (523*scaleW)+'px';
-            podsw.style.height = (992*scaleH)+'px';
-            podsw.style.zIndex = 998;
-            overlay.appendChild(podsw);
+            podsw.style.left = (-104*cardDiv.offsetWidth/523)+'px';
+            podsw.style.top = (-10*cardDiv.offsetHeight/992)+'px';
+            podsw.style.width = (523*cardDiv.offsetWidth/523)+'px';
+            podsw.style.height = (992*cardDiv.offsetHeight/992)+'px';
+            podsw.style.zIndex = 140;
+            cardDiv.appendChild(podsw);
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.className = 'powiek-podsw2';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = (pos.left - 104)*scaleW+'px';
-            podsw2.style.top = (pos.top - 10)*scaleH+'px';
-            podsw2.style.width = (523*scaleW)+'px';
-            podsw2.style.height = (992*scaleH)+'px';
-            podsw2.style.zIndex = 999;
+            podsw2.style.left = (-104*cardDiv.offsetWidth/523)+'px';
+            podsw2.style.top = (-10*cardDiv.offsetHeight/992)+'px';
+            podsw2.style.width = (523*cardDiv.offsetWidth/523)+'px';
+            podsw2.style.height = (992*cardDiv.offsetHeight/992)+'px';
+            podsw2.style.zIndex = 141;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
-            overlay.appendChild(podsw2);
+            cardDiv.appendChild(podsw2);
         }
         // 5: pasek frakcji (nie dla królów)
         if(powiekMode !== 'leaders'){
@@ -162,7 +162,7 @@ function renderPowiek() {
             pointsBg.style.top = (-21*cardDiv.offsetHeight/992)+'px';
             pointsBg.style.width = (523*cardDiv.offsetWidth/523)+'px';
             pointsBg.style.height = (992*cardDiv.offsetHeight/992)+'px';
-            pointsBg.style.zIndex = '1000';
+            pointsBg.style.zIndex = '5';
             cardDiv.appendChild(pointsBg);
             const pointsDiv = document.createElement('div');
             pointsDiv.className = 'points';
@@ -174,7 +174,7 @@ function renderPowiek() {
             pointsDiv.style.height = '8.84%';
             pointsDiv.style.fontSize = '220%';
             pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
-            pointsDiv.style.zIndex = '1001';
+            pointsDiv.style.zIndex = '6';
             pointsDiv.style.display = 'flex';
             pointsDiv.style.justifyContent = 'center';
             pointsDiv.style.alignItems = 'center';
