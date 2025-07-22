@@ -327,6 +327,8 @@ function renderPowiek() {
         powiekBg.style.objectFit = 'cover';
         document.body.appendChild(powiekBg);
     }
+    // Dodaj overlay na wierzch
+    document.body.appendChild(overlay);
 }
 
 // Dodaj dynamiczne skalowanie powiększenia kart względem planszy/gui
