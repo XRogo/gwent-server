@@ -299,6 +299,13 @@ function renderPowiek() {
     overlay.focus();
 }
 
+// Dodaj dynamiczne skalowanie powiększenia kart względem planszy/gui
+window.addEventListener('resize', () => {
+    if (powiekActive) {
+        renderPowiek();
+    }
+});
+
 // Obsługa prawego kliknięcia na kartę lub dowódcę
 window.addEventListener('contextmenu', function(e){
     const cardEl = e.target.closest('.card, .powiek-card');
