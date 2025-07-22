@@ -34,15 +34,13 @@ function renderPowiek() {
     const overlay = document.createElement('div');
     overlay.id = 'powiekOverlay';
     overlay.className = 'powiek-overlay';
-    overlay.style.position = 'fixed';
+    overlay.style.position = 'absolute';
     overlay.style.left = '0';
     overlay.style.top = '0';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
+    overlay.style.width = '0';
+    overlay.style.height = '0';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
-    // USUNIĘTO CIEMNE TŁO
-    // overlay.style.background = 'rgba(0,0,0,0.7)';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // TEST: dodaj tekst do overlay
