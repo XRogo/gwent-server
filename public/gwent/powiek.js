@@ -65,6 +65,7 @@ function renderPowiek() {
     const scaleH = guiRect.height / 2158;
     const offsetLeft = guiRect.left;
     const offsetTop = guiRect.top;
+    console.log('POWIEK DEBUG:', {guiRect, scaleW, scaleH, offsetLeft, offsetTop});
     overlay.classList.add('powiek-anim');
     // Karty
     for(let i=-2;i<=2;i++){
@@ -79,6 +80,7 @@ function renderPowiek() {
         cardDiv.style.top = (pos.top*scaleH+offsetTop)+'px';
         cardDiv.style.width = (pos.width*scaleW)+'px';
         cardDiv.style.height = (pos.height*scaleH)+'px';
+        console.log('POWIEK CARD:', {left: cardDiv.style.left, top: cardDiv.style.top, width: cardDiv.style.width, height: cardDiv.style.height});
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
