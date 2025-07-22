@@ -19,6 +19,8 @@ function hidePowiek() {
     powiekActive = false;
     const el = document.getElementById('powiekOverlay');
     if (el) el.remove();
+    const powiekBg = document.getElementById('powiekBg');
+    if(powiekBg) powiekBg.remove();
 }
 
 function renderPowiek() {
@@ -308,6 +310,24 @@ function renderPowiek() {
     });
     overlay.tabIndex = 0;
     overlay.focus();
+
+    // Dodaj warstwę tła powiększenia (tłopowiek.webp) na planszę/gui
+    if(gui) {
+        let powiekBg = document.getElementById('powiekBg');
+        if(powiekBg) powiekBg.remove();
+        powiekBg = document.createElement('img');
+        powiekBg.id = 'powiekBg';
+        powiekBg.src = 'assets/asety/tłopowiek.webp';
+        powiekBg.style.position = 'absolute';
+        powiekBg.style.left = guiRect.left+'px';
+        powiekBg.style.top = guiRect.top+'px';
+        powiekBg.style.width = guiRect.width+'px';
+        powiekBg.style.height = guiRect.height+'px';
+        powiekBg.style.zIndex = 99998;
+        powiekBg.style.pointerEvents = 'none';
+        powiekBg.style.objectFit = 'cover';
+        document.body.appendChild(powiekBg);
+    }
 }
 
 // Dodaj dynamiczne skalowanie powiększenia kart względem planszy/gui
