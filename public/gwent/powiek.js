@@ -197,30 +197,6 @@ function renderPowiek() {
             mocIcon.style.zIndex = '6';
             cardDiv.appendChild(mocIcon);
         }
-        // 9: ilość (tylko w wyborze)
-        if(powiekMode==='cards' && card.ilosc>1){
-            const iloscIcon = document.createElement('img');
-            iloscIcon.className = 'ilosc-bg';
-            iloscIcon.src = 'assets/dkarty/ilosc.webp';
-            iloscIcon.style.position = 'absolute';
-            iloscIcon.style.left = '0';
-            iloscIcon.style.bottom = '0';
-            iloscIcon.style.width = (523*cardDiv.offsetWidth/523)+'px';
-            iloscIcon.style.height = (992*cardDiv.offsetHeight/992)+'px';
-            iloscIcon.style.zIndex = '7';
-            cardDiv.appendChild(iloscIcon);
-            const iloscDiv = document.createElement('div');
-            iloscDiv.className = 'ilosc';
-            iloscDiv.innerText = 'x'+card.ilosc;
-            iloscDiv.style.position = 'absolute';
-            iloscDiv.style.left = '5%';
-            iloscDiv.style.bottom = '5%';
-            iloscDiv.style.fontSize = '1.2em';
-            iloscDiv.style.color = '#72451f';
-            iloscDiv.style.fontWeight = 'bold';
-            iloscDiv.style.zIndex = '20';
-            cardDiv.appendChild(iloscDiv);
-        }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
         nameDiv.className = 'name';
