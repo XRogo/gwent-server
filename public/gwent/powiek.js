@@ -327,7 +327,15 @@ function renderPowiek() {
         powiekBg.style.objectFit = 'cover';
         document.body.appendChild(powiekBg);
     }
-    // Dodaj overlay na wierzch
+    // Ustaw overlay jako kontener na powiększenie, nad tłopowiek.webp
+    overlay.style.position = 'absolute';
+    overlay.style.left = guiRect.left+'px';
+    overlay.style.top = guiRect.top+'px';
+    overlay.style.width = guiRect.width+'px';
+    overlay.style.height = guiRect.height+'px';
+    overlay.style.zIndex = 99999;
+    overlay.style.pointerEvents = 'auto';
+    overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
 }
 
