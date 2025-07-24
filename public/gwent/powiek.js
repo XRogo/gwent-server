@@ -75,6 +75,7 @@ function renderPowiek() {
     overlay.style.background = 'none';
     overlay.style.opacity = '1';
     overlay.style.filter = 'none';
+    overlay.style.overflow = 'hidden';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // Funkcja pomocnicza: px w 4K -> % względem tłopowiek.webp
