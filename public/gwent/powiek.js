@@ -78,9 +78,17 @@ function renderPowiek() {
     overlay.style.overflow = 'hidden';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
+
     // Funkcja pomocnicza: px w 4K -> % względem tłopowiek.webp
     function percentW(px) { return (px/3837)*100; }
     function percentH(px) { return (px/2158)*100; }
+
+    // Przykład pozycjonowania karty:
+    // cardDiv.style.left = percentW(x)+'%'; // x - pozycja w px względem tłopowiek.webp
+    // cardDiv.style.top = percentH(y)+'%';  // y - pozycja w px względem tłopowiek.webp
+    // cardDiv.style.width = percentW(w)+'%'; // w - szerokość w px względem tłopowiek.webp
+    // cardDiv.style.height = percentH(h)+'%'; // h - wysokość w px względem tłopowiek.webp
+
     // Pozycje kart w 4K względem tłopowiek.webp (teraz w %)
     const positions = [
         {left:percentW(468),top:percentH(444),width:percentW(899-468),height:percentH(1261-444)},
