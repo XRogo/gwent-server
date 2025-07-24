@@ -187,11 +187,11 @@ function renderPowiek() {
             const pointsDiv = document.createElement('div');
             pointsDiv.innerText = card.punkty;
             pointsDiv.style.position = 'absolute';
-            pointsDiv.style.top = (7.8*cardDiv.offsetHeight/100)+'px';
-            pointsDiv.style.left = (14.5*cardDiv.offsetWidth/100)+'px';
-            pointsDiv.style.width = (23.61*cardDiv.offsetWidth/100)+'px';
-            pointsDiv.style.height = (8.84*cardDiv.offsetHeight/100)+'px';
-            pointsDiv.style.fontSize = (220*cardDiv.offsetWidth/523)+'px';
+            pointsDiv.style.top = percentH(77)+'%'; // 7.8%*992=77
+            pointsDiv.style.left = percentW(76)+'%'; // 14.5%*523=76
+            pointsDiv.style.width = percentW(123)+'%'; // 23.61%*523=123
+            pointsDiv.style.height = percentH(88)+'%'; // 8.84%*992=88
+            pointsDiv.style.fontSize = percentW(220)+'%';
             pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
             pointsDiv.style.zIndex = 8;
             pointsDiv.style.display = 'flex';
@@ -199,32 +199,16 @@ function renderPowiek() {
             pointsDiv.style.alignItems = 'center';
             cardDiv.appendChild(pointsDiv);
         }
-        // 8: okienko mocy
-        if(card.moc){
-            const mocIcon = document.createElement('img');
-            let mocSrc = `assets/dkarty/${card.moc}.webp`;
-            if(card.moc==='porz' && card.numer==='510') mocSrc = 'assets/dkarty/2porz.webp';
-            if(card.moc==='grzybki' && card.numer==='504') mocSrc = 'assets/dkarty/igrzybki.webp';
-            if(card.moc==='grzybki' && card.numer==='000') mocSrc = 'assets/dkarty/grzybki.webp';
-            mocIcon.src = mocSrc;
-            mocIcon.style.position = 'absolute';
-            mocIcon.style.left = '0';
-            mocIcon.style.top = '0';
-            mocIcon.style.width = '100%';
-            mocIcon.style.height = '100%';
-            mocIcon.style.zIndex = 9;
-            cardDiv.appendChild(mocIcon);
-        }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
         nameDiv.innerText = card.nazwa;
         nameDiv.style.position = 'absolute';
-        nameDiv.style.left = (113*cardDiv.offsetWidth/523)+'px';
-        nameDiv.style.top = (766*cardDiv.offsetHeight/992)+'px';
-        nameDiv.style.width = (518*cardDiv.offsetWidth/523)+'px';
-        nameDiv.style.height = (111*cardDiv.offsetHeight/992)+'px';
+        nameDiv.style.left = percentW(113)+'%';
+        nameDiv.style.top = percentH(766)+'%';
+        nameDiv.style.width = percentW(518)+'%';
+        nameDiv.style.height = percentH(111)+'%';
         nameDiv.style.textAlign = 'center';
-        nameDiv.style.fontSize = (44*cardDiv.offsetWidth/524)+'px';
+        nameDiv.style.fontSize = percentW(44)+'%';
         nameDiv.style.color = '#474747';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = 10;
@@ -239,13 +223,13 @@ function renderPowiek() {
             const opisDiv = document.createElement('div');
             opisDiv.innerText = card.opis||'';
             opisDiv.style.position = 'absolute';
-            opisDiv.style.left = (9*cardDiv.offsetWidth/523)+'px';
-            opisDiv.style.top = (879*cardDiv.offsetHeight/992)+'px';
-            opisDiv.style.width = (514*cardDiv.offsetWidth/523)+'px';
-            opisDiv.style.height = (991*cardDiv.offsetHeight/992)+'px';
+            opisDiv.style.left = percentW(9)+'%';
+            opisDiv.style.top = percentH(879)+'%';
+            opisDiv.style.width = percentW(514)+'%';
+            opisDiv.style.height = percentH(991)+'%';
             opisDiv.style.textAlign = 'center';
             opisDiv.style.color = '#fff';
-            opisDiv.style.fontSize = (44*cardDiv.offsetWidth/524)+'px';
+            opisDiv.style.fontSize = percentW(44)+'%';
             opisDiv.style.zIndex = 20;
             cardDiv.appendChild(opisDiv);
         }
