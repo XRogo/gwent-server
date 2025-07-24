@@ -250,6 +250,7 @@ function renderPowiek() {
         infoBox.style.width = (695*scaleW)+'px';
         infoBox.style.height = (202*scaleH)+'px';
         infoBox.style.zIndex = 200;
+        infoBox.style.objectFit = 'none';
         overlay.appendChild(infoBox);
         // Ikona mocy
         const mocIcon = document.createElement('img');
