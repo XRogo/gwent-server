@@ -53,7 +53,10 @@ function renderPowiek() {
     powiekBg.style.height = guiRect.height+'px';
     powiekBg.style.zIndex = 99998;
     powiekBg.style.pointerEvents = 'none';
-    powiekBg.style.objectFit = 'cover';
+    powiekBg.style.objectFit = 'contain';
+    powiekBg.style.background = 'none';
+    powiekBg.style.opacity = '1';
+    powiekBg.style.filter = 'none';
     document.body.appendChild(powiekBg);
     // Overlay na karty
     const overlay = document.createElement('div');
@@ -66,6 +69,9 @@ function renderPowiek() {
     overlay.style.height = guiRect.height+'px';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
+    overlay.style.background = 'none';
+    overlay.style.opacity = '1';
+    overlay.style.filter = 'none';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // Pozycje kart w 4K
@@ -250,7 +256,6 @@ function renderPowiek() {
         infoBox.style.width = (695*scaleW)+'px';
         infoBox.style.height = (202*scaleH)+'px';
         infoBox.style.zIndex = 200;
-        infoBox.style.objectFit = 'none';
         overlay.appendChild(infoBox);
         // Ikona mocy
         const mocIcon = document.createElement('img');
