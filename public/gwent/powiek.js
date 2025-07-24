@@ -40,38 +40,50 @@ function renderPowiek() {
         guiRect = { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
     }
 
-    // Skalowanie względem tłopowiek.webp (4K: 3837x2158)
-    const tloW = guiRect.width;
-    const tloH = guiRect.height;
-    const scaleW = tloW / 3837;
-    const scaleH = tloH / 2158;
-
+    // Skalowanie i pozycjonowanie jak w wyborach (game.js)
+    const TLO_W = 3837;
+    const TLO_H = 2158;
+    const windowAspectRatio = window.innerWidth / window.innerHeight;
+    const tloAspectRatio = TLO_W / TLO_H;
+    let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+    if (windowAspectRatio > tloAspectRatio) {
+        scale = guiRect.height / TLO_H;
+        backgroundWidth = TLO_W * scale;
+        backgroundHeight = guiRect.height;
+        backgroundLeft = guiRect.left + (guiRect.width - backgroundWidth) / 2;
+        backgroundTop = guiRect.top;
+    } else {
+        scale = guiRect.width / TLO_W;
+        backgroundWidth = guiRect.width;
+        backgroundHeight = TLO_H * scale;
+        backgroundLeft = guiRect.left;
+        backgroundTop = guiRect.top + (guiRect.height - backgroundHeight) / 2;
+    }
     // Warstwa tła powiek
     const powiekBg = document.createElement('img');
     powiekBg.id = 'powiekBg';
     powiekBg.src = 'assets/asety/tłopowiek.webp';
     powiekBg.style.position = 'absolute';
-    powiekBg.style.left = guiRect.left + 'px';
-    powiekBg.style.top = guiRect.top + 'px';
-    powiekBg.style.width = guiRect.width + 'px';
-    powiekBg.style.height = guiRect.height + 'px';
+    powiekBg.style.left = backgroundLeft+'px';
+    powiekBg.style.top = backgroundTop+'px';
+    powiekBg.style.width = backgroundWidth+'px';
+    powiekBg.style.height = backgroundHeight+'px';
     powiekBg.style.zIndex = 99998;
     powiekBg.style.pointerEvents = 'none';
-    powiekBg.style.objectFit = 'contain';
+    powiekBg.style.objectFit = 'cover';
     powiekBg.style.background = 'none';
     powiekBg.style.opacity = '1';
     powiekBg.style.filter = 'none';
     document.body.appendChild(powiekBg);
-
     // Overlay na karty
     const overlay = document.createElement('div');
     overlay.id = 'powiekOverlay';
     overlay.className = 'powiek-overlay';
     overlay.style.position = 'absolute';
-    overlay.style.left = guiRect.left + 'px';
-    overlay.style.top = guiRect.top + 'px';
-    overlay.style.width = guiRect.width + 'px';
-    overlay.style.height = guiRect.height + 'px';
+    overlay.style.left = backgroundLeft+'px';
+    overlay.style.top = backgroundTop+'px';
+    overlay.style.width = backgroundWidth+'px';
+    overlay.style.height = backgroundHeight+'px';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
     overlay.style.background = 'none';
@@ -80,20 +92,17 @@ function renderPowiek() {
     overlay.style.overflow = 'hidden';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
-
-    // Funkcja pomocnicza: px w 4K -> % względem tłopowiek.webp
-    function percentW(px) { return (px / 3837) * 100; }
-    function percentH(px) { return (px / 2158) * 100; }
-
-    // Pozycje kart w % względem tłopowiek.webp
+    // Funkcja pomocnicza: px w 4K -> px względem backgroundWidth/backgroundHeight
+    function relW(px) { return (px / TLO_W) * backgroundWidth; }
+    function relH(px) { return (px / TLO_H) * backgroundHeight; }
+    // Pozycje kart w px względem tłopowiek.webp
     const positions = [
-        { left: percentW(468), top: percentH(444), width: percentW(899 - 468), height: percentH(1261 - 444) },
-        { left: percentW(1040), top: percentH(444), width: percentW(1563 - 1040), height: percentH(1436 - 444) },
-        { left: percentW(1617), top: percentH(456), width: percentW(2222 - 1617), height: percentH(1609 - 456) },
-        { left: percentW(2274), top: percentH(444), width: percentW(2799 - 2274), height: percentH(1436 - 444) },
-        { left: percentW(2938), top: percentH(444), width: percentW(3371 - 2938), height: percentH(1261 - 444) }
+        {left:relW(468),top:relH(444),width:relW(899-468),height:relH(1261-444)},
+        {left:relW(1040),top:relH(444),width:relW(1563-1040),height:relH(1436-444)},
+        {left:relW(1617),top:relH(456),width:relW(2222-1617),height:relH(1609-456)},
+        {left:relW(2274),top:relH(444),width:relW(2799-2274),height:relH(1436-444)},
+        {left:relW(2938),top:relH(444),width:relW(3371-2938),height:relH(1261-444)}
     ];
-
     // Karty
     for (let i = -2; i <= 2; i++) {
         const idx = powiekIndex + i;
@@ -103,10 +112,10 @@ function renderPowiek() {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card';
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = pos.left + '%';
-        cardDiv.style.top = pos.top + '%';
-        cardDiv.style.width = pos.width + '%';
-        cardDiv.style.height = pos.height + '%';
+        cardDiv.style.left = pos.left+'px';
+        cardDiv.style.top = pos.top+'px';
+        cardDiv.style.width = pos.width+'px';
+        cardDiv.style.height = pos.height+'px';
         cardDiv.style.zIndex = i === 0 ? 100 : 50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
