@@ -166,7 +166,7 @@ function renderPowiek() {
         beton.style.zIndex = 4;
         cardDiv.appendChild(beton);
         // 5: pasek frakcji (nie dla królów)
-        if (!card.isKing && card.frakcja && card.frakcja !== 'nie') {
+        if (powiekMode !== 'leaders' && !card.isKing && card.frakcja && card.frakcja !== 'nie') {
             const bannerDiv = document.createElement('img');
             bannerDiv.src = `assets/dkarty/${card.frakcja === '1' ? 'polnoc.webp' : card.frakcja === '2' ? 'nilfgaard.webp' : card.frakcja === '3' ? 'scoiatael.webp' : card.frakcja === '4' ? 'potwory.webp' : 'skellige.webp'}`;
             bannerDiv.style.position = 'absolute';
@@ -192,12 +192,21 @@ function renderPowiek() {
         // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych)
         if (card.punkty !== undefined) {
             const pointsBg = document.createElement('img');
-            pointsBg.src = card.bohater ? 'assets/dkarty/bohater.webp' : 'assets/dkarty/punkty.webp';
-            pointsBg.style.position = 'absolute';
-            pointsBg.style.left = '-23px';
-            pointsBg.style.top = '-21px';
-            pointsBg.style.width = '523px';
-            pointsBg.style.height = '992px';
+            if(card.bohater) {
+                pointsBg.src = 'assets/dkarty/bohater.webp';
+                pointsBg.style.position = 'absolute';
+                pointsBg.style.left = '-23px';
+                pointsBg.style.top = '-21px';
+                pointsBg.style.width = '523px';
+                pointsBg.style.height = '992px';
+            } else {
+                pointsBg.src = 'assets/dkarty/punkty.webp';
+                pointsBg.style.position = 'absolute';
+                pointsBg.style.left = '0';
+                pointsBg.style.top = '0';
+                pointsBg.style.width = '100%';
+                pointsBg.style.height = '100%';
+            }
             pointsBg.style.zIndex = 7;
             cardDiv.appendChild(pointsBg);
             const pointsDiv = document.createElement('div');
