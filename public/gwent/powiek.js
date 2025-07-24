@@ -245,6 +245,55 @@ function renderPowiek() {
             opisDiv.style.fontSize = (44*cardDiv.offsetWidth/524)+'px';
             opisDiv.style.zIndex = 20;
             cardDiv.appendChild(opisDiv);
+
+            // Okienko informacyjne
+            const infoBox = document.createElement('img');
+            infoBox.src = 'assets/asety/infor.webp';
+            infoBox.style.position = 'absolute';
+            infoBox.style.left = (1356*scaleW+offsetLeft)+'px';
+            infoBox.style.top = (1661*scaleH+offsetTop)+'px';
+            infoBox.style.width = (695*scaleW)+'px'; // szerokość infor.webp
+            infoBox.style.height = (202*scaleH)+'px'; // wysokość infor.webp
+            infoBox.style.zIndex = 200;
+            overlay.appendChild(infoBox);
+
+            // Ikona mocy w lewym górnym rogu okienka
+            const mocIcon = document.createElement('img');
+            mocIcon.src = `assets/moc/${card.moc}.webp`; // ścieżka do ikony mocy
+            mocIcon.style.position = 'absolute';
+            mocIcon.style.left = (1356*scaleW+offsetLeft+10*scaleW)+'px';
+            mocIcon.style.top = (1661*scaleH+offsetTop+10*scaleH)+'px';
+            mocIcon.style.width = (64*scaleW)+'px';
+            mocIcon.style.height = (64*scaleH)+'px';
+            mocIcon.style.zIndex = 201;
+            overlay.appendChild(mocIcon);
+
+            // Nazwa mocy nad okienkiem
+            const mocName = document.createElement('div');
+            mocName.textContent = moce[card.moc]?.nazwa || '';
+            mocName.style.position = 'absolute';
+            mocName.style.left = (1356*scaleW+offsetLeft)+'px';
+            mocName.style.top = (1735*scaleH+offsetTop)+'px';
+            mocName.style.width = (695*scaleW)+'px';
+            mocName.style.textAlign = 'center';
+            mocName.style.fontWeight = 'bold';
+            mocName.style.fontSize = (44*scaleW)+'px';
+            mocName.style.color = '#c7a76e';
+            mocName.style.zIndex = 202;
+            overlay.appendChild(mocName);
+
+            // Opis mocy pod nazwą
+            const mocDesc = document.createElement('div');
+            mocDesc.textContent = moce[card.moc]?.opis || '';
+            mocDesc.style.position = 'absolute';
+            mocDesc.style.left = (1356*scaleW+offsetLeft)+'px';
+            mocDesc.style.top = (1814*scaleH+offsetTop)+'px';
+            mocDesc.style.width = (695*scaleW)+'px';
+            mocDesc.style.textAlign = 'center';
+            mocDesc.style.fontSize = (32*scaleW)+'px';
+            mocDesc.style.color = '#c7a76e';
+            mocDesc.style.zIndex = 202;
+            overlay.appendChild(mocDesc);
         }
         overlay.appendChild(cardDiv);
     }
