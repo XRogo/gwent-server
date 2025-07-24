@@ -126,8 +126,8 @@ function renderPowiek() {
             const podsw = document.createElement('img');
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.style.position = 'absolute';
-            podsw.style.left = (-104/523*100) + '%';
-            podsw.style.top = (-10/992*100) + '%';
+            podsw.style.left = '0';
+            podsw.style.top = '0';
             podsw.style.width = '100%';
             podsw.style.height = '100%';
             podsw.style.zIndex = 1;
@@ -136,8 +136,8 @@ function renderPowiek() {
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = (-104/523*100) + '%';
-            podsw2.style.top = (-10/992*100) + '%';
+            podsw2.style.left = '0';
+            podsw2.style.top = '0';
             podsw2.style.width = '100%';
             podsw2.style.height = '100%';
             podsw2.style.zIndex = 2;
@@ -194,8 +194,8 @@ function renderPowiek() {
             const pointsBg = document.createElement('img');
             pointsBg.src = card.bohater ? 'assets/dkarty/bohater.webp' : 'assets/dkarty/punkty.webp';
             pointsBg.style.position = 'absolute';
-            pointsBg.style.left = (-23/523*100) + '%';
-            pointsBg.style.top = (-21/992*100) + '%';
+            pointsBg.style.left = '0';
+            pointsBg.style.top = '0';
             pointsBg.style.width = '100%';
             pointsBg.style.height = '100%';
             pointsBg.style.zIndex = 7;
@@ -203,11 +203,11 @@ function renderPowiek() {
             const pointsDiv = document.createElement('div');
             pointsDiv.innerText = card.punkty;
             pointsDiv.style.position = 'absolute';
-            pointsDiv.style.top = (77/992*100) + '%';
-            pointsDiv.style.left = (76/523*100) + '%';
-            pointsDiv.style.width = (123/523*100) + '%';
-            pointsDiv.style.height = (88/992*100) + '%';
-            pointsDiv.style.fontSize = (44/523*100) + '%';
+            pointsDiv.style.top = '8%';
+            pointsDiv.style.left = '15%';
+            pointsDiv.style.width = '24%';
+            pointsDiv.style.height = '9%';
+            pointsDiv.style.fontSize = '220%';
             pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
             pointsDiv.style.zIndex = 8;
             pointsDiv.style.display = 'flex';
@@ -219,12 +219,12 @@ function renderPowiek() {
         const nameDiv = document.createElement('div');
         nameDiv.innerText = card.nazwa;
         nameDiv.style.position = 'absolute';
-        nameDiv.style.left = (113/523*100) + '%';
-        nameDiv.style.top = (766/992*100) + '%';
-        nameDiv.style.width = (518/523*100) + '%';
-        nameDiv.style.height = (111/992*100) + '%';
+        nameDiv.style.left = '22%';
+        nameDiv.style.top = '77%';
+        nameDiv.style.width = '76%';
+        nameDiv.style.height = '11%';
         nameDiv.style.textAlign = 'center';
-        nameDiv.style.fontSize = (44/523*100) + '%';
+        nameDiv.style.fontSize = '44px';
         nameDiv.style.color = '#474747';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = 10;
@@ -239,16 +239,17 @@ function renderPowiek() {
             const opisDiv = document.createElement('div');
             opisDiv.innerText = card.opis || '';
             opisDiv.style.position = 'absolute';
-            opisDiv.style.left = (9/523*100) + '%';
-            opisDiv.style.top = (879/992*100) + '%';
-            opisDiv.style.width = (514/523*100) + '%';
-            opisDiv.style.height = (991/992*100) + '%';
+            opisDiv.style.left = '2%';
+            opisDiv.style.top = '89%';
+            opisDiv.style.width = '96%';
+            opisDiv.style.height = '8%';
             opisDiv.style.textAlign = 'center';
             opisDiv.style.color = '#fff';
-            opisDiv.style.fontSize = (44/523*100) + '%';
+            opisDiv.style.fontSize = '44px';
             opisDiv.style.zIndex = 20;
             cardDiv.appendChild(opisDiv);
         }
+        overlay.appendChild(cardDiv);
     }
 
     // Okienko infor.webp dla środkowej karty, jeśli wymaga
