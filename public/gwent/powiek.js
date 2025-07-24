@@ -66,10 +66,10 @@ function renderPowiek() {
     overlay.id = 'powiekOverlay';
     overlay.className = 'powiek-overlay';
     overlay.style.position = 'absolute';
-    overlay.style.left = '0';
-    overlay.style.top = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
+    overlay.style.left = guiRect.left+'px';
+    overlay.style.top = guiRect.top+'px';
+    overlay.style.width = guiRect.width+'px';
+    overlay.style.height = guiRect.height+'px';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
     overlay.style.background = 'none';
