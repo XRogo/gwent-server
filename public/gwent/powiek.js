@@ -120,9 +120,9 @@ function renderPowiek() {
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
 
-        // Warstwy karty
+        // Warstwy karty wg infoo.txt
+        // 1: podsw.webp (jeśli wybrana, tylko środkowa)
         if (i === 0) {
-            // 1: podsw.webp
             const podsw = document.createElement('img');
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.style.position = 'absolute';
@@ -165,8 +165,8 @@ function renderPowiek() {
         beton.style.height = '100%';
         beton.style.zIndex = 4;
         cardDiv.appendChild(beton);
-        // 5: pasek frakcji
-        if (card.frakcja && card.frakcja !== 'nie') {
+        // 5: pasek frakcji (nie dla królów)
+        if (!card.isKing && card.frakcja && card.frakcja !== 'nie') {
             const bannerDiv = document.createElement('img');
             bannerDiv.src = `assets/dkarty/${card.frakcja === '1' ? 'polnoc.webp' : card.frakcja === '2' ? 'nilfgaard.webp' : card.frakcja === '3' ? 'scoiatael.webp' : card.frakcja === '4' ? 'potwory.webp' : 'skellige.webp'}`;
             bannerDiv.style.position = 'absolute';
@@ -215,6 +215,34 @@ function renderPowiek() {
             pointsDiv.style.alignItems = 'center';
             cardDiv.appendChild(pointsDiv);
         }
+        // 8: okienko mocy
+        if (card.moc) {
+            const mocIcon = document.createElement('img');
+            let mocSrc = `assets/dkarty/${card.moc}.webp`;
+            if(card.moc==='porz' && card.numer==='510') mocSrc = 'assets/dkarty/2porz.webp';
+            if(card.moc==='grzybki' && card.numer==='504') mocSrc = 'assets/dkarty/igrzybki.webp';
+            if(card.moc==='grzybki' && card.numer==='000') mocSrc = 'assets/dkarty/grzybki.webp';
+            mocIcon.src = mocSrc;
+            mocIcon.style.position = 'absolute';
+            mocIcon.style.left = '0';
+            mocIcon.style.top = '0';
+            mocIcon.style.width = '100%';
+            mocIcon.style.height = '100%';
+            mocIcon.style.zIndex = 9;
+            cardDiv.appendChild(mocIcon);
+        }
+        // 9: ilość (jeśli w wyborze)
+        if (card.ilosc !== undefined) {
+            const iloscLayer = document.createElement('img');
+            iloscLayer.src = 'assets/dkarty/ilosc.webp';
+            iloscLayer.style.position = 'absolute';
+            iloscLayer.style.left = '0';
+            iloscLayer.style.top = '0';
+            iloscLayer.style.width = '100%';
+            iloscLayer.style.height = '100%';
+            iloscLayer.style.zIndex = 11;
+            cardDiv.appendChild(iloscLayer);
+        }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
         nameDiv.innerText = card.nazwa;
@@ -227,14 +255,14 @@ function renderPowiek() {
         nameDiv.style.fontSize = '44px';
         nameDiv.style.color = '#474747';
         nameDiv.style.fontWeight = 'bold';
-        nameDiv.style.zIndex = 10;
+        nameDiv.style.zIndex = 12;
         nameDiv.style.whiteSpace = 'normal';
         nameDiv.style.wordBreak = 'break-word';
         nameDiv.style.lineHeight = '1.1';
         nameDiv.style.padding = '0 4px';
         nameDiv.style.transform = 'none';
         cardDiv.appendChild(nameDiv);
-        // Opis pod dużą kartą
+        // 11: opis pod dużą kartą
         if (i === 0) {
             const opisDiv = document.createElement('div');
             opisDiv.innerText = card.opis || '';
