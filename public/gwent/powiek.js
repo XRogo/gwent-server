@@ -38,8 +38,11 @@ function renderPowiek() {
     } else {
         guiRect = {left:0,top:0,width:window.innerWidth,height:window.innerHeight};
     }
-    const scaleW = guiRect.width / 3837;
-    const scaleH = guiRect.height / 2158;
+    // Skalowanie względem tłopowiek.webp (4K: 3837x2158)
+    const tloW = guiRect.width;
+    const tloH = guiRect.height;
+    const scaleW = tloW / 3837;
+    const scaleH = tloH / 2158;
     const offsetLeft = guiRect.left;
     const offsetTop = guiRect.top;
     // Warstwa tła powiek
@@ -74,7 +77,7 @@ function renderPowiek() {
     overlay.style.filter = 'none';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
-    // Pozycje kart w 4K
+    // Pozycje kart w 4K względem tłopowiek.webp
     const positions = [
         {left:468,top:444,width:899-468,height:1261-444},
         {left:1040,top:444,width:1563-1040,height:1436-444},
