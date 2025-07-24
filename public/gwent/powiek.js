@@ -77,13 +77,16 @@ function renderPowiek() {
     overlay.style.filter = 'none';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
-    // Pozycje kart w 4K względem tłopowiek.webp
+    // Funkcja pomocnicza: px w 4K -> % względem tłopowiek.webp
+    function percentW(px) { return (px/3837)*100; }
+    function percentH(px) { return (px/2158)*100; }
+    // Pozycje kart w 4K względem tłopowiek.webp (teraz w %)
     const positions = [
-        {left:468,top:444,width:899-468,height:1261-444},
-        {left:1040,top:444,width:1563-1040,height:1436-444},
-        {left:1617,top:456,width:2222-1617,height:1609-456},
-        {left:2274,top:444,width:2799-2274,height:1436-444},
-        {left:2938,top:444,width:3371-2938,height:1261-444}
+        {left:percentW(468),top:percentH(444),width:percentW(899-468),height:percentH(1261-444)},
+        {left:percentW(1040),top:percentH(444),width:percentW(1563-1040),height:percentH(1436-444)},
+        {left:percentW(1617),top:percentH(456),width:percentW(2222-1617),height:percentH(1609-456)},
+        {left:percentW(2274),top:percentH(444),width:percentW(2799-2274),height:percentH(1436-444)},
+        {left:percentW(2938),top:percentH(444),width:percentW(3371-2938),height:percentH(1261-444)}
     ];
     // Karty
     for(let i=-2;i<=2;i++){
@@ -94,10 +97,10 @@ function renderPowiek() {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card';
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = (pos.left*scaleW+offsetLeft)+'px';
-        cardDiv.style.top = (pos.top*scaleH+offsetTop)+'px';
-        cardDiv.style.width = (pos.width*scaleW)+'px';
-        cardDiv.style.height = (pos.height*scaleH+'px');
+        cardDiv.style.left = pos.left+'%';
+        cardDiv.style.top = pos.top+'%';
+        cardDiv.style.width = pos.width+'%';
+        cardDiv.style.height = pos.height+'%';
         cardDiv.style.zIndex = i===0?100:50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
@@ -107,20 +110,20 @@ function renderPowiek() {
             const podsw = document.createElement('img');
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.style.position = 'absolute';
-            podsw.style.left = (-104*scaleW)+'px';
-            podsw.style.top = (-10*scaleH)+'px';
-            podsw.style.width = (523*scaleW)+'px';
-            podsw.style.height = (992*scaleH)+'px';
+            podsw.style.left = percentW(-104)+'%';
+            podsw.style.top = percentH(-10)+'%';
+            podsw.style.width = percentW(523)+'%';
+            podsw.style.height = percentH(992)+'%';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             // 2: podsw2.webp (pulsuje)
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = (-104*scaleW)+'px';
-            podsw2.style.top = (-10*scaleH)+'px';
-            podsw2.style.width = (523*scaleW)+'px';
-            podsw2.style.height = (992*scaleH)+'px';
+            podsw2.style.left = percentW(-104)+'%';
+            podsw2.style.top = percentH(-10)+'%';
+            podsw2.style.width = percentW(523)+'%';
+            podsw2.style.height = percentH(992)+'%';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
@@ -175,10 +178,10 @@ function renderPowiek() {
             const pointsBg = document.createElement('img');
             pointsBg.src = card.bohater ? 'assets/dkarty/bohater.webp' : 'assets/dkarty/punkty.webp';
             pointsBg.style.position = 'absolute';
-            pointsBg.style.left = (-23*scaleW)+'px';
-            pointsBg.style.top = (-21*scaleH)+'px';
-            pointsBg.style.width = (523*scaleW)+'px';
-            pointsBg.style.height = (992*scaleH)+'px';
+            pointsBg.style.left = percentW(-23)+'%';
+            pointsBg.style.top = percentH(-21)+'%';
+            pointsBg.style.width = percentW(523)+'%';
+            pointsBg.style.height = percentH(992)+'%';
             pointsBg.style.zIndex = 7;
             cardDiv.appendChild(pointsBg);
             const pointsDiv = document.createElement('div');
