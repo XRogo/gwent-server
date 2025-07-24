@@ -126,20 +126,20 @@ function renderPowiek() {
             const podsw = document.createElement('img');
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.style.position = 'absolute';
-            podsw.style.left = '0';
-            podsw.style.top = '0';
-            podsw.style.width = '100%';
-            podsw.style.height = '100%';
+            podsw.style.left = '-104px';
+            podsw.style.top = '-10px';
+            podsw.style.width = '523px';
+            podsw.style.height = '992px';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             // 2: podsw2.webp (pulsuje)
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = '0';
-            podsw2.style.top = '0';
-            podsw2.style.width = '100%';
-            podsw2.style.height = '100%';
+            podsw2.style.left = '-104px';
+            podsw2.style.top = '-10px';
+            podsw2.style.width = '523px';
+            podsw2.style.height = '992px';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
@@ -189,15 +189,15 @@ function renderPowiek() {
             posIcon.style.zIndex = 6;
             cardDiv.appendChild(posIcon);
         }
-        // 7: punkty okienko
+        // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych)
         if (card.punkty !== undefined) {
             const pointsBg = document.createElement('img');
             pointsBg.src = card.bohater ? 'assets/dkarty/bohater.webp' : 'assets/dkarty/punkty.webp';
             pointsBg.style.position = 'absolute';
-            pointsBg.style.left = '0';
-            pointsBg.style.top = '0';
-            pointsBg.style.width = '100%';
-            pointsBg.style.height = '100%';
+            pointsBg.style.left = '-23px';
+            pointsBg.style.top = '-21px';
+            pointsBg.style.width = '523px';
+            pointsBg.style.height = '992px';
             pointsBg.style.zIndex = 7;
             cardDiv.appendChild(pointsBg);
             const pointsDiv = document.createElement('div');
@@ -230,18 +230,6 @@ function renderPowiek() {
             mocIcon.style.height = '100%';
             mocIcon.style.zIndex = 9;
             cardDiv.appendChild(mocIcon);
-        }
-        // 9: ilość (jeśli w wyborze)
-        if (card.ilosc !== undefined) {
-            const iloscLayer = document.createElement('img');
-            iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            iloscLayer.style.position = 'absolute';
-            iloscLayer.style.left = '0';
-            iloscLayer.style.top = '0';
-            iloscLayer.style.width = '100%';
-            iloscLayer.style.height = '100%';
-            iloscLayer.style.zIndex = 11;
-            cardDiv.appendChild(iloscLayer);
         }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
