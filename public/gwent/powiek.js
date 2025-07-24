@@ -128,8 +128,8 @@ function renderPowiek() {
             podsw.style.position = 'absolute';
             podsw.style.left = (-104/523*100) + '%';
             podsw.style.top = (-10/992*100) + '%';
-            podsw.style.width = (523/pos.width*100) + '%';
-            podsw.style.height = (992/pos.height*100) + '%';
+            podsw.style.width = (523/523*100) + '%';
+            podsw.style.height = (992/992*100) + '%';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             // 2: podsw2.webp (pulsuje)
@@ -138,8 +138,8 @@ function renderPowiek() {
             podsw2.style.position = 'absolute';
             podsw2.style.left = (-104/523*100) + '%';
             podsw2.style.top = (-10/992*100) + '%';
-            podsw2.style.width = (523/pos.width*100) + '%';
-            podsw2.style.height = (992/pos.height*100) + '%';
+            podsw2.style.width = (523/523*100) + '%';
+            podsw2.style.height = (992/992*100) + '%';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
@@ -196,8 +196,8 @@ function renderPowiek() {
             pointsBg.style.position = 'absolute';
             pointsBg.style.left = (-23/523*100) + '%';
             pointsBg.style.top = (-21/992*100) + '%';
-            pointsBg.style.width = (523/pos.width*100) + '%';
-            pointsBg.style.height = (992/pos.height*100) + '%';
+            pointsBg.style.width = (523/523*100) + '%';
+            pointsBg.style.height = (992/992*100) + '%';
             pointsBg.style.zIndex = 7;
             cardDiv.appendChild(pointsBg);
             const pointsDiv = document.createElement('div');
