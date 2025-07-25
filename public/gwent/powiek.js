@@ -350,7 +350,6 @@ window.addEventListener('contextmenu', function (e) {
     const cardEl = e.target.closest('.card, .powiek-card');
     if (cardEl && cardEl.dataset && cardEl.dataset.index) {
         e.preventDefault();
-        // Pobierz wybraną frakcję (np. z localStorage lub window.selectedFaction)
         let selectedFaction = window.selectedFaction || localStorage.getItem('faction');
         // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko unikalne numery z kolekcji, tylko wybrana frakcja + niezależne
         if (cardEl.classList.contains('kolekcja-card')) {
@@ -378,8 +377,8 @@ window.addEventListener('contextmenu', function (e) {
             showPowiek(uniqueTalia, parseInt(cardEl.dataset.index), 'cards');
             return;
         }
-        // Domyślnie: pokazuj całą talię
-        showPowiek(window.deckForPowiek || [], parseInt(cardEl.dataset.index), 'cards');
+        // Jeśli wywołanie z gry (window.deckForPowiek), pokazuj wszystkie karty (duplikaty dozwolone)
+        showPowiek(window.deckForPowiek || [], parseInt(cardEl.dataset.index), 'game');
     }
     if (e.target.classList.contains('leader-card-x')) {
         e.preventDefault();
