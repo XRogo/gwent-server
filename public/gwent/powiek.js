@@ -165,8 +165,8 @@ function renderPowiek() {
         beton.style.height = '100%';
         beton.style.zIndex = 4;
         cardDiv.appendChild(beton);
-        // 5: pasek frakcji (nie dla królów)
-        if (powiekMode !== 'leaders' && !card.isKing && card.frakcja && card.frakcja !== 'nie') {
+        // 5: pasek frakcji (dodawany dla wszystkich kart z frakcją, ale nie dla dowódców)
+        if (card.frakcja && card.frakcja !== 'nie' && !(powiekMode === 'leaders' || card.isKing)) {
             const bannerDiv = document.createElement('img');
             bannerDiv.src = `assets/dkarty/${card.frakcja === '1' ? 'polnoc.webp' : card.frakcja === '2' ? 'nilfgaard.webp' : card.frakcja === '3' ? 'scoiatael.webp' : card.frakcja === '4' ? 'potwory.webp' : 'skellige.webp'}`;
             bannerDiv.style.position = 'absolute';
