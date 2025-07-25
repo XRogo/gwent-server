@@ -356,6 +356,40 @@ window.addEventListener('contextmenu', function (e) {
     }
 });
 
+// Obsługa przesuwania kart strzałkami i scrollem
+window.addEventListener('keydown', function (event) {
+    if (!powiekActive) return;
+    if (event.key === 'ArrowRight') {
+        if (powiekIndex < powiekDeck.length - 1) {
+            powiekIndex++;
+            renderPowiek();
+        }
+    }
+    if (event.key === 'ArrowLeft') {
+        if (powiekIndex > 0) {
+            powiekIndex--;
+            renderPowiek();
+        }
+    }
+});
+
+window.addEventListener('wheel', function (event) {
+    if (!powiekActive) return;
+    if (event.deltaY < 0) {
+        // Scroll do góry = następna karta
+        if (powiekIndex < powiekDeck.length - 1) {
+            powiekIndex++;
+            renderPowiek();
+        }
+    } else if (event.deltaY > 0) {
+        // Scroll w dół = poprzednia karta
+        if (powiekIndex > 0) {
+            powiekIndex--;
+            renderPowiek();
+        }
+    }
+});
+
 document.addEventListener('keydown', function (event) {
     if (event.key === 'x' || event.key === 'X') {
         console.log('Naciśnięto klawisz X');
