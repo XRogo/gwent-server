@@ -8,7 +8,16 @@ let powiekActive = false;
 let powiekMode = 'cards'; // 'cards' lub 'leaders'
 
 function showPowiek(deck, index, mode = 'cards') {
-    powiekDeck = deck;
+    // Filtruj duplikaty po numerze
+    const uniqueDeck = [];
+    const seenNumbers = new Set();
+    for (const card of deck) {
+        if (!seenNumbers.has(card.numer)) {
+            uniqueDeck.push(card);
+            seenNumbers.add(card.numer);
+        }
+    }
+    powiekDeck = uniqueDeck;
     powiekIndex = index;
     powiekActive = true;
     powiekMode = mode;
