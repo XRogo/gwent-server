@@ -377,6 +377,19 @@ window.addEventListener('contextmenu', function (e) {
             showPowiek(uniqueTalia, parseInt(cardEl.dataset.index), 'cards');
             return;
         }
+        // Jeśli wywołanie z gry (window.deckForPowiek), pokazuj tylko unikalne numery (duplikaty ukryte)
+        if (window.deckForPowiek && cardEl.closest('.talia-gry')) {
+            const uniqueGame = [];
+            const seenNumbers = new Set();
+            for (const card of window.deckForPowiek) {
+                if (!seenNumbers.has(card.numer)) {
+                    uniqueGame.push(card);
+                    seenNumbers.add(card.numer);
+                }
+            }
+            showPowiek(uniqueGame, parseInt(cardEl.dataset.index), 'game');
+            return;
+        }
         // Jeśli wywołanie z gry (window.deckForPowiek), pokazuj wszystkie karty (duplikaty dozwolone)
         showPowiek(window.deckForPowiek || [], parseInt(cardEl.dataset.index), 'game');
     }
