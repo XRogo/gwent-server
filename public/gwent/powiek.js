@@ -351,47 +351,42 @@ window.addEventListener('contextmenu', function (e) {
     if (cardEl && cardEl.dataset && cardEl.dataset.index) {
         e.preventDefault();
         let selectedFaction = window.selectedFaction || localStorage.getItem('faction');
-        // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko unikalne numery z kolekcji, tylko wybrana frakcja + niezależne
-        if (cardEl.classList.contains('kolekcja-card')) {
-            const uniqueKolekcja = [];
+        // Pobierz źródło kart
+        let source = null;
+        if (cardEl.classList.contains('kolekcja-card')) source = window.kolekcjaPowiek || [];
+        else if (cardEl.classList.contains('talia-card')) source = window.taliaPowiek || [];
+        else if (cardEl.closest('.talia-gry')) source = window.deckForPowiek || [];
+        // Jeśli jest źródło, filtruj po numerze
+        if (source) {
+            const uniqueCards = [];
             const seenNumbers = new Set();
-            for (const card of window.kolekcjaPowiek || []) {
-                if ((card.frakcja === selectedFaction || card.frakcja === 'nie') && !seenNumbers.has(card.numer)) {
-                    uniqueKolekcja.push(card);
-                    seenNumbers.add(card.numer);
+            for (const card of source) {
+                // Frakcja: dla kolekcji/talii filtruj frakcję, dla gry nie
+                if ((cardEl.classList.contains('kolekcja-card') || cardEl.classList.contains('talia-card'))) {
+                    if ((card.frakcja === selectedFaction || card.frakcja === 'nie') && !seenNumbers.has(card.numer)) {
+                        uniqueCards.push(card);
+                        seenNumbers.add(card.numer);
+                    }
+                } else {
+                    if (!seenNumbers.has(card.numer)) {
+                        uniqueCards.push(card);
+                        seenNumbers.add(card.numer);
+                    }
                 }
             }
-            showPowiek(uniqueKolekcja, parseInt(cardEl.dataset.index), 'cards');
+            showPowiek(uniqueCards, parseInt(cardEl.dataset.index), 'cards');
             return;
         }
-        // Blokada: jeśli kliknięto na kartę w talii, pokazuj tylko unikalne numery z talii, tylko wybrana frakcja + niezależne
-        if (cardEl.classList.contains('talia-card')) {
-            const uniqueTalia = [];
-            const seenNumbers = new Set();
-            for (const card of window.taliaPowiek || []) {
-                if ((card.frakcja === selectedFaction || card.frakcja === 'nie') && !seenNumbers.has(card.numer)) {
-                    uniqueTalia.push(card);
-                    seenNumbers.add(card.numer);
-                }
+        // Domyślnie: pokazuj całą talię bez duplikatów
+        const uniqueDeck = [];
+        const seenDeckNumbers = new Set();
+        for (const card of window.deckForPowiek || []) {
+            if (!seenDeckNumbers.has(card.numer)) {
+                uniqueDeck.push(card);
+                seenDeckNumbers.add(card.numer);
             }
-            showPowiek(uniqueTalia, parseInt(cardEl.dataset.index), 'cards');
-            return;
         }
-        // Jeśli wywołanie z gry (window.deckForPowiek), pokazuj tylko unikalne numery (duplikaty ukryte)
-        if (window.deckForPowiek && cardEl.closest('.talia-gry')) {
-            const uniqueGame = [];
-            const seenNumbers = new Set();
-            for (const card of window.deckForPowiek) {
-                if (!seenNumbers.has(card.numer)) {
-                    uniqueGame.push(card);
-                    seenNumbers.add(card.numer);
-                }
-            }
-            showPowiek(uniqueGame, parseInt(cardEl.dataset.index), 'game');
-            return;
-        }
-        // Jeśli wywołanie z gry (window.deckForPowiek), pokazuj wszystkie karty (duplikaty dozwolone)
-        showPowiek(window.deckForPowiek || [], parseInt(cardEl.dataset.index), 'game');
+        showPowiek(uniqueDeck, parseInt(cardEl.dataset.index), 'game');
     }
     if (e.target.classList.contains('leader-card-x')) {
         e.preventDefault();
