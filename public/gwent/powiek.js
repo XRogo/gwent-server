@@ -364,8 +364,10 @@ window.addEventListener('contextmenu', function (e) {
         let source = null;
         if (cardEl.classList.contains('kolekcja-card')) {
             const selectedFaction = window.selectedFaction || localStorage.getItem('faction');
-            // ZAWSZE filtruj kolekcję po frakcji i neutralnych
-            const filteredKolekcja = (window.kolekcjaPowiek || []).filter(card => card.frakcja === selectedFaction || card.frakcja === 'nie');
+            // Pobierz numery kart z talii gracza
+            const taliaNumery = new Set((window.taliaPowiek || []).map(card => card.numer));
+            // Filtruj kolekcję: tylko wybrana frakcja + neutralne, których nie ma w talii
+            const filteredKolekcja = (window.kolekcjaPowiek || []).filter(card => (card.frakcja === selectedFaction || card.frakcja === 'nie') && !taliaNumery.has(card.numer));
             // Filtruj po numerze
             const uniqueCards = [];
             const seenNumbers = new Set();
