@@ -166,7 +166,6 @@ function renderPowiek() {
         beton.style.zIndex = 4;
         cardDiv.appendChild(beton);
         // 5: pasek frakcji (dodawany dla każdej karty z frakcją 1-5, nie dla dowódców)
-        console.log('KARTA:', card);
         const isKing = card.isKing || card.typ === 'krol' || false;
         if (typeof card.frakcja === 'string' && ['1','2','3','4','5'].includes(card.frakcja) && !isKing) {
             let frakcjaMap = {
@@ -199,7 +198,8 @@ function renderPowiek() {
             cardDiv.appendChild(posIcon);
         }
         // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych)
-        if (card.punkty !== undefined) {
+        const isWeather = ['mroz','mgla','deszcz','niebo','sztorm'].includes(card.moc);
+        if (card.punkty !== undefined || isWeather) {
             const pointsBg = document.createElement('img');
             if(card.bohater) {
                 pointsBg.src = 'assets/dkarty/bohater.webp';
@@ -218,20 +218,22 @@ function renderPowiek() {
             }
             pointsBg.style.zIndex = 7;
             cardDiv.appendChild(pointsBg);
-            const pointsDiv = document.createElement('div');
-            pointsDiv.innerText = card.punkty;
-            pointsDiv.style.position = 'absolute';
-            pointsDiv.style.top = '8%';
-            pointsDiv.style.left = '15%';
-            pointsDiv.style.width = '24%';
-            pointsDiv.style.height = '9%';
-            pointsDiv.style.fontSize = '220%';
-            pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
-            pointsDiv.style.zIndex = 8;
-            pointsDiv.style.display = 'flex';
-            pointsDiv.style.justifyContent = 'center';
-            pointsDiv.style.alignItems = 'center';
-            cardDiv.appendChild(pointsDiv);
+            if(card.punkty !== undefined) {
+                const pointsDiv = document.createElement('div');
+                pointsDiv.innerText = card.punkty;
+                pointsDiv.style.position = 'absolute';
+                pointsDiv.style.top = '8%';
+                pointsDiv.style.left = '15%';
+                pointsDiv.style.width = '24%';
+                pointsDiv.style.height = '9%';
+                pointsDiv.style.fontSize = '220%';
+                pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
+                pointsDiv.style.zIndex = 8;
+                pointsDiv.style.display = 'flex';
+                pointsDiv.style.justifyContent = 'center';
+                pointsDiv.style.alignItems = 'center';
+                cardDiv.appendChild(pointsDiv);
+            }
         }
         // 8: okienko mocy
         if (card.moc) {
@@ -403,15 +405,15 @@ window.addEventListener('keydown', function (event) {
 window.addEventListener('wheel', function (event) {
     if (!powiekActive) return;
     if (event.deltaY < 0) {
-        // Scroll do góry = następna karta
-        if (powiekIndex < powiekDeck.length - 1) {
-            powiekIndex++;
+        // Scroll do góry = poprzednia karta
+        if (powiekIndex > 0) {
+            powiekIndex--;
             renderPowiek();
         }
     } else if (event.deltaY > 0) {
-        // Scroll w dół = poprzednia karta
-        if (powiekIndex > 0) {
-            powiekIndex--;
+        // Scroll w dół = następna karta
+        if (powiekIndex < powiekDeck.length - 1) {
+            powiekIndex++;
             renderPowiek();
         }
     }
