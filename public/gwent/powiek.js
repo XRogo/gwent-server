@@ -348,6 +348,17 @@ window.addEventListener('contextmenu', function (e) {
     const cardEl = e.target.closest('.card, .powiek-card');
     if (cardEl && cardEl.dataset && cardEl.dataset.index) {
         e.preventDefault();
+        // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko kolekcję
+        if (cardEl.classList.contains('kolekcja-card')) {
+            showPowiek(window.kolekcjaPowiek || [], parseInt(cardEl.dataset.index), 'cards');
+            return;
+        }
+        // Blokada: jeśli kliknięto na kartę w talii, pokazuj tylko talię
+        if (cardEl.classList.contains('talia-card')) {
+            showPowiek(window.taliaPowiek || [], parseInt(cardEl.dataset.index), 'cards');
+            return;
+        }
+        // Domyślnie: pokazuj całą talię
         showPowiek(window.deckForPowiek || [], parseInt(cardEl.dataset.index), 'cards');
     }
     if (e.target.classList.contains('leader-card-x')) {
