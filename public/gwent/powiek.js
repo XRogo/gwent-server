@@ -348,14 +348,30 @@ window.addEventListener('contextmenu', function (e) {
     const cardEl = e.target.closest('.card, .powiek-card');
     if (cardEl && cardEl.dataset && cardEl.dataset.index) {
         e.preventDefault();
-        // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko kolekcję
+        // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko unikalne numery z kolekcji
         if (cardEl.classList.contains('kolekcja-card')) {
-            showPowiek(window.kolekcjaPowiek || [], parseInt(cardEl.dataset.index), 'cards');
+            const uniqueKolekcja = [];
+            const seenNumbers = new Set();
+            for (const card of window.kolekcjaPowiek || []) {
+                if (!seenNumbers.has(card.numer)) {
+                    uniqueKolekcja.push(card);
+                    seenNumbers.add(card.numer);
+                }
+            }
+            showPowiek(uniqueKolekcja, parseInt(cardEl.dataset.index), 'cards');
             return;
         }
-        // Blokada: jeśli kliknięto na kartę w talii, pokazuj tylko talię
+        // Blokada: jeśli kliknięto na kartę w talii, pokazuj tylko unikalne numery z talii
         if (cardEl.classList.contains('talia-card')) {
-            showPowiek(window.taliaPowiek || [], parseInt(cardEl.dataset.index), 'cards');
+            const uniqueTalia = [];
+            const seenNumbers = new Set();
+            for (const card of window.taliaPowiek || []) {
+                if (!seenNumbers.has(card.numer)) {
+                    uniqueTalia.push(card);
+                    seenNumbers.add(card.numer);
+                }
+            }
+            showPowiek(uniqueTalia, parseInt(cardEl.dataset.index), 'cards');
             return;
         }
         // Domyślnie: pokazuj całą talię
