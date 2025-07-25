@@ -215,12 +215,12 @@ function renderPowiek() {
             if(card.bohater) {
                 pointsBg.src = 'assets/dkarty/bohater.webp';
                 if (i === 0) {
-                    // Środkowa karta (powiększona) - pozycja i rozmiar z infoo.txt
+                    // Środkowa karta (powiększona) - skalowanie dynamiczne
                     pointsBg.style.position = 'absolute';
-                    pointsBg.style.left = '-23px';
-                    pointsBg.style.top = '-21px';
-                    pointsBg.style.width = '523px';
-                    pointsBg.style.height = '992px';
+                    pointsBg.style.left = relW(-23) + 'px';
+                    pointsBg.style.top = relH(-21) + 'px';
+                    pointsBg.style.width = relW(523) + 'px';
+                    pointsBg.style.height = relH(992) + 'px';
                 } else {
                     // Pozostałe karty - dopasuj do kontenera
                     pointsBg.style.position = 'absolute';
