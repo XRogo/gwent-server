@@ -350,28 +350,20 @@ window.addEventListener('contextmenu', function (e) {
     const cardEl = e.target.closest('.card, .powiek-card');
     if (cardEl && cardEl.dataset && cardEl.dataset.index) {
         e.preventDefault();
-        let selectedFaction = window.selectedFaction || localStorage.getItem('faction');
         // Pobierz źródło kart
         let source = null;
         if (cardEl.classList.contains('kolekcja-card')) source = window.kolekcjaPowiek || [];
         else if (cardEl.classList.contains('talia-card')) source = window.taliaPowiek || [];
         else if (cardEl.closest('.talia-gry')) source = window.deckForPowiek || [];
-        // Jeśli jest źródło, filtruj po numerze
+        else if (cardEl.classList.contains('powiek-card')) source = powiekDeck || [];
+        // ZAWSZE filtruj po numerze
         if (source) {
             const uniqueCards = [];
             const seenNumbers = new Set();
             for (const card of source) {
-                // Frakcja: dla kolekcji/talii filtruj frakcję, dla gry nie
-                if ((cardEl.classList.contains('kolekcja-card') || cardEl.classList.contains('talia-card'))) {
-                    if ((card.frakcja === selectedFaction || card.frakcja === 'nie') && !seenNumbers.has(card.numer)) {
-                        uniqueCards.push(card);
-                        seenNumbers.add(card.numer);
-                    }
-                } else {
-                    if (!seenNumbers.has(card.numer)) {
-                        uniqueCards.push(card);
-                        seenNumbers.add(card.numer);
-                    }
+                if (!seenNumbers.has(card.numer)) {
+                    uniqueCards.push(card);
+                    seenNumbers.add(card.numer);
                 }
             }
             showPowiek(uniqueCards, parseInt(cardEl.dataset.index), 'cards');
