@@ -165,10 +165,9 @@ function renderPowiek() {
         beton.style.height = '100%';
         beton.style.zIndex = 4;
         cardDiv.appendChild(beton);
-        // 5: pasek frakcji (debug: logujemy warunek)
+        // 5: pasek frakcji (dodawany dla każdej karty z frakcją 1-5, nie dla dowódców)
         const isKing = card.isKing || card.typ === 'krol' || false;
-        if (typeof card.frakcja === 'string' && ['1','2','3','4','5'].includes(card.frakcja) && !(powiekMode === 'leaders' || isKing)) {
-            console.log('Dodaję pasek frakcji dla karty', card.nazwa, card.frakcja);
+        if (typeof card.frakcja === 'string' && ['1','2','3','4','5'].includes(card.frakcja) && !isKing) {
             let frakcjaMap = {
                 '1': 'polnoc.webp',
                 '2': 'nilfgaard.webp',
