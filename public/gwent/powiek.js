@@ -209,15 +209,26 @@ function renderPowiek() {
         // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych i specjalnych)
         const isWeather = ['mroz','mgla','deszcz','niebo','sztorm'].includes(card.moc);
         const isSpecial = ['porz','rog','maneki'].includes(card.moc);
-        if (card.punkty !== undefined || isWeather || isSpecial) {
+        const isManekOrGrzybki = card.moc === 'manek' || card.numer === '000';
+        if (card.punkty !== undefined || isWeather || isSpecial || isManekOrGrzybki) {
             const pointsBg = document.createElement('img');
             if(card.bohater) {
                 pointsBg.src = 'assets/dkarty/bohater.webp';
-                pointsBg.style.position = 'absolute';
-                pointsBg.style.left = '-23px';
-                pointsBg.style.top = '-21px';
-                pointsBg.style.width = '523px';
-                pointsBg.style.height = '992px';
+                if (i === 0) {
+                    // Środkowa karta (powiększona) - pozycja i rozmiar z infoo.txt
+                    pointsBg.style.position = 'absolute';
+                    pointsBg.style.left = '-23px';
+                    pointsBg.style.top = '-21px';
+                    pointsBg.style.width = '523px';
+                    pointsBg.style.height = '992px';
+                } else {
+                    // Pozostałe karty - dopasuj do kontenera
+                    pointsBg.style.position = 'absolute';
+                    pointsBg.style.left = '0';
+                    pointsBg.style.top = '0';
+                    pointsBg.style.width = '100%';
+                    pointsBg.style.height = '100%';
+                }
             } else {
                 pointsBg.src = 'assets/dkarty/punkty.webp';
                 pointsBg.style.position = 'absolute';
