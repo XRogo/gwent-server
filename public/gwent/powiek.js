@@ -206,9 +206,10 @@ function renderPowiek() {
             posIcon.style.zIndex = 6;
             cardDiv.appendChild(posIcon);
         }
-        // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych)
+        // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych i specjalnych)
         const isWeather = ['mroz','mgla','deszcz','niebo','sztorm'].includes(card.moc);
-        if (card.punkty !== undefined || isWeather) {
+        const isSpecial = ['porz','rog','maneki'].includes(card.moc);
+        if (card.punkty !== undefined || isWeather || isSpecial) {
             const pointsBg = document.createElement('img');
             if(card.bohater) {
                 pointsBg.src = 'assets/dkarty/bohater.webp';
@@ -361,7 +362,35 @@ window.addEventListener('contextmenu', function (e) {
         e.preventDefault();
         // Pobierz źródło kart
         let source = null;
-        if (cardEl.classList.contains('kolekcja-card')) source = window.kolekcjaPowiek || [];
+        if (cardEl.classList.contains('kolekcja-card')) {
+            const selectedFaction = window.selectedFaction || localStorage.getItem('faction');
+            const filteredKolekcja = [];
+            for (const card of window.kolekcjaPowiek || []) {
+                if (card.frakcja === selectedFaction || card.frakcja === 'nie') {
+                    filteredKolekcja.push(card);
+                }
+            }
+            // Filtruj po numerze
+            const uniqueCards = [];
+            const seenNumbers = new Set();
+            for (const card of filteredKolekcja) {
+                if (!seenNumbers.has(card.numer)) {
+                    uniqueCards.push(card);
+                    seenNumbers.add(card.numer);
+                }
+            }
+            // Przelicz indeks na unikalną tablicę
+            let origIndex = parseInt(cardEl.dataset.index);
+            let cardNumer = null;
+            if (window.kolekcjaPowiek && window.kolekcjaPowiek[origIndex]) cardNumer = window.kolekcjaPowiek[origIndex].numer;
+            let newIndex = 0;
+            if (cardNumer) {
+                newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);
+                if (newIndex === -1) newIndex = 0;
+            }
+            showPowiek(uniqueCards, newIndex, 'cards');
+            return;
+        }
         else if (cardEl.classList.contains('talia-card')) source = window.taliaPowiek || [];
         else if (cardEl.closest('.talia-gry')) source = window.deckForPowiek || [];
         else if (cardEl.classList.contains('powiek-card')) source = powiekDeck || [];
