@@ -364,12 +364,8 @@ window.addEventListener('contextmenu', function (e) {
         let source = null;
         if (cardEl.classList.contains('kolekcja-card')) {
             const selectedFaction = window.selectedFaction || localStorage.getItem('faction');
-            const filteredKolekcja = [];
-            for (const card of window.kolekcjaPowiek || []) {
-                if (card.frakcja === selectedFaction || card.frakcja === 'nie') {
-                    filteredKolekcja.push(card);
-                }
-            }
+            // ZAWSZE filtruj kolekcję po frakcji i neutralnych
+            const filteredKolekcja = (window.kolekcjaPowiek || []).filter(card => card.frakcja === selectedFaction || card.frakcja === 'nie');
             // Filtruj po numerze
             const uniqueCards = [];
             const seenNumbers = new Set();
