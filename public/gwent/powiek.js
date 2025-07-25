@@ -352,52 +352,13 @@ window.addEventListener('contextmenu', function (e) {
         e.preventDefault();
         // Pobierz źródło kart
         let source = null;
+        let mode = 'cards';
         if (cardEl.classList.contains('kolekcja-card')) source = window.kolekcjaPowiek || [];
-        else if (cardEl.classList.contains('talia-card')) {
-            const uniqueTalia = [];
-            const seenNumbers = new Set();
-            for (const card of window.taliaPowiek || []) {
-                if (!seenNumbers.has(card.numer)) {
-                    uniqueTalia.push(card);
-                    seenNumbers.add(card.numer);
-                }
-            }
-            // Przelicz indeks na unikalną talię
-            let origIndex = parseInt(cardEl.dataset.index);
-            let cardNumer = null;
-            if (window.taliaPowiek && window.taliaPowiek[origIndex]) cardNumer = window.taliaPowiek[origIndex].numer;
-            let newIndex = 0;
-            if (cardNumer) {
-                newIndex = uniqueTalia.findIndex(card => card.numer === cardNumer);
-                if (newIndex === -1) newIndex = 0;
-            }
-            showPowiek(uniqueTalia, newIndex, 'cards');
-            return;
-        }
-        else if (cardEl.closest('.talia-gry')) {
-            const uniqueGame = [];
-            const seenNumbers = new Set();
-            for (const card of window.deckForPowiek || []) {
-                if (!seenNumbers.has(card.numer)) {
-                    uniqueGame.push(card);
-                    seenNumbers.add(card.numer);
-                }
-            }
-            // Przelicz indeks na unikalną talię gry
-            let origIndex = parseInt(cardEl.dataset.index);
-            let cardNumer = null;
-            if (window.deckForPowiek && window.deckForPowiek[origIndex]) cardNumer = window.deckForPowiek[origIndex].numer;
-            let newIndex = 0;
-            if (cardNumer) {
-                newIndex = uniqueGame.findIndex(card => card.numer === cardNumer);
-                if (newIndex === -1) newIndex = 0;
-            }
-            showPowiek(uniqueGame, newIndex, 'cards');
-            return;
-        }
+        else if (cardEl.classList.contains('talia-card')) source = window.taliaPowiek || [];
+        else if (cardEl.closest('.talia-gry')) source = window.deckForPowiek || [];
         else if (cardEl.classList.contains('powiek-card')) source = powiekDeck || [];
-        // ZAWSZE filtruj po numerze
         if (!source || source.length === 0) source = window.deckForPowiek || [];
+        // Filtruj po numerze
         const uniqueCards = [];
         const seenNumbers = new Set();
         for (const card of source) {
@@ -406,18 +367,17 @@ window.addEventListener('contextmenu', function (e) {
                 seenNumbers.add(card.numer);
             }
         }
-        // Przelicz indeks na unikalną talię
-        let origIndex = parseInt(cardEl.dataset.index);  
+        // Przelicz indeks na unikalną tablicę
+        let origIndex = parseInt(cardEl.dataset.index);
         let cardNumer = null;
         if (source[origIndex]) cardNumer = source[origIndex].numer;
-        // Jeśli nie znaleziono numeru, spróbuj z powiekDeck
         if (!cardNumer && powiekDeck && powiekDeck[origIndex]) cardNumer = powiekDeck[origIndex].numer;
         let newIndex = 0;
         if (cardNumer) {
             newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);
             if (newIndex === -1) newIndex = 0;
         }
-        showPowiek(uniqueCards, newIndex, 'cards');
+        showPowiek(uniqueCards, newIndex, mode);
         return;
     }
     if (e.target.classList.contains('leader-card-x')) {
