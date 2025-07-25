@@ -367,9 +367,11 @@ window.addEventListener('contextmenu', function (e) {
             }
         }
         // Przelicz indeks na unikalną talię
-        const origIndex = parseInt(cardEl.dataset.index);
+        let origIndex = parseInt(cardEl.dataset.index);
         let cardNumer = null;
         if (source[origIndex]) cardNumer = source[origIndex].numer;
+        // Jeśli nie znaleziono numeru, spróbuj z powiekDeck
+        if (!cardNumer && powiekDeck && powiekDeck[origIndex]) cardNumer = powiekDeck[origIndex].numer;
         let newIndex = 0;
         if (cardNumer) {
             newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);
