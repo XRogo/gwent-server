@@ -352,7 +352,6 @@ window.addEventListener('contextmenu', function (e) {
         e.preventDefault();
         // Pobierz źródło kart
         let source = null;
-        let mode = 'cards';
         if (cardEl.classList.contains('kolekcja-card')) source = window.kolekcjaPowiek || [];
         else if (cardEl.classList.contains('talia-card')) source = window.taliaPowiek || [];
         else if (cardEl.closest('.talia-gry')) source = window.deckForPowiek || [];
@@ -377,7 +376,7 @@ window.addEventListener('contextmenu', function (e) {
             newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);
             if (newIndex === -1) newIndex = 0;
         }
-        showPowiek(uniqueCards, newIndex, mode);
+        showPowiek(uniqueCards, newIndex, 'cards');
         return;
     }
     if (e.target.classList.contains('leader-card-x')) {
