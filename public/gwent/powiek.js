@@ -350,12 +350,14 @@ window.addEventListener('contextmenu', function (e) {
     const cardEl = e.target.closest('.card, .powiek-card');
     if (cardEl && cardEl.dataset && cardEl.dataset.index) {
         e.preventDefault();
-        // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko unikalne numery z kolekcji
+        // Pobierz wybraną frakcję (np. z localStorage lub window.selectedFaction)
+        let selectedFaction = window.selectedFaction || localStorage.getItem('faction');
+        // Blokada: jeśli kliknięto na kartę w kolekcji, pokazuj tylko unikalne numery z kolekcji, tylko wybrana frakcja + niezależne
         if (cardEl.classList.contains('kolekcja-card')) {
             const uniqueKolekcja = [];
             const seenNumbers = new Set();
             for (const card of window.kolekcjaPowiek || []) {
-                if (!seenNumbers.has(card.numer)) {
+                if ((card.frakcja === selectedFaction || card.frakcja === 'nie') && !seenNumbers.has(card.numer)) {
                     uniqueKolekcja.push(card);
                     seenNumbers.add(card.numer);
                 }
@@ -363,12 +365,12 @@ window.addEventListener('contextmenu', function (e) {
             showPowiek(uniqueKolekcja, parseInt(cardEl.dataset.index), 'cards');
             return;
         }
-        // Blokada: jeśli kliknięto na kartę w talii, pokazuj tylko unikalne numery z talii
+        // Blokada: jeśli kliknięto na kartę w talii, pokazuj tylko unikalne numery z talii, tylko wybrana frakcja + niezależne
         if (cardEl.classList.contains('talia-card')) {
             const uniqueTalia = [];
             const seenNumbers = new Set();
             for (const card of window.taliaPowiek || []) {
-                if (!seenNumbers.has(card.numer)) {
+                if ((card.frakcja === selectedFaction || card.frakcja === 'nie') && !seenNumbers.has(card.numer)) {
                     uniqueTalia.push(card);
                     seenNumbers.add(card.numer);
                 }
