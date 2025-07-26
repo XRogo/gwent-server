@@ -16,7 +16,7 @@ const cards = [
     {
         nazwa: "Róg dowódcy",
         karta: "/gwent/assets/karty/niezalerzne/rog_dowodcy.webp",
-        dkarta: "/gwent/assets/dkarty/1/rog.webp",
+        dkarta: "/gwent/assets/dkarty/1/rog.wep",
         opis: '"Do atakuuuuu!!!"',
         bohater: false,
         moc: "rog",
