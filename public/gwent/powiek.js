@@ -218,8 +218,8 @@ function renderPowiek() {
                 pointsBg.style.position = 'absolute';
                 pointsBg.style.left = (pos.width * (-23/523)) + 'px';
                 pointsBg.style.top = (pos.height * (-21/992)) + 'px';
-                pointsBg.style.width = (pos.width * (523/523)) + 'px';
-                pointsBg.style.height = (pos.height * (992/992)) + 'px';
+                pointsBg.style.width = (pos.width * (285/523)) + 'px';
+                pointsBg.style.height = (pos.height * (287/992)) + 'px';
             } else {
                 pointsBg.src = 'assets/dkarty/punkty.webp';
                 pointsBg.style.position = 'absolute';
