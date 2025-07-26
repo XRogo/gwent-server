@@ -98,7 +98,7 @@ function renderPowiek() {
     overlay.style.background = 'none';
     overlay.style.opacity = '1';
     overlay.style.filter = 'none';
-    overlay.style.overflow = 'hidden';
+    overlay.style.overflow = 'visible';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // Funkcja pomocnicza: px w 4K -> px względem backgroundWidth/backgroundHeight
@@ -148,7 +148,7 @@ function renderPowiek() {
             podsw2.style.left = (pos.width * (-104/628)) + 'px';
             podsw2.style.top = (pos.height * (-10/1003)) + 'px';
             podsw2.style.width = (pos.width * (628/628)) + 'px';
-            podsw2.style.height = (pos.height * (1003/992)) + 'px';
+            podsw2.style.height = (pos.height * (1003/1003)) + 'px';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
