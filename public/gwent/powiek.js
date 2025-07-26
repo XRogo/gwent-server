@@ -99,6 +99,8 @@ function renderPowiek() {
     overlay.style.opacity = '1';
     overlay.style.filter = 'none';
     overlay.style.overflow = 'visible';
+    document.body.style.overflow = 'visible';
+    document.documentElement.style.overflow = 'visible';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // Funkcja pomocnicza: px w 4K -> px względem backgroundWidth/backgroundHeight
