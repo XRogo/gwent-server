@@ -123,10 +123,17 @@ function renderPowiek() {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card';
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = pos.left+'px';
-        cardDiv.style.top = pos.top+'px';
-        cardDiv.style.width = pos.width+'px';
-        cardDiv.style.height = pos.height+'px';
+        if (i === 0) {
+            cardDiv.style.left = (pos.left - pos.width * 0.2) + 'px';
+            cardDiv.style.top = (pos.top - pos.height * 0.02) + 'px';
+            cardDiv.style.width = (pos.width * 1.4) + 'px';
+            cardDiv.style.height = (pos.height * 1.14) + 'px';
+        } else {
+            cardDiv.style.left = pos.left+'px';
+            cardDiv.style.top = pos.top+'px';
+            cardDiv.style.width = pos.width+'px';
+            cardDiv.style.height = pos.height+'px';
+        }
         cardDiv.style.zIndex = i === 0 ? 100 : 50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
