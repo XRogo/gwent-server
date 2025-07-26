@@ -68,3 +68,14 @@
     align-items: center;
     justify-content: center;
 }
+.poswiata {
+    position: absolute;
+    pointer-events: none;
+    max-width: none;
+    max-height: none;
+    object-fit: none;
+}
+img.poswiata {
+    max-width: none;
+    height: auto;
+}
