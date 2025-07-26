@@ -26,10 +26,10 @@ function showPowiek(deck, index, mode = 'cards') {
 
 function hidePowiek() {
     powiekActive = false;
-    const el = document.getElementById('powiekOverlay');
-    if (el) el.remove();
-    const powiekBg = document.getElementById('powiekBg');
-    if (el) el.remove();
+    const overlay = document.getElementById('powiekOverlay');
+    const bg = document.getElementById('powiekBg');
+    if (overlay) overlay.remove();
+    if (bg) bg.remove();
 }
 
 function renderPowiek() {
@@ -81,7 +81,6 @@ function renderPowiek() {
     powiekBg.style.zIndex = 9998;
     powiekBg.style.pointerEvents = 'none';
     powiekBg.style.objectFit = 'cover';
-    powiekBg.style.background = 'none';
     powiekBg.style.opacity = '1';
     powiekBg.style.filter = 'none';
     document.body.appendChild(powiekBg);
@@ -97,7 +96,7 @@ function renderPowiek() {
     overlay.style.height = '100vh';
     overlay.style.zIndex = 9999;
     overlay.style.pointerEvents = 'auto';
-    overlay.style.background = 'rgba(0,0,0,0.7)';
+    overlay.style.background = 'rgba(0,0,0,0.0)'; // Zmniejszona opacity dla lepszej widoczności tła
     overlay.style.overflow = 'visible';
     document.body.style.overflow = 'visible';
     document.documentElement.style.overflow = 'visible';
@@ -303,7 +302,7 @@ function renderPowiek() {
             podsw.style.top = (pos.top + pos.height * (-10 / 992)) + 'px';
             podsw.style.width = (pos.width * (628 / 523)) + 'px';
             podsw.style.height = (pos.height * (1003 / 992)) + 'px';
-            podsw.style.zIndex = 99; // Pod kartą (z-index: 100)
+            podsw.style.zIndex = 99;
             overlay.appendChild(podsw);
 
             const podsw2 = document.createElement('img');
@@ -314,7 +313,7 @@ function renderPowiek() {
             podsw2.style.top = (pos.top + pos.height * (-10 / 992)) + 'px';
             podsw2.style.width = (pos.width * (628 / 523)) + 'px';
             podsw2.style.height = (pos.height * (1003 / 992)) + 'px';
-            podsw2.style.zIndex = 99; // Pod kartą
+            podsw2.style.zIndex = 99;
             overlay.appendChild(podsw2);
         }
     }
