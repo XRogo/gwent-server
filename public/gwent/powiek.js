@@ -135,20 +135,20 @@ function renderPowiek() {
             const podsw = document.createElement('img');
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.style.position = 'absolute';
-            podsw.style.left = (pos.width * (-104/628)) + 'px';
-            podsw.style.top = (pos.height * (-10/1003)) + 'px';
-            podsw.style.width = (pos.width * (628/628)) + 'px';
-            podsw.style.height = (pos.height * (1003/1003)) + 'px';
+            podsw.style.left = '-104px';
+            podsw.style.top = '-10px';
+            podsw.style.width = '628px';
+            podsw.style.height = '1003px';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             // 2: podsw2.webp (pulsuje)
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = (pos.width * (-104/628)) + 'px';
-            podsw2.style.top = (pos.height * (-10/1003)) + 'px';
-            podsw2.style.width = (pos.width * (628/628)) + 'px';
-            podsw2.style.height = (pos.height * (1003/1003)) + 'px';
+            podsw2.style.left = '-104px';
+            podsw2.style.top = '-10px';
+            podsw2.style.width = '628px';
+            podsw2.style.height = '1003px';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
