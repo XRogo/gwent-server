@@ -43,14 +43,16 @@
 }
 .powiek-podsw {
     pointer-events: none;
+    z-index: 1;
 }
 .powiek-podsw2 {
     pointer-events: none;
     animation: powiek-pulse 4s infinite;
+    z-index: 1;
 }
 @keyframes powiek-pulse {
     0% { opacity: 1; }
-    50% { opacity: 0.1; }
+    50% { opacity: 0.3; }
     100% { opacity: 1; }
 }
 .powiek-arrow {
@@ -74,8 +76,10 @@
     max-width: none;
     max-height: none;
     object-fit: none;
+    z-index: 1;
 }
 img.poswiata {
     max-width: none;
     height: auto;
+    pointer-events: none;
 }
