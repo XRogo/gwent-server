@@ -61,8 +61,8 @@ Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są ska
 
 
  Budowa dkarty warstwowo od dołu (współżędne px liczą 0/-0) wielkości karty 523, 992 {w tym nawiaświ jest pokazywana pozycja} karta tak zbudowana powinna byś dynamicznie skalowana do podanego obszaru wszystkie obrazy jakie są urzywane do budowy karty są tej samwj wielkości nie trzeba ich skalować czy rozciągać 100px na 1 obrazku jest = 100px na wszystkich innych =======================================================================================
- 1 {-104, -10} (jeśli wybrana) podsw.webp
- 2 {-104, -10} (jeśli wybrana) podsw2.webp ma pulsować przeźroczystość 100%>10%>100>10%... zamiana z 100 od 10 ma trwać ~1,5s
+ 1 {-104, -10 x 628, 1003} (jeśli wybrana) podsw.webp
+ 2 {-104, -10 x 628, 1003} (jeśli wybrana) podsw2.webp ma pulsować przeźroczystość 100%>10%>100>10%... zamiana z 100 od 10 ma trwać ~1,5s
  3 {0, 0} Obraz znajdujący sie w którymś miejscu w folderze dkarty
  4 {0, 0} beton.webp/bbeton.webp w zależności czy karta bochater czy nie jeśli 
      bohater: false > beton.webp
