@@ -8,7 +8,6 @@ let powiekActive = false;
 let powiekMode = 'cards'; // 'cards' lub 'leaders'
 
 function showPowiek(deck, index, mode = 'cards') {
-    // Filtruj duplikaty po numerze
     const uniqueDeck = [];
     const seenNumbers = new Set();
     for (const card of deck) {
@@ -33,7 +32,7 @@ function hidePowiek() {
 }
 
 function renderPowiek() {
-    // Usuwam poprzedni overlay i tło powiek, jeśli istnieje
+    // Usuwam poprzedni overlay i tło powiek
     const oldOverlay = document.getElementById('powiekOverlay');
     if (oldOverlay) oldOverlay.remove();
     const oldBg = document.getElementById('powiekBg');
@@ -49,7 +48,7 @@ function renderPowiek() {
         guiRect = { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
     }
 
-    // Skalowanie i pozycjonowanie jak w wyborach (game.js)
+    // Skalowanie i pozycjonowanie
     const TLO_W = 3837;
     const TLO_H = 2158;
     const windowAspectRatio = window.innerWidth / window.innerHeight;
@@ -83,6 +82,8 @@ function renderPowiek() {
     powiekBg.style.objectFit = 'cover';
     powiekBg.style.opacity = '1';
     powiekBg.style.filter = 'none';
+    powiekBg.onerror = () => console.error('Błąd ładowania tła:', powiekBg.src);
+    powiekBg.onload = () => console.log('Tło załadowane:', powiekBg.src);
     document.body.appendChild(powiekBg);
 
     // Overlay na karty
@@ -96,7 +97,7 @@ function renderPowiek() {
     overlay.style.height = '100vh';
     overlay.style.zIndex = 9999;
     overlay.style.pointerEvents = 'auto';
-    overlay.style.background = 'rgba(0,0,0,0.0)'; // Zmniejszona opacity dla lepszej widoczności tła
+    overlay.style.background = 'rgba(0,0,0,0.4)';
     overlay.style.overflow = 'visible';
     document.body.style.overflow = 'visible';
     document.documentElement.style.overflow = 'visible';
@@ -298,23 +299,44 @@ function renderPowiek() {
             podsw.src = 'assets/dkarty/podsw.webp';
             podsw.className = 'powiek-podsw';
             podsw.style.position = 'absolute';
-            podsw.style.left = (pos.left + pos.width * (-104 / 523)) + 'px';
-            podsw.style.top = (pos.top + pos.height * (-10 / 992)) + 'px';
-            podsw.style.width = (pos.width * (628 / 523)) + 'px';
-            podsw.style.height = (pos.height * (1003 / 992)) + 'px';
+            // Skalowanie względem pozycji i rozmiaru karty
+            const podswLeft = pos.left + pos.width * (-104 / 523);
+            const podswTop = pos.top + pos.height * (-10 / 992);
+            const podswWidth = pos.width * (628 / 523);
+            const podswHeight = pos.height * (1003 / 992);
+            podsw.style.left = podswLeft + 'px';
+            podsw.style.top = podswTop + 'px';
+            podsw.style.width = podswWidth + 'px';
+            podsw.style.height = podswHeight + 'px';
             podsw.style.zIndex = 99;
+            podsw.onerror = () => console.error('Błąd ładowania podsw:', podsw.src);
+            podsw.onload = () => console.log('Podsw załadowane:', podsw.src);
             overlay.appendChild(podsw);
 
             const podsw2 = document.createElement('img');
             podsw2.src = 'assets/dkarty/podsw2.webp';
             podsw2.className = 'powiek-podsw2';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = (pos.left + pos.width * (-104 / 523)) + 'px';
-            podsw2.style.top = (pos.top + pos.height * (-10 / 992)) + 'px';
-            podsw2.style.width = (pos.width * (628 / 523)) + 'px';
-            podsw2.style.height = (pos.height * (1003 / 992)) + 'px';
+            podsw2.style.left = podswLeft + 'px';
+            podsw2.style.top = podswTop + 'px';
+            podsw2.style.width = podswWidth + 'px';
+            podsw2.style.height = podswHeight + 'px';
             podsw2.style.zIndex = 99;
+            podsw2.onerror = () => console.error('Błąd ładowania podsw2:', podsw2.src);
+            podsw2.onload = () => console.log('Podsw2 załadowane:', podsw2.src);
             overlay.appendChild(podsw2);
+
+            // Debugowanie pozycji poświat
+            console.log('Podsw position:', {
+                left: podswLeft,
+                top: podswTop,
+                width: podswWidth,
+                height: podswHeight,
+                cardLeft: pos.left,
+                cardTop: pos.top,
+                cardWidth: pos.width,
+                cardHeight: pos.height
+            });
         }
     }
 
@@ -331,7 +353,6 @@ function renderPowiek() {
         infoBox.style.zIndex = 200;
         overlay.appendChild(infoBox);
 
-        // Ikona mocy
         const mocIcon = document.createElement('img');
         mocIcon.src = `assets/dkarty/${card0.moc}.webp`;
         mocIcon.className = 'powiek-ikona';
@@ -343,7 +364,6 @@ function renderPowiek() {
         mocIcon.style.zIndex = 201;
         overlay.appendChild(mocIcon);
 
-        // Nazwa mocy
         const mocName = document.createElement('div');
         mocName.className = 'powiek-nazwa';
         mocName.textContent = window.moce?.[card0.moc]?.nazwa || '';
@@ -356,7 +376,6 @@ function renderPowiek() {
         mocName.style.zIndex = 202;
         overlay.appendChild(mocName);
 
-        // Opis mocy
         const mocDesc = document.createElement('div');
         mocDesc.className = 'powiek-moc-opis';
         mocDesc.textContent = window.moce?.[card0.moc]?.opis || '';
