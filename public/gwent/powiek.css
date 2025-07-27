@@ -68,3 +68,7 @@
     align-items: center;
     justify-content: center;
 }
+.poswiata, .powiek-podsw, .powiek-podsw2 {
+    filter: none !important;
+    box-shadow: none !important;
+}
