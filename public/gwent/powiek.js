@@ -145,8 +145,8 @@ function renderPowiek() {
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.className = 'poswiata powiek-podsw';
             podsw.style.position = 'absolute';
-            podsw.style.left = ((0/523)*100) + '%';
-            podsw.style.top = ((5/992)*100) + '%';
+            podsw.style.left = ((1/523)*100) + '%';
+            podsw.style.top = ((13/992)*100) + '%';
             podsw.style.width = ((523/523)*100) + '%';
             podsw.style.height = ((890/992)*100) + '%';
             podsw.style.zIndex = 1;
