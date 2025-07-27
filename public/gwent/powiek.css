@@ -10,7 +10,6 @@
     box-shadow: 0 0 32px #000;
     border-radius: 12px;
     transition: box-shadow 0.2s;
-    overflow: visible !important;
 }
 .powiek-opis {
     font-family: 'Gwent', serif;
@@ -44,16 +43,14 @@
 }
 .powiek-podsw {
     pointer-events: none;
-    z-index: 1;
 }
 .powiek-podsw2 {
     pointer-events: none;
     animation: powiek-pulse 4s infinite;
-    z-index: 1;
 }
 @keyframes powiek-pulse {
     0% { opacity: 1; }
-    50% { opacity: 0.3; }
+    50% { opacity: 0.1; }
     100% { opacity: 1; }
 }
 .powiek-arrow {
@@ -70,17 +67,4 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.poswiata {
-    position: absolute;
-    pointer-events: none !important;
-    max-width: none !important;
-    max-height: none !important;
-    object-fit: none;
-    z-index: 1;
-}
-img.poswiata {
-    max-width: none !important;
-    height: auto !important;
-    pointer-events: none !important;
 }
