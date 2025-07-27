@@ -145,10 +145,10 @@ function renderPowiek() {
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.className = 'poswiata powiek-podsw';
             podsw.style.position = 'absolute';
-            podsw.style.left = ((-105/523)*100) + '%';
-            podsw.style.top = ((-11.5/992)*100) + '%';
-            podsw.style.width = ((734/523)*100) + '%';
-            podsw.style.height = ((1015/992)*100) + '%';
+            podsw.style.left = ((0/523)*100) + '%';
+            podsw.style.top = ((0/992)*100) + '%';
+            podsw.style.width = ((523/523)*100) + '%';
+            podsw.style.height = ((900/992)*100) + '%';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             const podsw2 = document.createElement('img');
@@ -156,7 +156,7 @@ function renderPowiek() {
             podsw2.className = 'poswiata powiek-podsw2';
             podsw2.style.position = 'absolute';
             podsw2.style.left = ((0/523)*100) + '%';
-            podsw2.style.top = ((-11.5/992)*100) + '%';
+            podsw2.style.top = ((0/992)*100) + '%';
             podsw2.style.width = ((523/523)*100) + '%';
             podsw2.style.height = ((900/992)*100) + '%';
             podsw2.style.zIndex = 2;
