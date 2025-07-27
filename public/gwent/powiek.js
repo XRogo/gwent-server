@@ -157,8 +157,8 @@ function renderPowiek() {
             podsw2.style.position = 'absolute';
             podsw2.style.left = ((0/523)*100) + '%';
             podsw2.style.top = ((-11.5/992)*100) + '%';
-            podsw2.style.width = ((500/523)*100) + '%';
-            podsw2.style.height = ((800/992)*100) + '%';
+            podsw2.style.width = ((523/523)*100) + '%';
+            podsw2.style.height = ((900/992)*100) + '%';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
