@@ -123,10 +123,17 @@ function renderPowiek() {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card';
         cardDiv.style.position = 'absolute';
-        cardDiv.style.left = pos.left+'px';
-        cardDiv.style.top = pos.top+'px';
-        cardDiv.style.width = pos.width+'px';
-        cardDiv.style.height = pos.height+'px';
+        if (i === 0) {
+            cardDiv.style.left = (pos.left - pos.width * 0.2) + 'px';
+            cardDiv.style.top = (pos.top - pos.height * 0.02) + 'px';
+            cardDiv.style.width = (pos.width * 1.4) + 'px';
+            cardDiv.style.height = (pos.height * 1.14) + 'px';
+        } else {
+            cardDiv.style.left = pos.left+'px';
+            cardDiv.style.top = pos.top+'px';
+            cardDiv.style.width = pos.width+'px';
+            cardDiv.style.height = pos.height+'px';
+        }
         cardDiv.style.zIndex = i === 0 ? 100 : 50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
@@ -136,6 +143,7 @@ function renderPowiek() {
         if (i === 0) {
             const podsw = document.createElement('img');
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
+            podsw.className = 'poswiata powiek-podsw';
             podsw.style.position = 'absolute';
             podsw.style.left = ((-104/523)*100) + '%';
             podsw.style.top = ((-10/992)*100) + '%';
@@ -143,9 +151,9 @@ function renderPowiek() {
             podsw.style.height = ((1003/992)*100) + '%';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
-            // 2: podsw2.webp (pulsuje)
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
+            podsw2.className = 'poswiata powiek-podsw2';
             podsw2.style.position = 'absolute';
             podsw2.style.left = ((-104/523)*100) + '%';
             podsw2.style.top = ((-10/992)*100) + '%';
@@ -154,6 +162,20 @@ function renderPowiek() {
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
+        }
+        // Wrapper na resztę warstw (obraz karty, beton, frakcja, punkty, itd.)
+        const inner = document.createElement('div');
+        inner.style.position = 'absolute';
+        if (i === 0) {
+            inner.style.left = (pos.width * 0.2) + 'px';
+            inner.style.top = (pos.height * 0.02) + 'px';
+            inner.style.width = pos.width + 'px';
+            inner.style.height = pos.height + 'px';
+        } else {
+            inner.style.left = '0';
+            inner.style.top = '0';
+            inner.style.width = '100%';
+            inner.style.height = '100%';
         }
         // 3: obraz karty
         const img = document.createElement('img');
@@ -165,7 +187,7 @@ function renderPowiek() {
         img.style.height = '100%';
         img.style.objectFit = 'contain';
         img.style.zIndex = 3;
-        cardDiv.appendChild(img);
+        inner.appendChild(img);
         // 4: beton/bbeton
         const beton = document.createElement('img');
         beton.src = card.bohater ? 'assets/dkarty/bbeton.webp' : 'assets/dkarty/beton.webp';
@@ -175,7 +197,7 @@ function renderPowiek() {
         beton.style.width = '100%';
         beton.style.height = '100%';
         beton.style.zIndex = 4;
-        cardDiv.appendChild(beton);
+        inner.appendChild(beton);
         // 5: pasek frakcji (dodawany dla każdej karty z frakcją 1-5, nie dla dowódców)
         const isKing = card.isKing || card.typ === 'krol' || false;
         if (typeof card.frakcja === 'string' && ['1','2','3','4','5'].includes(card.frakcja) && !isKing) {
@@ -194,7 +216,7 @@ function renderPowiek() {
             bannerDiv.style.width = '100%';
             bannerDiv.style.height = '100%';
             bannerDiv.style.zIndex = 5;
-            cardDiv.appendChild(bannerDiv);
+            inner.appendChild(bannerDiv);
         }
         // 6: pozycja
         if (card.pozycja) {
@@ -206,7 +228,7 @@ function renderPowiek() {
             posIcon.style.width = '100%';
             posIcon.style.height = '100%';
             posIcon.style.zIndex = 6;
-            cardDiv.appendChild(posIcon);
+            inner.appendChild(posIcon);
         }
         // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych i specjalnych)
         const isWeather = ['mroz','mgla','deszcz','niebo','sztorm'].includes(card.moc);
@@ -216,7 +238,6 @@ function renderPowiek() {
             const pointsBg = document.createElement('img');
             if(card.bohater) {
                 pointsBg.src = 'assets/dkarty/bohater.webp';
-                // Dla każdej karty (i od -2 do 2) ustaw pozycję i rozmiar względem slotu
                 pointsBg.style.position = 'absolute';
                 pointsBg.style.left = (pos.width * (-23/523)) + 'px';
                 pointsBg.style.top = (pos.height * (-21/992)) + 'px';
@@ -231,7 +252,7 @@ function renderPowiek() {
                 pointsBg.style.height = '100%';
             }
             pointsBg.style.zIndex = 7;
-            cardDiv.appendChild(pointsBg);
+            inner.appendChild(pointsBg);
             if(card.punkty !== undefined) {
                 const pointsDiv = document.createElement('div');
                 pointsDiv.innerText = card.punkty;
@@ -240,13 +261,13 @@ function renderPowiek() {
                 pointsDiv.style.left = '15%';
                 pointsDiv.style.width = '24%';
                 pointsDiv.style.height = '9%';
-                pointsDiv.style.fontSize = '220%';
+                pointsDiv.style.fontSize = (pos.height * 0.13) + 'px';
                 pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
                 pointsDiv.style.zIndex = 8;
                 pointsDiv.style.display = 'flex';
                 pointsDiv.style.justifyContent = 'center';
                 pointsDiv.style.alignItems = 'center';
-                cardDiv.appendChild(pointsDiv);
+                inner.appendChild(pointsDiv);
             }
         }
         // 8: okienko mocy
@@ -263,7 +284,7 @@ function renderPowiek() {
             mocIcon.style.width = '100%';
             mocIcon.style.height = '100%';
             mocIcon.style.zIndex = 9;
-            cardDiv.appendChild(mocIcon);
+            inner.appendChild(mocIcon);
         }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
@@ -283,7 +304,7 @@ function renderPowiek() {
         nameDiv.style.lineHeight = '1.1';
         nameDiv.style.padding = '0 4px';
         nameDiv.style.transform = 'none';
-        cardDiv.appendChild(nameDiv);
+        inner.appendChild(nameDiv);
         // 11: opis pod dużą kartą
         if (i === 0) {
             const opisDiv = document.createElement('div');
@@ -294,11 +315,12 @@ function renderPowiek() {
             opisDiv.style.width = '96%';
             opisDiv.style.height = '8%';
             opisDiv.style.textAlign = 'center';
-            opisDiv.style.color = '#fff';
+            opisDiv.style.color = '#030303ff';
             opisDiv.style.fontSize = (pos.height * 0.044) + 'px';
             opisDiv.style.zIndex = 20;
-            cardDiv.appendChild(opisDiv);
+            inner.appendChild(opisDiv);
         }
+        cardDiv.appendChild(inner);
         overlay.appendChild(cardDiv);
     }
 
