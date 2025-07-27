@@ -146,9 +146,9 @@ function renderPowiek() {
             podsw.className = 'poswiata powiek-podsw';
             podsw.style.position = 'absolute';
             podsw.style.left = ((0/523)*100) + '%';
-            podsw.style.top = ((2/992)*100) + '%';
+            podsw.style.top = ((5/992)*100) + '%';
             podsw.style.width = ((523/523)*100) + '%';
-            podsw.style.height = ((902/992)*100) + '%';
+            podsw.style.height = ((890/992)*100) + '%';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             const podsw2 = document.createElement('img');
@@ -156,9 +156,9 @@ function renderPowiek() {
             podsw2.className = 'poswiata powiek-podsw2';
             podsw2.style.position = 'absolute';
             podsw2.style.left = ((0/523)*100) + '%';
-            podsw2.style.top = ((2/992)*100) + '%';
+            podsw2.style.top = ((5/992)*100) + '%';
             podsw2.style.width = ((523/523)*100) + '%';
-            podsw2.style.height = ((902/992)*100) + '%';
+            podsw2.style.height = ((890/992)*100) + '%';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
