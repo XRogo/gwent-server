@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showPowiek(leaders, 0, 'leaders');
             window.selectedLeaderCallback = function(krol) {
                 selectedLeader = krol;
-                updatePage();
+                updatePage(); // odśwież wyświetlanie wybranego dowódcy
             };
         }
     });

@@ -99,7 +99,7 @@ const krole = [
         dkarta: "/gwent/assets/dkarty/kure/2002.webp",
         opis: '"Nie interesują mnie twoje przesłaniki. Oczekikję wyników".',
         frakcja: "2",
-        numer: "2001",
+        numer: "2002",
         umiejetnosc: "Obejrzyj 3 losowe karty z ręki przeciwnika",
         funkcja: function (gameState) {
             // w podglądzie widzisz 3 losowe karty z ręki przeciwnika nic więcej nie możesz z nimi zrobić
@@ -171,7 +171,7 @@ const krole = [
         dkarta: "/gwent/assets/dkarty/kure/3002.webp",
         opis: '"Powszechnei uważa się ją za najpiękniejszą kobietę świata".',
         frakcja: "3",
-        numer: "3001",
+        numer: "3002",
         umiejetnosc: "Weź o jedną kartę więcej na początku bitwy.",
         funkcja: function (gameState) {
             // na początku bitwy bierze o jedną kartę więcej (czyli 11 zamiast 10) i dodaje ją do ręki gracza
