@@ -584,51 +584,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updatePage() {
         const faction = factions[currentPage - 1];
-        const factionName = document.querySelector('.faction-name');
-        const factionShield = document.querySelector('.faction-shield');
-        const factionAbility = document.querySelector('.faction-ability');
-        const leaderCard = document.querySelector('.leader-card');
-        // Pobierz backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop
-        const overlay = document.querySelector('.overlay');
-        if (!overlay) return;
-        const overlayRect = overlay.getBoundingClientRect();
-        const overlayWidth = overlayRect.width;
-        const overlayHeight = overlayRect.height;
-        const overlayLeft = overlayRect.left;
-        const overlayTop = overlayRect.top;
-        const windowAspectRatio = window.innerWidth / window.innerHeight;
-        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
-        let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
-        if (windowAspectRatio > guiAspectRatio) {
-            scale = overlayHeight / GUI_HEIGHT;
-            backgroundWidth = GUI_WIDTH * scale;
-            backgroundHeight = overlayHeight;
-            backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
-            backgroundTop = overlayTop;
-        } else {
-            scale = overlayWidth / GUI_WIDTH;
-            backgroundWidth = overlayWidth;
-            backgroundHeight = GUI_HEIGHT * scale;
-            backgroundLeft = overlayLeft;
-            backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
-        }
-
-        if (factionName) factionName.textContent = faction.name;
-        if (factionShield) factionShield.src = faction.shield;
-        if (factionAbility) factionAbility.textContent = faction.ability;
-
-        pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
-
-        displayCollection('all');
-        displayDeck();
-        updateStats();
-        setTimeout(updatePositionsAndScaling, 0); // wymusza przerysowanie GUI
-
+        // ...existing code...
         // Wyświetl tylko jednego dowódcę w slocie lidera
         if (leaderCard) {
             leaderCard.innerHTML = '';
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
-            const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
+            // Domyślnie wybierz pierwszego dowódcę jeśli nie ma wybranego
+            if (!selectedLeader || selectedLeader.frakcja !== faction.id) {
+                selectedLeader = leaders[0];
+            }
+            const selected = selectedLeader;
             if (selected) {
                 // Skalowanie względem GUI (gui.webp)
                 const guiLeft = 1792, guiTop = 538, guiW = 2051-1792, guiH = 1029-538;
@@ -811,11 +776,18 @@ document.addEventListener('DOMContentLoaded', () => {
             div.style.margin = '12px';
             div.style.textAlign = 'center';
             div.style.cursor = 'pointer';
-            div.onclick = () => {
+            // Lewy klik wybiera dowódcę
+            div.addEventListener('click', (e) => {
+                e.preventDefault();
                 selectedLeader = krol;
                 updatePage();
                 if (window.closePowiek) window.closePowiek();
-            };
+            });
+            // Prawy klik tylko podgląd (nie wybiera dowódcy)
+            div.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                // Możesz tu dodać podgląd powiększenia jeśli chcesz
+            });
             const img = document.createElement('img');
             img.src = krol.dkarta;
             img.style.width = '180px';
