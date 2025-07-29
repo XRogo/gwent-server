@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (leaderCard) {
             leaderCard.innerHTML = '';
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
-            // Domyślnie wybierz pierwszego dowódcę jeśli nie ma wybranego
+            // Domyślnie wybierz pierwszego dowódcę jeśli nie ma wybranego lub nie pasuje do frakcji
             if (!selectedLeader || selectedLeader.frakcja !== faction.id) {
                 selectedLeader = leaders[0];
             }
@@ -783,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updatePage();
                 if (window.closePowiek) window.closePowiek();
             });
-            // Prawy klik tylko podgląd (nie wybiera dowódcy)
+            // Prawy klik tylko podgląd (nie wybiera dowódcę)
             div.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 // Możesz tu dodać podgląd powiększenia jeśli chcesz
@@ -816,10 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const faction = factions[currentPage - 1];
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             showPowiek(leaders, 0, 'leaders');
-            window.selectedLeaderCallback = function(krol) {
-                selectedLeader = krol;
-                updatePage(); // odśwież wyświetlanie wybranego dowódcy
-            };
+            // Usuwam window.selectedLeaderCallback, bo wybór jest przez kliknięcie
         }
     });
 
