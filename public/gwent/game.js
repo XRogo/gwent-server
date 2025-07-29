@@ -874,6 +874,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Dodaj obsługę przycisku 'Zapisz wybór'
+    const saveDeckButton = document.getElementById('saveDeckButton');
+    if (saveDeckButton) {
+        saveDeckButton.addEventListener('click', () => {
+            const faction = factions[currentPage - 1];
+            if (!faction) return;
+            const numerDowodcy = selectedLeader ? selectedLeader.numer : null;
+            if (!numerDowodcy) {
+                alert('Wybierz dowódcę przed zapisaniem!');
+                return;
+            }
+            const kartyNumery = deck.map(card => card.numer);
+            if (window.saveDeck) {
+                window.saveDeck(faction.id, numerDowodcy, kartyNumery);
+                saveDeckButton.textContent = 'Zapisano!';
+                setTimeout(() => { saveDeckButton.textContent = 'Zapisz wybór'; }, 1200);
+            } else {
+                alert('Brak funkcji zapisu talii!');
+            }
+        });
+    }
 });
 
 window.addEventListener('DOMContentLoaded', () => {
