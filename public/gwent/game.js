@@ -812,8 +812,9 @@ document.addEventListener('DOMContentLoaded', () => {
             div.style.textAlign = 'center';
             div.style.cursor = 'pointer';
             div.onclick = () => {
-                window.selectedLeader = krol;
-                // Możesz dodać podgląd powiększenia lub callback
+                selectedLeader = krol;
+                updatePage();
+                if (window.closePowiek) window.closePowiek();
             };
             const img = document.createElement('img');
             img.src = krol.dkarta;
