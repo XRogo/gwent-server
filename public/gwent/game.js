@@ -1,7 +1,6 @@
 import cards from './cards.js';
 import { krole } from './krole.js';
 import { showPowiek } from './powiek.js';
-import { saveDeck, loadDecks } from './deckStorage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
@@ -785,14 +784,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const factionId = factions[currentPage - 1].id;
         const deckNumbers = deck.map(card => card.numer);
         const leaderNumber = selectedLeader ? selectedLeader.numer : null;
-        if (leaderNumber) {
-            saveDeck(factionId, leaderNumber, deckNumbers);
+        if (leaderNumber && window.saveDeck) {
+            window.saveDeck(factionId, leaderNumber, deckNumbers);
         }
     }
 
     // Przy starcie strony: odczytaj deck i dowódcę z localStorage
     document.addEventListener('DOMContentLoaded', () => {
-        const talie = loadDecks();
+        const talie = window.loadDecks ? window.loadDecks() : {};
         const faction = factions[currentPage - 1];
         if (talie && talie[faction.id]) {
             deck = talie[faction.id].karty
