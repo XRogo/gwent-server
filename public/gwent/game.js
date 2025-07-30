@@ -1,6 +1,7 @@
 import cards from './cards.js';
 import { krole } from './krole.js';
 import { showPowiek } from './powiek.js';
+import { saveDeck, loadDecks } from './deckStorage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
@@ -14,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_WIDTH = 3840;
     const GUI_HEIGHT = 2160;
     let deck = [];
-
     let selectedLeader = null;
 
     const factions = [
@@ -535,6 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     displayDeck();
                     displayCollection('all');
                     updateStats();
+                    autoSaveDeck();
                 }
             }
         });
@@ -545,7 +546,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardElement = event.target.closest('.card');
             if (cardElement) {
                 const cardName = cardElement.querySelector('.name').textContent;
-                // Pobierz numer karty z obiektu deck (po nazwie i pozycjach w DOM)
                 const cardInDeck = deck.find(c => c.nazwa === cardName && cardElement.querySelector('.card-image').style.backgroundImage.includes(c.dkarta));
                 if (cardInDeck) {
                     const index = deck.findIndex(c => c.numer === cardInDeck.numer);
@@ -558,6 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         displayDeck();
                         displayCollection('all');
                         updateStats();
+                        autoSaveDeck();
                     }
                 }
             }
@@ -628,7 +629,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (leaderCard) {
             leaderCard.innerHTML = '';
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
-            const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
+            // Domyślnie wybierz pierwszego dowódcę jeśli nie ma wybranego lub nie pasuje do frakcji
+            if (!selectedLeader || selectedLeader.frakcja !== faction.id) {
+                selectedLeader = leaders[0];
+                autoSaveDeck();
+            }
+            const selected = selectedLeader;
             if (selected) {
                 // Skalowanie względem GUI (gui.webp)
                 const guiLeft = 1792, guiTop = 538, guiW = 2051-1792, guiH = 1029-538;
@@ -774,17 +780,30 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePage();
     updateStats();
 
-    const talie = window.loadDecks ? window.loadDecks() : {};
-    const faction = factions[currentPage - 1];
-    if (talie && talie[faction.id]) {
-        deck = talie[faction.id].karty
-            .map(numer => cards.find(c => c.numer === numer))
-            .filter(Boolean);
-        selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
-        displayDeck();
-        displayCollection('all');
-        updateStats();
+    // Automatyczny zapis talii po każdej zmianie
+    function autoSaveDeck() {
+        const factionId = factions[currentPage - 1].id;
+        const deckNumbers = deck.map(card => card.numer);
+        const leaderNumber = selectedLeader ? selectedLeader.numer : null;
+        if (leaderNumber) {
+            saveDeck(factionId, leaderNumber, deckNumbers);
+        }
     }
+
+    // Przy starcie strony: odczytaj deck i dowódcę z localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const talie = loadDecks();
+        const faction = factions[currentPage - 1];
+        if (talie && talie[faction.id]) {
+            deck = talie[faction.id].karty
+                .map(numer => cards.find(c => c.numer === numer))
+                .filter(Boolean);
+            selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
+            displayDeck();
+            displayCollection('all');
+            updateStats();
+        }
+    });
 
     function groupDeck(deck) {
         const grouped = [];
@@ -874,6 +893,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Obsługa wyboru dowódcy przez kliknięcie (np. w powiek.js)
+    window.selectLeader = function(numer) {
+        const factionId = factions[currentPage - 1].id;
+        const leader = krole.find(krol => krol.numer === numer && krol.frakcja === factionId);
+        if (leader) {
+            selectedLeader = leader;
+            autoSaveDeck();
+            updatePage();
+        }
+    };
 });
 
 window.addEventListener('DOMContentLoaded', () => {
