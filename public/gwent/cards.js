@@ -16,7 +16,7 @@ const cards = [
     {
         nazwa: "Róg dowódcy",
         karta: "/gwent/assets/karty/niezalerzne/rog_dowodcy.webp",
-        dkarta: "/gwent/assets/dkarty/1/rog.wep",
+        dkarta: "/gwent/assets/dkarty/1/rog.webp",
         opis: '"Do atakuuuuu!!!"',
         bohater: false,
         moc: "rog",
@@ -380,7 +380,7 @@ const cards = [
     {
         nazwa: "Katapulta",
         karta: "/gwent/assets/karty/polnoc/katapulta.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/2/105.webp",
         opis: '"WORK."',
         bohater: false,
         moc: "wiez",
@@ -420,7 +420,7 @@ const cards = [
     {
         nazwa: "Trebusz",
         karta: "/gwent/assets/karty/polnoc/trebusz1.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/2/108.webp",
         opis: '"WORK."',
         bohater: false,
         frakcja: "1",
@@ -446,7 +446,7 @@ const cards = [
     {
         nazwa: "Balista",
         karta: "/gwent/assets/karty/polnoc/balista.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/2/110.webp",
         opis: '"WORK."',
         bohater: false,
         frakcja: "1",
@@ -472,7 +472,7 @@ const cards = [
     {
         nazwa: "Ves",
         karta: "/gwent/assets/karty/polnoc/ves.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/2/112.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "1",
@@ -674,7 +674,7 @@ const cards = [
     {
         nazwa: "Redański piechur",
         karta: "/gwent/assets/karty/polnoc/redanski_piechur2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/2/127.webp",
         opis: '"WORK."',
         bohater: false,
         frakcja: "1",
@@ -769,7 +769,7 @@ const cards = [
     {
         nazwa: "Nilfgaardzki łucznik",
         karta: "/gwent/assets/karty/nilftgard/nilfgaardzki-lucznik.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/3/206.webp",
         opis: '"WORK."',
         bohater: false,
         frakcja: "2",
@@ -916,7 +916,7 @@ const cards = [
     {
         nazwa: "Młody emisariusz",
         karta: "/gwent/assets/karty/nilftgard/mlody_emisariusz2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/3/217.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wiez",
@@ -1104,7 +1104,7 @@ const cards = [
     {
         nazwa: "Wsparcie łuczników",
         karta: "/gwent/assets/karty/nilftgard/wsparcie_lucznikow.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/3/231.webp",
         opis: "WORK.",
         bohater: false,
         moc: "medyk",
@@ -1294,7 +1294,7 @@ const cards = [
     {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/313.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1308,7 +1308,7 @@ const cards = [
     {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/314.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1336,7 +1336,7 @@ const cards = [
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/316.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1350,7 +1350,7 @@ const cards = [
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/317.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1377,7 +1377,7 @@ const cards = [
     {
         nazwa: "Bryada Vrihedd",
         karta: "/gwent/assets/karty/scio'tel/brygada_vrihedd.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/319.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1403,7 +1403,7 @@ const cards = [
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/321.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1416,7 +1416,7 @@ const cards = [
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu3.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/322.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1429,7 +1429,7 @@ const cards = [
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu5.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/323.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1442,7 +1442,7 @@ const cards = [
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu4.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/324.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1481,7 +1481,7 @@ const cards = [
     {
         nazwa: "Ciran aep Easnillien",
         karta: "/gwent/assets/karty/scio'tel/ciaran_aep_easnillien.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/327.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1508,7 +1508,7 @@ const cards = [
     {
         nazwa: "Krasnolud Harcownik",
         karta: "/gwent/assets/karty/scio'tel/krasnolud_harcownik2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/329.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1522,7 +1522,7 @@ const cards = [
     {
         nazwa: "Krasnolud Harcownik",
         karta: "/gwent/assets/karty/scio'tel/krasnolud_harcownik.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/330.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1564,7 +1564,7 @@ const cards = [
     {
         nazwa: "Elfi harcownik",
         karta: "/gwent/assets/karty/scio'tel/elfi_harcownik3.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/333.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1579,7 +1579,7 @@ const cards = [
     {
         nazwa: "Elfi harcownik",
         karta: "/gwent/assets/karty/scio'tel/elfi_harcownik2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/334.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -1594,7 +1594,7 @@ const cards = [
     {
         nazwa: "Riordain",
         karta: "/gwent/assets/karty/scio'tel/riordain.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/335.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "3",
@@ -1621,7 +1621,7 @@ const cards = [
     {
         nazwa: "Havekarski medyk",
         karta: "/gwent/assets/karty/scio'tel/havekarski_medyk2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/337.webp",
         opis: "WORK.",
         bohater: false,
         moc: "medyk",
@@ -1635,7 +1635,7 @@ const cards = [
     {
         nazwa: "Havekarski medyk",
         karta: "/gwent/assets/karty/scio'tel/havekarski_medyk.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/5/338.webp",
         opis: "WORK.",
         bohater: false,
         moc: "medyk",
@@ -1651,7 +1651,7 @@ const cards = [
     {
         nazwa: "Draug",
         karta: "/gwent/assets/karty/potwory/draug.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/401.webp",
         opis: "WORK.",
         bohater: "true",
         frakcja: "4",
@@ -1664,7 +1664,7 @@ const cards = [
     {
         nazwa: "Imlerith",
         karta: "/gwent/assets/karty/potwory/imlerith.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/402.webp",
         opis: "WORK.",
         bohater: true,
         frakcja: "4",
@@ -1677,7 +1677,7 @@ const cards = [
     {
         nazwa: "Leszy",
         karta: "/gwent/assets/karty/potwory/leszy.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/403.webp",
         opis: "WORK.",
         bohater: true,
         frakcja: "4",
@@ -1690,7 +1690,7 @@ const cards = [
     {
         nazwa: "Kejran",
         karta: "/gwent/assets/karty/potwory/kejran.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/404.webp",
         opis: "WORK.",
         bohater: true,
         moc: "morale",
@@ -1704,7 +1704,7 @@ const cards = [
     {
         nazwa: "Królewicz ropuch",
         karta: "/gwent/assets/karty/potwory/krolewicz_ropuch.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/405.webp",
         opis: "WORK.",
         bohater: false,
         moc: "iporz",
@@ -1718,7 +1718,7 @@ const cards = [
     {
         nazwa: "Żywiołak ziemi",
         karta: "/gwent/assets/karty/potwory/zywiolak_ziemi.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/406.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1731,7 +1731,7 @@ const cards = [
     {
         nazwa: "Bies",
         karta: "/gwent/assets/karty/potwory/bies.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/407.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1744,7 +1744,7 @@ const cards = [
     {
         nazwa: "Żywiołak ognia",
         karta: "/gwent/assets/karty/potwory/zywiolak_ognia.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/408.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1757,7 +1757,7 @@ const cards = [
     {
         nazwa: "Olbrzymi krabopająk",
         karta: "/gwent/assets/karty/potwory/olbrzymi_krabopajak.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/409.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -2178,7 +2178,7 @@ const cards = [
     {
         nazwa: "Ghul",
         karta: "/gwent/assets/karty/potwory/ghul3.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/439.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -2193,7 +2193,7 @@ const cards = [
     {
         nazwa: "Ghul",
         karta: "/gwent/assets/karty/potwory/ghul2.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/440.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -2208,7 +2208,7 @@ const cards = [
     {
         nazwa: "Ghul",
         karta: "/gwent/assets/karty/potwory/ghul1.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/441.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -2227,7 +2227,7 @@ const cards = [
     {
         nazwa: "Olaf",
         karta: "/gwent/assets/karty/Skellige/olaf.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/501.webp",
         opis: "WORK.",
         bohater: false,
         moc: "morale",
@@ -2241,7 +2241,7 @@ const cards = [
     {
         nazwa: "Hjalmar",
         karta: "/gwent/assets/karty/Skellige/hjalmar.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/502.webp",
         opis: "WORK.",
         bohater: true,
         frakcja: "5",
@@ -2254,7 +2254,7 @@ const cards = [
     {
         nazwa: "Cerys",
         karta: "/gwent/assets/karty/Skellige/cerys.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/503.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -2269,7 +2269,7 @@ const cards = [
     {
         nazwa: "Myszowór",
         karta: "/gwent/assets/karty/Skellige/myszowór.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/504.webp",
         opis: "WORK.",
         bohater: true,
         moc: "grzybki",
@@ -2283,7 +2283,7 @@ const cards = [
     {
         nazwa: "Lugos Szalony",
         karta: "/gwent/assets/karty/Skellige/lugos_szalony.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/505.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2296,7 +2296,7 @@ const cards = [
     {
         nazwa: "Lugos Siny",
         karta: "/gwent/assets/karty/Skellige/lugos_siny.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/506.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
