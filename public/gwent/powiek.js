@@ -128,6 +128,15 @@ function renderPowiek() {
             cardDiv.style.top = (pos.top - pos.height * 0.02) + 'px';
             cardDiv.style.width = (pos.width * 1.4) + 'px';
             cardDiv.style.height = (pos.height * 1.14) + 'px';
+            // Dodaj kliknięcie na środkowego króla w trybie leaders
+            if (powiekMode === 'leaders') {
+                cardDiv.style.cursor = 'pointer';
+                cardDiv.onclick = function(e) {
+                    e.stopPropagation();
+                    if (window.selectLeader) window.selectLeader(card.numer);
+                    hidePowiek();
+                };
+            }
         } else {
             cardDiv.style.left = pos.left+'px';
             cardDiv.style.top = pos.top+'px';
