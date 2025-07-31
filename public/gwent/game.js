@@ -905,17 +905,4 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-    const fade = document.getElementById('fadeScreen');
-    const joinSound = document.getElementById('joinSound');
-    if (joinSound) {
-        joinSound.currentTime = 0;
-        joinSound.play().catch(()=>{});
-    }
-    if (fade) {
-        setTimeout(() => {
-            fade.style.opacity = '0';
-            setTimeout(() => fade.style.display = 'none', 600);
-        }, 50);
-    }
-});
+// KONIEC PLIKU, nie dodawaj już window.addEventListener('DOMContentLoaded', ...) na końcu!
