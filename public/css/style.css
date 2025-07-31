@@ -6,6 +6,10 @@ body {
     background-color: black;
 }
 
+html, body {
+    overflow: hidden !important;
+}
+
 .main-menu, .host-screen, .join-screen, .nickname-screen {
     background-image: url('../assets/background.jpg');
     background-size: cover;
