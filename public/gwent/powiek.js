@@ -21,6 +21,9 @@ function showPowiek(deck, index, mode = 'cards') {
     powiekIndex = index;
     powiekActive = true;
     powiekMode = mode;
+    // Wyłącz scroll strony podczas powiek
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     renderPowiek();
 }
 
@@ -30,6 +33,9 @@ function hidePowiek() {
     if (el) el.remove();
     const powiekBg = document.getElementById('powiekBg');
     if (powiekBg) powiekBg.remove();
+    // Przywróć blokadę scrolla po zamknięciu powiek
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
 }
 
 function renderPowiek() {
