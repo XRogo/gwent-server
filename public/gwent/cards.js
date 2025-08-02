@@ -1286,7 +1286,6 @@ const cards = [
         frakcja: "3",
         punkty: 6,
         pozycja: 4,
-        summon: "",
         ilosc: 1,
         numer: "312"
     },   
@@ -1300,7 +1299,6 @@ const cards = [
         frakcja: "3",
         punkty: 6,
         pozycja: 4,
-        summon: "",
         ilosc: 1,
         numer: "313"
     },   
@@ -1314,7 +1312,6 @@ const cards = [
         frakcja: "3",
         punkty: 6,
         pozycja: 4,
-        summon: "",
         ilosc: 1,
         numer: "314"
     },   
@@ -1329,6 +1326,7 @@ const cards = [
         frakcja: "3",
         punkty: 5,
         pozycja: 1,
+        summon: "316, 317",
         ilosc: 1,
         numer: "315"
     }, 
@@ -1343,6 +1341,7 @@ const cards = [
         frakcja: "3",
         punkty: 5,
         pozycja: 1,
+        summon: "315, 317",
         ilosc: 1,
         numer: "316"
     },    
@@ -1357,6 +1356,7 @@ const cards = [
         frakcja: "3",
         punkty: 5,
         pozycja: 1,
+        summon: "315, 316",
         ilosc: 1,
         numer: "317"
     },      
@@ -1501,6 +1501,7 @@ const cards = [
         frakcja: "3",
         punkty: 3,
         pozycja: 1,
+        summon: "329, 330",
         ilosc: 1,
         numer: "328"
     },
@@ -1515,6 +1516,7 @@ const cards = [
         frakcja: "3",
         punkty: 3,
         pozycja: 1,
+        summon: "328, 330",
         ilosc: 1,
         numer: "329"
     }, 
@@ -1529,6 +1531,7 @@ const cards = [
         frakcja: "3",
         punkty: 3,
         pozycja: 1,
+        summon: "328, 329",
         ilosc: 1,
         numer: "330"
     },
@@ -1556,7 +1559,7 @@ const cards = [
         frakcja: "3",
         punkty: 2,
         pozycja: 2,
-        summon: "Elfi harcownik",
+        summon: "333, 334",
         ilosc: 1,
         numer: "332"
     },
@@ -1571,7 +1574,7 @@ const cards = [
         frakcja: "3",
         punkty: 2,
         pozycja: 2,
-        summon: "Elfi harcownik",
+        summon: "332, 334",
         ilosc: 1,
         numer: "333"
     },
@@ -1586,7 +1589,7 @@ const cards = [
         frakcja: "3",
         punkty: 2,
         pozycja: 2,
-        summon: "Elfi harcownik",
+        summon: "332, 333",
         ilosc: 1,
         numer: "334"
     },
@@ -1779,7 +1782,7 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 1,
-        summon: "Wiedzma: Szepciucha, Wiedzma: Prządka",
+        summon: "411, 412",
         ilosc: 1,
         numer: "410"
     },
@@ -1794,7 +1797,7 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 1,
-        summon: "Wiedzma: Kuchta, Wiedzma: Szepciucha",
+        summon: "410, 412",
         ilosc: 1,
         numer: "411"
     },
@@ -1809,7 +1812,7 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 1,
-        summon: "Wiedzma: Kuchta, Wiedzma: Prządka",
+        summon: "410, 411",
         ilosc: 1,
         numer: "412"
     },
@@ -1817,7 +1820,7 @@ const cards = [
     {
         nazwa: "Widłogon",
         karta: "/gwent/assets/karty/potwory/widlogon.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/413.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1830,7 +1833,7 @@ const cards = [
     {
         nazwa: "Morowa dziewica",
         karta: "/gwent/assets/karty/potwory/morowa_dziewica.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/414.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1843,7 +1846,7 @@ const cards = [
     {
         nazwa: "Gryf",
         karta: "/gwent/assets/karty/potwory/gryf.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/415.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1856,7 +1859,7 @@ const cards = [
     {
         nazwa: "Wilkołak",
         karta: "/gwent/assets/karty/potwory/wilkolak.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/416.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1869,7 +1872,7 @@ const cards = [
     {
         nazwa: "Przeraza",
         karta: "/gwent/assets/karty/potwory/przeraza.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/417.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1882,7 +1885,7 @@ const cards = [
     {
         nazwa: "Lodowy Gigant",
         karta: "/gwent/assets/karty/potwory/lodowt_gigant.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/418.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1895,7 +1898,7 @@ const cards = [
     {
         nazwa: "Baba cmentarna",
         karta: "/gwent/assets/karty/potwory/baba_cmentarna.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/419.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1908,14 +1911,14 @@ const cards = [
     {
         nazwa: "Wampir: Katakan",
         karta: "/gwent/assets/karty/potwory/wampir_katakan.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/420.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 5,
         pozycja: 1,
-        summon: "",
+        summon: "425, 426, 427, 428",
         ilosc: 1,
         numer: "420"
     },
@@ -1923,7 +1926,7 @@ const cards = [
     {
         nazwa: "Poroniec",
         karta: "/gwent/assets/karty/potwory/poroniec.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/421.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -1936,14 +1939,14 @@ const cards = [
     {
         nazwa: "Krabopająk",
         karta: "/gwent/assets/karty/potwory/krabopajak3.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/422.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Krabopająk",
+        summon: "423, 424",
         ilosc: 1,
         numer: "422"
     },
@@ -1951,14 +1954,14 @@ const cards = [
     {
         nazwa: "Krabopająk",
         karta: "/gwent/assets/karty/potwory/krabopajak2.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/423.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Krabopająk",
+        summon: "422, 424",
         ilosc: 1,
         numer: "423"
     },
@@ -1966,14 +1969,14 @@ const cards = [
     {
         nazwa: "Krabopająk",
         karta: "/gwent/assets/karty/potwory/krabopajak1.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/424.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Krabopająk",
+        summon: "422, 423",
         ilosc: 1,
         numer: "424"
     },
@@ -1981,14 +1984,14 @@ const cards = [
     {
         nazwa: "Wampir: Ekimma",
         karta: "/gwent/assets/karty/potwory/wampir_ekimma.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/425.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Wampir",
+        summon: "420, 426, 427, 428",
         ilosc: 1,
         numer: "425"
     },
@@ -1996,14 +1999,14 @@ const cards = [
     {
         nazwa: "Wampir: Fleder",
         karta: "/gwent/assets/karty/potwory/wampir_fleader.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/426.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Wampir",
+        summon: "420, 425, 427, 428",
         ilosc: 1,
         numer: "426"
     },
@@ -2011,14 +2014,14 @@ const cards = [
     {
         nazwa: "Wampir: Garkain",
         karta: "/gwent/assets/karty/potwory/wampir_garkain.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/427.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Wampir",
+        summon: "420, 425, 426, 428",
         ilosc: 1,
         numer: "427"
     },
@@ -2026,14 +2029,14 @@ const cards = [
     {
         nazwa: "Wampir: Bruxa",
         karta: "/gwent/assets/karty/potwory/wampir_bruxa.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/428.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 4,
         pozycja: 1,
-        summon: "Wampir",
+        summon: "420, 425, 426, 427",
         ilosc: 1,
         numer: "428"
     },
@@ -2041,7 +2044,7 @@ const cards = [
     {
         nazwa: "Endriaga",
         karta: "/gwent/assets/karty/potwory/endriaga.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/429.webp",
         opis: "Work",
         bohater: false,
         frakcja: "4",
@@ -2054,7 +2057,7 @@ const cards = [
     {
         nazwa: "Harpia",
         karta: "/gwent/assets/karty/potwory/harpia.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/430.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -2067,7 +2070,7 @@ const cards = [
     {
         nazwa: "Kuroliszek",
         karta: "/gwent/assets/karty/potwory/kuroliszek.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/431.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -2080,7 +2083,7 @@ const cards = [
     {
         nazwa: "Gargulec",
         karta: "/gwent/assets/karty/potwory/gargulec.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/432.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -2093,7 +2096,7 @@ const cards = [
     {
         nazwa: "Harpia Celaeno",
         karta: "/gwent/assets/karty/potwory/harpia_celaeno.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/433.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -2106,7 +2109,7 @@ const cards = [
     {
         nazwa: "Mglak",
         karta: "/gwent/assets/karty/potwory/mglak.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/434.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -2119,7 +2122,7 @@ const cards = [
     {
         nazwa: "Wiwerna",
         karta: "/gwent/assets/karty/potwory/wiwerna.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/435.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "4",
@@ -2133,14 +2136,14 @@ const cards = [
     {
         nazwa: "Nekker",
         karta: "/gwent/assets/karty/potwory/nekker3.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/436.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 2,
         pozycja: 1,
-        summon:"Nekker",
+        summon:"437, 438",
         ilosc: 1,
         numer: "436"
     },
@@ -2148,14 +2151,14 @@ const cards = [
     {
         nazwa: "Nekker",
         karta: "/gwent/assets/karty/potwory/nekker2.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/437.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 2,
         pozycja: 1,
-        summon:"Nekker",
+        summon:"436, 438",
         ilosc: 1,
         numer: "437"
     },
@@ -2163,14 +2166,14 @@ const cards = [
     {
         nazwa: "Nekker",
         karta: "/gwent/assets/karty/potwory/nekker1.webp",
-        dkarta: "/gwent/assets/dkarty/4/4.webp",
+        dkarta: "/gwent/assets/dkarty/4/438.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
         frakcja: "4",
         punkty: 2,
         pozycja: 1,
-        summon:"Nekker",
+        summon:"436, 437",
         ilosc: 1,
         numer: "438"
     },    
@@ -2185,7 +2188,7 @@ const cards = [
         frakcja: "4",
         punkty: 1,
         pozycja: 1,
-        summon:"Ghul",
+        summon:"440, 441",
         ilosc: 1,
         numer: "439"
     },
@@ -2200,7 +2203,7 @@ const cards = [
         frakcja: "4",
         punkty: 1,
         pozycja: 1,
-        summon:"Ghul",
+        summon:"439, 441",
         ilosc: 1,
         numer: "440"
     },    
@@ -2215,7 +2218,7 @@ const cards = [
         frakcja: "4",
         punkty: 1,
         pozycja: 1,
-        summon:"Ghul",
+        summon:"439, 440",
         ilosc: 1,
         numer: "441"
     },
@@ -2261,7 +2264,7 @@ const cards = [
         frakcja: "5",
         punkty: 10,
         pozycja: 1,
-        summon:"",
+        summon:"519, 520, 521",
         ilosc: 1,
         numer: "503"
     },    
@@ -2309,7 +2312,7 @@ const cards = [
     {
         nazwa: "Wojownik klanu Craite",
         karta: "/gwent/assets/karty/Skellige/wojownik_klanu_craite.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/507.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wiez",
@@ -2323,7 +2326,7 @@ const cards = [
     {
         nazwa: "Drakkar wojenny",
         karta: "/gwent/assets/karty/Skellige/drakkar_wojenny.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/508.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wiez",
@@ -2337,7 +2340,7 @@ const cards = [
     {
         nazwa: "Łucznik klanu Brokvar",
         karta: "/gwent/assets/karty/Skellige/lucznik_klanu_brokvar.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/509.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2350,7 +2353,7 @@ const cards = [
     {
         nazwa: "Purat klanu Dimun",
         karta: "/gwent/assets/karty/Skellige/pirat_z_klanu_dimun.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/510.webp",
         opis: "WORK.",
         bohater: false,
         moc: "porz",
@@ -2364,7 +2367,7 @@ const cards = [
     {
         nazwa: "Holger Czarna Ręka",
         karta: "/gwent/assets/karty/Skellige/holger_czarna_reka.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/511.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2377,7 +2380,7 @@ const cards = [
     {
         nazwa: "Donar an Hindar",
         karta: "/gwent/assets/karty/Skellige/donar_an_hindar.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/512.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2390,7 +2393,7 @@ const cards = [
     {
         nazwa: "Udarlyk",
         karta: "/gwent/assets/karty/Skellige/udarlyk.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/513.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2403,7 +2406,7 @@ const cards = [
     {
         nazwa: "Svanrige",
         karta: "/gwent/assets/karty/Skellige/svanrige.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/514.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2414,16 +2417,16 @@ const cards = [
     },    
     
     {
-        nazwa: "Berserk",
+        nazwa: "Berserker",
         karta: "/gwent/assets/karty/Skellige/berserk.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/515.webp",
         opis: "WORK.",
         bohater: false,
         moc: "berserk",
         frakcja: "5",
         punkty: 4,
         pozycja: 1,
-        summon:"",
+        summon:"527",
         ilosc: 1,
         numer: "515"
     },
@@ -2431,7 +2434,7 @@ const cards = [
     {
         nazwa: "Płatnerz klanu Torrdaroch",
         karta: "/gwent/assets/karty/Skellige/platnerz_klanu_tordarroch.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/516.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2444,7 +2447,7 @@ const cards = [
     {
         nazwa: "Sklad klanu Heymaey",
         karta: "/gwent/assets/karty/Skellige/skald_klanu_heymaey.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/517.webp",
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
@@ -2457,7 +2460,7 @@ const cards = [
     {
         nazwa: "Lekki Drakkar",
         karta: "/gwent/assets/karty/Skellige/lekki_drakkar.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/518.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwanie",
@@ -2471,7 +2474,7 @@ const cards = [
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond1.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/519.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wiez",
@@ -2485,7 +2488,7 @@ const cards = [
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond2.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/520.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wiez",
@@ -2499,7 +2502,7 @@ const cards = [
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond3.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/521.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wiez",
@@ -2511,9 +2514,9 @@ const cards = [
     },  
   
     {
-        nazwa: "Draig Bon-Duh",
+        nazwa: "Draig Bon-Dhu",
         karta: "/gwent/assets/karty/Skellige/draig_bon_dhu.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/522.webp",
         opis: "WORK.",
         bohater: false,
         moc: "rog",
@@ -2527,7 +2530,7 @@ const cards = [
     {
         nazwa: "Birna Bran",
         karta: "/gwent/assets/karty/Skellige/birna_bran.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/523.webp",
         opis: "WORK.",
         bohater: false,
         moc: "medyk",
@@ -2541,14 +2544,14 @@ const cards = [
     {
         nazwa: "Młody berserk",
         karta: "/gwent/assets/karty/Skellige/mlody_berserker.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/524.webp",
         opis: "WORK.",
         bohater: false,
         moc: "berserk",
         frakcja: "5",
         punkty: 2,
         pozycja: 2,
-        summon:"",
+        summon:"528",
         ilosc: 3,
         numer: "524"
     },
@@ -2556,14 +2559,14 @@ const cards = [
     {
         nazwa: "Kambi",
         karta: "/gwent/assets/karty/Skellige/kambi.webp",
-        dkarta: "/gwent/assets/dkarty/6/tymaczasem.webp",
+        dkarta: "/gwent/assets/dkarty/6/525.webp",
         opis: "WORK.",
         bohater: false,
         moc: "wezwarniezza",
         frakcja: "5",
         punkty: 0,
         pozycja: 1,
-        summon:"",
+        summon:"526",
         ilosc: 1,
         numer: "525"
     },
@@ -2578,7 +2581,7 @@ const cards = [
         bohater: true,
         punkty: 11,
         pozycja: 1,
-        numer: "601"
+        numer: "526"
     },   
     
     {
@@ -2590,7 +2593,7 @@ const cards = [
         moc: "morale",
         punkty: 14,
         pozycja: 1,
-        numer: "502"
+        numer: "527"
     },    
     
     {
@@ -2602,7 +2605,7 @@ const cards = [
         moc: "wiez",
         punkty: 8,
         pozycja: 2,
-        numer: "603"
+        numer: "528"
     },
 ];
 export default cards;
