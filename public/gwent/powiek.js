@@ -7,6 +7,10 @@ let powiekDeck = [];
 let powiekActive = false;
 let powiekMode = 'cards'; // 'cards' lub 'leaders'
 
+let powiekBlockScroll = function(e) {
+    e.preventDefault();
+    return false;
+};
 function showPowiek(deck, index, mode = 'cards') {
     // Filtruj duplikaty po numerze
     const uniqueDeck = [];
@@ -24,6 +28,10 @@ function showPowiek(deck, index, mode = 'cards') {
     // Wyłącz scroll strony podczas powiek
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
+    // Blokuj scroll myszką, dotykiem i klawiaturą
+    window.addEventListener('wheel', powiekBlockScroll, { passive: false });
+    window.addEventListener('touchmove', powiekBlockScroll, { passive: false });
+    window.addEventListener('keydown', powiekBlockScroll, { passive: false });
     renderPowiek();
 }
 
@@ -36,6 +44,10 @@ function hidePowiek() {
     // Przywróć blokadę scrolla po zamknięciu powiek
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
+    // Usuń blokadę scrolla
+    window.removeEventListener('wheel', powiekBlockScroll, { passive: false });
+    window.removeEventListener('touchmove', powiekBlockScroll, { passive: false });
+    window.removeEventListener('keydown', powiekBlockScroll, { passive: false });
 }
 
 function renderPowiek() {
