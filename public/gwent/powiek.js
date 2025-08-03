@@ -145,7 +145,7 @@ function renderPowiek() {
         const card = powiekDeck[idx];
         const pos = positions[i + 2];
         const cardDiv = document.createElement('div');
-        cardDiv.className = 'powiek-card';
+        cardDiv.className = 'powiek-card' + (i === 0 ? ' powiek-central' : '');
         cardDiv.style.position = 'absolute';
         if (i === 0) {
             cardDiv.style.left = (pos.left - pos.width * 0.2) + 'px';

@@ -9,6 +9,9 @@
     border-radius: 12px;
     transition: box-shadow 0.2s;
 }
+.powiek-card.powiek-central {
+    box-shadow: none !important;
+}
 .powiek-opis {
     font-family: 'Gwent', serif;
     font-weight: bold;
