@@ -552,7 +552,7 @@ window.startTestGame = function() {
                 const updated = JSON.parse(e.newValue || '{}');
                 if (updated.gracz2) {
                     window.removeEventListener('storage', testGameListener);
-                    setTimeout(() => { window.location.href = 'gra.html'; }, 500);
+                    setTimeout(() => { window.location.href = 'game.html'; }, 500);
                 }
             }
         });
@@ -561,7 +561,7 @@ window.startTestGame = function() {
         localStorage.setItem('testGameLobby', JSON.stringify(lobby));
         localStorage.setItem('nickname', 'gracz2');
         msgDiv.textContent = 'Dołączono jako gracz2. Start gry!';
-        setTimeout(() => { window.location.href = 'gra.html'; }, 500);
+        setTimeout(() => { window.location.href = 'game.html'; }, 500);
     } else {
         msgDiv.textContent = 'Test Game: Brak wolnych miejsc!';
         return;
