@@ -86,10 +86,9 @@ function renderPowiek() {
         backgroundLeft = guiRect.left;
         backgroundTop = guiRect.top + (guiRect.height - backgroundHeight) / 2;
     }
-    // Warstwa tła powiek
-    const powiekBg = document.createElement('img');
+    // Warstwa tła powiek jako DIV z backgroundImage
+    const powiekBg = document.createElement('div');
     powiekBg.id = 'powiekBg';
-    powiekBg.src = 'assets/asety/tłopowiek.webp';
     powiekBg.style.position = 'absolute';
     powiekBg.style.left = backgroundLeft+'px';
     powiekBg.style.top = backgroundTop+'px';
@@ -97,8 +96,10 @@ function renderPowiek() {
     powiekBg.style.height = backgroundHeight+'px';
     powiekBg.style.zIndex = 99998;
     powiekBg.style.pointerEvents = 'none';
-    powiekBg.style.objectFit = 'cover';
-    powiekBg.style.background = 'none';
+    powiekBg.style.backgroundImage = "url('assets/asety/tłopowiek.webp')";
+    powiekBg.style.backgroundSize = 'cover';
+    powiekBg.style.backgroundPosition = 'center';
+    powiekBg.style.backgroundRepeat = 'no-repeat';
     powiekBg.style.opacity = '1';
     powiekBg.style.filter = 'none';
     powiekBg.style.overflow = 'hidden';
