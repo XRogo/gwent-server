@@ -56,7 +56,7 @@ wybór dowódców obdywa sie za pomocą przycisku "x" po naciśnięciu akwywóje
 pozycaj któla wybor 
 1792, 538 x 2051, 1029
 
-Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są skalowane względem gui.webp, a karta dowódcy wypełnia ten obszar proporcjonalnie (object-fit: contain), z betonem i nazwą."
+Budowa Dkarty === Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są skalowane względem gui.webp, a karta dowódcy wypełnia ten obszar proporcjonalnie (object-fit: contain), z betonem i nazwą."
 
 
 
@@ -113,4 +113,25 @@ Dowódca jest wyświetlany w wyznaczonym obszarze GUI, pozycja i rozmiar są ska
         bohater: false > 000000
         bohater: true > fcfdfc
  10 {113,766 x 518,877} Pozycja nazwy karty [nazwa:] (nazwa pogrubiona) kolor 474747
- 10 {obecnie jest dobrze ustawiona pozycja tego nie zmieniaj} liosc koart (x1/x2/x3) kolor 72451f
+ 10 {obecnie jest dobrze ustawiona pozycja tego nie zmieniaj} liosc koart (x1/x2/x3) kolor 72451
+Pozycje Kart w wyborze
+ tu cos ma być xD
+Umiejętności mocy 
+     moc: "manek" > pozwala zabrać do kart w ręce 1 wybraną karte z planszy (tylko z swojej strony (nie przeciwnika)) (nie dotyczy kart pogodowych i bochaterów, tych nie można zabrać)
+     moc: "rog" > w zależności w której linij jest zagrana karta podwaja ilość punktów kazdej karty (nie dotyczy kart bochaterów)
+     moc: "porz" > niszczy najmocniejszą karte/karty na planszy gry 
+     moc: "mroz" > zmiejsza ilość pk w lini 1 do 1 (jeśli jest karta która podwaja punkty to podwojenie ma działać ale do 1)
+     moc: "mgla" > zmiejsza ilość pk w lini 2 do 1 (jeśli jest karta która podwaja punkty to podwojenie ma działać ale do 1)
+     moc: "deszcz" > zmiejsza ilość pk w lini 3 do 1 (jeśli jest karta która podwaja punkty to podwojenie ma działać ale do 1)
+     moc: "niebo" > usuwa z planszy efekty deszcz mgła i mroz  
+     moc: "sztorm" > urzywa effekr mgła i deszcz
+     moc: "grzybki" > aktywuje karty z mocą beresek
+     moc: "wezwanie" > jeśli zostanie zagranna kart z tą mocą sprawdzi jakie karty z summon są w ręce/tali kart (nie dodtyczy kart odrzuconych) i zagra jes natychmiast
+     moc: "medyk" > aktywóje powiek z kartami odrzuconymi i pozwala zabrać 1 karte (nie dotyczy kart specjalnych i bochaterów)
+     moc: "iporz" > niszczy najmocniejszą jednostke jeśli suma jednostek wycnosi 10 bądz wiecej (chodzi tylko o linie zagrania)
+     moc: "morale" > dodaje 1 pk każdej karcie w lini
+     moc: "wiez" > dodaje 2 tyle pk co ma karte jeśli na polu gry znajduje sie karta z summon karty (jest 1 karta kartama 4 pk to ma 4pk, jeśli znajdują sie 2 karety to mają 8 jeśli 3 to 12pk..)
+     moc: "szpieg" >  dodaje 2 karty z tali kart ale zostaje zagrany do części przeciwnika
+     moc: "wezwarniezza" po rundzie w miejsce karty z tą mocą zostaje dodana karta z summon
+     moc: "berserk" > jeśli zostaje rzucona na plansze gry grzybki to zamień obecne karty na te z summon
+ 
