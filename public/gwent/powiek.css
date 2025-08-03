@@ -1,10 +1,8 @@
 .powiek-overlay {
     position: absolute;
     left: 0; top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.7);
     z-index: 9999;
+    /* width/height ustawia JS, nie CSS! */
 }
 .powiek-card {
     box-shadow: 0 0 32px #000;
@@ -21,7 +19,7 @@
     padding: 8px 0;
 }
 .powiek-info {
-    background: url('/gwent/assets/asety/infor.webp') no-repeat center;
+    background: url('assets/asety/infor.webp') no-repeat center;
     background-size: cover;
     border-radius: 12px;
     box-shadow: 0 0 16px #000;
