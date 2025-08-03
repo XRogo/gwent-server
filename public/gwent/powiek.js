@@ -101,6 +101,9 @@ function renderPowiek() {
     powiekBg.style.background = 'none';
     powiekBg.style.opacity = '1';
     powiekBg.style.filter = 'none';
+    powiekBg.style.overflow = 'hidden';
+    powiekBg.style.maxHeight = '100vh';
+    powiekBg.style.maxWidth = '100vw';
     document.body.appendChild(powiekBg);
     // Overlay na karty
     const overlay = document.createElement('div');
@@ -116,9 +119,11 @@ function renderPowiek() {
     overlay.style.background = 'none';
     overlay.style.opacity = '1';
     overlay.style.filter = 'none';
-    overlay.style.overflow = 'visible';
-    document.body.style.overflow = 'visible';
-    document.documentElement.style.overflow = 'visible';
+    overlay.style.overflow = 'hidden';
+    overlay.style.maxHeight = '100vh';
+    overlay.style.maxWidth = '100vw';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     overlay.onclick = hidePowiek;
     document.body.appendChild(overlay);
     // Funkcja pomocnicza: px w 4K -> px względem backgroundWidth/backgroundHeight
