@@ -69,4 +69,6 @@
 .poswiata, .powiek-podsw, .powiek-podsw2 {
     box-shadow: none !important;
     filter: none !important;
+    background: none !important;
+    outline: none !important;
 }
