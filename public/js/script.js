@@ -534,3 +534,31 @@ backButtons.forEach(button => {
         backHoverSound.play();
     });
 });
+
+// Funkcjonalność Test Game
+let testGameState = { players: [] };
+window.startTestGame = function() {
+    const msgDiv = document.getElementById('testGameMsg');
+    // Sprawdź czy już są dwaj gracze
+    if (testGameState.players.length >= 2) {
+        msgDiv.textContent = 'Test Game: Brak wolnych miejsc!';
+        return;
+    }
+    // Nadaj nick gracz1 lub gracz2
+    let nick = 'gracz1';
+    if (testGameState.players.includes('gracz1')) nick = 'gracz2';
+    testGameState.players.push(nick);
+    msgDiv.textContent = 'Dołączono jako ' + nick + (testGameState.players.length === 2 ? ' (drugi gracz dołączył, start gry!)' : ' (czekam na drugiego gracza...)');
+    // Zapamiętaj nick w localStorage
+    localStorage.setItem('nickname', nick);
+    // Przenieś do wyboru talii/nicku
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('nicknameScreen').style.display = '';
+    document.querySelector('.nickname-input').value = nick;
+    // Jeśli już są dwaj gracze, przejdź do gry
+    if (testGameState.players.length === 2) {
+        setTimeout(() => {
+            window.location.href = 'gra.html';
+        }, 1200);
+    }
+};
