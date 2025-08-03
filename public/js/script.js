@@ -539,26 +539,34 @@ backButtons.forEach(button => {
 let testGameState = { players: [] };
 window.startTestGame = function() {
     const msgDiv = document.getElementById('testGameMsg');
-    // Sprawdź czy już są dwaj gracze
-    if (testGameState.players.length >= 2) {
+    // Pobierz stan lobby z localStorage
+    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
+    if (!lobby.gracz1) {
+        lobby.gracz1 = true;
+        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
+        localStorage.setItem('nickname', 'gracz1');
+        msgDiv.textContent = 'Dołączono jako gracz1. Czekam na drugiego gracza...';
+        // Nasłuchuj na dołączenie gracza2 w innym oknie
+        window.addEventListener('storage', function testGameListener(e) {
+            if (e.key === 'testGameLobby') {
+                const updated = JSON.parse(e.newValue || '{}');
+                if (updated.gracz2) {
+                    window.removeEventListener('storage', testGameListener);
+                    setTimeout(() => { window.location.href = 'gra.html'; }, 500);
+                }
+            }
+        });
+    } else if (!lobby.gracz2) {
+        lobby.gracz2 = true;
+        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
+        localStorage.setItem('nickname', 'gracz2');
+        msgDiv.textContent = 'Dołączono jako gracz2. Start gry!';
+        setTimeout(() => { window.location.href = 'gra.html'; }, 500);
+    } else {
         msgDiv.textContent = 'Test Game: Brak wolnych miejsc!';
         return;
     }
-    // Nadaj nick gracz1 lub gracz2
-    let nick = 'gracz1';
-    if (testGameState.players.includes('gracz1')) nick = 'gracz2';
-    testGameState.players.push(nick);
-    msgDiv.textContent = 'Dołączono jako ' + nick + (testGameState.players.length === 2 ? ' (drugi gracz dołączył, start gry!)' : ' (czekam na drugiego gracza...)');
-    // Zapamiętaj nick w localStorage
-    localStorage.setItem('nickname', nick);
-    // Przenieś do wyboru talii/nicku
+    // Przenieś do wyboru talii/nicku (opcjonalnie można pominąć ten krok)
     document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('nicknameScreen').style.display = '';
-    document.querySelector('.nickname-input').value = nick;
-    // Jeśli już są dwaj gracze, przejdź do gry
-    if (testGameState.players.length === 2) {
-        setTimeout(() => {
-            window.location.href = 'gra.html';
-        }, 1200);
-    }
+    // document.getElementById('nicknameScreen').style.display = '';
 };
