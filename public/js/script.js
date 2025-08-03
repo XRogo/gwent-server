@@ -570,3 +570,25 @@ window.startTestGame = function() {
     document.getElementById('mainMenu').style.display = 'none';
     // document.getElementById('nicknameScreen').style.display = '';
 };
+
+// Czyszczenie lobby testowego przy zamknięciu karty/przeglądarki
+window.addEventListener('beforeunload', function() {
+    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
+    const nick = localStorage.getItem('nickname');
+    if (lobby && nick && lobby[nick]) {
+        delete lobby[nick];
+        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
+    }
+});
+
+// Nadpisz showMainMenu, by czyścić lobby testowe po powrocie do menu
+const origShowMainMenu = window.showMainMenu;
+window.showMainMenu = function() {
+    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
+    const nick = localStorage.getItem('nickname');
+    if (lobby && nick && lobby[nick]) {
+        delete lobby[nick];
+        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
+    }
+    if (typeof origShowMainMenu === 'function') origShowMainMenu();
+};
