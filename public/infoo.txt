@@ -134,4 +134,8 @@ Umiejętności mocy
      moc: "szpieg" >  dodaje 2 karty z tali kart ale zostaje zagrany do części przeciwnika
      moc: "wezwarniezza" po rundzie w miejsce karty z tą mocą zostaje dodana karta z summon
      moc: "berserk" > jeśli zostaje rzucona na plansze gry grzybki to zamień obecne karty na te z summon
- 
+Budowa planszy
+  pozycje nicków
+    przeciwnik {483, 569 - 850, 602}
+    ty {483, 1498 x 850, 1532}
+

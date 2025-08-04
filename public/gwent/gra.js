@@ -334,6 +334,26 @@ function renderLeaders() {
     overlay.appendChild(leadersArea);
 }
 
+// Funkcja do wyświetlania nicków na planszy
+function showNicknames(playerNick, opponentNick) {
+    // Usuń stare nicki jeśli są
+    document.querySelectorAll('.nick-player, .nick-opponent').forEach(e => e.remove());
+    // Nick gracza
+    const playerDiv = document.createElement('div');
+    playerDiv.className = 'nick-player';
+    playerDiv.textContent = playerNick;
+    document.body.appendChild(playerDiv);
+    // Nick przeciwnika
+    const oppDiv = document.createElement('div');
+    oppDiv.className = 'nick-opponent';
+    oppDiv.textContent = opponentNick;
+    document.body.appendChild(oppDiv);
+}
+
+// Przykład użycia po naciśnięciu "Graj":
+showNicknames('TwójNick', 'PrzeciwnikNick');
+// Właściwe nicki pobierz z logiki gry/sesji
+
 document.addEventListener('DOMContentLoaded', () => {
     deck = JSON.parse(localStorage.getItem('deck') || '[]');
     renderCards();
