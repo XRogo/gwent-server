@@ -1,5 +1,4 @@
 const socket = io();
-
 const buttons = document.querySelectorAll('.menu-button');
 const okButtons = document.querySelectorAll('.ok-button');
 const copyIcons = document.querySelectorAll('.copy-icon');
@@ -17,7 +16,6 @@ const playerIcon = document.querySelector('.player-icon img');
 const wszystkieKartyText = document.querySelector('.wszystkie_karty-text');
 const wybraneKartyText = document.querySelector('.wybrane_karty-text');
 const nicknameInput = document.querySelector('.nickname-input');
-
 let selectedMode = null;
 let isHost = false;
 let isJoined = false;
@@ -44,14 +42,13 @@ if (gameCodeFromUrl) {
     });
 }
 
-// Dźwięk przy najechaniu
+// Dźwięki i animacje (pozostawione bez zmian)
 buttons.forEach(button => {
     button.addEventListener('mouseenter', () => {
         const hoverSound = new Audio('assets/hover-sound.mp3');
         hoverSound.play();
     });
 });
-
 okButtons.forEach(button => {
     button.addEventListener('mouseenter', () => {
         const hoverSound = new Audio('assets/hover-sound.mp3');
@@ -65,14 +62,12 @@ okButtons.forEach(button => {
         });
     }
 });
-
 copyIcons.forEach(icon => {
     icon.addEventListener('mouseenter', () => {
         const hoverSound = new Audio('assets/hover-sound.mp3');
         hoverSound.play();
     });
 });
-
 const modeButtons = document.querySelectorAll('.mode-button');
 modeButtons.forEach(button => {
     button.addEventListener('mouseenter', () => {
@@ -83,7 +78,6 @@ modeButtons.forEach(button => {
     });
 });
 
-// Pokazywanie ekranów z animacją
 function fadeOut(element, callback) {
     element.style.opacity = '0';
     setTimeout(() => {
@@ -205,12 +199,11 @@ function joinGame() {
         alert('Wprowadź kod gry!');
         return;
     }
-    // Jeśli gracz jest rozłączony, resetujemy jego stan przed dołączeniem
     if (hasJoined) {
-        socket.disconnect(); // Rozłączamy stare połączenie
-        resetGameState(); // Resetujemy stan gry
+        socket.disconnect();
+        resetGameState();
     }
-    socket.connect(); // Nawiązujemy nowe połączenie
+    socket.connect();
     socket.emit('join-game', { gameCode });
 }
 
@@ -229,29 +222,20 @@ function updateHostUI() {
     if (playerIcon) {
         playerIcon.style.display = 'block';
         playerIcon.src = 'assets/ludeka.png?cache=' + Date.now();
-    } else {
-        console.error('playerIcon nie istnieje!');
     }
     if (wszystkieKartyText) {
         wszystkieKartyText.style.display = 'block';
         wszystkieKartyText.src = 'assets/wszystkiekarty.png';
-    } else {
-        console.error('wszystkieKartyText nie istnieje!');
     }
     if (wybraneKartyText) {
         wybraneKartyText.style.display = 'block';
         wybraneKartyText.src = 'assets/wybranekarty.png';
-    } else {
-        console.error('wybraneKartyText nie istnieje!');
     }
-
     const wszystkieKartyButton = document.querySelector('.mode-button.wszystkie_karty');
     const wybraneKartyButton = document.querySelector('.mode-button.wybrane_karty');
     if (wszystkieKartyButton && wybraneKartyButton) {
         wszystkieKartyButton.classList.remove('disabled');
         wybraneKartyButton.classList.remove('disabled');
-    } else {
-        console.error('Przyciski wyboru trybu nie istnieją!');
     }
 }
 
@@ -294,27 +278,27 @@ nicknameInput.addEventListener('keydown', (event) => {
 });
 
 function startGame() {
-    // Twój istniejący kod walidacji nicków itp.
-    window.location.href = '/gwent/game.html';
+    // Przechowaj kod gry i przejdź na game.html z parametrami
+    const gameCode = localStorage.getItem('gameCode');
+    const playerId = localStorage.getItem('playerId');
+    window.location.href = `/gwent/game.html?game=${gameCode}&playerId=${playerId}`;
 }
 
 function resetGameState() {
     selectedMode = null;
     isHost = false;
     isJoined = false;
-    hasJoined = false; // Upewniamy się, że hasJoined jest zresetowane
+    hasJoined = false;
     opponentJoined = false;
     opponentId = null;
     hostId = null;
     hostNickname = null;
     opponentNickname = null;
-    // Resetowanie UI hosta
     resetHostUI();
-    // Resetowanie inputu kodu, aby można było wpisać nowy kod
     const codeInput = document.querySelector('.code-input');
     if (codeInput) {
         codeInput.value = '';
-        codeInput.disabled = false; // Upewniamy się, że pole kodu jest aktywne
+        codeInput.disabled = false;
     }
 }
 
@@ -322,6 +306,8 @@ socket.on('join-success', (data) => {
     console.log('Dołączono do gry:', data.gameCode);
     isJoined = true;
     hasJoined = true;
+    localStorage.setItem('gameCode', data.gameCode); // Zapisz kod gry
+    localStorage.setItem('playerId', data.playerId); // Zapisz ID gracza
     if (data.isHost) {
         console.log('Jesteś hostem.');
         isHost = true;
@@ -363,25 +349,10 @@ socket.on('opponent-joined', (data) => {
 socket.on('opponent-left', (message) => {
     alert(message);
     if (isHost) {
-        selectedMode = null;
-        isJoined = false;
-        hasJoined = false;
-        opponentJoined = false;
-        opponentId = null;
-        hostNickname = null;
-        opponentNickname = null;
-        resetHostUI();
-        nicknameScreen.style.display = 'none';
-        gameScreen.style.display = 'none';
-        loadingScreen.style.display = 'none';
-        joinScreen.style.display = 'none';
+        resetGameState();
         fadeIn(hostScreen);
     } else {
         resetGameState();
-        nicknameScreen.style.display = 'none';
-        gameScreen.style.display = 'none';
-        loadingScreen.style.display = 'none';
-        joinScreen.style.display = 'none';
         fadeIn(mainMenu);
     }
 });
@@ -428,7 +399,7 @@ function submitNickname() {
         nickname = nicknameInput.placeholder;
     }
     nicknameInput.disabled = true;
-
+    localStorage.setItem('nickname', nickname); // Zapisz nick
     if (isHost) {
         hostNickname = nickname;
         console.log(`Host wybrał nick: ${hostNickname}`);
@@ -444,7 +415,7 @@ function submitNickname() {
             startGame();
         }
     } else {
-        const gameCode = document.querySelector('.code-input').value.trim();
+        const gameCode = localStorage.getItem('gameCode');
         socket.emit('send-to-host', { gameCode, message: { type: 'submit-nickname', nickname } });
         const opponentIcon = document.querySelector('.opponent-player-icon img');
         if (opponentIcon) {
@@ -453,30 +424,13 @@ function submitNickname() {
     }
 }
 
-// Referencje do elementów
-const infoScreen = document.getElementById('infoScreen');
-
-// Pokaż stronę I (Informacje)
-function showInfoScreen() {
-    fadeOut(mainMenu, () => {
-        fadeIn(infoScreen);
-    });
-}
-
-// Pokaż menu główne (strona A)
-function showMainMenu() {
-    fadeOut(infoScreen, () => {
-        fadeIn(mainMenu);
-    });
-}
-
-// Funkcje powrotu
+// Funkcje powrotu (pozostawione bez większych zmian)
 function goBackFromHostScreen() {
     fadeOut(hostScreen, () => {
-        fadeIn(mainMenu); // Host wraca na stronę A
+        fadeIn(mainMenu);
         if (isHost) {
             socket.emit('hostLeft');
-            socket.disconnect(); // Rozłączamy hosta
+            socket.disconnect();
         }
         resetGameState();
     });
@@ -484,38 +438,38 @@ function goBackFromHostScreen() {
 
 function goBackFromJoinScreen() {
     fadeOut(joinScreen, () => {
-        fadeIn(mainMenu); // Przeciwnik wraca na stronę A
+        fadeIn(mainMenu);
         if (!isHost) {
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
-            socket.disconnect(); // Rozłączamy przeciwnika
+            socket.disconnect();
         }
-        resetGameState(); // Resetujemy stan gry
+        resetGameState();
     });
 }
 
 function goBackFromLoadingScreen() {
     fadeOut(loadingScreen, () => {
-        fadeIn(mainMenu); // Przeciwnik wraca na stronę A
+        fadeIn(mainMenu);
         if (!isHost) {
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
-            socket.disconnect(); // Rozłączamy przeciwnika
+            socket.disconnect();
         }
-        resetGameState(); // Resetujemy stan gry
+        resetGameState();
     });
 }
 
 function goBackFromNicknameScreen() {
     if (isHost) {
         fadeOut(nicknameScreen, () => {
-            fadeIn(hostScreen); // Host wraca na stronę B
+            fadeIn(hostScreen);
             socket.emit('hostLeft');
         });
     } else {
         fadeOut(nicknameScreen, () => {
-            fadeIn(mainMenu); // Przeciwnik wraca na stronę A
+            fadeIn(mainMenu);
             socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
-            socket.disconnect(); // Rozłączamy przeciwnika
-            resetGameState(); // Resetujemy stan gry
+            socket.disconnect();
+            resetGameState();
         });
     }
 }
@@ -526,7 +480,6 @@ socket.on('hostLeft', () => {
     });
 });
 
-// Dźwięk dla przycisku Back
 const backButtons = document.querySelectorAll('.back-button');
 backButtons.forEach(button => {
     button.addEventListener('mouseenter', () => {
@@ -535,84 +488,42 @@ backButtons.forEach(button => {
     });
 });
 
-// Funkcjonalność Test Game
-let testGameState = { players: [] };
+// Poprawiona funkcjonalność Test Game
 window.startTestGame = function() {
     const msgDiv = document.getElementById('testGameMsg');
-    // Pobierz stan lobby z localStorage
-    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
-    if (!lobby.gracz1) {
-        lobby.gracz1 = true;
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-        localStorage.setItem('nickname', 'gracz1');
-        msgDiv.textContent = 'Dołączono jako gracz1. Czekam na drugiego gracza...';
-        // Nasłuchuj na dołączenie gracza2 w innym oknie
-        window.addEventListener('storage', function testGameListener(e) {
-            if (e.key === 'testGameLobby') {
-                const updated = JSON.parse(e.newValue || '{}');
-                if (updated.gracz2) {
-                    window.removeEventListener('storage', testGameListener);
-                    setTimeout(() => { window.location.href = '/gwent/game.html'; }, 500);
-                }
-            }
-        });
-    } else if (!lobby.gracz2) {
-        lobby.gracz2 = true;
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-        localStorage.setItem('nickname', 'gracz2');
-        msgDiv.textContent = 'Dołączono jako gracz2. Start gry!';
-        setTimeout(() => { window.location.href = '/gwent/game.html'; }, 500);
-    } else {
-        msgDiv.textContent = 'Test Game: Brak wolnych miejsc!';
-        return;
-    }
-    // Przenieś do wyboru talii/nicku (opcjonalnie można pominąć ten krok)
-    document.getElementById('mainMenu').style.display = 'none';
-    // document.getElementById('nicknameScreen').style.display = '';
+    msgDiv.textContent = 'Łączenie z grą testową...';
+    socket.emit('join-test-game');
 };
 
-// Czyszczenie lobby testowego przy zamknięciu karty/przeglądarki
-window.addEventListener('beforeunload', function() {
-    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
-    const nick = localStorage.getItem('nickname');
-    if (lobby && nick && lobby[nick]) {
-        delete lobby[nick];
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-    }
+socket.on('test-game-joined', (data) => {
+    localStorage.setItem('gameCode', data.gameCode);
+    localStorage.setItem('playerId', data.playerId);
+    localStorage.setItem('nickname', data.nickname);
+    const msgDiv = document.getElementById('testGameMsg');
+    msgDiv.textContent = `Dołączono jako ${data.nickname}. Przechodzę do gry...`;
+    fadeOut(mainMenu, () => {
+        window.location.href = `/gwent/game.html?game=${data.gameCode}&playerId=${data.playerId}`;
+    });
 });
 
-// Nadpisz showMainMenu, by czyścić lobby testowe po powrocie do menu
-const origShowMainMenu = window.showMainMenu;
-window.showMainMenu = function() {
-    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
-    const nick = localStorage.getItem('nickname');
-    if (lobby && nick && lobby[nick]) {
-        delete lobby[nick];
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-    }
-    if (typeof origShowMainMenu === 'function') origShowMainMenu();
-};
+socket.on('test-game-full', () => {
+    const msgDiv = document.getElementById('testGameMsg');
+    msgDiv.textContent = 'Pełne lobby! Spróbuj ponownie później.';
+    setTimeout(() => {
+        msgDiv.textContent = '';
+    }, 3000);
+});
 
-// --- SPA: przejście do planszy gry bez reloadu ---
-function startGameSPA(playerNick, opponentNick) {
-    // Ukryj wszystkie ekrany
-    [mainMenu, hostScreen, joinScreen, loadingScreen, nicknameScreen, gameScreen].forEach(e => { if(e) e.style.display = 'none'; });
-    // Pokaż planszę
-    const board = document.getElementById('gameBoard');
-    board.style.display = 'block';
-    // Wyświetl nicki na planszy
-    if (window.showNicknames) window.showNicknames(playerNick, opponentNick);
+// Informacje (bez zmian)
+const infoScreen = document.getElementById('infoScreen');
+function showInfoScreen() {
+    fadeOut(mainMenu, () => {
+        fadeIn(infoScreen);
+    });
 }
 
-// Po stronie hosta: po wyborze nicków i kart
-// socket.emit('start-game', { playerNick, opponentNick, ...wybory });
-// Po stronie obu graczy:
-socket.on('start-game', data => {
-    // data: { playerNick, opponentNick, ...wybory }
-    // Ustal kto jest kim na podstawie localStorage.getItem('nickname')
-    const myNick = localStorage.getItem('nickname');
-    let playerNick = myNick;
-    let opponentNick = (myNick === data.playerNick) ? data.opponentNick : data.playerNick;
-    startGameSPA(playerNick, opponentNick);
-    // ...tutaj możesz przekazać wybory do planszy...
-});
+function showMainMenu() {
+    fadeOut(infoScreen, () => {
+        fadeIn(mainMenu);
+    });
+}

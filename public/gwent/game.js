@@ -2,6 +2,35 @@ import cards from './cards.js';
 import { krole } from './krole.js';
 import { showPowiek } from './powiek.js';
 
+// Połączenie z Socket.IO
+const socket = io();
+
+// Odczyt parametrów URL
+const urlParams = new URLSearchParams(window.location.search);
+const gameCode = urlParams.get('game');
+const playerId = urlParams.get('playerId');
+
+// Ponowne połączenie z serwerem
+if (gameCode && playerId) {
+    socket.emit('reconnect-to-game', { gameCode, playerId });
+    localStorage.setItem('gameCode', gameCode); // Upewniamy się, że gameCode jest zapisany
+    localStorage.setItem('playerId', playerId); // Upewniamy się, że playerId jest zapisany
+}
+
+socket.on('reconnect-success', (data) => {
+    console.log('Ponownie połączono z grą:', data.gameCode);
+    // Możesz tu zaktualizować UI, np. wyświetlić nicki
+    const myNick = localStorage.getItem('nickname');
+    const opponentNick = data.nicknames.find(n => n !== myNick);
+    document.getElementById('hostNickname').textContent = myNick; // Zakładam, że to gracz
+    document.getElementById('opponentNickname').textContent = opponentNick || 'Czekam na przeciwnika...';
+});
+
+socket.on('opponent-left', () => {
+    alert('Przeciwnik opuścił grę.');
+    document.getElementById('opponentNickname').textContent = 'Przeciwnik rozłączony';
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
     const gameScreen = document.getElementById('gameScreen');
@@ -15,6 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_HEIGHT = 2160;
     let deck = [];
     let selectedLeader = null;
+
+    // Reszta kodu pozostaje bez zmian, z wyjątkiem dostosowania UI do nicków
+    const hostNicknameElement = document.getElementById('hostNickname');
+    const opponentNicknameElement = document.getElementById('opponentNickname');
+    hostNicknameElement.textContent = localStorage.getItem('nickname') || '...';
+    opponentNicknameElement.textContent = 'Czekam na przeciwnika...';
 
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
