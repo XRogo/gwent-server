@@ -54,7 +54,7 @@
                 <span>Test Game</span>
             </div>
         </div>
-        <div class="info-button" onclick="showInfoScreen()">INFO Alpha 3.76
+        <div class="info-button" onclick="showInfoScreen()">INFO Alpha 3.78
         </div>
         <div id="testGameMsg" style="color:#c7a76e; font-family:'Gwent',serif; font-size:1.2em; text-align:center; margin-top:12px;"></div>
     </div>
@@ -187,6 +187,11 @@
         <p>Host: <span id="hostNickname">...</span></p>
         <p>Przeciwnik: <span id="opponentNickname">...</span></p>
     </div>
+</div>
+
+<!-- Ekran gry SPA -->
+<div id="gameBoard" style="display:none; width:100vw; height:100vh; position:relative;">
+    <!-- Tutaj pojawi się plansza, nicki, karty itd. -->
 </div>
 
     <script src="/socket.io/socket.io.js"></script>

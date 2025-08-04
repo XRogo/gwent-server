@@ -592,3 +592,27 @@ window.showMainMenu = function() {
     }
     if (typeof origShowMainMenu === 'function') origShowMainMenu();
 };
+
+// --- SPA: przejście do planszy gry bez reloadu ---
+function startGameSPA(playerNick, opponentNick) {
+    // Ukryj wszystkie ekrany
+    [mainMenu, hostScreen, joinScreen, loadingScreen, nicknameScreen, gameScreen].forEach(e => { if(e) e.style.display = 'none'; });
+    // Pokaż planszę
+    const board = document.getElementById('gameBoard');
+    board.style.display = 'block';
+    // Wyświetl nicki na planszy
+    if (window.showNicknames) window.showNicknames(playerNick, opponentNick);
+}
+
+// Po stronie hosta: po wyborze nicków i kart
+// socket.emit('start-game', { playerNick, opponentNick, ...wybory });
+// Po stronie obu graczy:
+socket.on('start-game', data => {
+    // data: { playerNick, opponentNick, ...wybory }
+    // Ustal kto jest kim na podstawie localStorage.getItem('nickname')
+    const myNick = localStorage.getItem('nickname');
+    let playerNick = myNick;
+    let opponentNick = (myNick === data.playerNick) ? data.opponentNick : data.playerNick;
+    startGameSPA(playerNick, opponentNick);
+    // ...tutaj możesz przekazać wybory do planszy...
+});
