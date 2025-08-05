@@ -2,40 +2,6 @@ import cards from './cards.js';
 import { krole } from './krole.js';
 import { showPowiek } from './powiek.js';
 
-// Połączenie z Socket.IO
-const socket = io();
-
-// Odczyt parametrów URL
-const urlParams = new URLSearchParams(window.location.search);
-const gameCode = urlParams.get('game');
-const playerId = urlParams.get('playerId');
-
-// Ponowne połączenie z serwerem
-if (gameCode && playerId) {
-    socket.emit('reconnect-to-game', { gameCode, playerId });
-    localStorage.setItem('gameCode', gameCode); // Upewniamy się, że gameCode jest zapisany
-    localStorage.setItem('playerId', playerId); // Upewniamy się, że playerId jest zapisany
-}
-
-socket.on('reconnect-success', (data) => {
-    console.log('Ponownie połączono z grą:', data.gameCode);
-    // Możesz tu zaktualizować UI, np. wyświetlić nicki
-    const myNick = localStorage.getItem('nickname');
-    const opponentNick = data.nicknames.find(n => n !== myNick);
-    document.getElementById('hostNickname').textContent = myNick; // Zakładam, że to gracz
-    document.getElementById('opponentNickname').textContent = opponentNick || 'Czekam na przeciwnika...';
-    // Po reconnect-success odśwież UI
-    if (typeof displayCollection === 'function') displayCollection('all');
-    if (typeof displayDeck === 'function') displayDeck();
-    if (typeof updatePage === 'function') updatePage();
-    if (typeof updateStats === 'function') updateStats();
-});
-
-socket.on('opponent-left', () => {
-    alert('Przeciwnik opuścił grę.');
-    document.getElementById('opponentNickname').textContent = 'Przeciwnik rozłączony';
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
     const gameScreen = document.getElementById('gameScreen');
@@ -49,31 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_HEIGHT = 2160;
     let deck = [];
     let selectedLeader = null;
-
-    // --- SPA: zawsze pokazuj ekran wyboru kart, nawet po odświeżeniu ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const cardSelectionScreen = document.getElementById('cardSelectionScreen');
-        if (cardSelectionScreen) cardSelectionScreen.style.display = 'block';
-        // Sprawdź wymagane dane
-        const gameCode = localStorage.getItem('gameCode') || (new URLSearchParams(window.location.search)).get('game');
-        const playerId = localStorage.getItem('playerId') || (new URLSearchParams(window.location.search)).get('playerId');
-        const nickname = localStorage.getItem('nickname');
-        if (!gameCode || !playerId || !nickname) {
-            cardSelectionScreen.innerHTML = '<div style="color:red;font-size:2em;text-align:center;margin-top:100px;">Brak wymaganych danych do gry!<br>Wróć do menu i połącz się ponownie.</div>';
-            return;
-        }
-        // Renderuj UI
-        if (typeof displayCollection === 'function') displayCollection('all');
-        if (typeof displayDeck === 'function') displayDeck();
-        if (typeof updatePage === 'function') updatePage();
-        if (typeof updateStats === 'function') updateStats();
-    });
-
-    // Reszta kodu pozostaje bez zmian, z wyjątkiem dostosowania UI do nicków
-    const hostNicknameElement = document.getElementById('hostNickname');
-    const opponentNicknameElement = document.getElementById('opponentNickname');
-    hostNicknameElement.textContent = localStorage.getItem('nickname') || '...';
-    opponentNicknameElement.textContent = 'Czekam na przeciwnika...';
 
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
@@ -849,17 +790,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Przy starcie strony: odczytaj deck i dowódcę z localStorage
-    const talie = window.loadDecks ? window.loadDecks() : {};
-    const faction = factions[currentPage - 1];
-    if (talie && talie[faction.id]) {
-        deck = talie[faction.id].karty
-            .map(numer => cards.find(c => c.numer === numer))
-            .filter(Boolean);
-        selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
-        displayDeck();
-        displayCollection('all');
-        updateStats();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const talie = window.loadDecks ? window.loadDecks() : {};
+        const faction = factions[currentPage - 1];
+        if (talie && talie[faction.id]) {
+            deck = talie[faction.id].karty
+                .map(numer => cards.find(c => c.numer === numer))
+                .filter(Boolean);
+            selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
+            displayDeck();
+            displayCollection('all');
+            updateStats();
+        }
+    });
 
     function groupDeck(deck) {
         const grouped = [];
