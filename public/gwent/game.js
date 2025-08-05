@@ -849,19 +849,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Przy starcie strony: odczytaj deck i dowódcę z localStorage
-    document.addEventListener('DOMContentLoaded', () => {
-        const talie = window.loadDecks ? window.loadDecks() : {};
-        const faction = factions[currentPage - 1];
-        if (talie && talie[faction.id]) {
-            deck = talie[faction.id].karty
-                .map(numer => cards.find(c => c.numer === numer))
-                .filter(Boolean);
-            selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
-            displayDeck();
-            displayCollection('all');
-            updateStats();
-        }
-    });
+    const talie = window.loadDecks ? window.loadDecks() : {};
+    const faction = factions[currentPage - 1];
+    if (talie && talie[faction.id]) {
+        deck = talie[faction.id].karty
+            .map(numer => cards.find(c => c.numer === numer))
+            .filter(Boolean);
+        selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
+        displayDeck();
+        displayCollection('all');
+        updateStats();
+    }
 
     function groupDeck(deck) {
         const grouped = [];
