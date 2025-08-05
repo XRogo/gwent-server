@@ -363,21 +363,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- START: Losowanie ręki i wymiana kart na początku gry ---
 function startHandDraw(deck) {
-    // Skopiuj talię
     let deckCopy = [...deck];
-    // Wylosuj 10 kart na rękę
     let hand = [];
     for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
         const idx = Math.floor(Math.random() * deckCopy.length);
         hand.push(deckCopy.splice(idx, 1)[0]);
     }
-    // Pozostałe karty w deckCopy
     let swaps = 0;
     function showHandPowieka() {
         showPowiek(hand, 0, 'hand', {
             onCardClick: (cardIdx) => {
                 if (swaps < 2 && deckCopy.length > 0) {
-                    // Zamień wybraną kartę na losową z pozostałych
                     const newIdx = Math.floor(Math.random() * deckCopy.length);
                     const newCard = deckCopy.splice(newIdx, 1)[0];
                     deckCopy.push(hand[cardIdx]);
@@ -388,7 +384,6 @@ function startHandDraw(deck) {
             },
             onEsc: () => {
                 window.closePowiek && window.closePowiek();
-                // Tutaj możesz przekazać hand do dalszej gry
                 window.playerHand = hand;
             },
             onOk: () => {
@@ -400,8 +395,17 @@ function startHandDraw(deck) {
     }
     showHandPowieka();
 }
-// Wywołaj na starcie gry:
-// startHandDraw(deck);
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Wczytaj talię gracza z localStorage
+    const deck = JSON.parse(localStorage.getItem('deck') || '[]');
+    if (deck && deck.length >= 10) {
+        startHandDraw(deck);
+    } else {
+        // Możesz dodać komunikat o błędzie jeśli nie ma talii
+        alert('Brak talii lub za mało kart!');
+    }
+});
 // --- KONIEC: Losowanie ręki i wymiana kart na początku gry ---
 
 export { renderRow, renderRog, renderExtraPile, renderLeaders };
