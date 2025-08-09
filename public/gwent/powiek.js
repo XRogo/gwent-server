@@ -412,6 +412,7 @@ function renderPowiek() {
             if (typeof options.onCardClick === 'function') {
                 e.stopPropagation(); // nie zamykaj okna!
                 options.onCardClick(cardIdx);
+                // NIE wywołuj window.closePowiek tutaj!
             } else {
                 window.closePowiek && window.closePowiek();
             }
