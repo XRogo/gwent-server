@@ -374,9 +374,11 @@ function startHandDraw(deck) {
         hand.push(deckCopy.splice(idx, 1)[0]);
     }
     let swaps = 0;
+    let selectedIdx = 0;
     function showHandPowieka() {
-        showPowiek(hand, 0, 'hand', {
+        showPowiek(hand, selectedIdx, 'hand', {
             onCardClick: (cardIdx) => {
+                selectedIdx = cardIdx;
                 if (swaps < 2 && deckCopy.length > 0) {
                     const newIdx = Math.floor(Math.random() * deckCopy.length);
                     const newCard = deckCopy.splice(newIdx, 1)[0];
@@ -395,17 +397,21 @@ function startHandDraw(deck) {
                 window.playerHand = hand;
             },
             swapsLeft: 2 - swaps,
-            fontFamily: 'PFDinTextCondPro-Bold, Cinzel, serif'
+            fontFamily: 'PFDinTextCondPro-Bold, Cinzel, serif',
+            context: 'game'
         });
-        // Dodaj obsługę Enter do wymiany pierwszej karty
         document.onkeydown = function(e) {
             if (e.key === 'Enter' && swaps < 2 && deckCopy.length > 0) {
                 const newIdx = Math.floor(Math.random() * deckCopy.length);
                 const newCard = deckCopy.splice(newIdx, 1)[0];
-                deckCopy.push(hand[0]);
-                hand[0] = newCard;
+                deckCopy.push(hand[selectedIdx]);
+                hand[selectedIdx] = newCard;
                 swaps++;
                 showHandPowieka();
+            }
+            if (e.key === 'Escape') {
+                window.closePowiek && window.closePowiek();
+                window.playerHand = hand;
             }
         };
     }
