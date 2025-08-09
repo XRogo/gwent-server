@@ -337,6 +337,10 @@ function renderLeaders() {
 // Funkcja do wyświetlania nicków na planszy
 function showNicknames(playerNick, opponentNick) {
     const board = document.getElementById('gameBoard');
+    if (!board) {
+        console.warn('Nie znaleziono elementu #gameBoard!');
+        return;
+    }
     // Usuń stare nicki jeśli są
     board.querySelectorAll('.nick-player, .nick-opponent').forEach(e => e.remove());
     // Nick gracza
