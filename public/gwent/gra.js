@@ -383,7 +383,8 @@ function startHandDraw(deck) {
                     deckCopy.push(hand[cardIdx]);
                     hand[cardIdx] = newCard;
                     swaps++;
-                    showHandPowieka(); // ponownie pokaż powiekę z nową ręką
+                    // Odśwież powiekę, nie zamykaj okna
+                    setTimeout(showHandPowieka, 50);
                 }
             },
             onEsc: () => {
