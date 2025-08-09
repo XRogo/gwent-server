@@ -405,6 +405,18 @@ function renderPowiek() {
         mocDesc.style.zIndex = 203;
         overlay.appendChild(mocDesc);
     }
+
+    // Po wygenerowaniu kart w powiek:
+    document.querySelectorAll('.powiek-card').forEach((el, cardIdx) => {
+        el.onclick = function(e) {
+            if (typeof options.onCardClick === 'function') {
+                options.onCardClick(cardIdx);
+                // NIE zamykaj okna powiek, odświeżenie obsługuje callback
+            } else {
+                window.closePowiek && window.closePowiek();
+            }
+        };
+    });
 }
 
 // Dodaj dynamiczne skalowanie powiększenia kart względem planszy/gui
@@ -530,15 +542,5 @@ document.addEventListener('keydown', function (event) {
         console.log('Podgląd dowódców aktywowany');
     }
 });
-
-// Obsługa kliknięcia na kartę w powiek
-cardElement.onclick = function(e) {
-    if (typeof options.onCardClick === 'function') {
-        options.onCardClick(cardIdx);
-        // NIE zamykaj okna powiek, odświeżenie obsługuje callback
-    } else {
-        window.closePowiek && window.closePowiek();
-    }
-};
 
 export { showPowiek, hidePowiek };
