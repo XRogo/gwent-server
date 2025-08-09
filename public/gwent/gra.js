@@ -383,8 +383,7 @@ function startHandDraw(deck) {
                     deckCopy.push(hand[cardIdx]);
                     hand[cardIdx] = newCard;
                     swaps++;
-                    // Odśwież powiekę, nie zamykaj okna
-                    setTimeout(showHandPowieka, 50);
+                    showHandPowieka();
                 }
             },
             onEsc: () => {
@@ -398,6 +397,17 @@ function startHandDraw(deck) {
             swapsLeft: 2 - swaps,
             fontFamily: 'PFDinTextCondPro-Bold, Cinzel, serif'
         });
+        // Dodaj obsługę Enter do wymiany pierwszej karty
+        document.onkeydown = function(e) {
+            if (e.key === 'Enter' && swaps < 2 && deckCopy.length > 0) {
+                const newIdx = Math.floor(Math.random() * deckCopy.length);
+                const newCard = deckCopy.splice(newIdx, 1)[0];
+                deckCopy.push(hand[0]);
+                hand[0] = newCard;
+                swaps++;
+                showHandPowieka();
+            }
+        };
     }
     showHandPowieka();
 }
