@@ -410,8 +410,8 @@ function renderPowiek() {
     document.querySelectorAll('.powiek-card').forEach((el, cardIdx) => {
         el.onclick = function(e) {
             if (typeof options.onCardClick === 'function') {
+                e.stopPropagation(); // nie zamykaj okna!
                 options.onCardClick(cardIdx);
-                // NIE zamykaj okna powiek, odświeżenie obsługuje callback
             } else {
                 window.closePowiek && window.closePowiek();
             }
