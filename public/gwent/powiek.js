@@ -531,4 +531,14 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
+// Obsługa kliknięcia na kartę w powiek
+cardElement.onclick = function(e) {
+    if (typeof options.onCardClick === 'function') {
+        options.onCardClick(cardIdx);
+        // NIE zamykaj okna powiek, odświeżenie obsługuje callback
+    } else {
+        window.closePowiek && window.closePowiek();
+    }
+};
+
 export { showPowiek, hidePowiek };
