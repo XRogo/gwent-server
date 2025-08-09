@@ -406,7 +406,7 @@ function renderPowiek() {
         overlay.appendChild(mocDesc);
     }
 
-    // Po wygenerowaniu kart w powiek:
+    // Przy generowaniu kart w powiek.js:
     document.querySelectorAll('.powiek-card').forEach((el, cardIdx) => {
         el.onclick = function(e) {
             if (typeof options.onCardClick === 'function') {
