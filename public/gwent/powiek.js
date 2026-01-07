@@ -7,7 +7,7 @@ let powiekDeck = [];
 let powiekActive = false;
 let powiekMode = 'cards'; // 'cards' lub 'leaders'
 
-let powiekBlockScroll = function(e) {
+let powiekBlockScroll = function (e) {
     e.preventDefault();
     return false;
 };
@@ -90,10 +90,10 @@ function renderPowiek() {
     const powiekBg = document.createElement('div');
     powiekBg.id = 'powiekBg';
     powiekBg.style.position = 'absolute';
-    powiekBg.style.left = backgroundLeft+'px';
-    powiekBg.style.top = backgroundTop+'px';
-    powiekBg.style.width = backgroundWidth+'px';
-    powiekBg.style.height = backgroundHeight+'px';
+    powiekBg.style.left = backgroundLeft + 'px';
+    powiekBg.style.top = backgroundTop + 'px';
+    powiekBg.style.width = backgroundWidth + 'px';
+    powiekBg.style.height = backgroundHeight + 'px';
     powiekBg.style.zIndex = 99998;
     powiekBg.style.pointerEvents = 'none';
     powiekBg.style.backgroundImage = "url('assets/asety/tłopowiek.webp')";
@@ -111,10 +111,10 @@ function renderPowiek() {
     overlay.id = 'powiekOverlay';
     overlay.className = 'powiek-overlay';
     overlay.style.position = 'absolute';
-    overlay.style.left = backgroundLeft+'px';
-    overlay.style.top = backgroundTop+'px';
-    overlay.style.width = backgroundWidth+'px';
-    overlay.style.height = backgroundHeight+'px';
+    overlay.style.left = backgroundLeft + 'px';
+    overlay.style.top = backgroundTop + 'px';
+    overlay.style.width = backgroundWidth + 'px';
+    overlay.style.height = backgroundHeight + 'px';
     overlay.style.zIndex = 99999;
     overlay.style.pointerEvents = 'auto';
     overlay.style.background = 'none';
@@ -132,11 +132,11 @@ function renderPowiek() {
     function relH(px) { return (px / TLO_H) * backgroundHeight; }
     // Pozycje kart w px względem tłopowiek.webp
     const positions = [
-        {left:relW(468),top:relH(444),width:relW(899-468),height:relH(1261-444)},
-        {left:relW(1040),top:relH(444),width:relW(1563-1040),height:relH(1436-444)},
-        {left:relW(1617),top:relH(456),width:relW(2222-1617),height:relH(1609-456)},
-        {left:relW(2274),top:relH(444),width:relW(2799-2274),height:relH(1436-444)},
-        {left:relW(2938),top:relH(444),width:relW(3371-2938),height:relH(1261-444)}
+        { left: relW(468), top: relH(444), width: relW(899 - 468), height: relH(1261 - 444) },
+        { left: relW(1040), top: relH(444), width: relW(1563 - 1040), height: relH(1436 - 444) },
+        { left: relW(1617), top: relH(456), width: relW(2222 - 1617), height: relH(1609 - 456) },
+        { left: relW(2274), top: relH(444), width: relW(2799 - 2274), height: relH(1436 - 444) },
+        { left: relW(2938), top: relH(444), width: relW(3371 - 2938), height: relH(1261 - 444) }
     ];
     // Karty
     for (let i = -2; i <= 2; i++) {
@@ -155,17 +155,17 @@ function renderPowiek() {
             // Dodaj kliknięcie na środkowego króla w trybie leaders
             if (powiekMode === 'leaders') {
                 cardDiv.style.cursor = 'pointer';
-                cardDiv.onclick = function(e) {
+                cardDiv.onclick = function (e) {
                     e.stopPropagation();
                     if (window.selectLeader) window.selectLeader(card.numer);
                     hidePowiek();
                 };
             }
         } else {
-            cardDiv.style.left = pos.left+'px';
-            cardDiv.style.top = pos.top+'px';
-            cardDiv.style.width = pos.width+'px';
-            cardDiv.style.height = pos.height+'px';
+            cardDiv.style.left = pos.left + 'px';
+            cardDiv.style.top = pos.top + 'px';
+            cardDiv.style.width = pos.width + 'px';
+            cardDiv.style.height = pos.height + 'px';
         }
         cardDiv.style.zIndex = i === 0 ? 100 : 50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
@@ -178,20 +178,20 @@ function renderPowiek() {
             podsw.src = '/gwent/assets/dkarty/podsw.webp';
             podsw.className = 'poswiata powiek-podsw';
             podsw.style.position = 'absolute';
-            podsw.style.left = ((1/523)*100) + '%';
-            podsw.style.top = ((12/992)*100) + '%';
-            podsw.style.width = ((523/523)*100) + '%';
-            podsw.style.height = ((888/992)*100) + '%';
+            podsw.style.left = ((1 / 523) * 100) + '%';
+            podsw.style.top = ((12 / 992) * 100) + '%';
+            podsw.style.width = ((523 / 523) * 100) + '%';
+            podsw.style.height = ((888 / 992) * 100) + '%';
             podsw.style.zIndex = 1;
             cardDiv.appendChild(podsw);
             const podsw2 = document.createElement('img');
             podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
             podsw2.className = 'poswiata powiek-podsw2';
             podsw2.style.position = 'absolute';
-            podsw2.style.left = ((1/523)*100) + '%';
-            podsw2.style.top = ((12/992)*100) + '%';
-            podsw2.style.width = ((523/523)*100) + '%';
-            podsw2.style.height = ((888/992)*100) + '%';
+            podsw2.style.left = ((1 / 523) * 100) + '%';
+            podsw2.style.top = ((12 / 992) * 100) + '%';
+            podsw2.style.width = ((523 / 523) * 100) + '%';
+            podsw2.style.height = ((888 / 992) * 100) + '%';
             podsw2.style.zIndex = 2;
             podsw2.style.animation = 'powiek-pulse 1.5s infinite';
             cardDiv.appendChild(podsw2);
@@ -232,8 +232,8 @@ function renderPowiek() {
         beton.style.zIndex = 4;
         inner.appendChild(beton);
         // 5: pasek frakcji (dodawany dla każdej karty z frakcją 1-5, nie dla dowódców)
-        const isKing = card.isKing || card.typ === 'krol' || false;
-        if (typeof card.frakcja === 'string' && ['1','2','3','4','5'].includes(card.frakcja) && !isKing) {
+        const isKing = card.isKing || card.typ === 'krol' || powiekMode === 'leaders' || false;
+        if (typeof card.frakcja === 'string' && ['1', '2', '3', '4', '5'].includes(card.frakcja) && !isKing) {
             let frakcjaMap = {
                 '1': 'polnoc.webp',
                 '2': 'nilfgaard.webp',
@@ -264,18 +264,18 @@ function renderPowiek() {
             inner.appendChild(posIcon);
         }
         // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych i specjalnych)
-        const isWeather = ['mroz','mgla','deszcz','niebo','sztorm'].includes(card.moc);
-        const isSpecial = ['porz','rog','maneki'].includes(card.moc);
+        const isWeather = ['mroz', 'mgla', 'deszcz', 'niebo', 'sztorm'].includes(card.moc);
+        const isSpecial = ['porz', 'rog', 'maneki'].includes(card.moc);
         const isManekOrGrzybki = card.moc === 'manek' || card.numer === '000';
         if (card.punkty !== undefined || isWeather || isSpecial || isManekOrGrzybki) {
             const pointsBg = document.createElement('img');
-            if(card.bohater) {
+            if (card.bohater) {
                 pointsBg.src = 'assets/dkarty/bohater.webp';
                 pointsBg.style.position = 'absolute';
-                pointsBg.style.left = (pos.width * (-23/523)) + 'px';
-                pointsBg.style.top = (pos.height * (-21/992)) + 'px';
-                pointsBg.style.width = (pos.width * (285/523)) + 'px';
-                pointsBg.style.height = (pos.height * (287/992)) + 'px';
+                pointsBg.style.left = (pos.width * (-23 / 523)) + 'px';
+                pointsBg.style.top = (pos.height * (-21 / 992)) + 'px';
+                pointsBg.style.width = (pos.width * (285 / 523)) + 'px';
+                pointsBg.style.height = (pos.height * (287 / 992)) + 'px';
             } else {
                 pointsBg.src = 'assets/dkarty/punkty.webp';
                 pointsBg.style.position = 'absolute';
@@ -286,7 +286,7 @@ function renderPowiek() {
             }
             pointsBg.style.zIndex = 7;
             inner.appendChild(pointsBg);
-            if(card.punkty !== undefined) {
+            if (card.punkty !== undefined) {
                 const pointsDiv = document.createElement('div');
                 pointsDiv.innerText = card.punkty;
                 pointsDiv.style.position = 'absolute';
@@ -307,9 +307,9 @@ function renderPowiek() {
         if (card.moc) {
             const mocIcon = document.createElement('img');
             let mocSrc = `assets/dkarty/${card.moc}.webp`;
-            if(card.moc==='porz' && card.numer==='510') mocSrc = 'assets/dkarty/2porz.webp';
-            if(card.moc==='grzybki' && card.numer==='504') mocSrc = 'assets/dkarty/igrzybki.webp';
-            if(card.moc==='grzybki' && card.numer==='000') mocSrc = 'assets/dkarty/grzybki.webp';
+            if (card.moc === 'porz' && card.numer === '510') mocSrc = 'assets/dkarty/2porz.webp';
+            if (card.moc === 'grzybki' && card.numer === '504') mocSrc = 'assets/dkarty/igrzybki.webp';
+            if (card.moc === 'grzybki' && card.numer === '000') mocSrc = 'assets/dkarty/grzybki.webp';
             mocIcon.src = mocSrc;
             mocIcon.style.position = 'absolute';
             mocIcon.style.left = '0';
@@ -408,8 +408,8 @@ function renderPowiek() {
 
     // Przy generowaniu kart w powiek.js:
     document.querySelectorAll('.powiek-card').forEach((el, cardIdx) => {
-        el.onclick = function(e) {
-            if (typeof options.onCardClick === 'function') {
+        el.onclick = function (e) {
+            if (typeof options !== 'undefined' && typeof options.onCardClick === 'function') {
                 e.stopPropagation();
                 options.onCardClick(cardIdx);
             } else {
@@ -505,6 +505,14 @@ window.addEventListener('keydown', function (event) {
         if (powiekIndex > 0) {
             powiekIndex--;
             renderPowiek();
+        }
+    }
+    if (event.key === 'Enter') {
+        if (powiekMode === 'leaders') {
+            if (window.selectLeader) {
+                window.selectLeader(powiekDeck[powiekIndex].numer);
+                hidePowiek();
+            }
         }
     }
 });
