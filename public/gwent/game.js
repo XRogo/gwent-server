@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_HEIGHT = 2160;
     let deck = [];
     let selectedLeader = null;
+    // Pamięć podręczna dla wszystkich frakcji (żeby nie tracić stanu przy zmianie strony)
+    let allDecks = {
+        "1": { karty: [], dowodca: null },
+        "2": { karty: [], dowodca: null },
+        "3": { karty: [], dowodca: null },
+        "4": { karty: [], dowodca: null },
+        "5": { karty: [], dowodca: null }
+    };
 
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
@@ -23,6 +31,88 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zatrzymaj losowo wybraną jednostkę na polu bitwy po każdej rundzie." },
         { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "W trzeciej rundzie dwie przypadkowe karty ze stosu kart odrzuconych wracają na stół." },
     ];
+
+    // ... helper functions ...
+
+    // Funkcja zapisująca stan obecnej frakcji do pamięci (allDecks)
+    function saveCurrentFactionState() {
+        if (!factions[currentPage - 1]) return;
+        const factionId = factions[currentPage - 1].id;
+        allDecks[factionId] = {
+            karty: [...deck], // Kopia tablicy
+            dowodca: selectedLeader
+        };
+    }
+
+    // Funkcja wczytująca stan nowej frakcji z pamięci (allDecks)
+    function loadFactionState(newFactionId) {
+        const state = allDecks[newFactionId];
+        if (state) {
+            deck = [...state.karty];
+            selectedLeader = state.dowodca;
+        } else {
+            deck = [];
+            selectedLeader = null;
+        }
+    }
+
+    // --- ZMIANA STRON (Page Switching) ---
+
+    // Obsługa kropek (Page Dots)
+    pageDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            if (currentPage !== index + 1) {
+                saveCurrentFactionState(); // Zapisz starą
+                currentPage = index + 1;
+                loadFactionState(factions[currentPage - 1].id); // Wczytaj nową
+                updatePage();
+            }
+        });
+    });
+
+    // Strzałka w lewo
+    const pageLeft = document.querySelector('.page-left');
+    if (pageLeft) {
+        pageLeft.addEventListener('click', () => {
+            if (currentPage > 1) {
+                saveCurrentFactionState();
+                currentPage--;
+                loadFactionState(factions[currentPage - 1].id);
+                updatePage();
+            }
+        });
+    }
+
+    // Strzałka w prawo
+    const pageRight = document.querySelector('.page-right');
+    if (pageRight) {
+        pageRight.addEventListener('click', () => {
+            if (currentPage < factions.length) {
+                saveCurrentFactionState();
+                currentPage++;
+                loadFactionState(factions[currentPage - 1].id);
+                updatePage();
+            }
+        });
+    }
+
+    function updatePage() {
+        // Update visual indicators
+        pageDots.forEach((dot, index) => {
+            if (index + 1 === currentPage) {
+                dot.classList.add('active');
+                dot.style.backgroundColor = '#dcb164';
+            } else {
+                dot.classList.remove('active');
+                dot.style.backgroundColor = '#584a32';
+            }
+        });
+
+        updatePositionsAndScaling(); // Updates faction info header
+        displayCollection('all');
+        displayDeck();
+        updateStats();
+    }
 
     function getPowerImage(card) {
         const specialCases = {
@@ -57,6 +147,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return defaultImages[card.moc] || "";
     }
+
+    // Inicjalizacja: Wczytaj zapisane talie z localStorage
+    try {
+        const savedDecks = window.loadDecks();
+        if (savedDecks) {
+            for (const [fid, data] of Object.entries(savedDecks)) {
+                if (allDecks[fid]) {
+                    // Walidacja danych
+                    allDecks[fid].karty = Array.isArray(data.karty) ? data.karty : [];
+                    allDecks[fid].dowodca = data.dowodca || null;
+                }
+            }
+        }
+    } catch (e) { console.error("Error loading decks:", e); }
+
+    // Wczytaj początkową frakcję (1)
+    loadFactionState(factions[0].id);
 
     function updatePositionsAndScaling() {
         const overlay = document.querySelector('.overlay');
@@ -973,19 +1080,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Przy starcie strony: odczytaj deck i dowódcę z localStorage
-    document.addEventListener('DOMContentLoaded', () => {
-        const talie = window.loadDecks ? window.loadDecks() : {};
-        const faction = factions[currentPage - 1];
-        if (talie && talie[faction.id]) {
-            deck = talie[faction.id].karty
-                .map(numer => cards.find(c => c.numer === numer))
-                .filter(Boolean);
-            selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
-            displayDeck();
-            displayCollection('all');
-            updateStats();
-        }
-    });
+    // (Stary kod inicjalizacji usunięty - obsłużone na górze pliku w allDecks)
 
     function groupDeck(deck) {
         const grouped = [];
