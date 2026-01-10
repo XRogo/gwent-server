@@ -162,12 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_X = (35 / GUI_WIDTH) * backgroundWidth;
             const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
 
-            // Margines wewnętrzny, żeby poświata (wychodząca ~20% w lewo/prawo) się nie ucinała
-            const PADDING_SIDE = (80 / GUI_WIDTH) * backgroundWidth;
-            const SCROLLBAR_WIDTH = 25; // Zwiększam lekko margines na scrollbar
+            // Usunięto margines wewnętrzny (PADDING_SIDE), bo używamy global-glow
+            const SCROLLBAR_WIDTH = 20;
 
             // Efektywna szerokość na karty - obliczamy szerokość karty tak, żeby 3 zmieściły się w środku
-            const effectiveWidth = areaWidth - (2 * PADDING_SIDE) - SCROLLBAR_WIDTH;
+            const effectiveWidth = areaWidth - SCROLLBAR_WIDTH;
 
             // Szerokość karty
             // Odejmujemy przerwy: (COLS - 1) * GAP_X
@@ -176,17 +175,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Zróbmy floor() żeby uniknąć problemów z zaokrąglaniem
             cardWidth = Math.floor(cardWidth);
 
-            // Stylizacja obszaru z paddingiem
+            // Stylizacja obszaru bez wielkiego paddingu
             area.style.overflowY = 'auto';
             area.style.overflowX = 'hidden';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
-            area.style.paddingLeft = `${PADDING_SIDE}px`;
-            area.style.paddingRight = `${PADDING_SIDE}px`;
-            area.style.paddingTop = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
-            area.style.paddingBottom = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
+
+            // Minimalny padding dla estetyki
+            area.style.paddingLeft = '0px';
+            area.style.paddingRight = `${SCROLLBAR_WIDTH}px`;
+            area.style.paddingTop = `${(10 / GUI_HEIGHT) * backgroundHeight}px`;
+            area.style.paddingBottom = `${(10 / GUI_HEIGHT) * backgroundHeight}px`;
 
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
 
@@ -403,23 +404,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 bannerFaction = playerFaction;
             }
 
-            // --- NOWA STRUKTURA ---
-            // 1. Kontener na poświatę (pod kartą)
-            // Pozycjonuje się absolutnie względem .card, ale z ujemnym z-index względem treści karty
-            const glowContainer = document.createElement('div');
-            glowContainer.className = 'card-glow-container';
-
-            const podsw = document.createElement('img');
-            podsw.className = 'card-hover-bg podsw';
-            podsw.src = 'assets/dkarty/podsw.webp';
-            glowContainer.appendChild(podsw);
-
-            const podsw2 = document.createElement('img');
-            podsw2.className = 'card-hover-bg podsw2';
-            podsw2.src = 'assets/dkarty/podsw2.webp';
-            glowContainer.appendChild(podsw2);
-
-            cardElement.appendChild(glowContainer);
+            // --- NOWA STRUKTURA (Global Glow) ---
+            // Nie tworzymy tu glowContainer. Glow jest globalny.
 
             // 2. Kontener na treść karty (beton i reszta)
             const contentContainer = document.createElement('div');
@@ -949,6 +935,69 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePage();
         }
     };
+
+    // --- GLOBAL GLOW LOGIC ---
+    function initGlobalGlow() {
+        let glowOverlay = document.getElementById('global-glow');
+        if (!glowOverlay) {
+            glowOverlay = document.createElement('div');
+            glowOverlay.id = 'global-glow';
+
+            const podsw = document.createElement('img');
+            podsw.className = 'global-glow-img podsw';
+            podsw.src = 'assets/dkarty/podsw.webp';
+            glowOverlay.appendChild(podsw);
+
+            const podsw2 = document.createElement('img');
+            podsw2.className = 'global-glow-img podsw2';
+            podsw2.src = 'assets/dkarty/podsw2.webp';
+            glowOverlay.appendChild(podsw2);
+
+            document.body.appendChild(glowOverlay);
+        }
+
+        document.body.addEventListener('mouseover', function (e) {
+            const card = e.target.closest('.card');
+            if (card) {
+                const rect = card.getBoundingClientRect();
+
+                // Dane z infoo.txt: podsw ma wymiar 628x1003 przy karcie 523x992
+                // width ratio: 628/523 = ~1.20 (120%)
+                // height ratio: 1003/992 = ~1.011 (101.1%)
+                // Pozycja: -104, -10 (względem 0,0 karty). 
+                // offsetX ratio: -104/523 = -0.1988 (~ -20%)
+                // offsetY ratio: -10/992 = -0.01 (~ -1%)
+
+                const width = rect.width * 1.2007; // 120.07%
+                const height = rect.height * 1.011; // 101.1%
+                const left = rect.left - (rect.width * 0.1988); // -19.9%
+                const top = rect.top - (rect.height * 0.01); // -1%
+
+                glowOverlay.style.width = `${width}px`;
+                glowOverlay.style.height = `${height}px`;
+                glowOverlay.style.left = `${left}px`;
+                glowOverlay.style.top = `${top}px`;
+                glowOverlay.style.display = 'block';
+            }
+        });
+
+        document.body.addEventListener('mouseout', function (e) {
+            const card = e.target.closest('.card');
+            if (card) {
+                // Sprawdzamy, czy nie przeszliśmy na element dziecięcy tej samej karty
+                if (!e.relatedTarget || !e.relatedTarget.closest('.card') || e.relatedTarget.closest('.card') !== card) {
+                    glowOverlay.style.display = 'none';
+                }
+            }
+        });
+
+        // Ukryj glow podczas scrollowania
+        if (collectionArea) collectionArea.addEventListener('scroll', () => glowOverlay.style.display = 'none');
+        if (deckArea) deckArea.addEventListener('scroll', () => glowOverlay.style.display = 'none');
+    }
+
+    // Inicjalizacja
+    initGlobalGlow();
 });
 
 // KONIEC PLIKU, nie dodawaj już window.addEventListener('DOMContentLoaded', ...) na końcu!
