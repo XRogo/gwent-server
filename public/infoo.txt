@@ -1,39 +1,39 @@
 wszystkie pozoycje podane są w rozdzielczości 4k (3837, 2158)
 
-pozycja twojich kart                1163,1691 x 3018, 1932
+ pozycja twojich kart                1163,1691 x 3018, 1932
 
 
-pozycja kart oblężnicze przeciwnika 1412, 29    x 3021, 268
-pozycja kart łuczników przeciwnika  1412, 294   x 3021, 533
-pozycja kart piechoty przeciwnika   1412, 565   x 3021, 804
+ pozycja kart oblężnicze przeciwnika 1412, 29    x 3021, 268
+ pozycja kart łuczników przeciwnika  1412, 294   x 3021, 533
+ pozycja kart piechoty przeciwnika   1412, 565   x 3021, 804
 
-pozycja twojich kart piechoty       1412, 863   x 3021, 1102
-pozycja twojich kart łuczników      1412, 1129  x 3021, 1368
-pozycja twojich kart oblężnicze     1412, 1407  x 3021, 1646
+ pozycja twojich kart piechoty       1412, 863   x 3021, 1102
+ pozycja twojich kart łuczników      1412, 1129  x 3021, 1368
+ pozycja twojich kart oblężnicze     1412, 1407  x 3021, 1646
 
-poycje rogów dowódcy w tej samej lini co karty tylko przesunięte do szerokości 1182 - 1361
-
-
-kupka kary trupów 3111, 1680
-Jeśli kart odpadnie z planszy albo po końcu rundy trafia na tą kupke karty nakaładać sie na siebie z przesunięciem 2 px w góre i w lewo 
+ poycje rogów dowódcy w tej samej lini co karty tylko przesunięte do szerokości 1182 - 1361
 
 
-karty które są w grze ale nie są w tali gry  (tzn leśli graczy wybierze 30 kart ta gra mu wylosuje 10 i ta reszta trafia na tą kupke )
-potem te karty mogą trafić na plansze np za pomocą kart wezwania/ szpiegów...
-twoja pozycja 3457, 1654 
-pozycja przeciwnika 3457, 131
-jeśli grzcz / przeciwnik wybierze frakcje 
-1 urzyj gwent-server\public\gwent\assets\asety\polnoc.webp
-2 urzyj gwent-server\public\gwent\assets\asety\nilftgard_rewers.webp
-3 urzyj gwent-server\public\gwent\assets\asety\scoia'tel_rewers.webp
-4 urzyj gwent-server\public\gwent\assets\asety\potwory_rewers.webp
-5 urzyj gwent-server\public\gwent\assets\asety\skelige_rewers.webp
+  kupka kary trupów 3111, 1680
+ Jeśli kart odpadnie z planszy albo po końcu rundy trafia na tą kupke karty nakaładać sie na siebie z przesunięciem 2 px w góre i w lewo 
 
-w obszarze dla 
-gracza 3487, 1889 x 3587, 1963
-przeciwnika 3483, 358 x 358, 433
+ 
+  karty które są w grze ale nie są w tali gry  (tzn leśli graczy wybierze 30 kart ta gra mu wylosuje 10 i ta reszta trafia na tą kupke )
+  potem te karty mogą trafić na plansze np za pomocą kart wezwania/ szpiegów...
+  twoja pozycja 3457, 1654 
+ pozycja przeciwnika 3457, 131
+ jeśli grzcz / przeciwnik wybierze frakcje 
+ 1 urzyj gwent-server\public\gwent\assets\asety\polnoc.webp
+ 2 urzyj gwent-server\public\gwent\assets\asety\nilftgard_rewers.webp
+ 3 urzyj gwent-server\public\gwent\assets\asety\scoia'tel_rewers.webp
+ 4 urzyj gwent-server\public\gwent\assets\asety\potwory_rewers.webp
+ 5 urzyj gwent-server\public\gwent\assets\asety\skelige_rewers.webp
+
+ w obszarze dla 
+ gracza 3487, 1889 x 3587, 1963
+ przeciwnika 3483, 358 x 358, 433
  ma sie znajdować ilość kart które są na tej kupce (obszar ma być wypełniony czarnym kolorem z kryciem na 90%)
-czcionka ma być gwent-server\public\gwent\assets\fonts ta co tu sie znajduje pogrubiona i kolor c7a76e
+ czcionka ma być gwent-server\public\gwent\assets\fonts ta co tu sie znajduje pogrubiona i kolor c7a76e
 
 
 wygląd powiększenia kart jeśli gracz nacisnie (prawy myszy){w tym przypadku x} na karte podczas wybieranie lub gry zostanie aktywowany ta funkcja pojawią sie duże karyw w pozycjach

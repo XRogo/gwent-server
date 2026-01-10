@@ -116,58 +116,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.style.backgroundImage = `url('${image}')`;
             }
         });
- 
-        function updateCardArea(area, areaLeft, areaTop, areaWidth, areaHeight) {
-            const COLS = 3;
-            const GAP_X = (35 / 3840) * backgroundWidth;
-            const GAP_Y = (35 / 2160) * backgroundHeight;
-            const cardWidth = (areaWidth - 2 * GAP_X) / COLS;
 
-            area.style.left = `${areaLeft}px`;
-            area.style.top = `${areaTop}px`;
-            area.style.width = `${areaWidth}px`;
-            area.style.height = `${areaHeight}px`;
-            area.style.maxHeight = `${areaHeight}px`;
-            area.style.overflowY = 'auto';
+        if (collectionArea) {
+            // Współrzędne z infoo.txt dla kolekcji: 366, 491 - 1561, 1940
+            const cLeft = 366, cTop = 491, cRight = 1561, cBottom = 1940;
+            const cWidth = cRight - cLeft;
+            const cHeight = cBottom - cTop;
+
+            const areaLeft = backgroundLeft + (cLeft / GUI_WIDTH) * backgroundWidth;
+            const areaTop = backgroundTop + (cTop / GUI_HEIGHT) * backgroundHeight;
+            const areaWidth = (cWidth / GUI_WIDTH) * backgroundWidth;
+            const areaHeight = (cHeight / GUI_HEIGHT) * backgroundHeight;
+
+            collectionArea.style.left = `${areaLeft}px`;
+            collectionArea.style.top = `${areaTop}px`;
+            collectionArea.style.width = `${areaWidth}px`;
+            collectionArea.style.height = `${areaHeight}px`; // Wymuszamy wysokość
+            collectionArea.style.maxHeight = `${areaHeight}px`;
+
+            updateCardArea(collectionArea, areaWidth, areaHeight);
+        }
+        if (deckArea) {
+            // Współrzędne z infoo.txt dla talii: 2290, 491 - 3484, 1940
+            const dLeft = 2290, dTop = 491, dRight = 3484, dBottom = 1940;
+            const dWidth = dRight - dLeft;
+            const dHeight = dBottom - dTop;
+
+            const areaLeft = backgroundLeft + (dLeft / GUI_WIDTH) * backgroundWidth;
+            const areaTop = backgroundTop + (dTop / GUI_HEIGHT) * backgroundHeight;
+            const areaWidth = (dWidth / GUI_WIDTH) * backgroundWidth;
+            const areaHeight = (dHeight / GUI_HEIGHT) * backgroundHeight;
+
+            deckArea.style.left = `${areaLeft}px`;
+            deckArea.style.top = `${areaTop}px`;
+            deckArea.style.width = `${areaWidth}px`;
+            deckArea.style.height = `${areaHeight}px`; // Wymuszamy wysokość
+            deckArea.style.maxHeight = `${areaHeight}px`;
+
+            updateCardArea(deckArea, areaWidth, areaHeight);
+        }
+
+        function updateCardArea(area, areaWidth, areaHeight) {
+            const COLS = 3;
+            // Gap z infoo.txt p.119 (35px, 30px) - skalowane do szerokości tła
+            const GAP_X = (35 / GUI_WIDTH) * backgroundWidth;
+            const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight; // Używam wysokości dla Y
+
+            // Obliczamy szerokość karty tak, by zmieściły się 3 kolumny z przerwami
+            const cardWidth = (areaWidth - (COLS - 1) * GAP_X) / COLS;
+
+            // Stylizacja obszaru
+            area.style.overflowY = 'auto'; // scroll tylko pionowy
+            area.style.overflowX = 'hidden';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+            area.style.paddingRight = '20px'; // miejsce na scrollbar
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
+                // Wysokość automatyczna z aspect-ratio w CSS, ale możemy wymusić
+                // Proporcje z betonu: 523 / 992
+                const aspectRatio = 523 / 992;
+                const cardHeight = cardWidth / aspectRatio;
+                card.style.height = `${cardHeight}px`;
+
                 card.style.margin = '0';
                 card.style.padding = '0';
                 card.style.boxSizing = 'border-box';
                 card.style.flex = `0 0 ${cardWidth}px`;
-                card.style.height = 'auto';
                 card.style.maxWidth = `${cardWidth}px`;
-                card.style.fontSize = `${cardWidth / 12}px`; // 524/44 ≈ 12
+                card.style.fontSize = `${cardWidth / 12}px`; // Skalowanie czcionki
             });
-        }
-
-        if (collectionArea) {
-            const areaLeft = backgroundLeft + (331 / GUI_WIDTH) * backgroundWidth;
-            const areaWidth = ((1597 - 331) / GUI_WIDTH) * backgroundWidth;
-            collectionArea.style.left = `${areaLeft}px`;
-            collectionArea.style.width = `${areaWidth}px`;
-            updateCardArea(
-                collectionArea,
-                areaLeft,
-                backgroundTop + (457 / GUI_HEIGHT) * backgroundHeight,
-                areaWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight // wysokość
-            );
-        }
-        if (deckArea) {
-            updateCardArea(
-                deckArea,
-                backgroundLeft + (2255 / GUI_WIDTH) * backgroundWidth,
-                backgroundTop + (457 / GUI_HEIGHT) * backgroundHeight,
-                ((3519 - 2255) / GUI_WIDTH) * backgroundWidth,
-                (1470 / GUI_HEIGHT) * backgroundHeight // <-- TO JEST DOBRZE!
-            );
         }
 
         if (stats) {
@@ -242,14 +264,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const selected = selectedLeader && selectedLeader.frakcja === faction.id ? selectedLeader : leaders[0];
             if (selected) {
                 // Skalowanie względem GUI (gui.webp)
-                const guiLeft = 1792, guiTop = 538, guiW = 2051-1792, guiH = 1029-538;
+                const guiLeft = 1792, guiTop = 538, guiW = 2051 - 1792, guiH = 1029 - 538;
                 const scaleW = backgroundWidth / GUI_WIDTH;
                 const scaleH = backgroundHeight / GUI_HEIGHT;
                 leaderCard.style.position = 'absolute';
-                leaderCard.style.left = (backgroundLeft + guiLeft*scaleW)+'px';
-                leaderCard.style.top = (backgroundTop + guiTop*scaleH)+'px';
-                leaderCard.style.width = (guiW*scaleW)+'px';
-                leaderCard.style.height = (guiH*scaleH)+'px';
+                leaderCard.style.left = (backgroundLeft + guiLeft * scaleW) + 'px';
+                leaderCard.style.top = (backgroundTop + guiTop * scaleH) + 'px';
+                leaderCard.style.width = (guiW * scaleW) + 'px';
+                leaderCard.style.height = (guiH * scaleH) + 'px';
                 leaderCard.style.background = 'none';
                 // Tło
                 const tlo = document.createElement('div');
@@ -294,12 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = ((guiH-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = ((guiH - 60) * scaleH) + 'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#474747';
-                nameDiv.style.fontSize = (32*scaleW)+'px';
+                nameDiv.style.fontSize = (32 * scaleW) + 'px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
@@ -368,6 +390,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 bannerFaction = playerFaction;
             }
 
+            // --- NOWA STRUKTURA ---
+            // 1. Kontener na poświatę (pod kartą)
+            // Pozycjonuje się absolutnie względem .card, ale z ujemnym z-index względem treści karty
+            const glowContainer = document.createElement('div');
+            glowContainer.className = 'card-glow-container';
+
+            const podsw = document.createElement('img');
+            podsw.className = 'card-hover-bg podsw';
+            podsw.src = 'assets/dkarty/podsw.webp';
+            glowContainer.appendChild(podsw);
+
+            const podsw2 = document.createElement('img');
+            podsw2.className = 'card-hover-bg podsw2';
+            podsw2.src = 'assets/dkarty/podsw2.webp';
+            glowContainer.appendChild(podsw2);
+
+            cardElement.appendChild(glowContainer);
+
+            // 2. Kontener na treść karty (beton i reszta)
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'card-content';
+
             let html = `
                 <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
                 <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
@@ -423,25 +467,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            cardElement.innerHTML = html;
+            contentContainer.innerHTML = html;
+            cardElement.appendChild(contentContainer);
             area.appendChild(cardElement);
 
             const iloscLayer = document.createElement('img');
             iloscLayer.className = 'ilosc-layer';
             iloscLayer.src = 'assets/dkarty/ilosc.webp';
-            cardElement.appendChild(iloscLayer);
-
-            const hoverBg = document.createElement('img');
-            hoverBg.className = 'card-hover-bg';
-            hoverBg.src = 'assets/dkarty/podsw.webp';
-            hoverBg.style.zIndex = 200;
-            hoverBg.style.position = 'absolute';
-            hoverBg.style.left = '-20%';
-            hoverBg.style.top = '-1.1%';
-            hoverBg.style.width = '140%';
-            hoverBg.style.height = '102.2%';
-            hoverBg.style.pointerEvents = 'none';
-            cardElement.appendChild(hoverBg);
+            contentContainer.appendChild(iloscLayer); // Dodajemy do contentContainer
         });
 
         updatePositionsAndScaling();
@@ -513,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = cards.find(c => c.numer === cardNumer);
                 if (card) {
                     // SUMUJ wszystkie karty specjalne z limitem 10 (po numerach)
-                    const specialLimitNumbers = ['001','002','003','004','005','006','007','008','000'];
+                    const specialLimitNumbers = ['001', '002', '003', '004', '005', '006', '007', '008', '000'];
                     const isSpecialLimited = specialLimitNumbers.includes(card.numer);
                     const specialCount = deck.filter(c => specialLimitNumbers.includes(c.numer)).length;
                     if (isSpecialLimited && specialCount >= 10) {
@@ -529,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     deck.push({ ...card });
                     if (addCardSound) {
                         addCardSound.currentTime = 0;
-                        addCardSound.play().catch(()=>{});
+                        addCardSound.play().catch(() => { });
                     }
                     displayDeck();
                     displayCollection('all');
@@ -552,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         deck.splice(index, 1);
                         if (removeCardSound) {
                             removeCardSound.currentTime = 0;
-                            removeCardSound.play().catch(()=>{});
+                            removeCardSound.play().catch(() => { });
                         }
                         displayDeck();
                         displayCollection('all');
@@ -636,14 +669,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const selected = selectedLeader;
             if (selected) {
                 // Skalowanie względem GUI (gui.webp)
-                const guiLeft = 1792, guiTop = 538, guiW = 2051-1792, guiH = 1029-538;
+                const guiLeft = 1792, guiTop = 538, guiW = 2051 - 1792, guiH = 1029 - 538;
                 const scaleW = backgroundWidth / GUI_WIDTH;
                 const scaleH = backgroundHeight / GUI_HEIGHT;
                 leaderCard.style.position = 'absolute';
-                leaderCard.style.left = (backgroundLeft + guiLeft*scaleW)+'px';
-                leaderCard.style.top = (backgroundTop + guiTop*scaleH)+'px';
-                leaderCard.style.width = (guiW*scaleW)+'px';
-                leaderCard.style.height = (guiH*scaleH)+'px';
+                leaderCard.style.left = (backgroundLeft + guiLeft * scaleW) + 'px';
+                leaderCard.style.top = (backgroundTop + guiTop * scaleH) + 'px';
+                leaderCard.style.width = (guiW * scaleW) + 'px';
+                leaderCard.style.height = (guiH * scaleH) + 'px';
                 leaderCard.style.background = 'none';
                 // Tło
                 const tlo = document.createElement('div');
@@ -688,12 +721,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 nameDiv.innerText = selected.nazwa;
                 nameDiv.style.position = 'absolute';
                 nameDiv.style.left = '50%';
-                nameDiv.style.top = ((guiH-60)*scaleH)+'px'; // wysokość jak na zwykłych kartach
+                nameDiv.style.top = ((guiH - 60) * scaleH) + 'px'; // wysokość jak na zwykłych kartach
                 nameDiv.style.transform = 'translateX(-50%)';
                 nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
                 nameDiv.style.fontWeight = 'bold';
                 nameDiv.style.color = '#474747';
-                nameDiv.style.fontSize = (32*scaleW)+'px';
+                nameDiv.style.fontSize = (32 * scaleW) + 'px';
                 nameDiv.style.textAlign = 'center';
                 nameDiv.style.zIndex = '3';
                 leaderCard.appendChild(nameDiv);
@@ -742,11 +775,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Funkcja do odtwarzania dźwięku klikania, pozwala na nakładanie się dźwięków
     function playHoverSound() {
         const sound = new Audio('assets/klik.mp3');
-        sound.play().catch(()=>{});
+        sound.play().catch(() => { });
     }
 
     // Najechanie na kartę
-    document.addEventListener('mouseover', function(e) {
+    document.addEventListener('mouseover', function (e) {
         // Dodajemy poświatę tylko jeśli nie istnieje
         if (e.target.classList.contains('card')) {
             if (!e.target.querySelector('.card-hover-bg')) {
@@ -767,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Usuwanie poświaty po zjechaniu myszką
-    document.addEventListener('mouseout', function(e) {
+    document.addEventListener('mouseout', function (e) {
         if (e.target.classList.contains('card')) {
             const hoverBg = e.target.querySelector('.card-hover-bg');
             if (hoverBg) hoverBg.remove();
@@ -856,12 +889,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.renderLeaders = renderLeaders;
 
     // Obsługa klawisza 'x' do wyboru dowódcy
-    window.addEventListener('keydown', function(e) {
+    window.addEventListener('keydown', function (e) {
         if (e.key === 'x' || e.key === 'X') {
             const faction = factions[currentPage - 1];
             const leaders = krole.filter(krol => krol.frakcja === faction.id);
             showPowiek(leaders, 0, 'leaders');
-            window.selectedLeaderCallback = function(krol) {
+            window.selectedLeaderCallback = function (krol) {
                 selectedLeader = krol;
                 updatePage();
             };
@@ -870,31 +903,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Obsługa prawego kliknięcia na kartę w kolekcji
     if (collectionArea) {
-        collectionArea.addEventListener('contextmenu', function(e) {
+        collectionArea.addEventListener('contextmenu', function (e) {
             const cardEl = e.target.closest('.card');
-            if(cardEl) {
+            if (cardEl) {
                 e.preventDefault();
                 const numer = cardEl.getAttribute('data-numer');
                 const idx = cards.findIndex(c => c.numer === numer);
-                if(idx !== -1) showPowiek(cards, idx, 'cards');
+                if (idx !== -1) showPowiek(cards, idx, 'cards');
             }
         });
     }
     // Obsługa prawego kliknięcia na kartę w talii
     if (deckArea) {
-        deckArea.addEventListener('contextmenu', function(e) {
+        deckArea.addEventListener('contextmenu', function (e) {
             const cardEl = e.target.closest('.card');
-            if(cardEl) {
+            if (cardEl) {
                 e.preventDefault();
                 const numer = cardEl.getAttribute('data-numer');
                 const idx = deck.findIndex(c => c.numer === numer);
-                if(idx !== -1) showPowiek(deck, idx, 'cards');
+                if (idx !== -1) showPowiek(deck, idx, 'cards');
             }
         });
     }
 
     // Obsługa wyboru dowódcy przez kliknięcie (np. w powiek.js)
-    window.selectLeader = function(numer) {
+    window.selectLeader = function (numer) {
         const factionId = factions[currentPage - 1].id;
         const leader = krole.find(krol => krol.numer === numer && krol.frakcja === factionId);
         if (leader) {
