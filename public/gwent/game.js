@@ -158,27 +158,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function updateCardArea(area, areaWidth, areaHeight) {
             const COLS = 3;
-            // Gap z infoo.txt p.119 (35px, 30px) - skalowane do szerokości tła
+            // Gap z infoo.txt p.119 (35px, 30px)
             const GAP_X = (35 / GUI_WIDTH) * backgroundWidth;
-            const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight; // Używam wysokości dla Y
+            const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
 
-            // Obliczamy szerokość karty tak, by zmieściły się 3 kolumny z przerwami
-            const cardWidth = (areaWidth - (COLS - 1) * GAP_X) / COLS;
+            // Margines wewnętrzny, żeby poświata (wychodząca ~20% w lewo/prawo) się nie ucinała
+            const PADDING_SIDE = (80 / GUI_WIDTH) * backgroundWidth;
+            const SCROLLBAR_WIDTH = 25; // Zwiększam lekko margines na scrollbar
 
-            // Stylizacja obszaru
-            area.style.overflowY = 'auto'; // scroll tylko pionowy
+            // Efektywna szerokość na karty - obliczamy szerokość karty tak, żeby 3 zmieściły się w środku
+            const effectiveWidth = areaWidth - (2 * PADDING_SIDE) - SCROLLBAR_WIDTH;
+
+            // Szerokość karty
+            // Odejmujemy przerwy: (COLS - 1) * GAP_X
+            let cardWidth = (effectiveWidth - ((COLS - 1) * GAP_X)) / COLS;
+
+            // Zróbmy floor() żeby uniknąć problemów z zaokrąglaniem
+            cardWidth = Math.floor(cardWidth);
+
+            // Stylizacja obszaru z paddingiem
+            area.style.overflowY = 'auto';
             area.style.overflowX = 'hidden';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
+            area.style.paddingLeft = `${PADDING_SIDE}px`;
+            area.style.paddingRight = `${PADDING_SIDE}px`;
+            area.style.paddingTop = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
+            area.style.paddingBottom = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
+
             area.style.gap = `${GAP_Y}px ${GAP_X}px`;
-            area.style.paddingRight = '20px'; // miejsce na scrollbar
 
             area.querySelectorAll('.card').forEach(card => {
                 card.style.width = `${cardWidth}px`;
-                // Wysokość automatyczna z aspect-ratio w CSS, ale możemy wymusić
-                // Proporcje z betonu: 523 / 992
                 const aspectRatio = 523 / 992;
                 const cardHeight = cardWidth / aspectRatio;
                 card.style.height = `${cardHeight}px`;
@@ -188,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.boxSizing = 'border-box';
                 card.style.flex = `0 0 ${cardWidth}px`;
                 card.style.maxWidth = `${cardWidth}px`;
-                card.style.fontSize = `${cardWidth / 12}px`; // Skalowanie czcionki
+                card.style.fontSize = `${cardWidth / 12}px`;
             });
         }
 
