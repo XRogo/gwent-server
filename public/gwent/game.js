@@ -162,21 +162,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_X = (35 / GUI_WIDTH) * backgroundWidth;
             const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
             const SCROLLBAR_WIDTH = 25;
+            const PADDING_LEFT = 5;
 
             // Ścisły layout: karty muszą wejść w areaWidth
-            // Nie powiększamy kontenera (area.style.width nie jest zmieniana - chyba że była wcześniej, ale lepiej polegać na argumencie areaWidth)
-
-            // Przywracamy style width do wartości z argumentu (resetujemy ewentualne rozszerzenia z poprzednich kroków jeśli user nie odświeżył)
-            area.style.width = `${areaWidth}px`;
-
-            // Efektywna szerokość na karty
-            const effectiveWidth = areaWidth - SCROLLBAR_WIDTH;
+            // Obliczamy efektywną szerokość, odejmując WSZYSTKIE marginesy
+            const effectiveWidth = areaWidth - SCROLLBAR_WIDTH - PADDING_LEFT;
 
             // Szerokość karty
             let cardWidth = (effectiveWidth - ((COLS - 1) * GAP_X)) / COLS;
-            cardWidth = Math.floor(cardWidth);
+
+            // Floor i SAFETY MARGIN (-1px) żeby na 100% nie przeskoczyło przez zaokrąglenia
+            cardWidth = Math.floor(cardWidth) - 1;
 
             // Stylizacja obszaru
+            area.style.width = `${areaWidth}px`;
             area.style.overflowY = 'auto';
             area.style.overflowX = 'hidden';
             area.style.display = 'flex';
@@ -184,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
 
-            // Minimalny padding
-            area.style.paddingLeft = '5px'; // Minimalny odstęp od krawędzi
+            // Paddingi
+            area.style.paddingLeft = `${PADDING_LEFT}px`;
             area.style.paddingRight = `${SCROLLBAR_WIDTH}px`;
             area.style.paddingTop = `${(10 / GUI_HEIGHT) * backgroundHeight}px`;
             area.style.paddingBottom = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
@@ -1008,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deckArea) deckArea.addEventListener('scroll', () => glowOverlay.style.display = 'none');
     }
 
-    initGlobalGlow();
+    // initGlobalGlow();
 });
 
 // KONIEC PLIKU, nie dodawaj już window.addEventListener('DOMContentLoaded', ...) na końcu!
