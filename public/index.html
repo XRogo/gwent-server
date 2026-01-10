@@ -1,38 +1,44 @@
 <!DOCTYPE html>
 <html lang="pl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gwint Online, Player vs Player</title>
-        <!-- Opis strony dla wyszukiwarek -->
-        <meta name="description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
-        <!-- Tag weryfikacyjny Google (nie usuwaj!) -->
-        <meta name="google-site-verification" content="hLf1PX-1fD-PLj-3HAYo-pzLykQeqSmrrMrvrvE-lM8" />
-        <!-- Meta tag z hashtagami i słowami kluczowymi -->
-    <meta name="keywords" content="Gwint, Gwint Online, Gwint 1v1, Gwint Duel, Gwent, Gwent Online, Gwent 1v1, Wiedźmin 3, Witcher 3, gra karciana, card game, multiplayer card game, gra online, online game, #Gwint, #GwintOnline, #Gwint1v1, #Wiedźmin3, #Witcher3, #CardGame">
-        <!-- Meta tagi Open Graph (dla mediów społecznościowych) -->
-        <meta property="og:title" content="Gwint Online">
-        <meta property="og:description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="https://gwent-1vs1.onrender.com/">
-        <meta property="og:image" content="/assets/zdlink.jpg"> 
-        <!-- Meta tagi dla Twittera -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="Gwint Online">
-        <meta name="twitter:description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
-        <meta name="twitter:image" content="/assets/zdlink.jpg"> 
-        <!-- Istniejące linki do stylów, faviconów itd. -->
-        <link rel="stylesheet" href="css/style.css">
-        <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
-        <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
-        <link rel="icon" type="image/png" href="/icons/android-chrome-192x192.png" sizes="192x192">
-        <link rel="icon" type="image/png" href="/icons/android-chrome-512x512.png" sizes="512x512">
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-        <!-- Skrypty -->
-        <script src="/socket.io/socket.io.js"></script>
-        <script src="script.js" defer></script>
-    </head>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwint Online, Player vs Player</title>
+    <!-- Opis strony dla wyszukiwarek -->
+    <meta name="description"
+        content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
+    <!-- Tag weryfikacyjny Google (nie usuwaj!) -->
+    <meta name="google-site-verification" content="hLf1PX-1fD-PLj-3HAYo-pzLykQeqSmrrMrvrvE-lM8" />
+    <!-- Meta tag z hashtagami i słowami kluczowymi -->
+    <meta name="keywords"
+        content="Gwint, Gwint Online, Gwint 1v1, Gwint Duel, Gwent, Gwent Online, Gwent 1v1, Wiedźmin 3, Witcher 3, gra karciana, card game, multiplayer card game, gra online, online game, #Gwint, #GwintOnline, #Gwint1v1, #Wiedźmin3, #Witcher3, #CardGame">
+    <!-- Meta tagi Open Graph (dla mediów społecznościowych) -->
+    <meta property="og:title" content="Gwint Online">
+    <meta property="og:description"
+        content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gwent-1vs1.onrender.com/">
+    <meta property="og:image" content="/assets/zdlink.jpg">
+    <!-- Meta tagi dla Twittera -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gwint Online">
+    <meta name="twitter:description"
+        content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
+    <meta name="twitter:image" content="/assets/zdlink.jpg">
+    <!-- Istniejące linki do stylów, faviconów itd. -->
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+    <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/icons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/icons/android-chrome-512x512.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <!-- Skrypty -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js" defer></script>
+</head>
+
 <body>
     <!-- Strona A: Menu główne -->
     <div class="main-menu" id="mainMenu">
@@ -49,14 +55,17 @@
                 </div>
             </div>
             <!-- Nowy przycisk Test Game w lewym dolnym rogu -->
-            <div class="test-game-button" onclick="startTestGame()" style="position: absolute; left: 32px; bottom: 32px; color: #fff; font-size: 2.2em; font-family: 'Gwent', serif; font-weight: bold; z-index: 1001; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+            <div class="test-game-button" onclick="startTestGame()"
+                style="position: absolute; left: 32px; bottom: 32px; color: #fff; font-size: 2.2em; font-family: 'Gwent', serif; font-weight: bold; z-index: 1001; cursor: pointer; display: flex; align-items: center; gap: 12px;">
                 <img src="assets/ramka.png" class="hover-frame" alt="Ramka" style="width: 64px; height: 64px;">
                 <span>Test Game</span>
             </div>
         </div>
         <div class="info-button" onclick="showInfoScreen()">INFO Alpha 3.99
         </div>
-        <div id="testGameMsg" style="color:#c7a76e; font-family:'Gwent',serif; font-size:1.2em; text-align:center; margin-top:12px;"></div>
+        <div id="testGameMsg"
+            style="color:#c7a76e; font-family:'Gwent',serif; font-size:1.2em; text-align:center; margin-top:12px;">
+        </div>
     </div>
 
     <!-- Strona B: Tworzenie hosta -->
@@ -68,7 +77,8 @@
             <div class="host-content">
                 <div class="mode-options">
                     <div class="mode-button wszystkie_karty" onclick="selectMode('wszystkie_karty')">
-                        <img src="assets/swszystkiekarty.png" class="mode-text wszystkie_karty-text" alt="Wszystkie karty">
+                        <img src="assets/swszystkiekarty.png" class="mode-text wszystkie_karty-text"
+                            alt="Wszystkie karty">
                     </div>
                     <div class="mode-button wybrane_karty" onclick="selectMode('wybrane_karty')">
                         <img src="assets/swybranekarty.png" class="mode-text wybrane_karty-text" alt="Wybrane karty">
@@ -153,43 +163,50 @@
             <img src="assets/back.png" alt="Back">
         </div>
     </div>
-</div>
-
-<!-- Strona I: Informacje -->
-<div class="info-screen" id="infoScreen" style="display: none;">
-    <div class="info-content">
-        <h1>Informacje - Strona jest tworzona/work in progres 03.08.2025</h1>
-        <!-- Miejsce na Twoją treść -->
-         <br>Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem programować. Całą stronę od strony programowania robił Grok, ja tylko niektóre grafiki.
-         <p>Discord - report bugs/help / kontakt / change list <a href="https://discord.gg/vs9tnnmNAD" target="_blank">https://discord.gg/vs9tnnmNAD</a>
-         <p>Tu jest rozpiska, skąd co mam:
-         <br>Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3
-         <br>Ramki: bezpośrednio z gry i częściowo poprzerabiane
-         <br>Napis "Gwint": z Google Grafika
-         <br> Pasek ten czarny: z filmu <a href="https://www.youtube.com/watch?v=xx8kQ4s5hCY" target="_blank">https://www.youtube.com/watch?v=xx8kQ4s5hCY</a>
-         <br> Gradient: sam robiłem.
-         <br>Dźwięk przycisków: podjebane bezpośrednio z gry.
-         <br>Napisy: zrobione na stronie <a href="https://www.fontspace.com/category/the-witcher" target="_blank">https://www.fontspace.com/category/the-witcher</a>
-         <br>ładowanie sam robiłem wzór Yrden
-         <br>ikonki aktwynośći sam robiłem
-         <br>ikony strony rewers kart z wieśka 3
-         <br>tczcionka <a href="https://font.download/font/pf-din-text-cond-pro-2" target="_blank">https://font.download/font/pf-din-text-cond-pro-2</a>
-         <br>karty i wszystkie asety jakie sa już w grze są wzięte z gry wiedmzin 3 3 najlepszy
-        <!-- Koniec miejsca na treść -->
-        <button onclick="showMainMenu()">Wróć do menu</button>
     </div>
-</div>
+
+    <!-- Strona I: Informacje -->
+    <div class="info-screen" id="infoScreen" style="display: none;">
+        <div class="info-content">
+            <h1>Informacje - Strona jest tworzona/work in progres 10.01.2026</h1>
+            <!-- Miejsce na Twoją treść -->
+            <br>Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem
+            programować. Całą stronę od strony programowania robił Grok Copilot Gemini (GPT nie umie programować), ja
+            tylko grafiki.
+            <p>Discord - report bugs/help / kontakt / change list <a href="https://discord.gg/vs9tnnmNAD"
+                    target="_blank">https://discord.gg/vs9tnnmNAD</a>
+            <p>Tu jest rozpiska, skąd co mam:
+                <br>Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3
+                <br>Ramki: bezpośrednio z gry i częściowo poprzerabiane
+                <br>Napis "Gwint": z Google Grafika
+                <br> Pasek ten czarny: z filmu <a href="https://www.youtube.com/watch?v=xx8kQ4s5hCY"
+                    target="_blank">https://www.youtube.com/watch?v=xx8kQ4s5hCY</a>
+                <br> Gradient: sam robiłem.
+                <br>Dźwięk przycisków: podjebane bezpośrednio z gry.
+                <br>Napisy: zrobione na stronie <a href="https://www.fontspace.com/category/the-witcher"
+                    target="_blank">https://www.fontspace.com/category/the-witcher</a>
+                <br>ładowanie sam robiłem wzór Yrden
+                <br>ikonki aktwynośći sam robiłem
+                <br>ikony strony rewers kart z wieśka 3
+                <br>tczcionka <a href="https://font.download/font/pf-din-text-cond-pro-2"
+                    target="_blank">https://font.download/font/pf-din-text-cond-pro-2</a>
+                <br>karty i wszystkie asety jakie sa już w grze są wzięte z gry wiedmzin 3 3 najlepszy
+                <!-- Koniec miejsca na treść -->
+                <button onclick="showMainMenu()">Wróć do menu</button>
+        </div>
+    </div>
 
     <!-- Ekran gry (testowy) -->
-<div id="gameScreen" class="screen">
-    <div class="game-content">
-        <h2>Stan gry</h2>
-        <p>Host: <span id="hostNickname">...</span></p>
-        <p>Przeciwnik: <span id="opponentNickname">...</span></p>
+    <div id="gameScreen" class="screen">
+        <div class="game-content">
+            <h2>Stan gry</h2>
+            <p>Host: <span id="hostNickname">...</span></p>
+            <p>Przeciwnik: <span id="opponentNickname">...</span></p>
+        </div>
     </div>
-</div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/script.js"></script>
 </body>
+
 </html>

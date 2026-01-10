@@ -191,8 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Szerokość karty
             let cardWidth = (effectiveWidth - (2 * GAP_X)) / COLS;
 
-            // Floor i SAFETY MARGIN (-1px)
-            cardWidth = Math.floor(cardWidth) - 1;
+            // Allow precise fractional pixels - browsers handle this well now.
+            // No floor, no safety margin.
 
             // Stylizacja obszaru
             area.style.width = `${areaWidth}px`;
