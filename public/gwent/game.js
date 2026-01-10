@@ -172,11 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_BASE_4K = 34;
             const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
 
-            // Gap pionowy zostawiamy 30 (chociaż user nie precyzował, w infoo było 36/491 czyli... weźmy standard)
+            // Gap pionowy
             const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
 
-            const SCROLLBAR_WIDTH = 25;
-            const PADDING_LEFT = 5;
+            // Scaled margins
+            const SCROLLBAR_BASE_4K = 25;
+            const SCROLLBAR_WIDTH = (SCROLLBAR_BASE_4K / GUI_WIDTH) * backgroundWidth;
+
+            const PADDING_BASE_4K = 5;
+            const PADDING_LEFT = (PADDING_BASE_4K / GUI_WIDTH) * backgroundWidth;
 
             // Ścisły layout: 
             // cards must fit: 3 * width + 2 * GAP_X <= effectiveWidth
@@ -594,6 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const C_BERZ = '#a69377';
         const C_BERZNM = '#a27e3d';
         const C_SILA = '#35a842';
+        const C_CZER = '#ff1a1a'; // Nowy kolor
 
         // 1. DOWÓDCA
         createStat("Dowódca", "label", 457, 496, C_BERZNM, true);
@@ -613,7 +618,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Liczba kart jednostek
         createStat("Liczba kart jednostek", "label", 1238, 1277, C_BERZ, true);
         // Wartość: od* 1300 a 1332
-        createStat(unitCards, "value", 1300, 1332, C_BERZNM, false); // unitCards to hero + unit ("zwykłe" == unit)
+        // Logika: 0-21 -> CZERERWONY {suma/22}, >=22 -> ZŁOTY {suma}
+        if (unitCards < 22) {
+            createStat(`${unitCards}/22`, "value", 1300, 1332, C_CZER, false);
+        } else {
+            createStat(unitCards, "value", 1300, 1332, C_BERZNM, false);
+        }
 
         // 4. Karty specjalne
         createStat("Karty specjalne", "label", 1360, 1399, C_BERZ, true);
