@@ -123,42 +123,32 @@ body {
     cursor: pointer;
 }
 
+#global-glow {
+    position: fixed;
+    /* Fixed, żeby pływał nad wszystkim */
+    z-index: 1000;
+    /* Najwyżej */
+    pointer-events: none;
+    display: none;
+    /* Domyślnie ukryte */
+    /* width/height/left/top ustawiane JS */
+}
+
+.global-glow-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
 /* KONTENER NA TREŚĆ KARTY - z-index wyższy niż glow */
 .card-content {
     position: relative;
     width: 100%;
     height: 100%;
     z-index: 10;
-}
-
-/* KONTENER NA POŚWIATĘ */
-.card-glow-container {
-    position: absolute;
-    /* Pozycje z infoo.txt skalowane do 523x992 */
-    top: -1%;
-    /* -10px */
-    left: -19.9%;
-    /* -104px */
-    width: 120.1%;
-    /* 628px */
-    height: 101.1%;
-    /* 1003px */
-    z-index: -1;
-    /* Pod kartą */
-    pointer-events: none;
-    display: none;
-    /* Domyślnie ukryte */
-}
-
-/* POKAŻ POŚWIATĘ PRZY HOVER */
-.card:hover .card-glow-container {
-    display: block;
-}
-
-/* Z-INDEX OVERLAP */
-.card:hover {
-    z-index: 100 !important;
-    /* Wyciągnij kartę na wierzch */
 }
 
 .card-hover-bg {

@@ -163,51 +163,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
             const SCROLLBAR_WIDTH = 25;
 
-            // Najpierw obliczamy "idealną" szerokość karty bazując na układzie 2-kolumnowym który był "idealny"
-            // Wcześniej (przed moimi zmianami dzisiaj) updateCardArea dzieliło areaWidth przez 3 ale bez paddingów:
-            // const cardWidth = (areaWidth - 2 * GAP_X) / COLS; -> to dawało "małe" karty bo areaWidth była fixed.
-            // Ale user pisze "wróć o 2 aktualizacje do tyłu tam połozenie 2 pierwszych kart było idealne".
-            // Tamte "idealne" karty to były te duże.
+            // Ścisły layout: karty muszą wejść w areaWidth
+            // Nie powiększamy kontenera (area.style.width nie jest zmieniana - chyba że była wcześniej, ale lepiej polegać na argumencie areaWidth)
 
-            // Spróbujmy wymusić, żeby areaWidth było wystarczająco duże na 3 TAKIE SAMIE duże karty.
-            // Skoro 3 się nie mieściły i spadały do 2, to znaczy że 3 * cardWidth + gaps > originalAreaWidth.
-            // Ustalmy szerokość karty taką, jakby były 2 kolumny w oryginalnym obszarze (to daje wielkie karty), 
-            // a potem wymuśmy width kontenera na 3 * to + gaps.
+            // Przywracamy style width do wartości z argumentu (resetujemy ewentualne rozszerzenia z poprzednich kroków jeśli user nie odświeżył)
+            area.style.width = `${areaWidth}px`;
 
-            // Oblicz szerokość "dużej" karty (jakby były 2.5 kolumny albo po prostu max co wchodzi w 2?)
-            // Nie, user chce "tą samą wielkość".
-            // Załóżmy że karta ma mieć ok 300-350px (dla 1920px width).
-            // W oryginalnym infoo.txt: karty 1-5 mają szerokość 523px (w 4k).
-            // Przeliczmy 523px na aktualną rozdzielczość backgroundWidth.
-            const baseCardWidth4k = 523;
-            const idealCardWidth = (baseCardWidth4k / GUI_WIDTH) * backgroundWidth;
+            // Efektywna szerokość na karty
+            const effectiveWidth = areaWidth - SCROLLBAR_WIDTH;
 
-            // Wymagana szerokość kontenera na 3 karty
-            const requiredWidth = (3 * idealCardWidth) + (2 * GAP_X) + SCROLLBAR_WIDTH + 10; // +10 zapasu
-
-            // Ustawiamy szerokość kontenera na wymaganą (jeśli jest większa niż obecna)
-            // Ale musimy też uważać żeby nie wyjechać za bardzo? User pozwolił: "powiększ obszar planszy o 2-3-... px"
-            if (parseFloat(area.style.width) < requiredWidth) {
-                area.style.width = `${requiredWidth}px`;
-            }
-
-            // Teraz obliczamy cardWidth tak, żeby pasowało do requiredWidth
-            // W zasadzie powinno być równe idealCardWidth, ale dla pewności przeliczamy z kontenera
-            // Używamy width, którą przed chwilą ustawiliśmy
-            const currentWidth = parseFloat(area.style.width);
-            let cardWidth = (currentWidth - SCROLLBAR_WIDTH - ((COLS - 1) * GAP_X)) / COLS;
+            // Szerokość karty
+            let cardWidth = (effectiveWidth - ((COLS - 1) * GAP_X)) / COLS;
             cardWidth = Math.floor(cardWidth);
 
             // Stylizacja obszaru
             area.style.overflowY = 'auto';
-            area.style.overflowX = 'hidden'; // Ukryj poziomy scroll (karty się mieszczą bo poszerzyliśmy kontener)
+            area.style.overflowX = 'hidden';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
 
             // Minimalny padding
-            area.style.paddingLeft = '5px';
+            area.style.paddingLeft = '5px'; // Minimalny odstęp od krawędzi
             area.style.paddingRight = `${SCROLLBAR_WIDTH}px`;
             area.style.paddingTop = `${(10 / GUI_HEIGHT) * backgroundHeight}px`;
             area.style.paddingBottom = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
@@ -430,21 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bannerFaction = playerFaction;
             }
 
-            // --- LOCAL GLOW STRUCTURE (Restored) ---
-            const glowContainer = document.createElement('div');
-            glowContainer.className = 'card-glow-container';
-
-            const podsw = document.createElement('img');
-            podsw.className = 'card-hover-bg podsw';
-            podsw.src = 'assets/dkarty/podsw.webp';
-            glowContainer.appendChild(podsw);
-
-            const podsw2 = document.createElement('img');
-            podsw2.className = 'card-hover-bg podsw2';
-            podsw2.src = 'assets/dkarty/podsw2.webp';
-            glowContainer.appendChild(podsw2);
-
-            cardElement.appendChild(glowContainer);
+            // --- BRAK LOKALNEGO GLOW (jest globalny) ---
 
             // 2. Kontener na treść karty (beton i reszta)
             const contentContainer = document.createElement('div');
@@ -981,7 +945,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- GLOBAL GLOW LOGIC (Re-implemented) ---
+    function initGlobalGlow() {
+        let glowOverlay = document.getElementById('global-glow');
+        if (!glowOverlay) {
+            glowOverlay = document.createElement('div');
+            glowOverlay.id = 'global-glow';
 
+            const podsw = document.createElement('img');
+            podsw.className = 'global-glow-img podsw';
+            podsw.src = 'assets/dkarty/podsw.webp';
+            glowOverlay.appendChild(podsw);
+
+            const podsw2 = document.createElement('img');
+            podsw2.className = 'global-glow-img podsw2';
+            podsw2.src = 'assets/dkarty/podsw2.webp';
+            glowOverlay.appendChild(podsw2);
+
+            document.body.appendChild(glowOverlay);
+        }
+
+        const handleMouseOver = (e) => {
+            const card = e.target.closest('.card');
+            if (card) {
+                const rect = card.getBoundingClientRect();
+
+                // Dane z infoo.txt: podsw ma wymiar 628x1003 przy karcie 523x992
+                // width ratio: 628/523 = ~1.20 (120%)
+                // height ratio: 1003/992 = ~1.011 (101.1%)
+                // Pozycja: -104, -10 (względem 0,0 karty). 
+                // offsetX ratio: -104/523 = -0.1988 (~ -20%)
+                // offsetY ratio: -10/992 = -0.01 (~ -1%)
+
+                const width = rect.width * 1.2007; // 120.07%
+                const height = rect.height * 1.011; // 101.1%
+                const left = rect.left - (rect.width * 0.1988); // -19.9%
+                const top = rect.top - (rect.height * 0.01); // -1%
+
+                glowOverlay.style.width = `${width}px`;
+                glowOverlay.style.height = `${height}px`;
+                glowOverlay.style.left = `${left}px`;
+                glowOverlay.style.top = `${top}px`;
+                glowOverlay.style.display = 'block';
+            }
+        };
+
+        const handleMouseOut = (e) => {
+            const card = e.target.closest('.card');
+            if (card) {
+                // Sprawdzamy, czy nie przeszliśmy na element dziecięcy tej samej karty
+                if (!e.relatedTarget || !e.relatedTarget.closest('.card') || e.relatedTarget.closest('.card') !== card) {
+                    glowOverlay.style.display = 'none';
+                }
+            }
+        };
+
+        document.body.addEventListener('mouseover', handleMouseOver);
+        document.body.addEventListener('mouseout', handleMouseOut);
+
+        // Ukryj glow podczas scrollowania
+        if (collectionArea) collectionArea.addEventListener('scroll', () => glowOverlay.style.display = 'none');
+        if (deckArea) deckArea.addEventListener('scroll', () => glowOverlay.style.display = 'none');
+    }
+
+    initGlobalGlow();
 });
 
 // KONIEC PLIKU, nie dodawaj już window.addEventListener('DOMContentLoaded', ...) na końcu!

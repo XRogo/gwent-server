@@ -1,4 +1,13 @@
 wszystkie pozoycje podane są w rozdzielczości 4k (3837, 2158)
+ PLANSZA WYBORÓW
+  POZYCJE INFORMACYJNE
+    napis "Dowódca" środek - między 457  a 496
+    napis "Wszystkie karty w  talii" środek - między 1119 a 1158
+    napis "Liczba kart jednostek" środek - między 1238 a 1277
+
+
+
+
 
  pozycja twojich kart                1163,1691 x 3018, 1932
 
