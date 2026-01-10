@@ -398,6 +398,22 @@ body {
     padding: 20px;
 }
 
+#saveDeckButton {
+    position: absolute;
+    cursor: pointer;
+    z-index: 4;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid #7d6a45;
+    border-radius: 5px;
+    box-sizing: border-box;
+    /* Dynamic positioning in JS */
+}
+
+#saveDeckButton:hover {
+    background-color: rgba(40, 40, 40, 0.7);
+}
+
 .card-content .ilosc-layer {
     position: absolute;
     left: 0;

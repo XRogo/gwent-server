@@ -367,6 +367,26 @@ document.addEventListener('DOMContentLoaded', () => {
             goToGameButton.style.fontSize = `${(30 / GUI_WIDTH) * backgroundWidth}px`;
             goToGameButton.style.transform = `translateX(-50%)`;
         }
+
+        const saveDeckButton = document.getElementById('saveDeckButton');
+        if (saveDeckButton) {
+            // Position between Stats (Hero Cards @ ~1600-1700) and Start Button (Bottom ~43px from 2160)
+            // Let's put it around Y=1850 in 4K space.
+            const saveY = 1850;
+            saveDeckButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`; // Centered
+            saveDeckButton.style.top = `${backgroundTop + (saveY / GUI_HEIGHT) * backgroundHeight}px`;
+
+            saveDeckButton.style.padding = `${(8 / GUI_HEIGHT) * backgroundHeight}px ${(16 / GUI_WIDTH) * backgroundWidth}px`;
+            saveDeckButton.style.fontSize = `${(24 / GUI_WIDTH) * backgroundWidth}px`;
+            saveDeckButton.style.transform = `translateX(-50%)`;
+        }
+    }
+
+    if (document.getElementById('saveDeckButton')) {
+        document.getElementById('saveDeckButton').addEventListener('click', () => {
+            autoSaveDeck();
+            alert("Talia została zapisana!");
+        });
     }
 
     window.addEventListener('resize', updatePositionsAndScaling);
