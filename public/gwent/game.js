@@ -117,10 +117,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        if (stats) {
+            stats.style.width = `${backgroundWidth}px`;
+            stats.style.height = `${backgroundHeight}px`;
+            stats.style.left = `${backgroundLeft}px`;
+            stats.style.top = `${backgroundTop}px`;
+        }
+
         if (collectionArea) {
             // Współrzędne z infoo.txt dla kolekcji: 366, 491 - 1561, 1940
-            // UPDATE: Rozszerzamy do środka (do 1750), żeby zmieścić 3 duże karty
-            const cLeft = 366, cTop = 491, cRight = 1750, cBottom = 1940;
+            // REVERT: Wracamy do oryginału
+            const cLeft = 366, cTop = 491, cRight = 1561, cBottom = 1940;
             const cWidth = cRight - cLeft;
             const cHeight = cBottom - cTop;
 
@@ -139,8 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (deckArea) {
             // Współrzędne z infoo.txt dla talii: 2290, 491 - 3484, 1940
-            // UPDATE: Rozszerzamy od środka (od 2100), żeby zmieścić 3 duże karty
-            const dLeft = 2100, dTop = 491, dRight = 3484, dBottom = 1940;
+            // REVERT: Wracamy do oryginału
+            const dLeft = 2290, dTop = 491, dRight = 3484, dBottom = 1940;
             const dWidth = dRight - dLeft;
             const dHeight = dBottom - dTop;
 
@@ -160,20 +167,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function updateCardArea(area, areaWidth, areaHeight) {
             const COLS = 3;
-            // Gap z infoo.txt p.119 (35px, 30px)
-            const GAP_X = (35 / GUI_WIDTH) * backgroundWidth;
+            // Gap z infoo.txt: user chce 34px (w 4k)
+            // PRZYPOMNIENIE: GAP to odstęp MIĘDZY kartami.
+            const GAP_BASE_4K = 34;
+            const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
+
+            // Gap pionowy zostawiamy 30 (chociaż user nie precyzował, w infoo było 36/491 czyli... weźmy standard)
             const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
+
             const SCROLLBAR_WIDTH = 25;
             const PADDING_LEFT = 5;
 
-            // Ścisły layout: karty muszą wejść w areaWidth
-            // Obliczamy efektywną szerokość, odejmując WSZYSTKIE marginesy
+            // Ścisły layout: 
+            // cards must fit: 3 * width + 2 * GAP_X <= effectiveWidth
+            // width <= (effectiveWidth - 2 * GAP_X) / 3
+
             const effectiveWidth = areaWidth - SCROLLBAR_WIDTH - PADDING_LEFT;
 
             // Szerokość karty
-            let cardWidth = (effectiveWidth - ((COLS - 1) * GAP_X)) / COLS;
+            let cardWidth = (effectiveWidth - (2 * GAP_X)) / COLS;
 
-            // Floor i SAFETY MARGIN (-1px) żeby na 100% nie przeskoczyło przez zaokrąglenia
+            // Floor i SAFETY MARGIN (-1px)
             cardWidth = Math.floor(cardWidth) - 1;
 
             // Stylizacja obszaru
@@ -208,11 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        if (stats) {
-            stats.style.left = `${backgroundLeft + (1935 / GUI_WIDTH) * backgroundWidth}px`;
-            stats.style.top = `${backgroundTop + (1152 / GUI_HEIGHT) * backgroundHeight}px`;
-            stats.style.fontSize = `${(16 / GUI_WIDTH) * backgroundWidth}px`;
-        }
+        // Removed the specific positioning of `stats` here, as it's now a full-background container
+        // and its children will be positioned relatively within it.
 
         const pageLeft = document.querySelector('.page-left');
         if (pageLeft) {
@@ -523,70 +534,59 @@ document.addEventListener('DOMContentLoaded', () => {
         // Bohaterowie
         const heroCardsCount = deck.filter(card => card.bohater).length;
 
-        // Skalowanie dla stats
-        // Używamy backgroundWidth/Height z updatePositionsAndScaling? 
-        // Musimy je pobrać z DOM elementu overlay lub przeliczyć ponownie.
-        // Najlepiej pobrać aktualne wymiary obszaru kolekcji i przeliczyć proporcje, 
-        // albo po prostu użyć tych samych zmiennych co w updatePositionsAndScaling (musimy je mieć globalne lub przeliczyć).
-
-        const overlay = document.querySelector('.overlay');
-        if (!overlay) return;
-        const overlayRect = overlay.getBoundingClientRect();
-
-        // Skalowanie (uproszczone, to samo co w updatePositionsAndScaling)
-        const windowAspectRatio = window.innerWidth / window.innerHeight;
-        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
-        let scale, bgWidth, bgHeight, bgLeft, bgTop;
-
-        if (windowAspectRatio > guiAspectRatio) {
-            scale = overlayRect.height / GUI_HEIGHT;
-            bgWidth = GUI_WIDTH * scale;
-            bgHeight = overlayRect.height;
-            bgLeft = overlayRect.left + (overlayRect.width - bgWidth) / 2;
-            bgTop = overlayRect.top;
-        } else {
-            scale = overlayRect.width / GUI_WIDTH;
-            bgWidth = overlayRect.width;
-            bgHeight = GUI_HEIGHT * scale;
-            bgLeft = overlayRect.left;
-            bgTop = overlayRect.top + (overlayRect.height - bgHeight) / 2;
-        }
+        // Skalowanie: W updatePositionsAndScaling ustawiliśmy już rozmiar .stats,
+        // więc tutaj pozycjonujemy PROCENTOWO względem tego kontenera (background).
 
         const createStat = (text, type, y1, y2, color, alignCenter = true, isValue = false) => {
             const el = document.createElement('div');
             el.className = `stat-item ${type}`;
             el.textContent = text;
 
-            // Pozycje scaling
-            const top = bgTop + (y1 / GUI_HEIGHT) * bgHeight;
-            const height = ((y2 - y1) / GUI_HEIGHT) * bgHeight;
-            const left = bgLeft + (1935 / GUI_WIDTH) * bgWidth; // Oś X=1935
+            // Pozycje procentowe względem kontenera 3840x2160
+            const topPct = (y1 / GUI_HEIGHT) * 100;
+            const heightPct = ((y2 - y1) / GUI_HEIGHT) * 100;
+            const leftPct = (1935 / GUI_WIDTH) * 100; // Oś X=1935
 
             el.style.position = 'absolute';
-            el.style.top = `${top}px`;
-            el.style.height = `${height}px`;
-            el.style.left = `${left}px`;
+            el.style.top = `${topPct}%`;
+            el.style.height = `${heightPct}%`;
+            el.style.left = `${leftPct}%`;
             el.style.color = color;
             el.style.display = 'flex';
             el.style.alignItems = 'center'; // Pionowe centrowanie
             el.style.whiteSpace = 'nowrap';
-            el.style.fontFamily = 'PFDinTextCondPro, sans-serif';
-            el.style.fontSize = `${height * 0.8}px`; // Dopasuj font do wysokości
+            // Font size: tricky with percentages. Use vh/vw or just scale via calc if possible?
+            // Bezpieczniej: fontSize relative to height pixels?
+            // Skoro mamy backgroundHeight dostępne w zmiennych globalnych (nie mamy :/), 
+            // to użyjmy jednostek viewportu albo po prostu em?
+            // Najpewniej: pobierz height z elementu po dodaniu.
+            // Albo: użyjmy font-size w vh.
+            // heightPct to % wysokości tła. Tło skaluje się do okna.
+            // Height in px = (backgroundHeight * heightPct) / 100
+            // Ale nie mam backgroundHeight tutaj.
+            // Obejście: fontSize 80% wysokości elementu (wewnątrz flexa to zadziała?)
+            // Nie zadziała prosto w CSS bez query container.
 
-            // Centrowanie poziome względem osi 1935
+            // Rozwiązanie: font-size w vmin/vmax lub po prostu "duży".
+            // User ma monitor 1440p.
+            // Font size w "vh" będzie ok jeśli aspect ratio się zgadza.
+            // Ale zróbmy prościej: height: ...% i font-size: 2.5vh (przybliżenie).
+            // Lepiej: pobierz offsetHeight elementu 'stats' i przelicz.
+
+            // Zaufajmy że stats.offsetHeight jest poprawne (bo updatePositionsAndScaling działa co resize)
+            const bgH = stats ? stats.offsetHeight : window.innerHeight;
+            const pxHeight = (bgH * heightPct / 100);
+            el.style.fontSize = `${pxHeight * 0.8}px`;
+
+
+            // Centrowanie poziome względem osi
             if (alignCenter) {
                 el.style.transform = 'translate(-50%, 0)';
                 el.style.justifyContent = 'center';
             } else {
-                // Jeśli nie centrowane, to zaczyna się od osi? User pisał "od*"
-                // "od* - nazwa/cyfra nie może przekroczyć tej granicy w lewo (zaczynaj pisać od tej pozycji)"
-                // Czyli text-align left, start at left.
+                // Start at left
                 el.style.justifyContent = 'flex-start';
-                // Bez translate
             }
-
-            // Override dla font size jeśli za duży
-            // el.style.fontSize = ...
             stats.appendChild(el);
         };
 
