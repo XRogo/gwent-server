@@ -1,17 +1,28 @@
 wszystkie pozoycje podane są w rozdzielczości 4k (3837, 2158)
 karty specjalne to 001 002 003 004 005 006 007 008 000
+kolor #a69377 > *BERZ
+kolor #a27e3d > *BERZNM
+kolor #35a842 > *SIŁA
  PLANSZA WYBORÓW
   POZYCJE INFORMACYJNE  (od* - nazwa/cyfra nie może przekroczyć tej granicy w lewo (zaczynaj pisać od tej pozycji) 1935 )
-    napis "Dowódca" środek - między 457  a 496
-    napis "Wszystkie karty w  talii" środek - między 1119 a 1158
-     suma wszystkich kart w talii specjalnych bochaterów zwykłych (nie liczy dowódców) pozycja od* 1180 a 1212
-    napis "Liczba kart jednostek" środek - między 1238 a 1277
-      suma kart bochaterów i zwykłyc (nie liczysz kart dowódców i specjalnych)
+    napis "Dowódca" środek - *BERZNM - między 457  a 496
+    napis "Wszystkie karty w  talii" środek - *BERZ - między 1119 a 1158
+     suma wszystkich kart w talii specjalnych bochaterów zwykłych (nie liczy dowódców) *BERZNM - pozycja od* 1180 a 1212
+    napis "Liczba kart jednostek" środek - *BERZ - między 1238 a 1277
+      suma kart bochaterów i zwykłyc (nie liczysz kart dowódców i specjalnych)*BERZNM - pozycja od* 1300 a 1332
+    napis "Karty specjalne" środek - *BERZ - między 1360 a 1399
+     suma kart specjalnych *SIŁA - pozycja od* 1420 a 1455 zaspiane {suma}/10 <-- w tali może być maksymalnie 10 kart wiec noten tego
+    napis "Całkowita Siła Jednostek" środek - *BERZ - między 1480 a 1519
+     suma "punkty" wszystkich kart w tali *BERZNM - od* 1539 a 1572
+    napis "Karty bohaterów" środek - *BERZ - między 1598 a 1637 
+     suma kart bohaterów w tali *BERZNM - od* 1660 a 1692
 
 
 
 
- pozycja twojich kart                1163,1691 x 3018, 1932
+
+
+Pozycja twojich kart                1163,1691 x 3018, 1932
 
 
  pozycja kart oblężnicze przeciwnika 1412, 29    x 3021, 268

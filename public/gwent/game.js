@@ -119,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (collectionArea) {
             // Współrzędne z infoo.txt dla kolekcji: 366, 491 - 1561, 1940
-            const cLeft = 366, cTop = 491, cRight = 1561, cBottom = 1940;
+            // UPDATE: Rozszerzamy do środka (do 1750), żeby zmieścić 3 duże karty
+            const cLeft = 366, cTop = 491, cRight = 1750, cBottom = 1940;
             const cWidth = cRight - cLeft;
             const cHeight = cBottom - cTop;
 
@@ -138,7 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (deckArea) {
             // Współrzędne z infoo.txt dla talii: 2290, 491 - 3484, 1940
-            const dLeft = 2290, dTop = 491, dRight = 3484, dBottom = 1940;
+            // UPDATE: Rozszerzamy od środka (od 2100), żeby zmieścić 3 duże karty
+            const dLeft = 2100, dTop = 491, dRight = 3484, dBottom = 1940;
             const dWidth = dRight - dLeft;
             const dHeight = dBottom - dTop;
 
@@ -498,24 +500,135 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateStats() {
         if (!stats) return;
+        stats.innerHTML = ''; // Clear previous stats
 
+        const faction = factions[currentPage - 1];
+
+        // Obliczenia
         const totalCards = deck.length;
-        const unitCards = deck.filter(card => typeof card.punkty === 'number').length;
-        const specialCards = totalCards - unitCards;
+        // Karty jednostek (punkty number) ale NIE specjalne/pogodowe? 
+        // User: "suma kart bochaterów i zwykłyc (nie liczysz kart dowódców i specjalnych)"
+        const unitCards = deck.filter(c => typeof c.punkty === 'number').length;
+
+        // Specjalne: 001-008, 000
+        const specialLimitNumbers = ['001', '002', '003', '004', '005', '006', '007', '008', '000'];
+        const specialCardsCount = deck.filter(c => specialLimitNumbers.includes(c.numer)).length;
+
+        // Wszystkie w talii (specjalne + bohaterów + zwykłych) - czyli deck.length
+        // User: "suma wszystkich kart w talii specjalnych bochaterów zwykłych (nie liczy dowódców)" -> deck.length (dowódca jest osobno)
+
+        // Siła: suma "punkty"
         const totalStrength = deck.reduce((sum, card) => sum + (typeof card.punkty === 'number' ? card.punkty : 0), 0);
-        const heroCards = deck.filter(card => card.bohater).length;
 
-        const totalCardsEl = stats.querySelector('.total-cards');
-        const unitCardsEl = stats.querySelector('.unit-cards');
-        const specialCardsEl = stats.querySelector('.special-cards');
-        const totalStrengthEl = stats.querySelector('.total-strength');
-        const heroCardsEl = stats.querySelector('.hero-cards');
+        // Bohaterowie
+        const heroCardsCount = deck.filter(card => card.bohater).length;
 
-        if (totalCardsEl) totalCardsEl.textContent = totalCards;
-        if (unitCardsEl) unitCardsEl.textContent = `${unitCards}/22`;
-        if (specialCardsEl) specialCardsEl.textContent = `${specialCards}/10`;
-        if (totalStrengthEl) totalStrengthEl.textContent = totalStrength;
-        if (heroCardsEl) heroCardsEl.textContent = heroCards;
+        // Skalowanie dla stats
+        // Używamy backgroundWidth/Height z updatePositionsAndScaling? 
+        // Musimy je pobrać z DOM elementu overlay lub przeliczyć ponownie.
+        // Najlepiej pobrać aktualne wymiary obszaru kolekcji i przeliczyć proporcje, 
+        // albo po prostu użyć tych samych zmiennych co w updatePositionsAndScaling (musimy je mieć globalne lub przeliczyć).
+
+        const overlay = document.querySelector('.overlay');
+        if (!overlay) return;
+        const overlayRect = overlay.getBoundingClientRect();
+
+        // Skalowanie (uproszczone, to samo co w updatePositionsAndScaling)
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+        const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+        let scale, bgWidth, bgHeight, bgLeft, bgTop;
+
+        if (windowAspectRatio > guiAspectRatio) {
+            scale = overlayRect.height / GUI_HEIGHT;
+            bgWidth = GUI_WIDTH * scale;
+            bgHeight = overlayRect.height;
+            bgLeft = overlayRect.left + (overlayRect.width - bgWidth) / 2;
+            bgTop = overlayRect.top;
+        } else {
+            scale = overlayRect.width / GUI_WIDTH;
+            bgWidth = overlayRect.width;
+            bgHeight = GUI_HEIGHT * scale;
+            bgLeft = overlayRect.left;
+            bgTop = overlayRect.top + (overlayRect.height - bgHeight) / 2;
+        }
+
+        const createStat = (text, type, y1, y2, color, alignCenter = true, isValue = false) => {
+            const el = document.createElement('div');
+            el.className = `stat-item ${type}`;
+            el.textContent = text;
+
+            // Pozycje scaling
+            const top = bgTop + (y1 / GUI_HEIGHT) * bgHeight;
+            const height = ((y2 - y1) / GUI_HEIGHT) * bgHeight;
+            const left = bgLeft + (1935 / GUI_WIDTH) * bgWidth; // Oś X=1935
+
+            el.style.position = 'absolute';
+            el.style.top = `${top}px`;
+            el.style.height = `${height}px`;
+            el.style.left = `${left}px`;
+            el.style.color = color;
+            el.style.display = 'flex';
+            el.style.alignItems = 'center'; // Pionowe centrowanie
+            el.style.whiteSpace = 'nowrap';
+            el.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+            el.style.fontSize = `${height * 0.8}px`; // Dopasuj font do wysokości
+
+            // Centrowanie poziome względem osi 1935
+            if (alignCenter) {
+                el.style.transform = 'translate(-50%, 0)';
+                el.style.justifyContent = 'center';
+            } else {
+                // Jeśli nie centrowane, to zaczyna się od osi? User pisał "od*"
+                // "od* - nazwa/cyfra nie może przekroczyć tej granicy w lewo (zaczynaj pisać od tej pozycji)"
+                // Czyli text-align left, start at left.
+                el.style.justifyContent = 'flex-start';
+                // Bez translate
+            }
+
+            // Override dla font size jeśli za duży
+            // el.style.fontSize = ...
+            stats.appendChild(el);
+        };
+
+        // Kolory
+        const C_BERZ = '#a69377';
+        const C_BERZNM = '#a27e3d';
+        const C_SILA = '#35a842';
+
+        // 1. DOWÓDCA
+        createStat("Dowódca", "label", 457, 496, C_BERZNM, true);
+        if (selectedLeader) {
+            // Wyświetlamy nazwę dowódcy? Czy obrazek?
+            // User: 'napis "Dowódca" środek ...' - to label.
+            // Nie podano gdzie wyświetlić WARTOŚĆ dowódcy. 
+            // Zakładam że karta dowódcy jest wyświetlana osobno (leader-card w CSS)
+            // więc tu tylko label.
+        }
+
+        // 2. Wszystkie karty w talii
+        createStat("Wszystkie karty w talii", "label", 1119, 1158, C_BERZ, true);
+        // Wartość: od* 1180 a 1212
+        createStat(totalCards, "value", 1180, 1212, C_BERZNM, false);
+
+        // 3. Liczba kart jednostek
+        createStat("Liczba kart jednostek", "label", 1238, 1277, C_BERZ, true);
+        // Wartość: od* 1300 a 1332
+        createStat(unitCards, "value", 1300, 1332, C_BERZNM, false); // unitCards to hero + unit ("zwykłe" == unit)
+
+        // 4. Karty specjalne
+        createStat("Karty specjalne", "label", 1360, 1399, C_BERZ, true);
+        // Wartość: od* 1420 a 1455, format {suma}/10, kolor SIŁA
+        createStat(`${specialCardsCount}/10`, "value", 1420, 1455, C_SILA, false);
+
+        // 5. Całkowita Siła Jednostek
+        createStat("Całkowita Siła Jednostek", "label", 1480, 1519, C_BERZ, true);
+        // Wartość: od* 1539 a 1572
+        createStat(totalStrength, "value", 1539, 1572, C_BERZNM, false);
+
+        // 6. Karty bohaterów
+        createStat("Karty bohaterów", "label", 1598, 1637, C_BERZ, true);
+        // Wartość: od* 1660 a 1692
+        createStat(heroCardsCount, "value", 1660, 1692, C_BERZNM, false);
     }
 
     const goToGameButton = document.getElementById('goToGameButton');
