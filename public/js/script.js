@@ -294,8 +294,8 @@ nicknameInput.addEventListener('keydown', (event) => {
 });
 
 function startGame() {
-    // Twój istniejący kod walidacji nicków itp.
-    window.location.href = '/gwent/game.html';
+    const gameCode = gameCodeElement.textContent || (gameCodeFromUrl);
+    window.location.href = `/gwent/game.html?code=${gameCode}&host=${isHost}`;
 }
 
 function resetGameState() {
@@ -358,6 +358,14 @@ socket.on('opponent-joined', (data) => {
     opponentId = data.opponentId;
     opponentJoined = true;
     setTimeout(updateHostUI, 100);
+});
+
+socket.on('public-game-found', (data) => {
+    fadeOut(mainMenu, () => {
+        fadeIn(joinScreen);
+        document.querySelector('.code-input').value = data.gameCode;
+        joinGame(); // Automatycznie dołącz
+    });
 });
 
 socket.on('opponent-left', (message) => {
@@ -536,54 +544,15 @@ backButtons.forEach(button => {
 });
 
 // Funkcjonalność Test Game
-let testGameState = { players: [] };
-window.startTestGame = function() {
+window.startTestGame = function () {
+    socket.emit('find-public-game');
     const msgDiv = document.getElementById('testGameMsg');
-    // Pobierz stan lobby z localStorage
-    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
-    if (!lobby.gracz1) {
-        lobby.gracz1 = true;
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-        localStorage.setItem('nickname', 'gracz1');
-        msgDiv.textContent = 'Dołączono jako gracz1. Czekam na drugiego gracza...';
-        // Nasłuchuj na dołączenie gracza2 w innym oknie
-        window.addEventListener('storage', function testGameListener(e) {
-            if (e.key === 'testGameLobby') {
-                const updated = JSON.parse(e.newValue || '{}');
-                if (updated.gracz2) {
-                    window.removeEventListener('storage', testGameListener);
-                    setTimeout(() => { window.location.href = '/gwent/game.html'; }, 500);
-                }
-            }
-        });
-    } else if (!lobby.gracz2) {
-        lobby.gracz2 = true;
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-        localStorage.setItem('nickname', 'gracz2');
-        msgDiv.textContent = 'Dołączono jako gracz2. Start gry!';
-        setTimeout(() => { window.location.href = '/gwent/game.html'; }, 500);
-    } else {
-        msgDiv.textContent = 'Test Game: Brak wolnych miejsc!';
-        return;
-    }
-    // Przenieś do wyboru talii/nicku (opcjonalnie można pominąć ten krok)
-    document.getElementById('mainMenu').style.display = 'none';
-    // document.getElementById('nicknameScreen').style.display = '';
+    if (msgDiv) msgDiv.textContent = 'Szukanie przeciwnika...';
 };
-
-// Czyszczenie lobby testowego przy zamknięciu karty/przeglądarki
-window.addEventListener('beforeunload', function() {
-    let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
-    const nick = localStorage.getItem('nickname');
-    if (lobby && nick && lobby[nick]) {
-        delete lobby[nick];
-        localStorage.setItem('testGameLobby', JSON.stringify(lobby));
-    }
-});
 
 // Nadpisz showMainMenu, by czyścić lobby testowe po powrocie do menu
 const origShowMainMenu = window.showMainMenu;
-window.showMainMenu = function() {
+window.showMainMenu = function () {
     let lobby = JSON.parse(localStorage.getItem('testGameLobby') || '{}');
     const nick = localStorage.getItem('nickname');
     if (lobby && nick && lobby[nick]) {

@@ -41,28 +41,61 @@ io.on('connection', (socket) => {
             return;
         }
 
-        if (games[gameCode].isClosed) {
-            socket.emit('join-error', 'Gra jest już zamknięta!');
+        if (games[gameCode].isClosed && games[gameCode].host !== socket.id && !games[gameCode].players.includes(socket.id)) {
+            socket.emit('join-error', 'Gra jest już zamknieta i pełna!');
             return;
         }
 
-        if (games[gameCode].host === socket.id || games[gameCode].players.some(player => player === socket.id)) {
-            socket.emit('join-error', 'Już jesteś w tej grze!');
-            return;
+        if (games[gameCode].host !== socket.id && !games[gameCode].players.includes(socket.id)) {
+            if (games[gameCode].players.length >= 1) {
+                socket.emit('join-error', 'Gra jest pełna!');
+                return;
+            }
+            games[gameCode].players.push(socket.id);
+            games[gameCode].isClosed = true;
         }
 
-        if (games[gameCode].players.length >= 1) {
-            socket.emit('join-error', 'Gra jest pełna!');
-            return;
-        }
-
-        games[gameCode].players.push(socket.id);
-        games[gameCode].isClosed = true;
         socket.join(gameCode);
-        socket.emit('join-success', { gameCode, isHost: false, hostId: games[gameCode].host });
-        console.log(`Wysyłam opponent-joined do hosta: ${games[gameCode].host}, opponentId: ${socket.id}`);
-        io.to(games[gameCode].host).emit('opponent-joined', { opponentId: socket.id });
-        console.log(`Gracz dołączył do gry ${gameCode}: ${socket.id}`);
+        socket.emit('join-success', { gameCode, isHost: games[gameCode].host === socket.id, hostId: games[gameCode].host });
+
+        if (games[gameCode].host !== socket.id) {
+            io.to(games[gameCode].host).emit('opponent-joined', { opponentId: socket.id });
+        }
+    });
+
+    socket.on('find-public-game', () => {
+        // Znajdź grę, która nie jest zamknięta i ma miejsce
+        let targetCode = Object.keys(games).find(code => !games[code].isClosed && games[code].players.length === 0);
+
+        if (targetCode) {
+            // Dołącz do istniejącej
+            socket.emit('public-game-found', { gameCode: targetCode });
+        } else {
+            // Stwórz nową publiczną
+            const newCode = "PUB" + Math.floor(1000 + Math.random() * 9000);
+            games[newCode] = {
+                host: socket.id,
+                players: [],
+                isClosed: false,
+                isPublic: true
+            };
+            socket.join(newCode);
+            socket.emit('join-success', { gameCode: newCode, isHost: true });
+        }
+    });
+
+    socket.on('rejoin-game', (data) => {
+        const { gameCode, isHost } = data;
+        if (games[gameCode]) {
+            socket.join(gameCode);
+            if (isHost) {
+                games[gameCode].host = socket.id;
+            } else {
+                // Jeśli to gracz, aktualizujemy go w tablicy (zakładamy 1v1)
+                games[gameCode].players = [socket.id];
+            }
+            console.log(`Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isHost ? 'host' : 'opponent'}`);
+        }
     });
 
     socket.on('send-to-host', (data) => {

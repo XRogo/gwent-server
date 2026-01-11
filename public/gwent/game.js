@@ -16,6 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let deck = [];
     let selectedLeader = null;
 
+    // --- SOCKET.IO RECONNECTION ---
+    const socket = typeof io !== 'undefined' ? io() : null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameCode = urlParams.get('code');
+    const isHost = urlParams.get('host') === 'true';
+
+    if (socket && gameCode) {
+        socket.emit('rejoin-game', { gameCode, isHost });
+        console.log(`Reconnected to game ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+    }
+
     const factions = [
         { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
         { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Jeśli rozgrywka zakończy się remisem, to ty odnosisz zwycięstwo." },
@@ -703,10 +714,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fade) {
                 fade.style.opacity = '1';
                 setTimeout(() => {
-                    window.location.href = 'gra.html';
+                    window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
                 }, 600);
             } else {
-                window.location.href = 'gra.html';
+                window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
             }
         });
     }
