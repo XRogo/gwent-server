@@ -392,6 +392,22 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updatePositionsAndScaling);
     window.addEventListener('load', updatePositionsAndScaling);
 
+    function loadDeckForFaction(factionId) {
+        const talie = window.loadDecks ? window.loadDecks() : {};
+        if (talie && talie[factionId]) {
+            deck = (talie[factionId].karty || [])
+                .map(numer => cards.find(c => c.numer === numer))
+                .filter(Boolean);
+            selectedLeader = krole.find(krol => krol.numer === talie[factionId].dowodca) || null;
+        } else {
+            deck = [];
+            // Domyślny lider dla frakcji
+            const leaders = krole.filter(krol => krol.frakcja === factionId);
+            selectedLeader = leaders[0] || null;
+            autoSaveDeck(); // Zapisz domyślny stan
+        }
+    }
+
     function displayDeck() {
         const grouped = groupDeck(deck);
         displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
@@ -802,6 +818,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pageDots.forEach(dot => dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage));
 
+        loadDeckForFaction(faction.id); // Wczytaj talię dla tej konkretnej frakcji
+
         displayCollection('all');
         displayDeck();
         updateStats();
@@ -972,20 +990,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Przy starcie strony: odczytaj deck i dowódcę z localStorage
-    document.addEventListener('DOMContentLoaded', () => {
-        const talie = window.loadDecks ? window.loadDecks() : {};
-        const faction = factions[currentPage - 1];
-        if (talie && talie[faction.id]) {
-            deck = talie[faction.id].karty
-                .map(numer => cards.find(c => c.numer === numer))
-                .filter(Boolean);
-            selectedLeader = krole.find(krol => krol.numer === talie[faction.id].dowodca);
-            displayDeck();
-            displayCollection('all');
-            updateStats();
-        }
-    });
 
     function groupDeck(deck) {
         const grouped = [];
