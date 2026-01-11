@@ -101,7 +101,7 @@ body {
     align-content: flex-start;
     justify-content: flex-start;
     /* Dodaj clipping tylko od dołu, a boki i góra widoczne */
-    clip-path: inset(0px -100vw 40px 0px);
+    clip-path: none;
     /* pozwól wychodzić na prawo */
 }
 
