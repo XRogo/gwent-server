@@ -124,45 +124,52 @@ document.addEventListener('DOMContentLoaded', () => {
             stats.style.top = `${backgroundTop}px`;
         }
 
-        if (collectionArea) {
-            // Współrzędne z infoo.txt dla kolekcji: 366, 491 - 1561, 1940
-            // REVERT: Wracamy do oryginału
-            const cLeft = 366, cTop = 491, cRight = 1561, cBottom = 1940;
-            const cWidth = cRight - cLeft;
-            const cHeight = cBottom - cTop;
+        if (collectionArea || deckArea) {
+            // Wspólne parametry dla obu obszarów (do wyliczenia wysokości)
+            const SCROLLBAR_BASE_4K = 25;
+            const PADDING_BASE_4K = 5;
+            const GAP_BASE_4K = 34;
+            const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
+            const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
+            const PADDING_TOP = (10 / GUI_HEIGHT) * backgroundHeight;
+            const PADDING_BOTTOM = (20 / GUI_HEIGHT) * backgroundHeight;
 
-            const areaLeft = backgroundLeft + (cLeft / GUI_WIDTH) * backgroundWidth;
-            const areaTop = backgroundTop + (cTop / GUI_HEIGHT) * backgroundHeight;
-            const areaWidth = (cWidth / GUI_WIDTH) * backgroundWidth;
-            const areaHeight = (cHeight / GUI_HEIGHT) * backgroundHeight;
+            const cLeft = 366, cTop = 491, cRight = 1561;
+            const dLeft = 2290, dTop = 491, dRight = 3484;
 
-            collectionArea.style.left = `${areaLeft}px`;
-            collectionArea.style.top = `${areaTop}px`;
-            collectionArea.style.width = `${areaWidth}px`;
-            collectionArea.style.height = `${areaHeight}px`; // Wymuszamy wysokość
-            collectionArea.style.maxHeight = `${areaHeight}px`;
+            const areaWidth = ((cRight - cLeft) / GUI_WIDTH) * backgroundWidth;
+            const effectiveWidth = areaWidth - ((SCROLLBAR_BASE_4K / GUI_WIDTH) * backgroundWidth) - ((PADDING_BASE_4K / GUI_WIDTH) * backgroundWidth);
+            const cardWidth = (effectiveWidth - (2 * GAP_X)) / 3;
+            const cardHeight = cardWidth / (523 / 992);
 
-            updateCardArea(collectionArea, areaWidth, areaHeight);
-        }
-        if (deckArea) {
-            // Współrzędne z infoo.txt dla talii: 2290, 491 - 3484, 1940
-            // REVERT: Wracamy do oryginału
-            const dLeft = 2290, dTop = 491, dRight = 3484, dBottom = 1940;
-            const dWidth = dRight - dLeft;
-            const dHeight = dBottom - dTop;
+            // Wysokość na 2 rzędy: góra + karta1 + przerwa + karta2 + dół
+            const newAreaHeight = PADDING_TOP + (cardHeight * 2) + GAP_Y + PADDING_BOTTOM;
 
-            const areaLeft = backgroundLeft + (dLeft / GUI_WIDTH) * backgroundWidth;
-            const areaTop = backgroundTop + (dTop / GUI_HEIGHT) * backgroundHeight;
-            const areaWidth = (dWidth / GUI_WIDTH) * backgroundWidth;
-            const areaHeight = (dHeight / GUI_HEIGHT) * backgroundHeight;
+            if (collectionArea) {
+                const areaLeft = backgroundLeft + (cLeft / GUI_WIDTH) * backgroundWidth;
+                const areaTop = backgroundTop + (cTop / GUI_HEIGHT) * backgroundHeight;
 
-            deckArea.style.left = `${areaLeft}px`;
-            deckArea.style.top = `${areaTop}px`;
-            deckArea.style.width = `${areaWidth}px`;
-            deckArea.style.height = `${areaHeight}px`; // Wymuszamy wysokość
-            deckArea.style.maxHeight = `${areaHeight}px`;
+                collectionArea.style.left = `${areaLeft}px`;
+                collectionArea.style.top = `${areaTop}px`;
+                collectionArea.style.width = `${areaWidth}px`;
+                collectionArea.style.height = `${newAreaHeight}px`;
+                collectionArea.style.maxHeight = `${newAreaHeight}px`;
 
-            updateCardArea(deckArea, areaWidth, areaHeight);
+                updateCardArea(collectionArea, areaWidth, newAreaHeight);
+            }
+
+            if (deckArea) {
+                const areaLeft = backgroundLeft + (dLeft / GUI_WIDTH) * backgroundWidth;
+                const areaTop = backgroundTop + (dTop / GUI_HEIGHT) * backgroundHeight;
+
+                deckArea.style.left = `${areaLeft}px`;
+                deckArea.style.top = `${areaTop}px`;
+                deckArea.style.width = `${areaWidth}px`;
+                deckArea.style.height = `${newAreaHeight}px`;
+                deckArea.style.maxHeight = `${newAreaHeight}px`;
+
+                updateCardArea(deckArea, areaWidth, newAreaHeight);
+            }
         }
 
         function updateCardArea(area, areaWidth, areaHeight) {
