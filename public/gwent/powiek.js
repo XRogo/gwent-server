@@ -345,7 +345,8 @@ function renderPowiek() {
                 pointsDiv.style.width = '23.61%';
                 pointsDiv.style.height = '8.84%';
                 pointsDiv.style.transform = 'translate(-50%, -50%)';
-                pointsDiv.style.fontSize = (pos.height * 0.13) + 'px';
+                // Skala punktów: zmniejszona z 0.13 na 0.10 wg prośby o lepszą skalę
+                pointsDiv.style.fontSize = (pos.height * 0.10) + 'px';
                 pointsDiv.style.color = card.bohater ? '#ffffff' : '#000000';
                 pointsDiv.style.zIndex = 41;
                 pointsDiv.style.display = 'flex';
@@ -399,30 +400,22 @@ function renderPowiek() {
         nameDiv.style.justifyContent = 'center';
         inner.appendChild(nameDiv);
 
-        // --- 11: opis pod kartą (respektuje \n) ---
+        // --- 11: opis pod kartą (stała wielkość, wystaje w dół) ---
         const opisDiv = document.createElement('div');
         opisDiv.innerText = card.opis || '';
         opisDiv.style.position = 'absolute';
         opisDiv.style.left = '2%';
         opisDiv.style.top = '89%';
         opisDiv.style.width = '96%';
-        opisDiv.style.height = '8%';
         opisDiv.style.textAlign = 'center';
         opisDiv.style.color = '#030303ff';
         opisDiv.style.zIndex = 20;
-        opisDiv.style.display = 'flex';
-        opisDiv.style.justifyContent = 'center';
-        opisDiv.style.alignItems = 'center';
+        opisDiv.style.display = 'block'; // Block dla auto-height
         opisDiv.style.whiteSpace = 'pre-wrap';
         opisDiv.style.lineHeight = '1.1';
 
-        // Dynamiczny font-size (zmniejszony o ok. 10% wg prośby)
-        let baseFs = pos.height * 0.04;
-        const descLen = (card.opis || '').length;
-        if (descLen > 50) baseFs = pos.height * 0.034;
-        if (descLen > 80) baseFs = pos.height * 0.028;
-        if (descLen > 120) baseFs = pos.height * 0.024;
-        opisDiv.style.fontSize = baseFs + 'px';
+        // Stały font-size dla każdej karty (wg prośby)
+        opisDiv.style.fontSize = (pos.height * 0.035) + 'px';
 
         inner.appendChild(opisDiv);
         cardDiv.appendChild(inner);
@@ -511,16 +504,15 @@ window.addEventListener('contextmenu', function (e) {
         const selectedFaction = window.selectedFaction || localStorage.getItem('faction') || '1';
 
         if (cardEl.classList.contains('kolekcja-card')) {
-            // Pobierz numery kart z talii gracza
-            const taliaNumery = new Set((window.taliaPowiek || []).map(card => card.numer));
-            // Filtruj kolekcję: tylko wybrana frakcja + neutralne, których nie ma w talii
-            const filteredKolekcja = (window.kolekcjaPowiek || []).filter(card => (card.frakcja === selectedFaction || card.frakcja === 'nie') && !taliaNumery.has(card.numer));
-            source = filteredKolekcja;
+            // Użyj window.currentCollectionCards jeśli dostępne (tylko widoczne/dostępne karty)
+            source = window.currentCollectionCards || window.kolekcjaPowiek || [];
         }
         else if (cardEl.classList.contains('talia-card')) {
+            // Talia w wyborze
             source = window.taliaPowiek || [];
         }
         else if (cardEl.closest('.talia-gry')) {
+            // Talia podczas właściwej gry
             source = window.deckForPowiek || [];
         }
         else if (cardEl.classList.contains('powiek-card')) {
@@ -584,6 +576,10 @@ window.addEventListener('contextmenu', function (e) {
 // Obsługa przesuwania kart strzałkami i scrollem
 window.addEventListener('keydown', function (event) {
     if (!powiekActive) return;
+    if (event.key === 'Escape') {
+        hidePowiek();
+        return;
+    }
     if (event.key === 'ArrowRight') {
         if (powiekIndex < powiekDeck.length - 1) {
             powiekIndex++;

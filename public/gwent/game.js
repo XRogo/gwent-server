@@ -475,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const available = (typeof card.ilosc === 'number' ? card.ilosc : 1) - countInDeck;
                 return available > 0;
             });
+            window.currentCollectionCards = filteredCards;
         }
 
         filteredCards.forEach(card => {
