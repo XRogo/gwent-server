@@ -497,7 +497,7 @@ window.addEventListener('resize', () => {
 // Obsługa prawego kliknięcia na kartę lub dowódcę
 window.addEventListener('contextmenu', function (e) {
     const cardEl = e.target.closest('.card, .powiek-card');
-    if (cardEl && cardEl.dataset && cardEl.dataset.index) {
+    if (cardEl && cardEl.dataset && cardEl.dataset.numer) {
         e.preventDefault();
         // Pobierz źródło kart
         let source = null;
@@ -508,8 +508,8 @@ window.addEventListener('contextmenu', function (e) {
             source = window.currentCollectionCards || window.kolekcjaPowiek || [];
         }
         else if (cardEl.classList.contains('talia-card')) {
-            // Talia w wyborze
-            source = window.taliaPowiek || [];
+            // Talia w wyborze (używamy zgrupowanej listy widocznej na ekranie)
+            source = window.currentDeckCards || window.taliaPowiek || [];
         }
         else if (cardEl.closest('.talia-gry')) {
             // Talia podczas właściwej gry

@@ -437,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayDeck() {
         const grouped = groupDeck(deck);
+        window.currentDeckCards = grouped;
         displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
     }
 
@@ -578,15 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scrollTop > 0) {
             area.scrollTop = scrollTop;
         }
-    }
-
-    function displayDeck() {
-        const grouped = groupDeck(deck);
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
-    }
-
-    function displayCollection(filter) {
-        displayCards(filter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
     }
 
     function updateStats() {
@@ -1109,30 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Obsługa prawego kliknięcia na kartę w kolekcji
-    if (collectionArea) {
-        collectionArea.addEventListener('contextmenu', function (e) {
-            const cardEl = e.target.closest('.card');
-            if (cardEl) {
-                e.preventDefault();
-                const numer = cardEl.getAttribute('data-numer');
-                const idx = cards.findIndex(c => c.numer === numer);
-                if (idx !== -1) showPowiek(cards, idx, 'cards');
-            }
-        });
-    }
-    // Obsługa prawego kliknięcia na kartę w talii
-    if (deckArea) {
-        deckArea.addEventListener('contextmenu', function (e) {
-            const cardEl = e.target.closest('.card');
-            if (cardEl) {
-                e.preventDefault();
-                const numer = cardEl.getAttribute('data-numer');
-                const idx = deck.findIndex(c => c.numer === numer);
-                if (idx !== -1) showPowiek(deck, idx, 'cards');
-            }
-        });
-    }
+    // Zoom i obsługa kart jest teraz w pełni obsługiwana przez powiek.js globalnie
 
     // Obsługa wyboru dowódcy przez kliknięcie (np. w powiek.js)
     window.selectLeader = function (numer) {
