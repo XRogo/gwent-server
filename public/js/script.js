@@ -453,6 +453,7 @@ function submitNickname() {
             startGame();
         }
     } else {
+        localStorage.setItem('nickname', nickname); // Save for reconnection
         const gameCode = document.querySelector('.code-input').value.trim();
         socket.emit('send-to-host', { gameCode, message: { type: 'submit-nickname', nickname } });
         const opponentIcon = document.querySelector('.opponent-player-icon img');

@@ -13,6 +13,7 @@ const ConnectionUI = {
 
         // Jeśli mamy nick od razu, poinformujmy serwer
         if (this.nickname) {
+            console.log('Inicjalizacja statusu dla:', this.nickname);
             this.socket.emit('set-nickname', { gameCode: this.gameCode, isHost: this.isHost, nickname: this.nickname });
         }
     },

@@ -97,6 +97,18 @@ io.on('connection', (socket) => {
         }
     });
 
+    const broadcastStatus = (gameCode) => {
+        const game = games[gameCode];
+        if (!game) return;
+
+        io.to(gameCode).emit('opponent-status', {
+            hostConnected: !!io.sockets.sockets.get(game.host),
+            opponentConnected: game.players.some(id => io.sockets.sockets.get(id)),
+            hostNickname: game.hostNickname,
+            opponentNickname: game.opponentNickname
+        });
+    };
+
     socket.on('rejoin-game', (data) => {
         const { gameCode, isHost, nickname } = data;
         if (games[gameCode]) {
@@ -109,14 +121,7 @@ io.on('connection', (socket) => {
                 if (nickname) games[gameCode].opponentNickname = nickname;
             }
             console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isHost ? 'host' : 'opponent'} (nick: ${nickname || 'brak'})`);
-
-            // Notify other player
-            io.to(gameCode).emit('opponent-status', {
-                hostConnected: !!io.sockets.sockets.get(games[gameCode].host),
-                opponentConnected: games[gameCode].players.some(id => io.sockets.sockets.get(id)),
-                hostNickname: games[gameCode].hostNickname,
-                opponentNickname: games[gameCode].opponentNickname
-            });
+            broadcastStatus(gameCode);
         }
     });
 
@@ -126,13 +131,7 @@ io.on('connection', (socket) => {
             if (isHost) games[gameCode].hostNickname = nickname;
             else games[gameCode].opponentNickname = nickname;
             console.log(`[LOBBY] Ustawiono nick dla ${isHost ? 'hosta' : 'przeciwnika'} w ${gameCode}: ${nickname}`);
-
-            io.to(gameCode).emit('opponent-status', {
-                hostConnected: !!io.sockets.sockets.get(games[gameCode].host),
-                opponentConnected: games[gameCode].players.some(id => io.sockets.sockets.get(id)),
-                hostNickname: games[gameCode].hostNickname,
-                opponentNickname: games[gameCode].opponentNickname
-            });
+            broadcastStatus(gameCode);
         }
     });
 
@@ -169,13 +168,7 @@ io.on('connection', (socket) => {
                 games[gameCode].players.splice(playerIndex, 1);
                 games[gameCode].isClosed = false;
                 io.to(games[gameCode].host).emit('opponentLeft', message);
-
-                io.to(games[gameCode].host).emit('opponent-status', {
-                    hostConnected: true,
-                    opponentConnected: false,
-                    hostNickname: games[gameCode].hostNickname,
-                    opponentNickname: null
-                });
+                broadcastStatus(gameCode);
             }
         }
     });
@@ -186,12 +179,7 @@ io.on('connection', (socket) => {
             if (games[gameCode].host === socket.id) {
                 // Host się rozłączył - nie usuwamy od razu, dajemy szansę na powrót
                 console.log(`[LOBBY] Host rozłączony w grze ${gameCode}. Czekam na powrót.`);
-                io.to(gameCode).emit('opponent-status', {
-                    hostConnected: false,
-                    opponentConnected: games[gameCode].players.some(id => io.sockets.sockets.get(id)),
-                    hostNickname: games[gameCode].hostNickname,
-                    opponentNickname: games[gameCode].opponentNickname
-                });
+                broadcastStatus(gameCode);
 
                 // Opcjonalnie: ustaw timeout na usunięcie gry
                 setTimeout(() => {
@@ -208,12 +196,7 @@ io.on('connection', (socket) => {
                 const playerIndex = games[gameCode].players.findIndex(player => player === socket.id);
                 if (playerIndex !== -1) {
                     console.log(`[LOBBY] Przeciwnik rozłączony w grze ${gameCode}.`);
-                    io.to(games[gameCode].host).emit('opponent-status', {
-                        hostConnected: true,
-                        opponentConnected: false,
-                        hostNickname: games[gameCode].hostNickname,
-                        opponentNickname: games[gameCode].opponentNickname
-                    });
+                    broadcastStatus(gameCode);
                 }
             }
         }
