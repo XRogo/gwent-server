@@ -399,7 +399,7 @@ const ROWS = {
     player_obl: { left: 1412, top: 1407, right: 3021, bottom: 1646 }
 };
 
-function renderRow(cards, rowKey) {
+function renderRow(cardsInRow, rowKey) {
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
     const row = ROWS[rowKey];
@@ -409,6 +409,15 @@ function renderRow(cards, rowKey) {
     const areaT = row.top * scaleH;
     const areaW = (row.right - row.left) * scaleW;
     const areaH = (row.bottom - row.top) * scaleH;
+
+    // Sorting: Special cards first, then units by punkty ascending
+    const sortedCards = [...cardsInRow].sort((a, b) => {
+        if (a.punkty === undefined && b.punkty !== undefined) return -1;
+        if (a.punkty !== undefined && b.punkty === undefined) return 1;
+        if (a.punkty === undefined && b.punkty === undefined) return (a.numer || '').localeCompare(b.numer || '');
+        return a.punkty - b.punkty;
+    });
+
     const rowDiv = document.createElement('div');
     rowDiv.className = 'row-area';
     rowDiv.style.position = 'absolute';
@@ -418,12 +427,14 @@ function renderRow(cards, rowKey) {
     rowDiv.style.height = areaH + 'px';
     rowDiv.style.zIndex = 30;
     rowDiv.style.pointerEvents = 'none';
+
     let cardW = 180 * scaleW;
     let cardH = 240 * scaleH;
     let gap = 6 * scaleW;
-    let n = cards.length;
+    let n = sortedCards.length;
     let realGap = gap;
     let startX = 0;
+
     if (n > 1) {
         let totalWidth = n * cardW + (n - 1) * gap;
         if (totalWidth > areaW) {
@@ -437,7 +448,8 @@ function renderRow(cards, rowKey) {
     } else {
         startX = (areaW - cardW) / 2;
     }
-    cards.forEach((card, i) => {
+
+    sortedCards.forEach((card, i) => {
         const div = document.createElement('div');
         div.className = 'row-card card small-card';
         div.dataset.index = i;
@@ -452,13 +464,14 @@ function renderRow(cards, rowKey) {
         div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.5)';
         div.style.zIndex = 10 + i;
 
-        if (card.punkty !== undefined) {
+        // Points badge (coord: 19,12-45,52) - only for non-heroes with points
+        if (card.punkty !== undefined && !card.bohater) {
             const pointsData = document.createElement('div');
             pointsData.style.position = 'absolute';
             pointsData.style.left = '3.6%';   // 19/523
             pointsData.style.top = '1.2%';    // 12/992
-            pointsData.style.width = '5%';    // (45-19)/523
-            pointsData.style.height = '4%';   // (52-12)/992
+            pointsData.style.width = '4.97%'; // (45-19)/523
+            pointsData.style.height = '4.03%'; // (52-12)/992
             pointsData.style.color = '#000';
             pointsData.style.fontSize = `${24 * scaleW}px`;
             pointsData.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
@@ -472,7 +485,7 @@ function renderRow(cards, rowKey) {
 
         div.oncontextmenu = (e) => {
             e.preventDefault();
-            showPowiek(cards, i, 'cards');
+            showPowiek(sortedCards, i, 'cards');
         };
         rowDiv.appendChild(div);
     });
