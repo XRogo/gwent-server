@@ -14,7 +14,8 @@ const gameCode = urlParams.get('code');
 const isHost = urlParams.get('host') === 'true';
 
 if (socket && gameCode) {
-    const nick = localStorage.getItem('nickname') || (isHost ? 'Host' : 'Przeciwnik');
+    const nickFromUrl = urlParams.get('nick');
+    const nick = nickFromUrl || localStorage.getItem('nickname') || (isHost ? 'Host' : 'Przeciwnik');
 
     if (window.ConnectionUI) {
         window.ConnectionUI.init(socket, gameCode, isHost, nick);

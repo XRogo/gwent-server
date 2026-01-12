@@ -302,7 +302,8 @@ function startGame() {
         alert('Błąd: utracono kod gry. Spróbuj dołączyć ponownie.');
         return;
     }
-    window.location.href = `/gwent/game.html?code=${gameCode}&host=${isHost}`;
+    const nick = isHost ? hostNickname : opponentNickname;
+    window.location.href = `/gwent/game.html?code=${gameCode}&host=${isHost}&nick=${encodeURIComponent(nick || '')}`;
 }
 
 function resetGameState() {

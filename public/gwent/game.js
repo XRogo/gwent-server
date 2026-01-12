@@ -27,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (socket && gameCode) {
         const defaultNick = isHost ? 'Gospodarz' : 'Gość';
-        const nick = localStorage.getItem('nickname') || defaultNick;
+        const nickFromUrl = urlParams.get('nick');
+        const nick = nickFromUrl || localStorage.getItem('nickname') || defaultNick;
 
         if (window.ConnectionUI) {
             window.ConnectionUI.init(socket, gameCode, isHost, nick);
@@ -51,13 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('start-game-now', () => {
             applyAutoFillAndSave();
             const fade = document.getElementById('fadeScreen');
+            const nickParam = encodeURIComponent(nick || '');
             if (fade) {
                 fade.style.opacity = '1';
                 setTimeout(() => {
-                    window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}`;
+                    window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}&nick=${nickParam}`;
                 }, 600);
             } else {
-                window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}`;
+                window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}&nick=${nickParam}`;
             }
         });
 

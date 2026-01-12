@@ -123,8 +123,11 @@ const ConnectionUI = {
 
         this.socket.on('opponent-status', (data) => {
             // Re-verify isHost based on authoritative server data
-            if (data.hostId) {
+            if (data.hostId && this.socket.id) {
                 this.isHost = (this.socket.id === data.hostId);
+            } else {
+                // Fallback to initial value if socket info not ready
+                console.warn('ConnectionUI: socket.id missing during status update, using initial role:', this.isHost);
             }
 
             // If I am Host, I want to see the Opponent's name.
@@ -176,9 +179,9 @@ const ConnectionUI = {
                 this.dot.style.backgroundColor = '#e74c3c';
                 this.dot.style.color = '#e74c3c';
                 this.text.textContent = `Rozłączono`;
-                // Redirect after 15s
+                // Redirect after 15s to main page
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'https://gwent-1vs1.onrender.com';
                 }, 15000);
                 break;
         }
