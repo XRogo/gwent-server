@@ -438,6 +438,27 @@ socket.on('message-from-host', (message) => {
     }
 });
 
+socket.on('test-game-joined', (data) => {
+    isHost = data.isHost;
+    currentGameCode = data.gameCode;
+    const nick = data.nickname;
+    if (isHost) hostNickname = nick;
+    else opponentNickname = nick;
+
+    localStorage.setItem('nickname', nick);
+    window.location.href = `/gwent/game.html?code=${currentGameCode}&host=${isHost}&nick=${encodeURIComponent(nick)}`;
+});
+
+socket.on('test-game-error', (msg) => {
+    const msgDiv = document.getElementById('testGameMsg');
+    if (msgDiv) {
+        msgDiv.textContent = msg;
+        msgDiv.style.color = '#ff4d4d';
+    } else {
+        alert(msg);
+    }
+});
+
 function submitNickname() {
     let nickname = nicknameInput.value.trim();
     if (!nickname) {
@@ -555,9 +576,9 @@ backButtons.forEach(button => {
 
 // Funkcjonalność Test Game
 window.startTestGame = function () {
-    socket.emit('find-public-game');
+    socket.emit('find-test-game');
     const msgDiv = document.getElementById('testGameMsg');
-    if (msgDiv) msgDiv.textContent = 'Szukanie przeciwnika...';
+    if (msgDiv) msgDiv.textContent = 'Łączenie z grą testową...';
 };
 
 // Nadpisz showMainMenu, by czyścić lobby testowe po powrocie do menu

@@ -95,6 +95,48 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('find-test-game', () => {
+        const testCode = "TEST";
+        if (!games[testCode]) {
+            // Pierwszy gracz - host (test1)
+            games[testCode] = {
+                host: socket.id,
+                players: [],
+                isClosed: false,
+                hostNickname: "test1",
+                opponentNickname: null,
+                status: 'waiting',
+                hostReady: true, // Automatycznie gotowi dla testu
+                opponentReady: false
+            };
+            socket.join(testCode);
+            socket.emit('test-game-joined', { gameCode: testCode, isHost: true, nickname: "test1" });
+            console.log(`[TEST] Gracz ${socket.id} dołączył jako test1`);
+        } else if (games[testCode].players.length === 0 && games[testCode].host !== socket.id) {
+            // Drugi gracz - opponent (test2)
+            games[testCode].players.push(socket.id);
+            games[testCode].isClosed = true;
+            games[testCode].opponentNickname = "test2";
+            games[testCode].opponentReady = true;
+            socket.join(testCode);
+            socket.emit('test-game-joined', { gameCode: testCode, isHost: false, nickname: "test2" });
+            io.to(games[testCode].host).emit('opponent-joined', { opponentId: socket.id });
+            console.log(`[TEST] Gracz ${socket.id} dołączył jako test2`);
+            broadcastStatus(testCode);
+        } else if (games[testCode].host === socket.id || games[testCode].players.includes(socket.id)) {
+            // Gracz już jest w tej grze (np. odświeżenie strony głównej)
+            const isHost = games[testCode].host === socket.id;
+            socket.emit('test-game-joined', {
+                gameCode: testCode,
+                isHost: isHost,
+                nickname: isHost ? "test1" : "test2"
+            });
+        } else {
+            // Pełne
+            socket.emit('test-game-error', 'Zajęte - trwa już gra testowa.');
+        }
+    });
+
     const broadcastStatus = (gameCode, specificSocket = null) => {
         const game = games[gameCode];
         if (!game) return;
