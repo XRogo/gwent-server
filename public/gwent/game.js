@@ -45,7 +45,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateStats();
         });
+
+        // Sync game start for both
+        socket.on('start-game-now', () => {
+            applyAutoFillAndSave();
+            const fade = document.getElementById('fadeScreen');
+            if (fade) {
+                fade.style.opacity = '1';
+                setTimeout(() => {
+                    window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}`;
+                }, 600);
+            } else {
+                window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}`;
+            }
+        });
+
+        // Receive authoritative status
+        socket.on('opponent-status', (data) => {
+            if (data.hostId) {
+                window.isHostLocal = (socket.id === data.hostId);
+            }
+        });
     }
+
+    // Default value for isHostLocal
+    window.isHostLocal = isHost;
 
     let oppTimerInterval = null;
     function startOpponentTimer() {
@@ -68,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStats();
     }
 
-    function finishSelection() {
+    function applyAutoFillAndSave() {
         const unitCards = deck.filter(card => {
             const isUnit = typeof card.punkty === 'number';
             const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
@@ -77,13 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Auto-fill if needed
         if (unitCards.length < 22) {
+            const factionId = factions[currentPage - 1].id;
             const allUnitCards = cards.filter(card => {
                 const isUnit = typeof card.punkty === 'number';
                 const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
-                return isUnit && !isWeather;
+                // Restricted to current faction or neutrals
+                return isUnit && !isWeather && (card.frakcja === factionId || card.frakcja === "nie");
             });
 
-            while (unitCards.length < 22) {
+            while (unitCards.length < 22 && allUnitCards.length > 0) {
                 const randomCard = allUnitCards[Math.floor(Math.random() * allUnitCards.length)];
                 deck.push({ ...randomCard });
                 unitCards.push({ ...randomCard });
@@ -91,15 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         localStorage.setItem('deck', JSON.stringify(deck));
-        const fade = document.getElementById('fadeScreen');
-        if (fade) {
-            fade.style.opacity = '1';
-            setTimeout(() => {
-                window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
-            }, 600);
-        } else {
-            window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
-        }
+    }
+
+    function finishSelection() {
+        applyAutoFillAndSave();
+        socket.emit('force-start-game', { gameCode });
     }
 
     const factions = [
@@ -678,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const createStat = (text, type, y1, y2, color, alignCenter = true, isValue = false) => {
             const el = document.createElement('div');
             el.className = `stat-item ${type}`;
-            el.textContent = text;
+            el.innerHTML = text; // Changed from textContent to innerHTML
 
             // Pozycje procentowe względem kontenera 3840x2160
             const topPct = (y1 / GUI_HEIGHT) * 100;
@@ -780,7 +802,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let timerColor = '#35a842'; // Green default
             if (timer <= 19) timerColor = '#a27e3d';
             if (timer <= 9) timerColor = '#ff1a1a';
-            createStat(`Rywal - Gotowy - ${timer}s`, "label", 1750, 1789, timerColor, true);
+
+            // Label green, timer dynamic color
+            const statusHTML = `Rywal - Gotowy - <span style="color: ${timerColor}">${timer}s</span>`;
+            createStat(statusHTML, "label", 1750, 1789, '#35a842', true);
         } else {
             createStat("Rywal - Nie gotowy", "label", 1750, 1789, '#ff1a1a', true);
         }

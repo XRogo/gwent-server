@@ -122,6 +122,11 @@ const ConnectionUI = {
         });
 
         this.socket.on('opponent-status', (data) => {
+            // Re-verify isHost based on authoritative server data
+            if (data.hostId) {
+                this.isHost = (this.socket.id === data.hostId);
+            }
+
             const opponentConnected = this.isHost ? data.opponentConnected : data.hostConnected;
             const oppNick = this.isHost ? data.opponentNickname : data.hostNickname;
 

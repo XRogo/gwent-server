@@ -104,6 +104,7 @@ io.on('connection', (socket) => {
         const opponentSocket = opponentId ? io.sockets.sockets.get(opponentId) : null;
 
         const statusData = {
+            hostId: game.host,
             hostConnected: !!(hostSocket && hostSocket.connected),
             opponentConnected: !!(opponentSocket && opponentSocket.connected),
             hostNickname: game.hostNickname,
@@ -163,6 +164,12 @@ io.on('connection', (socket) => {
                 io.to(targetId).emit('opponent-ready-status', { isReady });
             }
         }
+    });
+
+    socket.on('force-start-game', (data) => {
+        const { gameCode } = data;
+        console.log(`[GAME] Forcing game start for ${gameCode}`);
+        io.to(gameCode).emit('start-game-now');
     });
 
     socket.on('send-to-host', (data) => {
