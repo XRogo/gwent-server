@@ -3,166 +3,395 @@ import cards from './cards.js';
 import { showPowiek } from './powiek.js';
 import { krole } from './krole.js';
 
-let deck = [];
-let timer = null;
-let timeLeft = 60;
+let playerHand = [];
+let drawPile = [];
+let playerGraveyard = [];
+let opponentHandCount = 10;
+let opponentDeckCount = 12;
+let opponentGraveyard = [];
 
 // --- SOCKET.IO RECONNECTION ---
 const socket = typeof io !== 'undefined' ? io() : null;
 const urlParams = new URLSearchParams(window.location.search);
 const gameCode = urlParams.get('code');
 const isHost = urlParams.get('host') === 'true';
+const nick = urlParams.get('nick') || (isHost ? 'Gospodarz' : 'Gość');
 
 if (socket && gameCode) {
-    const nickFromUrl = urlParams.get('nick');
-    const nick = nickFromUrl || localStorage.getItem('nickname') || (isHost ? 'Host' : 'Przeciwnik');
-
     if (window.ConnectionUI) {
         window.ConnectionUI.init(socket, gameCode, isHost, nick);
     }
 
     socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
-    console.log(`Reconnected to board ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+    socket.emit('get-game-state', { gameCode, isHost });
+
+    socket.on('init-game-state', (data) => {
+        if (data.hand) {
+            playerHand = data.hand;
+            drawPile = data.deck;
+            playerGraveyard = data.graveyard || [];
+            opponentHandCount = data.opponentHandCount;
+            opponentDeckCount = data.opponentDeckCount;
+            renderAll();
+        } else {
+            // First time entering the board
+            startNewGame();
+        }
+    });
+
+    socket.on('opponent-status', (data) => {
+        // Refresh nicknames if changed
+        const oppNick = isHost ? data.opponentNickname : data.hostNickname;
+        if (oppNick) renderNicknames(nick, oppNick);
+    });
 }
 
-function renderUI() {
-    document.body.innerHTML = `
-        <div class="game-setup">
-            <h2>Wybierz karty do talii (min. 22)</h2>
-            <div id="deck-status">Wybrano: ${deck.length} / 22</div>
-            <button id="playButton">Graj</button>
-            <div id="timer">Pozostały czas: ${timeLeft}s</div>
-        </div>
-    `;
-    document.getElementById('playButton').onclick = onPlay;
-}
-
-function onPlay() {
-    if (deck.length < 22) {
-        alert('Musisz mieć co najmniej 22 karty w talii!');
+function startNewGame() {
+    const fullDeck = JSON.parse(localStorage.getItem('deck') || '[]');
+    if (fullDeck.length < 22) {
+        alert('Talia jest niekompletna!');
+        window.location.href = `game.html?code=${gameCode}&host=${isHost}&nick=${encodeURIComponent(nick)}`;
         return;
     }
-    clearInterval(timer);
-    startGame(deck);
-}
 
-function startGame(finalDeck) {
-    // Tutaj możesz przekierować do właściwej rozgrywki lub przekazać deck dalej
-    document.body.innerHTML = `<h2>Twoja talia:</h2><pre>${JSON.stringify(finalDeck, null, 2)}</pre>`;
-}
+    // Sort deck by cards.js index to maintain order
+    const sortedDeck = [...fullDeck].sort((a, b) => {
+        const idxA = cards.findIndex(c => c.numer === a.numer);
+        const idxB = cards.findIndex(c => c.numer === b.numer);
+        return idxA - idxB;
+    });
 
-function autoFillDeck() {
-    if (deck.length < 22) {
-        // Dobierz brakujące karty z końca kolekcji
-        const allCards = [...cards];
-        for (let i = allCards.length - 1; i >= 0 && deck.length < 22; i--) {
-            const card = allCards[i];
-            // Sprawdź ile już masz tej karty
-            const count = deck.filter(c => c.numer === card.numer).length;
-            if (count < (card.ilosc || 1)) {
-                deck.push({ ...card });
-            }
-        }
+    // Draw 10 cards
+    let deckCopy = [...sortedDeck];
+    playerHand = [];
+    for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
+        const randIdx = Math.floor(Math.random() * deckCopy.length);
+        playerHand.push(deckCopy.splice(randIdx, 1)[0]);
     }
-    startGame(deck);
+
+    // Sort hand by cards.js index
+    playerHand.sort((a, b) => {
+        const idxA = cards.findIndex(c => c.numer === a.numer);
+        const idxB = cards.findIndex(c => c.numer === b.numer);
+        return idxA - idxB;
+    });
+
+    drawPile = deckCopy;
+
+    // Save to server
+    saveState();
+
+    // Start Mulligan
+    startMulligan();
 }
 
-function startTimer() {
-    timer = setInterval(() => {
-        timeLeft--;
-        const timerDiv = document.getElementById('timer');
-        if (timerDiv) timerDiv.textContent = `Pozostały czas: ${timeLeft}s`;
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            if (deck.length < 22) {
-                autoFillDeck();
-            } else {
-                startGame(deck);
-            }
+function saveState() {
+    socket.emit('save-game-state', {
+        gameCode,
+        isHost,
+        gameState: {
+            hand: playerHand,
+            deck: drawPile,
+            graveyard: playerGraveyard
         }
-    }, 1000);
+    });
 }
 
-function renderCards() {
-    const old = document.getElementById('cardsArea');
-    if (old) old.remove();
-    const GUI_WIDTH = 3839;
-    const GUI_HEIGHT = 2159;
+function startMulligan() {
+    let swaps = 0;
+    let selectedIdx = 0;
+
+    function refreshMulligan() {
+        showPowiek(playerHand, selectedIdx, 'hand', {
+            isMulligan: true,
+            swapsLeft: 2 - swaps,
+            onSwap: (idx) => {
+                if (swaps < 2 && drawPile.length > 0) {
+                    const newCardIdx = Math.floor(Math.random() * drawPile.length);
+                    const newCard = drawPile.splice(newCardIdx, 1)[0];
+                    const oldCard = playerHand[idx];
+
+                    playerHand[idx] = newCard;
+                    drawPile.push(oldCard);
+
+                    // Re-sort hand after swap
+                    playerHand.sort((a, b) => {
+                        const idxA = cards.findIndex(c => c.numer === a.numer);
+                        const idxB = cards.findIndex(c => c.numer === b.numer);
+                        return idxA - idxB;
+                    });
+
+                    swaps++;
+                    selectedIdx = playerHand.indexOf(newCard);
+                    refreshMulligan();
+                } else if (swaps >= 2) {
+                    closeMulligan();
+                }
+            },
+            onClose: () => closeMulligan()
+        });
+    }
+
+    function closeMulligan() {
+        if (window.closePowiek) window.closePowiek();
+        saveState();
+        renderAll();
+    }
+
+    document.addEventListener('keydown', function mulliganKeys(e) {
+        if (!window.isPowiekOpen) {
+            document.removeEventListener('keydown', mulliganKeys);
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            const currentIdx = window.currentPowiekIndex;
+            if (swaps < 2 && drawPile.length > 0) {
+                const newCardIdx = Math.floor(Math.random() * drawPile.length);
+                const newCard = drawPile.splice(newCardIdx, 1)[0];
+                const oldCard = playerHand[currentIdx];
+
+                playerHand[currentIdx] = newCard;
+                drawPile.push(oldCard);
+
+                playerHand.sort((a, b) => {
+                    const idxA = cards.findIndex(c => c.numer === a.numer);
+                    const idxB = cards.findIndex(c => c.numer === b.numer);
+                    return idxA - idxB;
+                });
+
+                swaps++;
+                selectedIdx = playerHand.indexOf(newCard);
+                refreshMulligan();
+            } else {
+                closeMulligan();
+            }
+        } else if (e.key === 'Escape') {
+            closeMulligan();
+        }
+    });
+
+    refreshMulligan();
+}
+
+function renderAll() {
+    const overlay = document.querySelector('.overlay');
+    if (!overlay) return;
+    overlay.innerHTML = ''; // Clear all
+
+    renderHand();
+    renderNicknames();
+    renderGraveyards();
+    renderPiles();
+}
+
+function renderHand() {
+    const overlay = document.querySelector('.overlay');
+    const GUI_WIDTH = 3840;
+    const GUI_HEIGHT = 2160;
     const areaLeft = 1163;
     const areaTop = 1691;
     const areaRight = 3018;
     const areaBottom = 1932;
-    const areaWidth = areaRight - areaLeft;
-    const areaHeight = areaBottom - areaTop;
-    const cardWidth = 180;
-    const cardHeight = 240;
-    const cardGap = 6;
-    const overlay = document.querySelector('.overlay');
-    if (!overlay) return;
-    const overlayRect = overlay.getBoundingClientRect();
-    const overlayW = overlayRect.width;
-    const overlayH = overlayRect.height;
-    const scale = Math.min(overlayW / GUI_WIDTH, overlayH / GUI_HEIGHT);
+
+    const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
     const boardW = GUI_WIDTH * scale;
     const boardH = GUI_HEIGHT * scale;
-    const boardLeft = (overlayW - boardW) / 2;
-    const boardTop = (overlayH - boardH) / 2;
-    const areaL = areaLeft * scale + boardLeft;
-    const areaT = areaTop * scale + boardTop;
-    const areaW = areaWidth * scale;
-    const areaH = areaHeight * scale;
-    const cardsArea = document.createElement('div');
-    cardsArea.id = 'cardsArea';
-    cardsArea.style.position = 'absolute';
-    cardsArea.style.left = `${areaL}px`;
-    cardsArea.style.top = `${areaT}px`;
-    cardsArea.style.width = `${areaW}px`;
-    cardsArea.style.height = `${areaH}px`;
-    cardsArea.style.pointerEvents = 'none';
-    cardsArea.style.zIndex = 20;
-    cardsArea.style.display = 'block';
-    let cardW = cardWidth * scale;
-    let cardH = cardHeight * scale;
-    let gap = cardGap * scale;
-    let n = deck.length;
-    let realGap = gap;
-    let startX = 0;
-    if (n > 1) {
-        let totalWidth = n * cardW + (n - 1) * gap;
-        if (totalWidth > areaW) {
-            // gap tak, by ostatnia karta kończyła się na prawej krawędzi
-            realGap = (areaW - n * cardW) / (n - 1);
-            startX = 0;
-        } else {
-            // wyśrodkuj
-            realGap = gap;
-            totalWidth = n * cardW + (n - 1) * realGap;
-            startX = (areaW - totalWidth) / 2;
-        }
-    } else {
-        // jedna karta - wyśrodkuj
-        startX = (areaW - cardW) / 2;
-    }
-    deck.forEach((card, i) => {
-        const cardDiv = document.createElement('img');
-        cardDiv.src = card.karta;
-        cardDiv.style.position = 'absolute';
-        cardDiv.style.left = `${startX + i * (cardW + realGap)}px`;
-        cardDiv.style.top = `${(areaH - cardH) / 2}px`;
-        cardDiv.style.width = `${cardW}px`;
-        cardDiv.style.height = `${cardH}px`;
-        cardDiv.style.objectFit = 'contain';
-        cardDiv.style.aspectRatio = '3/4';
-        cardDiv.style.zIndex = 10 + i;
-        cardDiv.className = 'card';
-        cardDiv.dataset.index = i;
-        cardDiv.oncontextmenu = (e) => {
+    const boardLeft = (window.innerWidth - boardW) / 2;
+    const boardTop = (window.innerHeight - boardH) / 2;
+
+    const areaW = (areaRight - areaLeft) * scale;
+    const areaH = (areaBottom - areaTop) * scale;
+
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = `${areaLeft * scale + boardLeft}px`;
+    container.style.top = `${areaTop * scale + boardTop}px`;
+    container.style.width = `${areaW}px`;
+    container.style.height = `${areaH}px`;
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+
+    const cardW = 180 * scale;
+    const cardH = 240 * scale;
+    const n = playerHand.length;
+    const gap = (n > 1) ? Math.min(10 * scale, (areaW - n * cardW) / (n - 1)) : 0;
+
+    playerHand.forEach((card, i) => {
+        const img = document.createElement('img');
+        img.src = card.karta;
+        img.style.width = `${cardW}px`;
+        img.style.height = `${cardH}px`;
+        img.style.marginRight = i === n - 1 ? '0' : `${gap}px`;
+        img.style.cursor = 'pointer';
+        img.oncontextmenu = (e) => {
             e.preventDefault();
-            showPowiek(deck, i, 'cards');
+            showPowiek(playerHand, i, 'hand');
         };
-        cardsArea.appendChild(cardDiv);
+        container.appendChild(img);
     });
-    overlay.appendChild(cardsArea);
+
+    overlay.appendChild(container);
+}
+
+function renderNicknames() {
+    const overlay = document.querySelector('.overlay');
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardW = 3840 * scale;
+    const boardH = 2160 * scale;
+    const boardLeft = (window.innerWidth - boardW) / 2;
+    const boardTop = (window.innerHeight - boardH) / 2;
+
+    // Przeciwnik: {483, 569} do {850, 602}
+    const oppX = 483 * scale + boardLeft;
+    const oppY = 569 * scale + boardTop;
+    const oppW = (850 - 483) * scale;
+    const oppH = (602 - 569) * scale;
+
+    // Ty: {483, 1498} do {850, 1532}
+    const selfX = 483 * scale + boardLeft;
+    const selfY = 1498 * scale + boardTop;
+    const selfW = (850 - 483) * scale;
+    const selfH = (1532 - 1498) * scale;
+
+    const createNick = (name, x, y, w, h) => {
+        const div = document.createElement('div');
+        div.style.position = 'absolute';
+        div.style.left = `${x}px`;
+        div.style.top = `${y}px`;
+        div.style.width = `${w}px`;
+        div.style.height = `${h}px`;
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'center';
+        div.style.color = '#c7a76e';
+        div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        div.style.fontSize = `${32 * scale}px`;
+        div.style.fontWeight = 'bold';
+        div.style.textShadow = '2px 2px 2px #000';
+        div.textContent = name;
+        return div;
+    };
+
+    overlay.appendChild(createNick(window.opponentNickname || 'PRZECIWNIK', oppX, oppY, oppW, oppH));
+    overlay.appendChild(createNick(nick, selfX, selfY, selfW, selfH));
+}
+
+function renderGraveyards() {
+    const overlay = document.querySelector('.overlay');
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardW = 3840 * scale;
+    const boardH = 2160 * scale;
+    const boardLeft = (window.innerWidth - boardW) / 2;
+    const boardTop = (window.innerHeight - boardH) / 2;
+
+    const gX = 3111 * scale + boardLeft;
+    const gY = 1680 * scale + boardTop;
+    const cardW = 180 * scale;
+    const cardH = 240 * scale;
+
+    // Stacking offset: 2px up and 2px left for each card
+    playerGraveyard.forEach((card, i) => {
+        const img = document.createElement('img');
+        img.src = card.karta;
+        img.style.position = 'absolute';
+        img.style.left = `${gX - (i * 2 * scale)}px`;
+        img.style.top = `${gY - (i * 2 * scale)}px`;
+        img.style.width = `${cardW}px`;
+        img.style.height = `${cardH}px`;
+        img.style.zIndex = 50 + i;
+        img.style.borderRadius = `${8 * scale}px`;
+        overlay.appendChild(img);
+    });
+}
+
+function renderPiles() {
+    const overlay = document.querySelector('.overlay');
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardW = 3840 * scale;
+    const boardH = 2160 * scale;
+    const boardLeft = (window.innerWidth - boardW) / 2;
+    const boardTop = (window.innerHeight - boardH) / 2;
+
+    const myFaction = localStorage.getItem('faction') || "1";
+    const pileAsset = getFactionReverse(myFaction);
+
+    // Twoja talia: 3457, 1654
+    const selfX = 3457 * scale + boardLeft;
+    const selfY = 1654 * scale + boardTop;
+
+    // Talia przeciwnika: 3457, 131
+    const oppX = 3457 * scale + boardLeft;
+    const oppY = 131 * scale + boardTop;
+
+    const cardW = 180 * scale;
+    const cardH = 240 * scale;
+
+    const renderPile = (x, y, count, isOpponent) => {
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = `${x}px`;
+        container.style.top = `${y}px`;
+        container.style.width = `${cardW}px`;
+        container.style.height = `${cardH}px`;
+
+        const img = document.createElement('img');
+        img.src = isOpponent ? '/gwent/assets/asety/nie_rewers.webp' : pileAsset;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = `${8 * scale}px`;
+        container.appendChild(img);
+
+        // Count overlay coordinates based on faction reverso layout
+        // ty: 3487, 1889 x 3587, 1963
+        // przeciwnik: 3483, 358 x 3583, 433
+        let badgeX, badgeY, badgeW, badgeH;
+        if (isOpponent) {
+            badgeX = (3483 - 3457) * scale;
+            badgeY = (358 - 131) * scale;
+            badgeW = (3583 - 3483) * scale;
+            badgeH = (433 - 358) * scale;
+        } else {
+            badgeX = (3487 - 3457) * scale;
+            badgeY = (1889 - 1654) * scale;
+            badgeW = (3587 - 3487) * scale;
+            badgeH = (1963 - 1889) * scale;
+        }
+
+        const badge = document.createElement('div');
+        badge.style.position = 'absolute';
+        badge.style.left = `${badgeX}px`;
+        badge.style.top = `${badgeY}px`;
+        badge.style.width = `${badgeW}px`;
+        badge.style.height = `${badgeH}px`;
+        badge.style.background = 'rgba(0,0,0,0.9)';
+        badge.style.color = '#c7a76e';
+        badge.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        badge.style.fontSize = `${38 * scale}px`;
+        badge.style.fontWeight = 'bold';
+        badge.style.display = 'flex';
+        badge.style.alignItems = 'center';
+        badge.style.justifyContent = 'center';
+        badge.textContent = count;
+        container.appendChild(badge);
+
+        return container;
+    };
+
+    overlay.appendChild(renderPile(selfX, selfY, drawPile.length, false));
+    overlay.appendChild(renderPile(oppX, oppY, opponentDeckCount, true));
+}
+
+function getFactionReverse(factionId) {
+    switch (factionId) {
+        case "1": return "/gwent/assets/asety/polnoc.webp";
+        case "2": return "/gwent/assets/asety/nilftgard_rewers.webp";
+        case "3": return "/gwent/assets/asety/scoia'tel_rewers.webp";
+        case "4": return "/gwent/assets/asety/potwory_rewers.webp";
+        case "5": return "/gwent/assets/asety/skelige_rewers.webp";
+        default: return "/gwent/assets/asety/polnoc.webp";
+    }
 }
 
 // Pozycje rzędów kart na planszy 4K
@@ -352,100 +581,9 @@ function renderLeaders() {
     overlay.appendChild(leadersArea);
 }
 
-// Funkcja do wyświetlania nicków na planszy
-function showNicknames(playerNick, opponentNick) {
-    const board = document.getElementById('gameBoard');
-    if (!board) {
-        console.warn('Nie znaleziono elementu #gameBoard!');
-        return;
-    }
-    // Usuń stare nicki jeśli są
-    board.querySelectorAll('.nick-player, .nick-opponent').forEach(e => e.remove());
-    // Nick gracza
-    const playerDiv = document.createElement('div');
-    playerDiv.className = 'nick-player';
-    playerDiv.textContent = playerNick;
-    board.appendChild(playerDiv);
-    // Nick przeciwnika
-    const oppDiv = document.createElement('div');
-    oppDiv.className = 'nick-opponent';
-    oppDiv.textContent = opponentNick;
-    board.appendChild(oppDiv);
-}
-
-// Przykład użycia po naciśnięciu "Graj":
-showNicknames('TwójNick', 'PrzeciwnikNick');
-// Właściwe nicki pobierz z logiki gry/sesji
-
 document.addEventListener('DOMContentLoaded', () => {
-    deck = JSON.parse(localStorage.getItem('deck') || '[]');
-    renderCards();
-    window.addEventListener('resize', renderCards);
+    // Initial render will happen after socket init
+    window.addEventListener('resize', renderAll);
 });
 
-// --- START: Losowanie ręki i wymiana kart na początku gry ---
-function startHandDraw(deck) {
-    let deckCopy = [...deck];
-    let hand = [];
-    for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
-        const idx = Math.floor(Math.random() * deckCopy.length);
-        hand.push(deckCopy.splice(idx, 1)[0]);
-    }
-    let swaps = 0;
-    let selectedIdx = 0;
-    function showHandPowieka() {
-        showPowiek(hand, selectedIdx, 'hand', {
-            onCardClick: (cardIdx) => {
-                selectedIdx = cardIdx;
-                if (swaps < 2 && deckCopy.length > 0) {
-                    const newIdx = Math.floor(Math.random() * deckCopy.length);
-                    const newCard = deckCopy.splice(newIdx, 1)[0];
-                    deckCopy.push(hand[cardIdx]);
-                    hand[cardIdx] = newCard;
-                    swaps++;
-                    showHandPowieka();
-                }
-            },
-            onEsc: () => {
-                window.closePowiek && window.closePowiek();
-                window.playerHand = hand;
-            },
-            onOk: () => {
-                window.closePowiek && window.closePowiek();
-                window.playerHand = hand;
-            },
-            swapsLeft: 2 - swaps,
-            fontFamily: 'PFDinTextCondPro-Bold, Cinzel, serif',
-            context: 'game'
-        });
-        document.onkeydown = function (e) {
-            if (e.key === 'Enter' && swaps < 2 && deckCopy.length > 0) {
-                const newIdx = Math.floor(Math.random() * deckCopy.length);
-                const newCard = deckCopy.splice(newIdx, 1)[0];
-                deckCopy.push(hand[selectedIdx]);
-                hand[selectedIdx] = newCard;
-                swaps++;
-                showHandPowieka();
-            }
-            if (e.key === 'Escape') {
-                window.closePowiek && window.closePowiek();
-                window.playerHand = hand;
-            }
-        };
-    }
-    showHandPowieka();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Wczytaj talię gracza z localStorage
-    const deck = JSON.parse(localStorage.getItem('deck') || '[]');
-    if (deck && deck.length >= 10) {
-        startHandDraw(deck);
-    } else {
-        // Możesz dodać komunikat o błędzie jeśli nie ma talii
-        alert('Brak talii lub za mało kart!');
-    }
-});
-// --- KONIEC: Losowanie ręki i wymiana kart na początku gry ---
-
-export { renderRow, renderRog, renderExtraPile, renderLeaders };
+export { renderRow, renderRog, renderExtraPile, renderLeaders, renderAll };

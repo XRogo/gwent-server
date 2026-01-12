@@ -45,20 +45,30 @@ function getPowerImage(card) {
 
     return defaultImages[card.moc] || "";
 }
-function showPowiek(deck, index, mode = 'cards') {
-    // Filtruj duplikaty po numerze
-    const uniqueDeck = [];
-    const seenNumbers = new Set();
-    for (const card of deck) {
-        if (!seenNumbers.has(card.numer)) {
-            uniqueDeck.push(card);
-            seenNumbers.add(card.numer);
+let powiekOptions = {};
+
+function showPowiek(deck, index, mode = 'cards', options = {}) {
+    powiekOptions = options;
+    if (mode === 'hand' || mode === 'game') {
+        powiekDeck = deck; // Don't unique for game hand
+    } else {
+        // Filtruj duplikaty po numerze for collection
+        const uniqueDeck = [];
+        const seenNumbers = new Set();
+        for (const card of deck) {
+            if (!seenNumbers.has(card.numer)) {
+                uniqueDeck.push(card);
+                seenNumbers.add(card.numer);
+            }
         }
+        powiekDeck = uniqueDeck;
     }
-    powiekDeck = uniqueDeck;
     powiekIndex = index;
     powiekActive = true;
     powiekMode = mode;
+    window.currentPowiekIndex = index;
+    window.isPowiekOpen = true;
+
     // Wyłącz scroll strony podczas powiek
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
@@ -71,6 +81,7 @@ function showPowiek(deck, index, mode = 'cards') {
 
 function hidePowiek() {
     powiekActive = false;
+    window.isPowiekOpen = false;
     const el = document.getElementById('powiekOverlay');
     if (el) el.remove();
     const powiekBg = document.getElementById('powiekBg');
@@ -82,6 +93,8 @@ function hidePowiek() {
     window.removeEventListener('wheel', powiekBlockScroll, { passive: false });
     window.removeEventListener('touchmove', powiekBlockScroll, { passive: false });
     window.removeEventListener('keydown', powiekBlockScroll, { passive: false });
+
+    if (powiekOptions && powiekOptions.onClose) powiekOptions.onClose();
 }
 
 function renderPowiek() {
@@ -186,13 +199,19 @@ function renderPowiek() {
             cardDiv.style.top = (pos.top - pos.height * 0.02) + 'px';
             cardDiv.style.width = (pos.width * 1.4) + 'px';
             cardDiv.style.height = (pos.height * 1.14) + 'px';
-            // Dodaj kliknięcie na środkowego króla w trybie leaders
+            // Dodaj kliknięcie na środkowego króla w trybie leaders lub zamianę w mulligan
             if (powiekMode === 'leaders') {
                 cardDiv.style.cursor = 'pointer';
                 cardDiv.onclick = function (e) {
                     e.stopPropagation();
                     if (window.selectLeader) window.selectLeader(card.numer);
                     hidePowiek();
+                };
+            } else if (powiekOptions && powiekOptions.isMulligan) {
+                cardDiv.style.cursor = 'pointer';
+                cardDiv.onclick = function (e) {
+                    e.stopPropagation();
+                    if (powiekOptions.onSwap) powiekOptions.onSwap(powiekIndex);
                 };
             }
         } else {
@@ -474,6 +493,34 @@ function renderPowiek() {
         overlay.appendChild(mocDesc);
     }
 
+    // Mulligan UI: Swaps left
+    if (powiekOptions && powiekOptions.isMulligan) {
+        const swapInfo = document.createElement('div');
+        swapInfo.style.position = 'absolute';
+        swapInfo.style.bottom = '5%';
+        swapInfo.style.left = '50%';
+        swapInfo.style.transform = 'translateX(-50%)';
+        swapInfo.style.color = '#c7a76e';
+        swapInfo.style.fontFamily = 'PFDinTextCondPro-Bold';
+        swapInfo.style.fontSize = relW(48) + 'px';
+        swapInfo.style.textShadow = '2px 2px 4px #000';
+        swapInfo.style.zIndex = 300;
+        swapInfo.textContent = `Pozostałe wymiany: ${powiekOptions.swapsLeft}`;
+        overlay.appendChild(swapInfo);
+
+        const helpInfo = document.createElement('div');
+        helpInfo.style.position = 'absolute';
+        helpInfo.style.bottom = '2%';
+        helpInfo.style.left = '50%';
+        helpInfo.style.transform = 'translateX(-50%)';
+        helpInfo.style.color = '#fff';
+        helpInfo.style.fontFamily = 'PFDinTextCondPro';
+        helpInfo.style.fontSize = relW(28) + 'px';
+        helpInfo.style.zIndex = 300;
+        helpInfo.textContent = 'Kliknij / Enter - wymień | Esc - zakończ';
+        overlay.appendChild(helpInfo);
+    }
+
     // Przy generowaniu kart w powiek.js:
     document.querySelectorAll('.powiek-card').forEach((el, cardIdx) => {
         el.onclick = function (e) {
@@ -598,6 +645,8 @@ window.addEventListener('keydown', function (event) {
                 window.selectLeader(powiekDeck[powiekIndex].numer);
                 hidePowiek();
             }
+        } else if (powiekOptions && powiekOptions.isMulligan) {
+            if (powiekOptions.onSwap) powiekOptions.onSwap(powiekIndex);
         } else {
             // Dodaj/usuń kartę Enterem
             handleCardActionInsideZoom();

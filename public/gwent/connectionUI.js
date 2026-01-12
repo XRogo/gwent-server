@@ -137,16 +137,18 @@ const ConnectionUI = {
 
             if (oppNick) {
                 this.opponentNickname = oppNick;
+                window.opponentNickname = oppNick;
                 if (this.oppLabel) this.oppLabel.textContent = oppNick;
             } else if (!this.opponentNickname) {
                 this.opponentNickname = this.isHost ? "Gość" : "Gospodarz";
+                window.opponentNickname = this.opponentNickname;
                 if (this.oppLabel) this.oppLabel.textContent = this.opponentNickname;
             }
 
             if (opponentConnected) {
                 this.updateStatus('connected');
             } else {
-                this.updateStatus('disconnected');
+                this.updateStatus('reconnecting');
             }
         });
 
@@ -174,6 +176,7 @@ const ConnectionUI = {
             case 'reconnecting':
                 this.dot.style.backgroundColor = '#ffde00';
                 this.dot.style.color = '#ffde00';
+                this.text.textContent = 'Łączenie...';
                 break;
             case 'timeout':
                 this.dot.style.backgroundColor = '#e74c3c';

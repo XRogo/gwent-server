@@ -182,7 +182,54 @@ io.on('connection', (socket) => {
     socket.on('force-start-game', (data) => {
         const { gameCode } = data;
         console.log(`[GAME] Forcing game start for ${gameCode}`);
+        if (games[gameCode]) {
+            games[gameCode].status = 'playing';
+            // Initialize empty state if not exists
+            if (!games[gameCode].gameState) {
+                games[gameCode].gameState = {
+                    hostHand: null,
+                    hostDeck: null,
+                    hostGraveyard: [],
+                    oppHand: null,
+                    oppDeck: null,
+                    oppGraveyard: [],
+                    board: {}
+                };
+            }
+        }
         io.to(gameCode).emit('start-game-now');
+    });
+
+    socket.on('save-game-state', (data) => {
+        const { gameCode, isHost, gameState } = data;
+        if (games[gameCode]) {
+            if (!games[gameCode].gameState) games[gameCode].gameState = {};
+
+            if (isHost) {
+                if (gameState.hand) games[gameCode].gameState.hostHand = gameState.hand;
+                if (gameState.deck) games[gameCode].gameState.hostDeck = gameState.deck;
+                if (gameState.graveyard) games[gameCode].gameState.hostGraveyard = gameState.graveyard;
+            } else {
+                if (gameState.hand) games[gameCode].gameState.oppHand = gameState.hand;
+                if (gameState.deck) games[gameCode].gameState.oppDeck = gameState.deck;
+                if (gameState.graveyard) games[gameCode].gameState.oppGraveyard = gameState.graveyard;
+            }
+            console.log(`[GAME] State saved for ${isHost ? 'Host' : 'Opponent'} in ${gameCode}`);
+        }
+    });
+
+    socket.on('get-game-state', (data) => {
+        const { gameCode, isHost } = data;
+        if (games[gameCode] && games[gameCode].gameState) {
+            const state = games[gameCode].gameState;
+            socket.emit('init-game-state', {
+                hand: isHost ? state.hostHand : state.oppHand,
+                deck: isHost ? state.hostDeck : state.oppDeck,
+                graveyard: isHost ? state.hostGraveyard : state.oppGraveyard,
+                opponentHandCount: isHost ? (state.oppHand ? state.oppHand.length : 0) : (state.hostHand ? state.hostHand.length : 0),
+                opponentDeckCount: isHost ? (state.oppDeck ? state.oppDeck.length : 0) : (state.hostDeck ? state.hostDeck.length : 0)
+            });
+        }
     });
 
     socket.on('send-to-host', (data) => {
