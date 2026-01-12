@@ -11,6 +11,40 @@ let powiekBlockScroll = function (e) {
     e.preventDefault();
     return false;
 };
+
+function getPowerImage(card) {
+    const specialCases = {
+        "000": { "grzybki": "grzybki.webp" },
+        "003": { "porz": "porz.webp" },
+        "002": { "rog": "rog.webp" }
+    };
+
+    if (specialCases[card.numer] && specialCases[card.numer][card.moc]) {
+        return specialCases[card.numer][card.moc];
+    }
+
+    const defaultImages = {
+        "berserk": "berserk.webp",
+        "deszcz": "deszcz.webp",
+        "grzybki": "igrzybki.webp",
+        "iporz": "iporz.webp",
+        "manek": "manek.webp",
+        "medyk": "medyk.webp",
+        "mgla": "mgla.webp",
+        "morale": "morale.webp",
+        "mroz": "mroz.webp",
+        "niebo": "niebo.webp",
+        "porz": "2porz.webp",
+        "rog": "irog.webp",
+        "szpieg": "szpieg.webp",
+        "sztorm": "sztorm.webp",
+        "wezwanie": "wezwanie.webp",
+        "wezwarniezza": "wezwarniezza.webp",
+        "wiez": "wiz.webp"
+    };
+
+    return defaultImages[card.moc] || "";
+}
 function showPowiek(deck, index, mode = 'cards') {
     // Filtruj duplikaty po numerze
     const uniqueDeck = [];
@@ -231,9 +265,16 @@ function renderPowiek() {
         beton.style.height = '100%';
         beton.style.zIndex = 4;
         inner.appendChild(beton);
-        // 5: pasek frakcji (dodawany dla każdej karty z frakcją 1-5, nie dla dowódców)
+        // 5: pasek frakcji
         const isKing = card.isKing || card.typ === 'krol' || powiekMode === 'leaders' || false;
-        if (typeof card.frakcja === 'string' && ['1', '2', '3', '4', '5'].includes(card.frakcja) && !isKing) {
+        if (!isKing) {
+            let bannerFaction = card.frakcja;
+            if (bannerFaction === "nie") {
+                bannerFaction = localStorage.getItem('faction') || '1';
+                // Fallback do frakcji z game.js jeśli dostępna
+                if (window.selectedFaction) bannerFaction = window.selectedFaction;
+            }
+
             let frakcjaMap = {
                 '1': 'polnoc.webp',
                 '2': 'nilfgaard.webp',
@@ -241,15 +282,18 @@ function renderPowiek() {
                 '4': 'potwory.webp',
                 '5': 'skellige.webp'
             };
-            const bannerDiv = document.createElement('img');
-            bannerDiv.src = `assets/dkarty/${frakcjaMap[card.frakcja]}`;
-            bannerDiv.style.position = 'absolute';
-            bannerDiv.style.left = '0';
-            bannerDiv.style.top = '0';
-            bannerDiv.style.width = '100%';
-            bannerDiv.style.height = '100%';
-            bannerDiv.style.zIndex = 5;
-            inner.appendChild(bannerDiv);
+
+            if (frakcjaMap[bannerFaction]) {
+                const bannerDiv = document.createElement('img');
+                bannerDiv.src = `assets/dkarty/${frakcjaMap[bannerFaction]}`;
+                bannerDiv.style.position = 'absolute';
+                bannerDiv.style.left = '0';
+                bannerDiv.style.top = '0';
+                bannerDiv.style.width = '100%';
+                bannerDiv.style.height = '100%';
+                bannerDiv.style.zIndex = 5;
+                inner.appendChild(bannerDiv);
+            }
         }
         // 6: pozycja
         if (card.pozycja) {
@@ -263,96 +307,119 @@ function renderPowiek() {
             posIcon.style.zIndex = 6;
             inner.appendChild(posIcon);
         }
-        // 7: punkty okienko (zawsze dla kart z punktami, także pogodowych i specjalnych)
-        const isWeather = ['mroz', 'mgla', 'deszcz', 'niebo', 'sztorm'].includes(card.moc);
-        const isSpecial = ['porz', 'rog', 'maneki'].includes(card.moc);
-        const isManekOrGrzybki = card.moc === 'manek' || card.numer === '000';
-        if (card.punkty !== undefined || isWeather || isSpecial || isManekOrGrzybki) {
+        // 7: punkty okienko i bohater icon
+        const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+        const isSpecialMoc = ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc);
+
+        if (card.punkty !== undefined || isWeather || isSpecialMoc) {
             const pointsBg = document.createElement('img');
-            if (card.bohater) {
-                pointsBg.src = 'assets/dkarty/bohater.webp';
-                pointsBg.style.position = 'absolute';
-                pointsBg.style.left = (pos.width * (-23 / 523)) + 'px';
-                pointsBg.style.top = (pos.height * (-21 / 992)) + 'px';
-                pointsBg.style.width = (pos.width * (285 / 523)) + 'px';
-                pointsBg.style.height = (pos.height * (287 / 992)) + 'px';
-            } else {
-                pointsBg.src = 'assets/dkarty/punkty.webp';
-                pointsBg.style.position = 'absolute';
-                pointsBg.style.left = '0';
-                pointsBg.style.top = '0';
-                pointsBg.style.width = '100%';
-                pointsBg.style.height = '100%';
-            }
+            pointsBg.src = 'assets/dkarty/punkty.webp';
+            pointsBg.style.position = 'absolute';
+            pointsBg.style.left = '0';
+            pointsBg.style.top = '0';
+            pointsBg.style.width = '100%';
+            pointsBg.style.height = '100%';
             pointsBg.style.zIndex = 7;
             inner.appendChild(pointsBg);
+
+            if (card.bohater) {
+                const heroIcon = document.createElement('img');
+                heroIcon.src = 'assets/dkarty/bohater.webp';
+                heroIcon.className = 'powiek-hero-icon';
+                heroIcon.style.position = 'absolute';
+                heroIcon.style.top = '-1.912386%';
+                heroIcon.style.left = '-4.389313%';
+                heroIcon.style.width = '59.160305%';
+                heroIcon.style.height = '31.017121%';
+                heroIcon.style.objectFit = 'contain';
+                heroIcon.style.zIndex = 40;
+                inner.appendChild(heroIcon);
+            }
+
             if (card.punkty !== undefined) {
                 const pointsDiv = document.createElement('div');
                 pointsDiv.innerText = card.punkty;
                 pointsDiv.style.position = 'absolute';
-                pointsDiv.style.top = '8%';
-                pointsDiv.style.left = '15%';
-                pointsDiv.style.width = '24%';
-                pointsDiv.style.height = '9%';
+                pointsDiv.style.top = '7.8%';
+                pointsDiv.style.left = '14.5%';
+                pointsDiv.style.width = '23.61%';
+                pointsDiv.style.height = '8.84%';
+                pointsDiv.style.transform = 'translate(-50%, -50%)';
                 pointsDiv.style.fontSize = (pos.height * 0.13) + 'px';
-                pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
-                pointsDiv.style.zIndex = 8;
+                pointsDiv.style.color = card.bohater ? '#ffffff' : '#000000';
+                pointsDiv.style.zIndex = 41;
                 pointsDiv.style.display = 'flex';
                 pointsDiv.style.justifyContent = 'center';
                 pointsDiv.style.alignItems = 'center';
+                // Font family i weight jak w wyborze
+                pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+                pointsDiv.style.fontWeight = 'bold';
                 inner.appendChild(pointsDiv);
             }
         }
         // 8: okienko mocy
         if (card.moc) {
-            const mocIcon = document.createElement('img');
-            let mocSrc = `assets/dkarty/${card.moc}.webp`;
-            if (card.moc === 'porz' && card.numer === '510') mocSrc = 'assets/dkarty/2porz.webp';
-            if (card.moc === 'grzybki' && card.numer === '504') mocSrc = 'assets/dkarty/igrzybki.webp';
-            if (card.moc === 'grzybki' && card.numer === '000') mocSrc = 'assets/dkarty/grzybki.webp';
-            mocIcon.src = mocSrc;
-            mocIcon.style.position = 'absolute';
-            mocIcon.style.left = '0';
-            mocIcon.style.top = '0';
-            mocIcon.style.width = '100%';
-            mocIcon.style.height = '100%';
-            mocIcon.style.zIndex = 9;
-            inner.appendChild(mocIcon);
+            const powerImage = getPowerImage(card);
+            if (powerImage) {
+                const mocIcon = document.createElement('img');
+                mocIcon.src = `assets/dkarty/${powerImage}`;
+                mocIcon.style.position = 'absolute';
+                mocIcon.style.left = '0';
+                mocIcon.style.top = '0';
+                mocIcon.style.width = '100%';
+                mocIcon.style.height = '100%';
+                mocIcon.style.zIndex = 9;
+                inner.appendChild(mocIcon);
+            }
         }
         // 10: nazwa karty
         const nameDiv = document.createElement('div');
         nameDiv.innerText = card.nazwa;
         nameDiv.style.position = 'absolute';
-        nameDiv.style.left = '22%';
+        if (powiekMode === 'leaders') {
+            nameDiv.style.left = '0';
+            nameDiv.style.width = '100%';
+        } else {
+            nameDiv.style.left = '22%';
+            nameDiv.style.width = '76%';
+        }
         nameDiv.style.top = '77%';
-        nameDiv.style.width = '76%';
         nameDiv.style.height = '11%';
         nameDiv.style.textAlign = 'center';
         nameDiv.style.fontSize = (pos.height * 0.044) + 'px';
         nameDiv.style.color = '#474747';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = 12;
-        nameDiv.style.whiteSpace = 'normal';
-        nameDiv.style.wordBreak = 'break-word';
-        nameDiv.style.lineHeight = '1.1';
+        nameDiv.style.whiteSpace = 'nowrap';
         nameDiv.style.padding = '0 4px';
-        nameDiv.style.transform = 'none';
         inner.appendChild(nameDiv);
-        // 11: opis pod dużą kartą
-        if (i === 0) {
-            const opisDiv = document.createElement('div');
-            opisDiv.innerText = card.opis || '';
-            opisDiv.style.position = 'absolute';
-            opisDiv.style.left = '2%';
-            opisDiv.style.top = '89%';
-            opisDiv.style.width = '96%';
-            opisDiv.style.height = '8%';
-            opisDiv.style.textAlign = 'center';
-            opisDiv.style.color = '#030303ff';
-            opisDiv.style.fontSize = (pos.height * 0.044) + 'px';
-            opisDiv.style.zIndex = 20;
-            inner.appendChild(opisDiv);
-        }
+
+        // --- 11: opis pod kartą (dla wszystkich kart) ---
+        const opisDiv = document.createElement('div');
+        // Usuwamy \n i trimujemy
+        const rawOpis = (card.opis || '').replace(/\n/g, ' ').trim();
+        opisDiv.innerText = rawOpis;
+        opisDiv.style.position = 'absolute';
+        opisDiv.style.left = '2%';
+        opisDiv.style.top = '89%';
+        opisDiv.style.width = '96%';
+        opisDiv.style.height = '8%';
+        opisDiv.style.textAlign = 'center';
+        opisDiv.style.color = '#030303ff';
+        opisDiv.style.zIndex = 20;
+        opisDiv.style.display = 'flex';
+        opisDiv.style.justifyContent = 'center';
+        opisDiv.style.alignItems = 'center';
+        opisDiv.style.whiteSpace = 'nowrap';
+
+        // Dynamiczny font-size
+        let baseFs = pos.height * 0.044;
+        if (rawOpis.length > 50) baseFs = pos.height * 0.038;
+        if (rawOpis.length > 80) baseFs = pos.height * 0.032;
+        if (rawOpis.length > 120) baseFs = pos.height * 0.026;
+        opisDiv.style.fontSize = baseFs + 'px';
+
+        inner.appendChild(opisDiv);
         cardDiv.appendChild(inner);
         overlay.appendChild(cardDiv);
     }
@@ -370,15 +437,18 @@ function renderPowiek() {
         infoBox.style.zIndex = 200;
         overlay.appendChild(infoBox);
         // Ikona mocy
-        const mocIcon = document.createElement('img');
-        mocIcon.src = `assets/dkarty/${card0.moc}.webp`;
-        mocIcon.style.position = 'absolute';
-        mocIcon.style.left = relW(1356 + 10) + 'px';
-        mocIcon.style.top = relH(1661 + 10) + 'px';
-        mocIcon.style.width = relW(64) + 'px';
-        mocIcon.style.height = relH(64) + 'px';
-        mocIcon.style.zIndex = 201;
-        overlay.appendChild(mocIcon);
+        const powerImage = getPowerImage(card0);
+        if (powerImage) {
+            const mocIcon = document.createElement('img');
+            mocIcon.src = `assets/dkarty/${powerImage}`;
+            mocIcon.style.position = 'absolute';
+            mocIcon.style.left = relW(1356 + 10) + 'px';
+            mocIcon.style.top = relH(1661 + 10) + 'px';
+            mocIcon.style.width = relW(64) + 'px';
+            mocIcon.style.height = relH(64) + 'px';
+            mocIcon.style.zIndex = 201;
+            overlay.appendChild(mocIcon);
+        }
         // Nazwa mocy
         const mocName = document.createElement('div');
         mocName.textContent = window.moce?.[card0.moc]?.nazwa || '';
@@ -433,38 +503,28 @@ window.addEventListener('contextmenu', function (e) {
         e.preventDefault();
         // Pobierz źródło kart
         let source = null;
+        const selectedFaction = window.selectedFaction || localStorage.getItem('faction') || '1';
+
         if (cardEl.classList.contains('kolekcja-card')) {
-            const selectedFaction = window.selectedFaction || localStorage.getItem('faction');
             // Pobierz numery kart z talii gracza
             const taliaNumery = new Set((window.taliaPowiek || []).map(card => card.numer));
             // Filtruj kolekcję: tylko wybrana frakcja + neutralne, których nie ma w talii
             const filteredKolekcja = (window.kolekcjaPowiek || []).filter(card => (card.frakcja === selectedFaction || card.frakcja === 'nie') && !taliaNumery.has(card.numer));
-            // Filtruj po numerze
-            const uniqueCards = [];
-            const seenNumbers = new Set();
-            for (const card of filteredKolekcja) {
-                if (!seenNumbers.has(card.numer)) {
-                    uniqueCards.push(card);
-                    seenNumbers.add(card.numer);
-                }
-            }
-            // Przelicz indeks na unikalną tablicę
-            let origIndex = parseInt(cardEl.dataset.index);
-            let cardNumer = null;
-            if (window.kolekcjaPowiek && window.kolekcjaPowiek[origIndex]) cardNumer = window.kolekcjaPowiek[origIndex].numer;
-            let newIndex = 0;
-            if (cardNumer) {
-                newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);
-                if (newIndex === -1) newIndex = 0;
-            }
-            showPowiek(uniqueCards, newIndex, 'cards');
-            return;
+            source = filteredKolekcja;
         }
-        else if (cardEl.classList.contains('talia-card')) source = window.taliaPowiek || [];
-        else if (cardEl.closest('.talia-gry')) source = window.deckForPowiek || [];
-        else if (cardEl.classList.contains('powiek-card')) source = powiekDeck || [];
+        else if (cardEl.classList.contains('talia-card')) {
+            source = window.taliaPowiek || [];
+        }
+        else if (cardEl.closest('.talia-gry')) {
+            source = window.deckForPowiek || [];
+        }
+        else if (cardEl.classList.contains('powiek-card')) {
+            source = powiekDeck || [];
+        }
+
         if (!source || source.length === 0) source = window.deckForPowiek || [];
-        // Filtruj po numerze
+
+        // Filtruj po numerze (unikalne karty dla nawigacji w powiększeniu)
         const uniqueCards = [];
         const seenNumbers = new Set();
         for (const card of source) {
@@ -475,9 +535,8 @@ window.addEventListener('contextmenu', function (e) {
         }
         // Przelicz indeks na unikalną tablicę
         let origIndex = parseInt(cardEl.dataset.index);
-        let cardNumer = null;
-        if (source[origIndex]) cardNumer = source[origIndex].numer;
-        if (!cardNumer && powiekDeck && powiekDeck[origIndex]) cardNumer = powiekDeck[origIndex].numer;
+        let cardNumer = cardEl.dataset.numer; // Pobieramy numer bezpośrednio z dataset
+
         let newIndex = 0;
         if (cardNumer) {
             newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);

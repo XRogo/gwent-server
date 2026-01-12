@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUI_WIDTH = 3840;
     const GUI_HEIGHT = 2160;
     let deck = [];
+    window.taliaPowiek = deck;
+    window.kolekcjaPowiek = cards;
+    window.selectedFaction = "1";
     let selectedLeader = null;
 
     // --- SOCKET.IO RECONNECTION ---
@@ -477,12 +480,24 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+            if (area === collectionArea) cardElement.classList.add('kolekcja-card');
+            if (area === deckArea) cardElement.classList.add('talia-card');
             cardElement.setAttribute('data-numer', card.numer);
+            cardElement.setAttribute('data-index', filteredCards.indexOf(card));
 
             let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
             if (card.nazwa === "Bies" && playerFaction !== "4") {
                 bannerFaction = playerFaction;
             }
+
+            const bannerMap = {
+                '1': 'polnoc.webp',
+                '2': 'nilfgaard.webp',
+                '3': 'scoiatael.webp',
+                '4': 'potwory.webp',
+                '5': 'skellige.webp'
+            };
+            const bannerImg = bannerMap[bannerFaction] || bannerMap[playerFaction] || 'polnoc.webp';
 
             // --- BRAK LOKALNEGO GLOW (jest globalny) ---
 
@@ -493,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = `
                 <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
                 <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerFaction === '1' ? 'polnoc.webp' : bannerFaction === '2' ? 'nilfgaard.webp' : bannerFaction === '3' ? 'scoiatael.webp' : bannerFaction === '4' ? 'potwory.webp' : 'skellige.webp'}');"></div>
+                <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>
             `;
 
             html += `<div class="name">${card.nazwa}</div>`;
@@ -791,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pageLeft) {
         pageLeft.addEventListener('click', () => {
             currentPage = (currentPage - 2 + factions.length) % factions.length + 1;
+            window.selectedFaction = factions[currentPage - 1].id;
             updatePage();
             updateStats();
         });
@@ -799,7 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageRight = document.querySelector('.page-right');
     if (pageRight) {
         pageRight.addEventListener('click', () => {
-            currentPage = currentPage % factions.length + 1;
+            currentPage = (currentPage % factions.length) + 1;
+            window.selectedFaction = factions[currentPage - 1].id;
             updatePage();
             updateStats();
         });
