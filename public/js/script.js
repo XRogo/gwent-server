@@ -27,6 +27,7 @@ let opponentId = null;
 let hostId = null;
 let hostNickname = null;
 let opponentNickname = null;
+let currentGameCode = null;
 
 const nicknames = [
     "Geralt", "Yennefer", "Ciri", "Triss", "Jaskier", "Zoltan", "Vesemir", "Lambert", "Eskel", "Foltest",
@@ -105,8 +106,8 @@ function showHostScreen() {
         fadeIn(hostScreen);
         isHost = true;
         generateGameCode();
-        const gameCode = gameCodeElement.textContent;
-        socket.emit('create-game', { gameCode });
+        currentGameCode = gameCodeElement.textContent;
+        socket.emit('create-game', { gameCode: currentGameCode });
         if (playerIcon) {
             playerIcon.style.display = 'block';
             playerIcon.src = 'assets/ludekn.png';
@@ -211,6 +212,7 @@ function joinGame() {
         resetGameState(); // Resetujemy stan gry
     }
     socket.connect(); // Nawiązujemy nowe połączenie
+    currentGameCode = gameCode;
     socket.emit('join-game', { gameCode });
 }
 
@@ -294,7 +296,12 @@ nicknameInput.addEventListener('keydown', (event) => {
 });
 
 function startGame() {
-    const gameCode = gameCodeElement.textContent || (gameCodeFromUrl);
+    const gameCode = currentGameCode || gameCodeElement.textContent || gameCodeFromUrl;
+    if (!gameCode) {
+        console.error('Brak kodu gry przy startowaniu!');
+        alert('Błąd: utracono kod gry. Spróbuj dołączyć ponownie.');
+        return;
+    }
     window.location.href = `/gwent/game.html?code=${gameCode}&host=${isHost}`;
 }
 

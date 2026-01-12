@@ -65,20 +65,26 @@ const ConnectionUI = {
     },
 
     setupListeners() {
+        console.log('Uruchamiam listenery ConnectionUI');
+
         this.socket.on('connect', () => {
-            console.log('Połączono z serwerem');
-            // Przy ekreacji/rejoin wysyłamy nick jeśli go mamy
+            console.log('ConnectionUI: Połączono z serwerem');
             if (this.nickname) {
+                console.log('ConnectionUI: Wysyłam nick po połączeniu:', this.nickname);
                 this.socket.emit('set-nickname', { gameCode: this.gameCode, isHost: this.isHost, nickname: this.nickname });
             }
         });
 
         this.socket.on('opponent-status', (data) => {
-            console.log('Status przeciwnika:', data);
+            console.log('ConnectionUI: Otrzymano status:', data);
             const opponentConnected = this.isHost ? data.opponentConnected : data.hostConnected;
             const oppNick = this.isHost ? data.opponentNickname : data.hostNickname;
 
-            this.opponentNickname = oppNick || 'Przeciwnik';
+            if (oppNick) {
+                this.opponentNickname = oppNick;
+            } else if (!this.opponentNickname) {
+                this.opponentNickname = 'Przeciwnik';
+            }
 
             if (opponentConnected) {
                 this.updateStatus('connected');
@@ -87,7 +93,8 @@ const ConnectionUI = {
             }
         });
 
-        this.socket.on('disconnect', () => {
+        this.socket.on('disconnect', (reason) => {
+            console.log('ConnectionUI: Rozłączono:', reason);
             this.updateStatus('reconnecting');
         });
     },

@@ -101,9 +101,15 @@ io.on('connection', (socket) => {
         const game = games[gameCode];
         if (!game) return;
 
+        const hostSocket = io.sockets.sockets.get(game.host);
+        const opponentId = game.players[0];
+        const opponentSocket = opponentId ? io.sockets.sockets.get(opponentId) : null;
+
+        console.log(`[STATUS] Rozsyłam status dla ${gameCode}. Host: ${!!hostSocket}, Opp: ${!!opponentSocket}`);
+
         io.to(gameCode).emit('opponent-status', {
-            hostConnected: !!io.sockets.sockets.get(game.host),
-            opponentConnected: game.players.some(id => io.sockets.sockets.get(id)),
+            hostConnected: !!(hostSocket && hostSocket.connected),
+            opponentConnected: !!(opponentSocket && opponentSocket.connected),
             hostNickname: game.hostNickname,
             opponentNickname: game.opponentNickname
         });
