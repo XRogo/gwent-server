@@ -209,12 +209,53 @@ io.on('connection', (socket) => {
                 if (gameState.hand) games[gameCode].gameState.hostHand = gameState.hand;
                 if (gameState.deck) games[gameCode].gameState.hostDeck = gameState.deck;
                 if (gameState.graveyard) games[gameCode].gameState.hostGraveyard = gameState.graveyard;
+                if (gameState.faction) games[gameCode].gameState.hostFaction = gameState.faction;
             } else {
                 if (gameState.hand) games[gameCode].gameState.oppHand = gameState.hand;
                 if (gameState.deck) games[gameCode].gameState.oppDeck = gameState.deck;
                 if (gameState.graveyard) games[gameCode].gameState.oppGraveyard = gameState.graveyard;
+                if (gameState.faction) games[gameCode].gameState.oppFaction = gameState.faction;
             }
             console.log(`[GAME] State saved for ${isHost ? 'Host' : 'Opponent'} in ${gameCode}`);
+
+            // Broadcast update to the other player for counts/reversos
+            const targetId = isHost ? (games[gameCode].players ? games[gameCode].players[0] : null) : games[gameCode].host;
+            if (targetId) {
+                io.to(targetId).emit('opponent-game-update', {
+                    handCount: gameState.hand ? gameState.hand.length : undefined,
+                    deckCount: gameState.deck ? gameState.deck.length : undefined,
+                    graveyardCount: gameState.graveyard ? gameState.graveyard.length : undefined,
+                    faction: gameState.faction
+                });
+            }
+        }
+    });
+
+    socket.on('get-game-state', (data) => {
+        const { gameCode, isHost } = data;
+        if (games[gameCode] && games[gameCode].gameState) {
+            const state = games[gameCode].gameState;
+            socket.emit('init-game-state', {
+                hand: isHost ? state.hostHand : state.oppHand,
+                deck: isHost ? state.hostDeck : state.oppDeck,
+                graveyard: isHost ? state.hostGraveyard : state.oppGraveyard,
+                faction: isHost ? state.hostFaction : state.oppFaction,
+                opponentHandCount: isHost ? (state.oppHand ? state.oppHand.length : 0) : (state.hostHand ? state.hostHand.length : 0),
+                opponentDeckCount: isHost ? (state.oppDeck ? state.oppDeck.length : 0) : (state.hostDeck ? state.hostDeck.length : 0),
+                opponentGraveyardCount: isHost ? (state.oppGraveyard ? state.oppGraveyard.length : 0) : (state.hostGraveyard ? state.hostGraveyard.length : 0),
+                opponentFaction: isHost ? state.oppFaction : state.hostFaction
+            });
+        }
+    });
+
+    socket.on('play-card', (data) => {
+        const { gameCode, isHost, card, rowIndex } = data;
+        if (games[gameCode]) {
+            // Broadcast the move to the opponent
+            const targetId = isHost ? (games[gameCode].players ? games[gameCode].players[0] : null) : games[gameCode].host;
+            if (targetId) {
+                io.to(targetId).emit('opponent-played-card', { card, rowIndex });
+            }
         }
     });
 

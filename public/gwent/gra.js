@@ -17,6 +17,12 @@ const gameCode = urlParams.get('code');
 const isHost = urlParams.get('host') === 'true';
 const nick = urlParams.get('nick') || (isHost ? 'Gospodarz' : 'Gość');
 
+// Board State
+let board = {
+    my: { row1: [], row2: [], row3: [], horn1: null, horn2: null, horn3: null },
+    opp: { row1: [], row2: [], row3: [], horn1: null, horn2: null, horn3: null }
+};
+
 if (socket && gameCode) {
     if (window.ConnectionUI) {
         window.ConnectionUI.init(socket, gameCode, isHost, nick);
@@ -32,6 +38,8 @@ if (socket && gameCode) {
             playerGraveyard = data.graveyard || [];
             opponentHandCount = data.opponentHandCount;
             opponentDeckCount = data.opponentDeckCount;
+            opponentGraveyard = data.opponentGraveyard || [];
+            window.opponentFaction = data.opponentFaction;
             renderAll();
         } else {
             // First time entering the board
@@ -42,7 +50,24 @@ if (socket && gameCode) {
     socket.on('opponent-status', (data) => {
         // Refresh nicknames if changed
         const oppNick = isHost ? data.opponentNickname : data.hostNickname;
-        if (oppNick) renderNicknames(nick, oppNick);
+        if (oppNick) {
+            window.opponentNickname = oppNick;
+            renderNicknames();
+        }
+    });
+
+    socket.on('opponent-game-update', (data) => {
+        if (data.handCount !== undefined) opponentHandCount = data.handCount;
+        if (data.deckCount !== undefined) opponentDeckCount = data.deckCount;
+        if (data.graveyardCount !== undefined) opponentGraveyardCount = data.graveyardCount;
+        if (data.faction !== undefined) window.opponentFaction = data.faction;
+        renderAll();
+    });
+
+    socket.on('opponent-played-card', (data) => {
+        // Basic sync for opponent playing a card (logical stub)
+        console.log('Opponent played card:', data.card, 'to row:', data.rowIndex);
+        // In a real implementation, we'd add it to a board state and render
     });
 }
 
@@ -92,7 +117,8 @@ function saveState() {
         gameState: {
             hand: playerHand,
             deck: drawPile,
-            graveyard: playerGraveyard
+            graveyard: playerGraveyard,
+            faction: localStorage.getItem('faction') || "1"
         }
     });
 }
@@ -114,7 +140,6 @@ function startMulligan() {
                     playerHand[idx] = newCard;
                     drawPile.push(oldCard);
 
-                    // Re-sort hand after swap
                     playerHand.sort((a, b) => {
                         const idxA = cards.findIndex(c => c.numer === a.numer);
                         const idxB = cards.findIndex(c => c.numer === b.numer);
@@ -124,7 +149,7 @@ function startMulligan() {
                     swaps++;
                     selectedIdx = playerHand.indexOf(newCard);
                     refreshMulligan();
-                } else if (swaps >= 2) {
+                } else {
                     closeMulligan();
                 }
             },
@@ -138,46 +163,13 @@ function startMulligan() {
         renderAll();
     }
 
-    document.addEventListener('keydown', function mulliganKeys(e) {
-        if (!window.isPowiekOpen) {
-            document.removeEventListener('keydown', mulliganKeys);
-            return;
-        }
-
-        if (e.key === 'Enter') {
-            const currentIdx = window.currentPowiekIndex;
-            if (swaps < 2 && drawPile.length > 0) {
-                const newCardIdx = Math.floor(Math.random() * drawPile.length);
-                const newCard = drawPile.splice(newCardIdx, 1)[0];
-                const oldCard = playerHand[currentIdx];
-
-                playerHand[currentIdx] = newCard;
-                drawPile.push(oldCard);
-
-                playerHand.sort((a, b) => {
-                    const idxA = cards.findIndex(c => c.numer === a.numer);
-                    const idxB = cards.findIndex(c => c.numer === b.numer);
-                    return idxA - idxB;
-                });
-
-                swaps++;
-                selectedIdx = playerHand.indexOf(newCard);
-                refreshMulligan();
-            } else {
-                closeMulligan();
-            }
-        } else if (e.key === 'Escape') {
-            closeMulligan();
-        }
-    });
-
     refreshMulligan();
 }
 
 function renderAll() {
     const overlay = document.querySelector('.overlay');
     if (!overlay) return;
-    overlay.innerHTML = ''; // Clear all
+    overlay.innerHTML = '';
 
     renderHand();
     renderNicknames();
@@ -274,7 +266,8 @@ function renderNicknames() {
         return div;
     };
 
-    overlay.appendChild(createNick(window.opponentNickname || 'PRZECIWNIK', oppX, oppY, oppW, oppH));
+    const oppNickDisplay = window.opponentNickname || 'PRZECIWNIK';
+    overlay.appendChild(createNick(oppNickDisplay, oppX, oppY, oppW, oppH));
     overlay.appendChild(createNick(nick, selfX, selfY, selfW, selfH));
 }
 
@@ -337,9 +330,11 @@ function renderPiles() {
         container.style.height = `${cardH}px`;
 
         const img = document.createElement('img');
-        img.src = isOpponent ? '/gwent/assets/asety/nie_rewers.webp' : pileAsset;
+        img.src = isOpponent ? getFactionReverse(window.opponentFaction || "0") : pileAsset;
         img.style.width = '100%';
         img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.objectPosition = 'top';
         img.style.borderRadius = `${8 * scale}px`;
         container.appendChild(img);
 
@@ -443,23 +438,43 @@ function renderRow(cards, rowKey) {
         startX = (areaW - cardW) / 2;
     }
     cards.forEach((card, i) => {
-        const cardDiv = document.createElement('img');
-        cardDiv.src = card.karta;
-        cardDiv.className = 'row-card card';
-        cardDiv.dataset.index = i;
-        cardDiv.style.position = 'absolute';
-        cardDiv.style.left = (startX + i * (cardW + realGap)) + 'px';
-        cardDiv.style.top = ((areaH - cardH) / 2) + 'px';
-        cardDiv.style.width = cardW + 'px';
-        cardDiv.style.height = cardH + 'px';
-        cardDiv.style.objectFit = 'contain';
-        cardDiv.style.aspectRatio = '3/4';
-        cardDiv.style.zIndex = 10 + i;
-        cardDiv.oncontextmenu = (e) => {
+        const div = document.createElement('div');
+        div.className = 'row-card card small-card';
+        div.dataset.index = i;
+        div.style.position = 'absolute';
+        div.style.left = (startX + i * (cardW + realGap)) + 'px';
+        div.style.top = ((areaH - cardH) / 2) + 'px';
+        div.style.width = cardW + 'px';
+        div.style.height = cardH + 'px';
+        div.style.backgroundImage = `url(${card.karta})`;
+        div.style.backgroundSize = 'cover';
+        div.style.borderRadius = `${8 * scaleW}px`;
+        div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.5)';
+        div.style.zIndex = 10 + i;
+
+        if (card.punkty !== undefined) {
+            const pointsData = document.createElement('div');
+            pointsData.style.position = 'absolute';
+            pointsData.style.left = '3.6%';   // 19/523
+            pointsData.style.top = '1.2%';    // 12/992
+            pointsData.style.width = '5%';    // (45-19)/523
+            pointsData.style.height = '4%';   // (52-12)/992
+            pointsData.style.color = '#000';
+            pointsData.style.fontSize = `${24 * scaleW}px`;
+            pointsData.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+            pointsData.style.display = 'flex';
+            pointsData.style.alignItems = 'center';
+            pointsData.style.justifyContent = 'center';
+            pointsData.style.fontWeight = 'bold';
+            pointsData.textContent = card.punkty;
+            div.appendChild(pointsData);
+        }
+
+        div.oncontextmenu = (e) => {
             e.preventDefault();
             showPowiek(cards, i, 'cards');
         };
-        rowDiv.appendChild(cardDiv);
+        rowDiv.appendChild(div);
     });
     overlay.appendChild(rowDiv);
 }
