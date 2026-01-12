@@ -26,14 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const isHost = urlParams.get('host') === 'true';
 
     if (socket && gameCode) {
-        const nick = localStorage.getItem('nickname') || (isHost ? 'Host' : 'Przeciwnik');
+        const defaultNick = isHost ? 'Gospodarz' : 'Gość';
+        const nick = localStorage.getItem('nickname') || defaultNick;
 
         if (window.ConnectionUI) {
             window.ConnectionUI.init(socket, gameCode, isHost, nick);
         }
 
         socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
-        console.log(`Reconnected to game ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+        console.log(`Reconnecting to game ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
 
         // Listen for opponent readiness
         socket.on('opponent-ready-status', (data) => {

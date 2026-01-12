@@ -127,12 +127,17 @@ const ConnectionUI = {
                 this.isHost = (this.socket.id === data.hostId);
             }
 
-            const opponentConnected = this.isHost ? data.opponentConnected : data.hostConnected;
+            // If I am Host, I want to see the Opponent's name.
+            // If I am Opponent, I want to see the Host's name.
             const oppNick = this.isHost ? data.opponentNickname : data.hostNickname;
+            const opponentConnected = this.isHost ? data.opponentConnected : data.hostConnected;
 
             if (oppNick) {
                 this.opponentNickname = oppNick;
                 if (this.oppLabel) this.oppLabel.textContent = oppNick;
+            } else if (!this.opponentNickname) {
+                this.opponentNickname = this.isHost ? "Gość" : "Gospodarz";
+                if (this.oppLabel) this.oppLabel.textContent = this.opponentNickname;
             }
 
             if (opponentConnected) {

@@ -121,22 +121,35 @@ io.on('connection', (socket) => {
     };
 
     socket.on('rejoin-game', (data) => {
-        const { gameCode, isHost, nickname } = data;
+        let { gameCode, isHost, nickname } = data;
         if (games[gameCode]) {
+            const game = games[gameCode];
+
+            // Server-side authority check:
+            // If the requester claims to be a host, but there's already a different host
+            // who is currently connected, force the requester to be an opponent.
+            if (isHost && game.host && game.host !== socket.id) {
+                const hostSocket = io.sockets.sockets.get(game.host);
+                if (hostSocket && hostSocket.connected) {
+                    console.log(`[LOBBY] Forcing ${socket.id} to OPPONENT role during rejoin.`);
+                    isHost = false;
+                }
+            }
+
             socket.join(gameCode);
             if (isHost) {
-                games[gameCode].host = socket.id;
-                games[gameCode].hostReady = false;
-                if (nickname) games[gameCode].hostNickname = nickname;
+                game.host = socket.id;
+                game.hostReady = false;
+                if (nickname) game.hostNickname = nickname;
             } else {
-                games[gameCode].players = [socket.id];
-                games[gameCode].opponentReady = false;
-                if (nickname) games[gameCode].opponentNickname = nickname;
+                game.players = [socket.id];
+                game.opponentReady = false;
+                if (nickname) game.opponentNickname = nickname;
             }
             console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isHost ? 'host' : 'opponent'} (nick: ${nickname || 'brak'})`);
             broadcastStatus(gameCode, socket);
 
-            const oppId = isHost ? (games[gameCode].players[0]) : games[gameCode].host;
+            const oppId = isHost ? (game.players[0]) : game.host;
             if (oppId) io.to(oppId).emit('opponent-ready-status', { isReady: false });
         }
     });
