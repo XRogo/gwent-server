@@ -743,64 +743,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    window.addCardToDeck = function (cardNumer) {
+        const card = cards.find(c => c.numer === cardNumer);
+        if (!card) return false;
+
+        // SUMUJ wszystkie karty specjalne z limitem 10
+        const specialLimitNumbers = ['001', '002', '003', '004', '005', '006', '007', '008', '000'];
+        const isSpecialLimited = specialLimitNumbers.includes(card.numer);
+        const specialCount = deck.filter(c => specialLimitNumbers.includes(c.numer)).length;
+        if (isSpecialLimited && specialCount >= 10) {
+            alert('Możesz mieć maksymalnie 10 kart specjalnych w talii!');
+            return false;
+        }
+
+        // Licz kopie
+        const countInDeck = deck.filter(c => c.numer === card.numer).length;
+        if (countInDeck >= (card.ilosc || 1)) {
+            alert('Nie ma więcej kopii tej karty.');
+            return false;
+        }
+
+        deck.push({ ...card });
+        if (typeof addCardSound !== 'undefined' && addCardSound) {
+            addCardSound.currentTime = 0;
+            addCardSound.play().catch(() => { });
+        }
+
+        window.refreshUI();
+        return true;
+    };
+
     if (collectionArea) {
         collectionArea.addEventListener('click', (event) => {
             const cardElement = event.target.closest('.card');
             if (cardElement) {
                 const cardNumer = cardElement.getAttribute('data-numer');
-                const card = cards.find(c => c.numer === cardNumer);
-                if (card) {
-                    // SUMUJ wszystkie karty specjalne z limitem 10 (po numerach)
-                    const specialLimitNumbers = ['001', '002', '003', '004', '005', '006', '007', '008', '000'];
-                    const isSpecialLimited = specialLimitNumbers.includes(card.numer);
-                    const specialCount = deck.filter(c => specialLimitNumbers.includes(c.numer)).length;
-                    if (isSpecialLimited && specialCount >= 10) {
-                        alert('Możesz mieć maksymalnie 10 kart specjalnych (pogodowe, manekin, róg, pożoga, grzybki) w talii!');
-                        return;
-                    }
-                    // Licz kopie po numerze
-                    const countInDeck = deck.filter(c => c.numer === card.numer).length;
-                    if (countInDeck >= card.ilosc) {
-                        alert('Nie ma więcej kopii tej karty do dodania.');
-                        return;
-                    }
-                    deck.push({ ...card });
-                    if (addCardSound) {
-                        addCardSound.currentTime = 0;
-                        addCardSound.play().catch(() => { });
-                    }
-                    displayDeck();
-                    displayCollection('all');
-                    updateStats();
-                    autoSaveDeck();
-                }
+                window.addCardToDeck(cardNumer);
             }
         });
     }
+
+    window.removeCardFromDeck = function (cardNumer) {
+        const index = deck.findIndex(c => c.numer === cardNumer);
+        if (index !== -1) {
+            deck.splice(index, 1);
+            if (typeof removeCardSound !== 'undefined' && removeCardSound) {
+                removeCardSound.currentTime = 0;
+                removeCardSound.play().catch(() => { });
+            }
+            window.refreshUI();
+            return true;
+        }
+        return false;
+    };
 
     if (deckArea) {
         deckArea.addEventListener('click', (event) => {
             const cardElement = event.target.closest('.card');
             if (cardElement) {
-                const cardName = cardElement.querySelector('.name').textContent;
-                const cardInDeck = deck.find(c => c.nazwa === cardName && cardElement.querySelector('.card-image').style.backgroundImage.includes(c.dkarta));
-                if (cardInDeck) {
-                    const index = deck.findIndex(c => c.numer === cardInDeck.numer);
-                    if (index !== -1) {
-                        deck.splice(index, 1);
-                        if (removeCardSound) {
-                            removeCardSound.currentTime = 0;
-                            removeCardSound.play().catch(() => { });
-                        }
-                        displayDeck();
-                        displayCollection('all');
-                        updateStats();
-                        autoSaveDeck();
-                    }
-                }
+                const cardNumer = cardElement.getAttribute('data-numer');
+                window.removeCardFromDeck(cardNumer);
             }
         });
     }
+
+    window.refreshUI = function () {
+        displayDeck();
+        displayCollection('all');
+        updateStats();
+        autoSaveDeck();
+    };
 
     const pageLeft = document.querySelector('.page-left');
     if (pageLeft) {

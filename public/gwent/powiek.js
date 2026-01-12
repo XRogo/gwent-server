@@ -351,9 +351,9 @@ function renderPowiek() {
                 pointsDiv.style.display = 'flex';
                 pointsDiv.style.justifyContent = 'center';
                 pointsDiv.style.alignItems = 'center';
-                // Font family i weight jak w wyborze
+                // Font family jak w wyborze, bez fontWeight bold dla "normalnego" wyglądu
                 pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
-                pointsDiv.style.fontWeight = 'bold';
+                pointsDiv.style.textShadow = 'none'; // Bez cienia
                 inner.appendChild(pointsDiv);
             }
         }
@@ -390,15 +390,18 @@ function renderPowiek() {
         nameDiv.style.color = '#474747';
         nameDiv.style.fontWeight = 'bold';
         nameDiv.style.zIndex = 12;
-        nameDiv.style.whiteSpace = 'nowrap';
+        nameDiv.style.whiteSpace = 'normal';
+        nameDiv.style.wordBreak = 'break-word';
         nameDiv.style.padding = '0 4px';
+        nameDiv.style.lineHeight = '1.1';
+        nameDiv.style.display = 'flex';
+        nameDiv.style.alignItems = 'center';
+        nameDiv.style.justifyContent = 'center';
         inner.appendChild(nameDiv);
 
-        // --- 11: opis pod kartą (dla wszystkich kart) ---
+        // --- 11: opis pod kartą (respektuje \n) ---
         const opisDiv = document.createElement('div');
-        // Usuwamy \n i trimujemy
-        const rawOpis = (card.opis || '').replace(/\n/g, ' ').trim();
-        opisDiv.innerText = rawOpis;
+        opisDiv.innerText = card.opis || '';
         opisDiv.style.position = 'absolute';
         opisDiv.style.left = '2%';
         opisDiv.style.top = '89%';
@@ -410,13 +413,15 @@ function renderPowiek() {
         opisDiv.style.display = 'flex';
         opisDiv.style.justifyContent = 'center';
         opisDiv.style.alignItems = 'center';
-        opisDiv.style.whiteSpace = 'nowrap';
+        opisDiv.style.whiteSpace = 'pre-wrap';
+        opisDiv.style.lineHeight = '1.1';
 
-        // Dynamiczny font-size
-        let baseFs = pos.height * 0.044;
-        if (rawOpis.length > 50) baseFs = pos.height * 0.038;
-        if (rawOpis.length > 80) baseFs = pos.height * 0.032;
-        if (rawOpis.length > 120) baseFs = pos.height * 0.026;
+        // Dynamiczny font-size (zmniejszony o ok. 10% wg prośby)
+        let baseFs = pos.height * 0.04;
+        const descLen = (card.opis || '').length;
+        if (descLen > 50) baseFs = pos.height * 0.034;
+        if (descLen > 80) baseFs = pos.height * 0.028;
+        if (descLen > 120) baseFs = pos.height * 0.024;
         opisDiv.style.fontSize = baseFs + 'px';
 
         inner.appendChild(opisDiv);
@@ -542,12 +547,37 @@ window.addEventListener('contextmenu', function (e) {
             newIndex = uniqueCards.findIndex(card => card.numer === cardNumer);
             if (newIndex === -1) newIndex = 0;
         }
+        // ...
         showPowiek(uniqueCards, newIndex, 'cards');
+        // Set metadata for zoom actions
+        if (cardEl.classList.contains('kolekcja-card')) window.powiekSourceArea = 'collection';
+        else if (cardEl.classList.contains('talia-card')) window.powiekSourceArea = 'deck';
+        else window.powiekSourceArea = 'other';
+
         return;
     }
     if (e.target.classList.contains('leader-card-x')) {
         e.preventDefault();
         showPowiek(krole, 0, 'leaders');
+        window.powiekSourceArea = 'leaders';
+    }
+});
+
+window.addEventListener('click', function (e) {
+    if (powiekActive) {
+        // Right click inside zoom (contextmenu is better for "prawym", click for testing if contextmenu is blocked)
+        // But user said "klikając prawym na kartę".
+    }
+});
+
+// Dodaj obsługę prawokliku wewnątrz powiększenia
+window.addEventListener('contextmenu', function (e) {
+    if (powiekActive) {
+        const insideZoom = e.target.closest('.powiek-card, .powiek-central');
+        if (insideZoom) {
+            e.preventDefault();
+            handleCardActionInsideZoom();
+        }
     }
 });
 
@@ -572,9 +602,40 @@ window.addEventListener('keydown', function (event) {
                 window.selectLeader(powiekDeck[powiekIndex].numer);
                 hidePowiek();
             }
+        } else {
+            // Dodaj/usuń kartę Enterem
+            handleCardActionInsideZoom();
         }
     }
 });
+
+function handleCardActionInsideZoom() {
+    if (!powiekDeck || !powiekDeck[powiekIndex]) return;
+    const card = powiekDeck[powiekIndex];
+    let success = false;
+
+    // Check where we are based on the source metadata (we might need to store it or infer)
+    // For now, let's check if the card is "in deck" to decide action
+    // But user wants separate contexts. Let's look at what showPowiek was called with.
+    // We'll use a global flag set in contextmenu.
+
+    if (window.powiekSourceArea === 'collection') {
+        if (window.addCardToDeck) success = window.addCardToDeck(card.numer);
+    } else if (window.powiekSourceArea === 'deck') {
+        if (window.removeCardFromDeck) success = window.removeCardFromDeck(card.numer);
+    }
+
+    if (success) {
+        // Usuń kartę z aktualnego widoku powiększenia
+        powiekDeck.splice(powiekIndex, 1);
+        if (powiekDeck.length === 0) {
+            window.hidePowiek && window.hidePowiek();
+        } else {
+            if (powiekIndex >= powiekDeck.length) powiekIndex = powiekDeck.length - 1;
+            renderPowiek();
+        }
+    }
+}
 
 window.addEventListener('wheel', function (event) {
     if (!powiekActive) return;
