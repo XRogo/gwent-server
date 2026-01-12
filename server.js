@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    const broadcastStatus = (gameCode) => {
+    const broadcastStatus = (gameCode, specificSocket = null) => {
         const game = games[gameCode];
         if (!game) return;
 
@@ -105,14 +105,19 @@ io.on('connection', (socket) => {
         const opponentId = game.players[0];
         const opponentSocket = opponentId ? io.sockets.sockets.get(opponentId) : null;
 
-        console.log(`[STATUS] Rozsyłam status dla ${gameCode}. Host: ${!!hostSocket}, Opp: ${!!opponentSocket}`);
-
-        io.to(gameCode).emit('opponent-status', {
+        const statusData = {
             hostConnected: !!(hostSocket && hostSocket.connected),
             opponentConnected: !!(opponentSocket && opponentSocket.connected),
             hostNickname: game.hostNickname,
             opponentNickname: game.opponentNickname
-        });
+        };
+
+        console.log(`[STATUS] Rozsyłam status dla ${gameCode}. Host: ${statusData.hostConnected}, Opp: ${statusData.opponentConnected}`);
+
+        if (specificSocket) {
+            specificSocket.emit('opponent-status', statusData);
+        }
+        io.to(gameCode).emit('opponent-status', statusData);
     };
 
     socket.on('rejoin-game', (data) => {
@@ -127,7 +132,7 @@ io.on('connection', (socket) => {
                 if (nickname) games[gameCode].opponentNickname = nickname;
             }
             console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isHost ? 'host' : 'opponent'} (nick: ${nickname || 'brak'})`);
-            broadcastStatus(gameCode);
+            broadcastStatus(gameCode, socket); // Wysyłamy status też bezpośrednio do gracza który dołączył
         }
     });
 

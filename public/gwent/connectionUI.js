@@ -11,11 +11,10 @@ const ConnectionUI = {
         this.injectUI();
         this.setupListeners();
 
-        // Jeśli mamy nick od razu, poinformujmy serwer
-        if (this.nickname) {
-            console.log('Inicjalizacja statusu dla:', this.nickname);
-            this.socket.emit('set-nickname', { gameCode: this.gameCode, isHost: this.isHost, nickname: this.nickname });
-        }
+        // Nie wysyłamy set-nickname tutaj, bo i tak zostanie wysłane 
+        // przy rejoin-game zaraz po init() w game.js/gra.js
+        // lub przy zdarzeniu 'connect' w setupListeners.
+        console.log('ConnectionUI zainicjalizowane dla:', this.nickname);
     },
 
     injectUI() {
