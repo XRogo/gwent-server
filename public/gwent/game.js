@@ -34,6 +34,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
         console.log(`Reconnected to game ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+
+        // Listen for opponent readiness
+        socket.on('opponent-ready-status', (data) => {
+            window.opponentReady = data.isReady;
+            if (data.isReady) {
+                startOpponentTimer();
+            } else {
+                stopOpponentTimer();
+            }
+            updateStats();
+        });
+    }
+
+    let oppTimerInterval = null;
+    function startOpponentTimer() {
+        if (oppTimerInterval) clearInterval(oppTimerInterval);
+        window.opponentReadyTimer = 60;
+        oppTimerInterval = setInterval(() => {
+            window.opponentReadyTimer--;
+            if (window.opponentReadyTimer <= 0) {
+                clearInterval(oppTimerInterval);
+                finishSelection();
+            }
+            updateStats();
+        }, 1000);
+    }
+
+    function stopOpponentTimer() {
+        if (oppTimerInterval) clearInterval(oppTimerInterval);
+        window.opponentReady = false;
+        window.opponentReadyTimer = 60;
+        updateStats();
+    }
+
+    function finishSelection() {
+        const unitCards = deck.filter(card => {
+            const isUnit = typeof card.punkty === 'number';
+            const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+            return isUnit && !isWeather;
+        });
+
+        // Auto-fill if needed
+        if (unitCards.length < 22) {
+            const allUnitCards = cards.filter(card => {
+                const isUnit = typeof card.punkty === 'number';
+                const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
+                return isUnit && !isWeather;
+            });
+
+            while (unitCards.length < 22) {
+                const randomCard = allUnitCards[Math.floor(Math.random() * allUnitCards.length)];
+                deck.push({ ...randomCard });
+                unitCards.push({ ...randomCard });
+            }
+        }
+
+        localStorage.setItem('deck', JSON.stringify(deck));
+        const fade = document.getElementById('fadeScreen');
+        if (fade) {
+            fade.style.opacity = '1';
+            setTimeout(() => {
+                window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
+            }, 600);
+        } else {
+            window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
+        }
     }
 
     const factions = [
@@ -707,31 +773,45 @@ document.addEventListener('DOMContentLoaded', () => {
         createStat("Karty bohaterów", "label", 1598, 1637, C_BERZ, true);
         // Wartość: od* 1660 a 1692
         createStat(heroCardsCount, "value", 1660, 1692, C_BERZNM, false);
+
+        // 7. STATUS RYWALA (Nowy element)
+        if (window.opponentReady) {
+            const timer = window.opponentReadyTimer || 60;
+            let timerColor = '#35a842'; // Green default
+            if (timer <= 19) timerColor = '#a27e3d';
+            if (timer <= 9) timerColor = '#ff1a1a';
+            createStat(`Rywal - Gotowy - ${timer}s`, "label", 1750, 1789, timerColor, true);
+        } else {
+            createStat("Rywal - Nie gotowy", "label", 1750, 1789, '#ff1a1a', true);
+        }
     }
 
     const goToGameButton = document.getElementById('goToGameButton');
     if (goToGameButton) {
         goToGameButton.textContent = 'Gotowość';
+        let amIReady = false;
         goToGameButton.addEventListener('click', () => {
             // Licz tylko karty walki (z punktami, ale nie pogodowe)
-            const unitCards = deck.filter(card => {
+            const unitCardsCount = deck.filter(card => {
                 const isUnit = typeof card.punkty === 'number';
                 const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
                 return isUnit && !isWeather;
             }).length;
-            if (unitCards < 22) {
+
+            if (!amIReady && unitCardsCount < 22) {
                 alert('Talia musi mieć co najmniej 22 karty walki (nie licząc pogodowych)!');
                 return;
             }
-            localStorage.setItem('deck', JSON.stringify(deck));
-            const fade = document.getElementById('fadeScreen');
-            if (fade) {
-                fade.style.opacity = '1';
-                setTimeout(() => {
-                    window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
-                }, 600);
-            } else {
-                window.location.href = `gra.html?code=${gameCode}&host=${isHost}`;
+
+            amIReady = !amIReady;
+            goToGameButton.textContent = amIReady ? 'Odwołaj Gotowość' : 'Gotowość';
+            goToGameButton.style.color = amIReady ? '#35a842' : '';
+
+            socket.emit('player-ready', { gameCode, isHost, isReady: amIReady });
+
+            if (amIReady && window.opponentReady) {
+                // Both ready!
+                finishSelection();
             }
         });
     }

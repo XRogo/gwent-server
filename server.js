@@ -26,7 +26,9 @@ io.on('connection', (socket) => {
                 isClosed: false,
                 hostNickname: null,
                 opponentNickname: null,
-                status: 'waiting'
+                status: 'waiting',
+                hostReady: false,
+                opponentReady: false
             };
             socket.join(gameCode);
             socket.emit('join-success', { gameCode, isHost: true });
@@ -64,13 +66,7 @@ io.on('connection', (socket) => {
 
         if (games[gameCode].host !== socket.id) {
             io.to(games[gameCode].host).emit('opponent-joined', { opponentId: socket.id });
-            // Notify both about status
-            io.to(gameCode).emit('opponent-status', {
-                hostConnected: true,
-                opponentConnected: true,
-                hostNickname: games[gameCode].hostNickname,
-                opponentNickname: games[gameCode].opponentNickname
-            });
+            broadcastStatus(gameCode);
         }
     });
 
@@ -89,7 +85,9 @@ io.on('connection', (socket) => {
                 isPublic: true,
                 hostNickname: null,
                 opponentNickname: null,
-                status: 'waiting'
+                status: 'waiting',
+                hostReady: false,
+                opponentReady: false
             };
             socket.join(newCode);
             socket.emit('join-success', { gameCode: newCode, isHost: true });
@@ -116,8 +114,9 @@ io.on('connection', (socket) => {
 
         if (specificSocket) {
             specificSocket.emit('opponent-status', statusData);
+        } else {
+            io.to(gameCode).emit('opponent-status', statusData);
         }
-        io.to(gameCode).emit('opponent-status', statusData);
     };
 
     socket.on('rejoin-game', (data) => {
@@ -126,13 +125,18 @@ io.on('connection', (socket) => {
             socket.join(gameCode);
             if (isHost) {
                 games[gameCode].host = socket.id;
+                games[gameCode].hostReady = false;
                 if (nickname) games[gameCode].hostNickname = nickname;
             } else {
                 games[gameCode].players = [socket.id];
+                games[gameCode].opponentReady = false;
                 if (nickname) games[gameCode].opponentNickname = nickname;
             }
             console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isHost ? 'host' : 'opponent'} (nick: ${nickname || 'brak'})`);
-            broadcastStatus(gameCode, socket); // Wysyłamy status też bezpośrednio do gracza który dołączył
+            broadcastStatus(gameCode, socket);
+
+            const oppId = isHost ? (games[gameCode].players[0]) : games[gameCode].host;
+            if (oppId) io.to(oppId).emit('opponent-ready-status', { isReady: false });
         }
     });
 
@@ -143,6 +147,21 @@ io.on('connection', (socket) => {
             else games[gameCode].opponentNickname = nickname;
             console.log(`[LOBBY] Ustawiono nick dla ${isHost ? 'hosta' : 'przeciwnika'} w ${gameCode}: ${nickname}`);
             broadcastStatus(gameCode);
+        }
+    });
+
+    socket.on('player-ready', (data) => {
+        const { gameCode, isHost, isReady } = data;
+        if (games[gameCode]) {
+            if (isHost) games[gameCode].hostReady = isReady;
+            else games[gameCode].opponentReady = isReady;
+
+            console.log(`[GAME] ${isHost ? 'Host' : 'Opponent'} is ${isReady ? 'READY' : 'NOT READY'} in ${gameCode}`);
+
+            const targetId = isHost ? (games[gameCode].players[0]) : games[gameCode].host;
+            if (targetId) {
+                io.to(targetId).emit('opponent-ready-status', { isReady });
+            }
         }
     });
 
@@ -188,11 +207,9 @@ io.on('connection', (socket) => {
         console.log(`[CONN] Użytkownik rozłączony: ${socket.id}, powód: ${reason}`);
         for (const gameCode in games) {
             if (games[gameCode].host === socket.id) {
-                // Host się rozłączył - nie usuwamy od razu, dajemy szansę na powrót
                 console.log(`[LOBBY] Host rozłączony w grze ${gameCode}. Czekam na powrót.`);
                 broadcastStatus(gameCode);
 
-                // Opcjonalnie: ustaw timeout na usunięcie gry
                 setTimeout(() => {
                     if (games[gameCode] && games[gameCode].host === socket.id && !io.sockets.sockets.get(socket.id)) {
                         console.log(`[LOBBY] Gra ${gameCode} usunięta z powodu długiego rozłączenia hosta.`);
@@ -202,7 +219,7 @@ io.on('connection', (socket) => {
                         });
                         delete games[gameCode];
                     }
-                }, 30000); // 30 sekund na powrót
+                }, 30000);
             } else {
                 const playerIndex = games[gameCode].players.findIndex(player => player === socket.id);
                 if (playerIndex !== -1) {
