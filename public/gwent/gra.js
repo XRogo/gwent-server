@@ -14,8 +14,13 @@ const gameCode = urlParams.get('code');
 const isHost = urlParams.get('host') === 'true';
 
 if (socket && gameCode) {
-    socket.emit('rejoin-game', { gameCode, isHost });
+    const nick = localStorage.getItem('nickname') || (isHost ? 'Host' : 'Przeciwnik');
+    socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
     console.log(`Reconnected to board ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+
+    if (window.ConnectionUI) {
+        window.ConnectionUI.init(socket, gameCode, isHost, nick);
+    }
 }
 
 function renderUI() {

@@ -23,8 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const isHost = urlParams.get('host') === 'true';
 
     if (socket && gameCode) {
-        socket.emit('rejoin-game', { gameCode, isHost });
+        // Obliczamy nick - w game.js (wybór talii) może jeszcze nie być nicku z lobby,
+        // ale pobieramy go z localStorage jeśli jest
+        const nick = localStorage.getItem('nickname') || (isHost ? 'Host' : 'Przeciwnik');
+        socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
         console.log(`Reconnected to game ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+
+        if (window.ConnectionUI) {
+            window.ConnectionUI.init(socket, gameCode, isHost, nick);
+        }
     }
 
     const factions = [

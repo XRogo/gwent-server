@@ -439,6 +439,7 @@ function submitNickname() {
 
     if (isHost) {
         hostNickname = nickname;
+        localStorage.setItem('nickname', nickname); // Save for reconnection
         console.log(`Host wybrał nick: ${hostNickname}`);
         const hostIcon = document.querySelector('.host-player-icon img');
         if (hostIcon) {

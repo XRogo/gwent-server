@@ -29,7 +29,7 @@ const cards = [
         nazwa: "Pożoga",
         karta: "/gwent/assets/karty/niezalerzne/pozoga.webp",
         dkarta: "/gwent/assets/dkarty/1/porz.webp",
-        opis: '"Że też zawsze musi jebnąć, tma gdzie najbardziej boli".',
+        opis: '"Że też zawsze musi jebnąć, tma gdzie\nnajbardziej boli".',
         bohater: false,
         moc: "porz",
         frakcja: "nie",
@@ -41,7 +41,7 @@ const cards = [
         nazwa: "Trzaskający mróz",
         karta: "/gwent/assets/karty/niezalerzne/trzaskajacy_mroz.webp",
         dkarta: "/gwent/assets/dkarty/1/mroz.webp",
-        opis: '"Tak mi palce zgrabiały, że lewie miecz trzymam... A tujeszcze machać trzeba".',
+        opis: '"Tak mi palce zgrabiały, że lewie miecz\ntrzymam... A tujeszcze machać trzeba".',
         bohater: false,
         moc: "mroz",
         frakcja: "nie",
@@ -53,7 +53,7 @@ const cards = [
         nazwa: "Gęsta mgła",
         karta: "/gwent/assets/karty/niezalerzne/gesta_mgla.webp",
         dkarta: "/gwent/assets/dkarty/1/mgla.webp",
-        opis: '"Mgła, że oko wykol... Cokolwiek to znaczy".',
+        opis: '"Mgła, że oko wykol... Cokolwiek to\nznaczy".',
         bohater: false,
         moc: "mgla",
         frakcja: "nie",
@@ -65,14 +65,14 @@ const cards = [
         nazwa: "Ulewny deszcz",
         karta: "/gwent/assets/karty/niezalerzne/ulewny_deszcz.webp",
         dkarta: "/gwent/assets/dkarty/1/deszcz.webp",
-        opis: '"Wieża oblężnicz utkneła w błocie!" "Widzę, idioto. Trąb na odwrót".',
+        opis: '"Wieża oblężnicz utkneła w błocie!"\n"Widzę, idioto. Trąb na odwrót".',
         bohater: false,
         moc: "deszcz",
         frakcja: "nie",
         ilosc: 3,
         numer: "006"
     },
-    
+
     {
         nazwa: "Czyste niebo",
         karta: "/gwent/assets/karty/niezalerzne/czyste_niebo.webp",
@@ -84,12 +84,12 @@ const cards = [
         ilosc: 3,
         numer: "007"
     },
-    
+
     {
         nazwa: "Skelligijski sztorm",
         karta: "/gwent/assets/karty/niezalerzne/skelligijski_sztorm.webp",
         dkarta: "/gwent/assets/dkarty/1/008.webp",
-        opis: '"To nie jest zwykła burza. To gniew bogów."',
+        opis: '"To nie jest zwykła burza. To gniew\nbogów."',
         bohater: false,
         moc: "sztorm",
         frakcja: "nie",
@@ -101,7 +101,7 @@ const cards = [
         nazwa: "Mardroeme",
         karta: "/gwent/assets/karty/niezalerzne/mardroeme.webp",
         dkarta: "/gwent/assets/dkarty/1/000.webp",
-        opis: "WORK.",
+        opis: '"Zjedz ich odpowiednio dużo, a świat już\nnigdy nie będzie taki sam..."',
         bohater: false,
         moc: "grzybki",
         frakcja: "5",
@@ -109,15 +109,15 @@ const cards = [
         numer: "000"
     },
 
-    
 
-//neutralne=============================================================================================================================================================
+
+    //neutralne=============================================================================================================================================================
 
     {
         nazwa: "Geralt z Rivi",
         karta: "/gwent/assets/karty/niezalerzne/geralt_z_rivi.webp",
         dkarta: "/gwent/assets/dkarty/1/009.webp",
-        opis: '"Jeżeli mam wybierać pomiędzy jednym złem a drugim, to wole nie wybierać wcale."',
+        opis: '"Jeżeli mam wybierać pomiędzy jednym\nzłem a drugim, to wole nie wybierać\nwcale."',
         bohater: true,
         moc: "wezwanie",
         frakcja: "nie",
@@ -127,12 +127,12 @@ const cards = [
         ilosc: 1,
         numer: "009"
     },
-    
+
     {
         nazwa: "Ciri",
         karta: "/gwent/assets/karty/niezalerzne/ciri.webp",
         dkarta: "/gwent/assets/dkarty/1/010.webp",
-        opis: '"Wiesz, kiedy bajki przestają być bajkami? Kiedy ludzie zaczynają w nie wierzyć."',
+        opis: '"Wiesz, kiedy bajki przestają być\nbajkami? Kiedy ludzie zaczynają w nie\nwierzyć."',
         bohater: true,
         moc: "wezwanie",
         frakcja: "nie",
@@ -147,7 +147,7 @@ const cards = [
         nazwa: "Yennefer z Vengerbergu",
         karta: "/gwent/assets/karty/niezalerzne/yenneder_z_vengerbergu.webp",
         dkarta: "/gwent/assets/dkarty/1/011.webp",
-        opis: '"Odziana w kompozycje czerni i bieli, przywodziła na myśl grudniowy poranek".',
+        opis: '"Odziana w kompozycje czerni i bieli,\nprzywodziła na myśl grudniowy poranek".',
         bohater: true,
         moc: "medyk",
         frakcja: "nie",
@@ -174,7 +174,7 @@ const cards = [
         nazwa: "Villentretenmerth",
         karta: "/gwent/assets/karty/niezalerzne/villentretenmerth.webp",
         dkarta: "/gwent/assets/dkarty/1/013.webp",
-        opis: '"Było w tym stworzeniu coś pełnego niewysławionej gracji".',
+        opis: '"Było w tym stworzeniu coś pełnego\nniewysławionej gracji".',
         bohater: false,
         moc: "iporz",
         frakcja: "nie",
@@ -188,7 +188,7 @@ const cards = [
         nazwa: "Vesemir",
         karta: "/gwent/assets/karty/niezalerzne/vesemir.webp",
         dkarta: "/gwent/assets/dkarty/1/014.webp",
-        opis: '"Gdy cie mają wieszać, poproś o wode. Nie wiadomo co może sie zdarzyć zanim przyniosą".',
+        opis: '"Gdy cie mają wieszać, poproś o wode.\nNie wiadomo co może sie zdarzyć zanim\nprzyniosą".',
         bohater: false,
         frakcja: "nie",
         punkty: 6,
@@ -201,7 +201,7 @@ const cards = [
         nazwa: "Olgierd von Everec",
         karta: "/gwent/assets/karty/niezalerzne/olgierd_von_everec.webp",
         dkarta: "/gwent/assets/dkarty/1/015.webp",
-        opis: '"Teraz przynajmniej wiesz, że łatwo nie trace głowy"',
+        opis: '"Teraz przynajmniej wiesz, że łatwo nie\ntrace głowy"',
         bohater: false,
         moc: "morale",
         frakcja: "nie",
@@ -215,7 +215,7 @@ const cards = [
         nazwa: "Zoltan Chivay",
         karta: "/gwent/assets/karty/niezalerzne/zoltan_chivay.webp",
         dkarta: "/gwent/assets/dkarty/1/016.webp",
-        opis: '"Lubie czynić dobro. Zwłaszcza dla siebie i mego bezpośredniego otocznia"',
+        opis: '"Lubie czynić dobro. Zwłaszcza dla siebie\ni mego bezpośredniego otocznia"',
         bohater: false,
         frakcja: "nie",
         punkty: 5,
@@ -228,7 +228,7 @@ const cards = [
         nazwa: "Emiel Regis Rohellec Terzieff",
         karta: "/gwent/assets/karty/niezalerzne/emirl_regis_rohellec_terzieff.webp",
         dkarta: "/gwent/assets/dkarty/1/017.webp",
-        opis: '"Uchodzę, delikatnie mówiąc, za potwora. Za krwiożercze monstrum".',
+        opis: '"Uchodzę, delikatnie mówiąc, za potwora.\nZa krwiożercze monstrum".',
         bohater: false,
         frakcja: "nie",
         punkty: 5,
@@ -256,7 +256,7 @@ const cards = [
         nazwa: "Guanter O'Dim",
         karta: "/gwent/assets/karty/niezalerzne/gaunter_o'dim.webp",
         dkarta: "/gwent/assets/dkarty/1/019.webp",
-        opis: "Życzenia twe zawsze spełni z ochotą, da ci brylant i srebro, i złoto",
+        opis: "Życzenia twe zawsze spełni z ochotą, da\nci brylant i srebro, i złoto",
         bohater: false,
         moc: "wezwanie",
         frakcja: "nie",
@@ -284,7 +284,7 @@ const cards = [
         nazwa: "Jaskier",
         karta: "/gwent/assets/karty/niezalerzne/jaskier.webp",
         dkarta: "/gwent/assets/dkarty/1/021.webp",
-        opis: '"Julian Alfred Pankratz wicehrabia de Lettenhove. Dla przyjaciół - Jaskier".',
+        opis: '"Julian Alfred Pankratz wicehrabia de\nLettenhove. Dla przyjaciół - Jaskier".',
         bohater: false,
         moc: "rog",
         frakcja: "nie",
@@ -298,7 +298,7 @@ const cards = [
         nazwa: "Tajemniczy elf",
         karta: "/gwent/assets/karty/niezalerzne/tajemniczy_elf.webp",
         dkarta: "/gwent/assets/dkarty/1/022.webp",
-        opis: '"WORK."',
+        opis: '"Nie zwykłem żartować."',
         bohater: true,
         moc: "szpieg",
         frakcja: "nie",
@@ -704,7 +704,7 @@ const cards = [
         nazwa: "Letho z Gulety",
         karta: "/gwent/assets/karty/nilftgard/letho_z_gulety.webp",
         dkarta: "/gwent/assets/dkarty/3/201.webp",
-        opis: '"WORK."',
+        opis: '"Czekam na tych, którzy chcą mnie zabić".',
         bohater: true,
         frakcja: "2",
         punkty: 10,
@@ -717,7 +717,7 @@ const cards = [
         nazwa: "Menno Coehoorn",
         karta: "/gwent/assets/karty/nilftgard/menno_coehoorn.webp",
         dkarta: "/gwent/assets/dkarty/3/202.webp",
-        opis: '"WORK."',
+        opis: '"Albo wrócę z rekonesansu z\ninformacją o formacji wroga - albo was\npowieszą".',
         bohater: false,
         moc: "medyk",
         frakcja: "2",
@@ -731,7 +731,7 @@ const cards = [
         nazwa: "Morvran Voorhis",
         karta: "/gwent/assets/karty/nilftgard/morvran_voorhis.webp",
         dkarta: "/gwent/assets/dkarty/3/203.webp",
-        opis: "WORK.",
+        opis: '"A ty kto? też jakiś balwierz?"\n"Nie Morvran Voorhis. Dowódca dywizji\nAlba".',
         bohater: true,
         frakcja: "2",
         punkty: 10,
@@ -744,7 +744,7 @@ const cards = [
         nazwa: "Tibor Eggebracht",
         karta: "/gwent/assets/karty/nilftgard/tibor_eggebracht.webp",
         dkarta: "/gwent/assets/dkarty/3/204.webp",
-        opis: '"WORK."',
+        opis: '"Naprzód, Alba! Niech żyje cesarz!"',
         bohater: true,
         frakcja: "2",
         punkty: 10,
@@ -757,7 +757,7 @@ const cards = [
         nazwa: "Nilfgaardzki łucznik",
         karta: "/gwent/assets/karty/nilftgard/error.webp",
         dkarta: "/gwent/assets/dkarty/3/205.webp",
-        opis: '"WORK."',
+        opis: '"Zawsze celuję w kolano".',
         bohater: false,
         frakcja: "2",
         punkty: 10,
@@ -770,7 +770,7 @@ const cards = [
         nazwa: "Nilfgaardzki łucznik",
         karta: "/gwent/assets/karty/nilftgard/nilfgaardzki-lucznik.webp",
         dkarta: "/gwent/assets/dkarty/3/206.webp",
-        opis: '"WORK."',
+        opis: '"Zawsze celuję w kolano".',
         bohater: false,
         frakcja: "2",
         punkty: 10,
@@ -783,7 +783,7 @@ const cards = [
         nazwa: "Wielki Ognisty Skorpion",
         karta: "/gwent/assets/karty/nilftgard/wielki_ognisty_skorpion.webp",
         dkarta: "/gwent/assets/dkarty/3/207.webp",
-        opis: '"WORK."',
+        opis: '"W Zerrikanii wszystko jest takie\nwielkie?"',
         bohater: false,
         frakcja: "2",
         punkty: 10,
@@ -791,12 +791,12 @@ const cards = [
         ilosc: 1,
         numer: "207"
     },
-    
+
     {
         nazwa: "Stefan Skellen",
         karta: "/gwent/assets/karty/nilftgard/stefan_skellen.webp",
         dkarta: "/gwent/assets/dkarty/3/208.webp",
-        opis: '"WORK."',
+        opis: '"Blizna na twarzy przyszłej cesarzowej\nstanowi moje największe osiągnięcie".',
         bohater: false,
         moc: "szpieg",
         frakcja: "2",
@@ -810,7 +810,7 @@ const cards = [
         nazwa: "Shilard Fitz-Oesterlen",
         karta: "/gwent/assets/karty/nilftgard/shilard_fitz-oesterlen.webp",
         dkarta: "/gwent/assets/dkarty/3/209.webp",
-        opis: "WORK.",
+        opis: '"Wojna to tylko krew i wrzaski. Bieg\nhistorii wytycza  dyplomacja".',
         bohater: false,
         moc: "szpieg",
         frakcja: "2",
@@ -824,7 +824,7 @@ const cards = [
         nazwa: "Assire var Anahid",
         karta: "/gwent/assets/karty/nilftgard/assire_var_anachid.webp",
         dkarta: "/gwent/assets/dkarty/3/210.webp",
-        opis: '"WORK."',
+        opis: '"Nilfgaardzcy czarodzieje maja do wyboru\nserwilizm - lub szafot".',
         bohater: false,
         frakcja: "2",
         punkty: 6,
@@ -832,12 +832,12 @@ const cards = [
         ilosc: 1,
         numer: "210"
     },
- 
+
     {
         nazwa: "Fringilla Vigo",
         karta: "/gwent/assets/karty/nilftgard/fringilla_vigo.webp",
         dkarta: "/gwent/assets/dkarty/3/211.webp",
-        opis: '"WORK."',
+        opis: '"Ach, miło rzucić wreszcie jakieś\nzaklęcie..."',
         bohater: false,
         frakcja: "2",
         punkty: 6,
@@ -850,7 +850,7 @@ const cards = [
         nazwa: "Cahir Mawr Dyffryn aep Ceallach",
         karta: "/gwent/assets/karty/nilftgard/cahir_mawr_dyffryn_aep_ceallach.webp",
         dkarta: "/gwent/assets/dkarty/3/212.webp",
-        opis: "WORK.",
+        opis: '"Poszukiwany za dezercję, Raptus Puellae,\nkradzieży i fałszowanie dokumentów".',
         bohater: false,
         frakcja: "2",
         punkty: 6,
@@ -863,7 +863,7 @@ const cards = [
         nazwa: "Saper",
         karta: "/gwent/assets/karty/nilftgard/saper.webp",
         dkarta: "/gwent/assets/dkarty/3/213.webp",
-        opis: "WORK.",
+        opis: '"W odpowiednich rękach poziomica może\nbyć zabójczą bronią".',
         bohater: false,
         frakcja: "2",
         punkty: 6,
@@ -876,7 +876,7 @@ const cards = [
         nazwa: "Renuald aep Matsen",
         karta: "/gwent/assets/karty/nilftgard/renuald_aep_matsen.webp",
         dkarta: "/gwent/assets/dkarty/3/214.webp",
-        opis: "WORK.",
+        opis: '"Żołnierze brygady impera nie boją sie\nniczego... Z wyjątkiem Renualda aep\nMatsena".',
         bohater: false,
         frakcja: "2",
         punkty: 5,
@@ -889,7 +889,7 @@ const cards = [
         nazwa: "Zerrikański Ognisty Skorpion",
         karta: "/gwent/assets/karty/nilftgard/zerrikanski_ognisty_skorpion.webp",
         dkarta: "/gwent/assets/dkarty/3/215.webp",
-        opis: "WORK.",
+        opis: '"Zerrikania słynie z swoich skorpionów".',
         bohater: false,
         frakcja: "2",
         punkty: 5,
@@ -902,7 +902,7 @@ const cards = [
         nazwa: "Młody emisariusz",
         karta: "/gwent/assets/karty/nilftgard/mlody_emisariusz.webp",
         dkarta: "/gwent/assets/dkarty/3/216.webp",
-        opis: "WORK.",
+        opis: '"Szpieg to trochę zbyt dużo powiedziane.\nJestem raczej obserwatorem".',
         bohater: false,
         moc: "wiez",
         frakcja: "2",
@@ -917,7 +917,7 @@ const cards = [
         nazwa: "Młody emisariusz",
         karta: "/gwent/assets/karty/nilftgard/mlody_emisariusz2.webp",
         dkarta: "/gwent/assets/dkarty/3/217.webp",
-        opis: "WORK.",
+        opis: '"Szpieg to trochę zbyt dużo powiedziane.\nJestem raczej obserwatorem".',
         bohater: false,
         moc: "wiez",
         frakcja: "2",
@@ -932,7 +932,7 @@ const cards = [
         nazwa: "Cynthia",
         karta: "/gwent/assets/karty/nilftgard/cynthia.webp",
         dkarta: "/gwent/assets/dkarty/3/218.webp",
-        opis: "WORK.",
+        opis: '"Talent Cynthii jest olbrzymi. Trzeba jej\nkrótszej smyczy".',
         bohater: false,
         frakcja: "2",
         punkty: 4,
@@ -945,7 +945,7 @@ const cards = [
         nazwa: "Rainfarn",
         karta: "/gwent/assets/karty/nilftgard/rainfarn.webp",
         dkarta: "/gwent/assets/dkarty/3/219.webp",
-        opis: "WORK.",
+        opis: '"Ten Rainfarn... On sie kiedyś uśmiecha?"\n"Mhm. Jak kogoś zabije".',
         bohater: false,
         frakcja: "2",
         punkty: 4,
@@ -958,7 +958,7 @@ const cards = [
         nazwa: "Vanhemar",
         karta: "/gwent/assets/karty/nilftgard/vanhemar.webp",
         dkarta: "/gwent/assets/dkarty/3/220.webp",
-        opis: "WORK.",
+        opis: '"Lubie bawić się ogniem. Zwłaszcza z\nNordlingami".',
         bohater: false,
         frakcja: "2",
         punkty: 4,
@@ -971,7 +971,7 @@ const cards = [
         nazwa: "Vattier de Rideaux",
         karta: "/gwent/assets/karty/nilftgard/vattier_de_rideaux.webp",
         dkarta: "/gwent/assets/dkarty/3/221.webp",
-        opis: "WORK.",
+        opis: '"Nie ma problemu, którego nie da sie\nrozwiązać skrytobójstwem".',
         bohater: false,
         moc: "szpieg",
         frakcja: "2",
@@ -985,7 +985,7 @@ const cards = [
         nazwa: "Moeteisen",
         karta: "/gwent/assets/karty/nilftgard/mortiesen.webp",
         dkarta: "/gwent/assets/dkarty/3/222.webp",
-        opis: "WORK.",
+        opis: '"Wiesz co jest największą bronią\nNilfgaardu? Dyscyplina".',
         bohater: false,
         frakcja: "2",
         punkty: 3,
@@ -998,7 +998,7 @@ const cards = [
         nazwa: "Zdezelowana mangonela",
         karta: "/gwent/assets/karty/nilftgard/zdezelowana_mangonela.webp",
         dkarta: "/gwent/assets/dkarty/3/223.webp",
-        opis: "WORK.",
+        opis: '"To badziewie jeszcze działa?!"\n"Zależy, co przez to rozumiesz..."',
         bohater: false,
         frakcja: "2",
         punkty: 3,
@@ -1011,7 +1011,7 @@ const cards = [
         nazwa: "Puttkammer",
         karta: "/gwent/assets/karty/nilftgard/puttkammer.webp",
         dkarta: "/gwent/assets/dkarty/3/224.webp",
-        opis: "WORK.",
+        opis: "Zatruć studnie? Ależ... To by było\nniehonorowe!",
         bohater: false,
         frakcja: "2",
         punkty: 3,
@@ -1024,7 +1024,7 @@ const cards = [
         nazwa: "Brygada Impera",
         karta: "/gwent/assets/karty/nilftgard/brygada_impera.webp",
         dkarta: "/gwent/assets/dkarty/3/225.webp",
-        opis: "WORK.",
+        opis: '"Brygada Impera nigdy sie nie poddaje.\nNigdy".',
         bohater: false,
         moc: "wiez",
         frakcja: "2",
@@ -1038,7 +1038,7 @@ const cards = [
         nazwa: "Albrich",
         karta: "/gwent/assets/karty/nilftgard/albrich.webp",
         dkarta: "/gwent/assets/dkarty/3/226.webp",
-        opis: "WORK.",
+        opis: '"Kula ognia? Oczywiscie. Co tylko Wasza\nCesarska Mość sobie życzy".',
         bohater: false,
         frakcja: "2",
         punkty: 2,
@@ -1051,7 +1051,7 @@ const cards = [
         nazwa: "Sweers",
         karta: "/gwent/assets/karty/nilftgard/sweers.webp",
         dkarta: "/gwent/assets/dkarty/3/227.webp",
-        opis: "WORK.",
+        opis: '"Jazda do roboty, chamy!"',
         bohater: false,
         frakcja: "2",
         punkty: 2,
@@ -1064,7 +1064,7 @@ const cards = [
         nazwa: "Vreemde",
         karta: "/gwent/assets/karty/nilftgard/vreemde.webp",
         dkarta: "/gwent/assets/dkarty/3/228.webp",
-        opis: "WORK.",
+        opis: '"Vreemde znany był z nieugiętego\ncharakteru. I okrucieństwa".',
         bohater: false,
         frakcja: "2",
         punkty: 2,
@@ -1077,7 +1077,7 @@ const cards = [
         nazwa: "Kawaleria Nauzicaa",
         karta: "/gwent/assets/karty/nilftgard/kawaleria_nauzicaa.webp",
         dkarta: "/gwent/assets/dkarty/3/229.webp",
-        opis: "WORK.",
+        opis: '"Vreemde znany był z nieugiętego charakteru. I okrucieństwa"\n"Nie to brygada kawalerii Nausica".',
         bohater: false,
         moc: "wiez",
         frakcja: "2",
@@ -1091,7 +1091,7 @@ const cards = [
         nazwa: "Wsparcie łuczników",
         karta: "/gwent/assets/karty/nilftgard/wsparcie_lucznikow2.webp",
         dkarta: "/gwent/assets/dkarty/3/230.webp",
-        opis: "WORK.",
+        opis: '"Szkolenie? Proszę bardzo. Strzelasz\nostrym do przodu".',
         bohater: false,
         moc: "medyk",
         frakcja: "2",
@@ -1183,7 +1183,7 @@ const cards = [
         ilosc: 1,
         numer: "304"
     },
-    
+
     {
         nazwa: "Milva",
         karta: "/gwent/assets/karty/scio'tel/milva.webp",
@@ -1263,7 +1263,7 @@ const cards = [
         ilosc: 1,
         numer: "310"
     },
-    
+
     {
         nazwa: "Barcayl Els",
         karta: "/gwent/assets/karty/scio'tel/barclay_els.webp",
@@ -1288,8 +1288,8 @@ const cards = [
         pozycja: 4,
         ilosc: 1,
         numer: "312"
-    },   
-    
+    },
+
     {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/zwiadowca_z_dol_blathanna.webp",
@@ -1301,7 +1301,7 @@ const cards = [
         pozycja: 4,
         ilosc: 1,
         numer: "313"
-    },   
+    },
 
     {
         nazwa: "Zwiadowca z Dol Blathanna",
@@ -1314,8 +1314,8 @@ const cards = [
         pozycja: 4,
         ilosc: 1,
         numer: "314"
-    },   
-    
+    },
+
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie3.webp",
@@ -1329,7 +1329,7 @@ const cards = [
         summon: "316, 317",
         ilosc: 1,
         numer: "315"
-    }, 
+    },
 
     {
         nazwa: "Hevekarskie wsparcie",
@@ -1344,8 +1344,8 @@ const cards = [
         summon: "315, 317",
         ilosc: 1,
         numer: "316"
-    },    
-       
+    },
+
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/gwent/assets/karty/scio'tel/havekarskie_wsparcie2.webp",
@@ -1359,7 +1359,7 @@ const cards = [
         summon: "315, 316",
         ilosc: 1,
         numer: "317"
-    },      
+    },
 
     {
         nazwa: "Bryada Vrihedd",
@@ -1373,7 +1373,7 @@ const cards = [
         ilosc: 1,
         numer: "318"
     },
-    
+
     {
         nazwa: "Bryada Vrihedd",
         karta: "/gwent/assets/karty/scio'tel/brygada_vrihedd.webp",
@@ -1412,7 +1412,7 @@ const cards = [
         ilosc: 1,
         numer: "321"
     },
-    
+
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu3.webp",
@@ -1425,7 +1425,7 @@ const cards = [
         ilosc: 1,
         numer: "322"
     },
-    
+
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu5.webp",
@@ -1438,7 +1438,7 @@ const cards = [
         ilosc: 1,
         numer: "323"
     },
-    
+
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/gwent/assets/karty/scio'tel/obronca_mahakamu4.webp",
@@ -1464,7 +1464,7 @@ const cards = [
         ilosc: 1,
         numer: "325"
     },
-       
+
     {
         nazwa: "Łucznik z Dol Blathanna",
         karta: "/gwent/assets/karty/scio'tel/lucznik_z_blathanna.webp",
@@ -1477,7 +1477,7 @@ const cards = [
         ilosc: 1,
         numer: "326"
     },
-    
+
     {
         nazwa: "Ciran aep Easnillien",
         karta: "/gwent/assets/karty/scio'tel/ciaran_aep_easnillien.webp",
@@ -1519,7 +1519,7 @@ const cards = [
         summon: "328, 330",
         ilosc: 1,
         numer: "329"
-    }, 
+    },
 
     {
         nazwa: "Krasnolud Harcownik",
@@ -1544,7 +1544,7 @@ const cards = [
         bohater: false,
         frakcja: "3",
         punkty: 2,
-        pozycja: 2, 
+        pozycja: 2,
         ilosc: 1,
         numer: "331"
     },
@@ -1663,7 +1663,7 @@ const cards = [
         ilosc: 1,
         numer: "401"
     },
- 
+
     {
         nazwa: "Imlerith",
         karta: "/gwent/assets/karty/potwory/imlerith.webp",
@@ -1676,7 +1676,7 @@ const cards = [
         ilosc: 1,
         numer: "402"
     },
-    
+
     {
         nazwa: "Leszy",
         karta: "/gwent/assets/karty/potwory/leszy.webp",
@@ -1756,7 +1756,7 @@ const cards = [
         ilosc: 1,
         numer: "408"
     },
-     
+
     {
         nazwa: "Olbrzymi krabopająk",
         karta: "/gwent/assets/karty/potwory/olbrzymi_krabopajak.webp",
@@ -1771,7 +1771,7 @@ const cards = [
         ilosc: 1,
         numer: "409"
     },
-  
+
     {
         nazwa: "Wiedzma: Kuchta",
         karta: "/gwent/assets/karty/potwory/wiedzma_kuchta.webp",
@@ -1828,7 +1828,7 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "413"
-    },              
+    },
 
     {
         nazwa: "Morowa dziewica",
@@ -1995,7 +1995,7 @@ const cards = [
         ilosc: 1,
         numer: "425"
     },
-     
+
     {
         nazwa: "Wampir: Fleder",
         karta: "/gwent/assets/karty/potwory/wampir_fleader.webp",
@@ -2010,7 +2010,7 @@ const cards = [
         ilosc: 1,
         numer: "426"
     },
-     
+
     {
         nazwa: "Wampir: Garkain",
         karta: "/gwent/assets/karty/potwory/wampir_garkain.webp",
@@ -2053,7 +2053,7 @@ const cards = [
         ilosc: 1,
         numer: "429"
     },
-    
+
     {
         nazwa: "Harpia",
         karta: "/gwent/assets/karty/potwory/harpia.webp",
@@ -2065,8 +2065,8 @@ const cards = [
         pozycja: 4,
         ilosc: 1,
         numer: "430"
-    },     
-    
+    },
+
     {
         nazwa: "Kuroliszek",
         karta: "/gwent/assets/karty/potwory/kuroliszek.webp",
@@ -2078,7 +2078,7 @@ const cards = [
         pozycja: 2,
         ilosc: 1,
         numer: "431"
-    },     
+    },
 
     {
         nazwa: "Gargulec",
@@ -2091,8 +2091,8 @@ const cards = [
         pozycja: 2,
         ilosc: 1,
         numer: "432"
-    },     
-    
+    },
+
     {
         nazwa: "Harpia Celaeno",
         karta: "/gwent/assets/karty/potwory/harpia_celaeno.webp",
@@ -2104,8 +2104,8 @@ const cards = [
         pozycja: 4,
         ilosc: 1,
         numer: "433"
-    },     
-    
+    },
+
     {
         nazwa: "Mglak",
         karta: "/gwent/assets/karty/potwory/mglak.webp",
@@ -2117,7 +2117,7 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "434"
-    },     
+    },
 
     {
         nazwa: "Wiwerna",
@@ -2143,7 +2143,7 @@ const cards = [
         frakcja: "4",
         punkty: 2,
         pozycja: 1,
-        summon:"437, 438",
+        summon: "437, 438",
         ilosc: 1,
         numer: "436"
     },
@@ -2158,7 +2158,7 @@ const cards = [
         frakcja: "4",
         punkty: 2,
         pozycja: 1,
-        summon:"436, 438",
+        summon: "436, 438",
         ilosc: 1,
         numer: "437"
     },
@@ -2173,10 +2173,10 @@ const cards = [
         frakcja: "4",
         punkty: 2,
         pozycja: 1,
-        summon:"436, 437",
+        summon: "436, 437",
         ilosc: 1,
         numer: "438"
-    },    
+    },
 
     {
         nazwa: "Ghul",
@@ -2188,11 +2188,11 @@ const cards = [
         frakcja: "4",
         punkty: 1,
         pozycja: 1,
-        summon:"440, 441",
+        summon: "440, 441",
         ilosc: 1,
         numer: "439"
     },
-    
+
     {
         nazwa: "Ghul",
         karta: "/gwent/assets/karty/potwory/ghul2.webp",
@@ -2203,11 +2203,11 @@ const cards = [
         frakcja: "4",
         punkty: 1,
         pozycja: 1,
-        summon:"439, 441",
+        summon: "439, 441",
         ilosc: 1,
         numer: "440"
-    },    
-    
+    },
+
     {
         nazwa: "Ghul",
         karta: "/gwent/assets/karty/potwory/ghul1.webp",
@@ -2218,15 +2218,15 @@ const cards = [
         frakcja: "4",
         punkty: 1,
         pozycja: 1,
-        summon:"439, 440",
+        summon: "439, 440",
         ilosc: 1,
         numer: "441"
     },
-    
-//skellige ==============================================
-//skellige ==============================================
-//skellige ==============================================
-    
+
+    //skellige ==============================================
+    //skellige ==============================================
+    //skellige ==============================================
+
     {
         nazwa: "Olaf",
         karta: "/gwent/assets/karty/Skellige/olaf.webp",
@@ -2239,8 +2239,8 @@ const cards = [
         pozycja: 4,
         ilosc: 1,
         numer: "501"
-    },   
-    
+    },
+
     {
         nazwa: "Hjalmar",
         karta: "/gwent/assets/karty/Skellige/hjalmar.webp",
@@ -2249,11 +2249,11 @@ const cards = [
         bohater: true,
         frakcja: "5",
         punkty: 10,
-        pozycja: 2,          
+        pozycja: 2,
         ilosc: 1,
         numer: "502"
-    },    
-    
+    },
+
     {
         nazwa: "Cerys",
         karta: "/gwent/assets/karty/Skellige/cerys.webp",
@@ -2264,11 +2264,11 @@ const cards = [
         frakcja: "5",
         punkty: 10,
         pozycja: 1,
-        summon:"519, 520, 521",
+        summon: "519, 520, 521",
         ilosc: 1,
         numer: "503"
-    },    
-    
+    },
+
     {
         nazwa: "Myszowór",
         karta: "/gwent/assets/karty/Skellige/myszowór.webp",
@@ -2281,8 +2281,8 @@ const cards = [
         pozycja: 2,
         ilosc: 1,
         numer: "504"
-    },    
-    
+    },
+
     {
         nazwa: "Lugos Szalony",
         karta: "/gwent/assets/karty/Skellige/lugos_szalony.webp",
@@ -2294,8 +2294,8 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "505"
-    },    
-    
+    },
+
     {
         nazwa: "Lugos Siny",
         karta: "/gwent/assets/karty/Skellige/lugos_siny.webp",
@@ -2308,7 +2308,7 @@ const cards = [
         ilosc: 1,
         numer: "506"
     },
-    
+
     {
         nazwa: "Wojownik klanu Craite",
         karta: "/gwent/assets/karty/Skellige/wojownik_klanu_craite.webp",
@@ -2321,8 +2321,8 @@ const cards = [
         pozycja: 1,
         ilosc: 3,
         numer: "507"
-    },    
-    
+    },
+
     {
         nazwa: "Drakkar wojenny",
         karta: "/gwent/assets/karty/Skellige/drakkar_wojenny.webp",
@@ -2335,8 +2335,8 @@ const cards = [
         pozycja: 3,
         ilosc: 3,
         numer: "508"
-    },    
-    
+    },
+
     {
         nazwa: "Łucznik klanu Brokvar",
         karta: "/gwent/assets/karty/Skellige/lucznik_klanu_brokvar.webp",
@@ -2348,8 +2348,8 @@ const cards = [
         pozycja: 5,
         ilosc: 3,
         numer: "509"
-    },    
-    
+    },
+
     {
         nazwa: "Purat klanu Dimun",
         karta: "/gwent/assets/karty/Skellige/pirat_z_klanu_dimun.webp",
@@ -2362,8 +2362,8 @@ const cards = [
         pozycja: 2,
         ilosc: 1,
         numer: "510"
-    },    
-    
+    },
+
     {
         nazwa: "Holger Czarna Ręka",
         karta: "/gwent/assets/karty/Skellige/holger_czarna_reka.webp",
@@ -2375,8 +2375,8 @@ const cards = [
         pozycja: 3,
         ilosc: 1,
         numer: "511"
-    },    
-    
+    },
+
     {
         nazwa: "Donar an Hindar",
         karta: "/gwent/assets/karty/Skellige/donar_an_hindar.webp",
@@ -2401,8 +2401,8 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "513"
-    },    
-    
+    },
+
     {
         nazwa: "Svanrige",
         karta: "/gwent/assets/karty/Skellige/svanrige.webp",
@@ -2414,8 +2414,8 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "514"
-    },    
-    
+    },
+
     {
         nazwa: "Berserker",
         karta: "/gwent/assets/karty/Skellige/berserk.webp",
@@ -2426,11 +2426,11 @@ const cards = [
         frakcja: "5",
         punkty: 4,
         pozycja: 1,
-        summon:"527",
+        summon: "527",
         ilosc: 1,
         numer: "515"
     },
-    
+
     {
         nazwa: "Płatnerz klanu Torrdaroch",
         karta: "/gwent/assets/karty/Skellige/platnerz_klanu_tordarroch.webp",
@@ -2438,12 +2438,12 @@ const cards = [
         opis: "WORK.",
         bohater: false,
         frakcja: "5",
-        punkty: 4 ,
+        punkty: 4,
         pozycja: 1,
         ilosc: 1,
         numer: "516"
-    },    
-    
+    },
+
     {
         nazwa: "Sklad klanu Heymaey",
         karta: "/gwent/assets/karty/Skellige/skald_klanu_heymaey.webp",
@@ -2452,11 +2452,11 @@ const cards = [
         bohater: false,
         frakcja: "5",
         punkty: 4,
-        pozycja: 1, 
+        pozycja: 1,
         ilosc: 1,
         numer: "517"
-    },    
-    
+    },
+
     {
         nazwa: "Lekki Drakkar",
         karta: "/gwent/assets/karty/Skellige/lekki_drakkar.webp",
@@ -2483,7 +2483,7 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "519"
-    },        
+    },
 
     {
         nazwa: "Tarczowniczka klanu Drummond",
@@ -2497,8 +2497,8 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "520"
-    },  
-      
+    },
+
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/gwent/assets/karty/Skellige/tarczowniczka_klanu_drummond3.webp",
@@ -2511,8 +2511,8 @@ const cards = [
         pozycja: 1,
         ilosc: 1,
         numer: "521"
-    },  
-  
+    },
+
     {
         nazwa: "Draig Bon-Dhu",
         karta: "/gwent/assets/karty/Skellige/draig_bon_dhu.webp",
@@ -2540,7 +2540,7 @@ const cards = [
         ilosc: 1,
         numer: "523"
     },
-    
+
     {
         nazwa: "Młody berserk",
         karta: "/gwent/assets/karty/Skellige/mlody_berserker.webp",
@@ -2551,11 +2551,11 @@ const cards = [
         frakcja: "5",
         punkty: 2,
         pozycja: 2,
-        summon:"528",
+        summon: "528",
         ilosc: 3,
         numer: "524"
     },
-    
+
     {
         nazwa: "Kambi",
         karta: "/gwent/assets/karty/Skellige/kambi.webp",
@@ -2566,7 +2566,7 @@ const cards = [
         frakcja: "5",
         punkty: 0,
         pozycja: 1,
-        summon:"526",
+        summon: "526",
         ilosc: 1,
         numer: "525"
     },
@@ -2577,25 +2577,25 @@ const cards = [
         nazwa: "Hemdal",
         karta: "/gwent/assets/karty/Skellige/hemdal.webp",
         dkarta: "/gwent/assets/dkarty/6/hemdal.webp",
-        opis: '"Kiedy nadejdzie Czas Białego Mrozu Hemdall wezwie nas do walki."',
+        opis: '"Kiedy nadejdzie Czas Białego Mrozu\nHemdall wezwie nas do walki."',
         bohater: true,
         punkty: 11,
         pozycja: 1,
         numer: "526"
-    },   
-    
+    },
+
     {
         nazwa: "Przemieniony Vildkaarl",
         karta: "/gwent/assets/karty/Skellige/kambi.webp",
         dkarta: "/gwent/assets/dkarty/6/berserk.webp",
-        opis: "Raz w życiu widziałem jak walczą... I więcej nie chce.",
+        opis: "Raz w życiu widziałem jak walczą... I\nwięcej nie chce.",
         bohater: false,
         moc: "morale",
         punkty: 14,
         pozycja: 1,
         numer: "527"
-    },    
-    
+    },
+
     {
         nazwa: "Przemieniony Młody Vildkaarl",
         karta: "/gwent/assets/karty/Skellige/kambi.webp",
