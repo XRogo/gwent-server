@@ -172,7 +172,13 @@ function renderPowiek() {
     overlay.style.maxWidth = '100vw';
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
-    overlay.onclick = hidePowiek;
+    overlay.onclick = (e) => {
+        if (powiekOptions && powiekOptions.isMulligan) {
+            e.stopPropagation();
+            return;
+        }
+        hidePowiek();
+    };
     document.body.appendChild(overlay);
     // Funkcja pomocnicza: px w 4K -> px względem backgroundWidth/backgroundHeight
     function relW(px) { return (px / TLO_W) * backgroundWidth; }

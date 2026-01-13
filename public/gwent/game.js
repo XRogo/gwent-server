@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function finishSelection() {
         applyAutoFillAndSave();
+        socket.emit('save-full-deck', { gameCode, isHost, deck });
         socket.emit('force-start-game', { gameCode });
     }
 

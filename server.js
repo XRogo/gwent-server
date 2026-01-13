@@ -221,14 +221,25 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('save-full-deck', (data) => {
+        const { gameCode, isHost, deck } = data;
+        if (games[gameCode]) {
+            if (isHost) games[gameCode].hostFullDeck = deck;
+            else games[gameCode].oppFullDeck = deck;
+            console.log(`[GAME] Full deck saved for ${isHost ? 'Host' : 'Opponent'} in ${gameCode}`);
+        }
+    });
+
     socket.on('force-start-game', (data) => {
         const { gameCode } = data;
         console.log(`[GAME] Forcing game start for ${gameCode}`);
         if (games[gameCode]) {
-            games[gameCode].status = 'playing';
+            const game = games[gameCode];
+            game.status = 'playing';
+
             // Initialize empty state if not exists
-            if (!games[gameCode].gameState) {
-                games[gameCode].gameState = {
+            if (!game.gameState) {
+                game.gameState = {
                     hostHand: null,
                     hostDeck: null,
                     hostGraveyard: [],
@@ -237,6 +248,29 @@ io.on('connection', (socket) => {
                     oppGraveyard: [],
                     board: {}
                 };
+            }
+
+            // Server-side card dealing if decks are available
+            if (game.hostFullDeck && game.oppFullDeck) {
+                const dealCards = (fullDeck) => {
+                    let deckCopy = [...fullDeck];
+                    let hand = [];
+                    for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
+                        const randIdx = Math.floor(Math.random() * deckCopy.length);
+                        hand.push(deckCopy.splice(randIdx, 1)[0]);
+                    }
+                    return { hand, remainingDeck: deckCopy };
+                };
+
+                const hostResult = dealCards(game.hostFullDeck);
+                game.gameState.hostHand = hostResult.hand;
+                game.gameState.hostDeck = hostResult.remainingDeck;
+
+                const oppResult = dealCards(game.oppFullDeck);
+                game.gameState.oppHand = oppResult.hand;
+                game.gameState.oppDeck = oppResult.remainingDeck;
+
+                console.log(`[GAME] Cards dealt server-side for ${gameCode}`);
             }
         }
         io.to(gameCode).emit('start-game-now');

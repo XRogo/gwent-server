@@ -72,6 +72,13 @@ if (socket && gameCode) {
 }
 
 function startNewGame() {
+    // If the server already provided a hand via init-game-state, we don't need to generate it
+    if (playerHand && playerHand.length > 0) {
+        console.log("Using server-provided hand");
+        startMulligan();
+        return;
+    }
+
     const fullDeck = JSON.parse(localStorage.getItem('deck') || '[]');
     if (fullDeck.length < 22) {
         alert('Talia jest niekompletna!');
@@ -86,7 +93,7 @@ function startNewGame() {
         return idxA - idxB;
     });
 
-    // Draw 10 cards
+    // Draw 10 cards (Fallback)
     let deckCopy = [...sortedDeck];
     playerHand = [];
     for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
@@ -140,6 +147,8 @@ function startMulligan() {
                     playerHand[idx] = newCard;
                     drawPile.push(oldCard);
 
+                    // Re-sort hand only if you want, but user might prefer to see the new card in the same spot
+                    // Let's re-sort to keep it consistent with game rules
                     playerHand.sort((a, b) => {
                         const idxA = cards.findIndex(c => c.numer === a.numer);
                         const idxB = cards.findIndex(c => c.numer === b.numer);
@@ -148,12 +157,22 @@ function startMulligan() {
 
                     swaps++;
                     selectedIdx = playerHand.indexOf(newCard);
-                    refreshMulligan();
+
+                    if (swaps >= 2) {
+                        setTimeout(() => {
+                            closeMulligan();
+                        }, 500); // Small delay to show the last card
+                    } else {
+                        refreshMulligan();
+                    }
                 } else {
                     closeMulligan();
                 }
             },
-            onClose: () => closeMulligan()
+            onClose: () => {
+                // If it's closed via ESC, we accept the current hand
+                closeMulligan();
+            }
         });
     }
 
