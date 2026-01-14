@@ -40,12 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // Listen for opponent readiness
         socket.on('opponent-ready-status', (data) => {
             window.opponentReady = data.isReady;
-            if (data.isReady) {
-                startOpponentTimer();
-            } else {
-                stopOpponentTimer();
-            }
             updateStats();
+        });
+
+        // Listen for server-side timer
+        socket.on('selection-timer-update', (data) => {
+            window.opponentReadyTimer = data.timeLeft;
+            updateStats();
+        });
+
+        socket.on('selection-timer-stopped', () => {
+            window.opponentReadyTimer = null;
+            updateStats();
+        });
+
+        socket.on('force-finish-selection', () => {
+            finishSelection();
         });
 
         // Sync game start for both
@@ -74,26 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Default value for isHostLocal
     window.isHostLocal = isHost;
 
-    let oppTimerInterval = null;
-    function startOpponentTimer() {
-        if (oppTimerInterval) clearInterval(oppTimerInterval);
-        window.opponentReadyTimer = 60;
-        oppTimerInterval = setInterval(() => {
-            window.opponentReadyTimer--;
-            if (window.opponentReadyTimer <= 0) {
-                clearInterval(oppTimerInterval);
-                finishSelection();
-            }
-            updateStats();
-        }, 1000);
-    }
-
-    function stopOpponentTimer() {
-        if (oppTimerInterval) clearInterval(oppTimerInterval);
-        window.opponentReady = false;
-        window.opponentReadyTimer = 60;
-        updateStats();
-    }
 
     function applyAutoFillAndSave() {
         const unitCards = deck.filter(card => {

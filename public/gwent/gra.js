@@ -158,6 +158,9 @@ function startMulligan() {
                     swaps++;
                     selectedIdx = playerHand.indexOf(newCard);
 
+                    // Save state "nabierząco" after each swap
+                    saveState();
+
                     if (swaps >= 2) {
                         setTimeout(() => {
                             closeMulligan();

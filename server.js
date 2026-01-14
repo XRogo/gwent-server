@@ -209,10 +209,45 @@ io.on('connection', (socket) => {
     socket.on('player-ready', (data) => {
         const { gameCode, isHost, isReady } = data;
         if (games[gameCode]) {
-            if (isHost) games[gameCode].hostReady = isReady;
-            else games[gameCode].opponentReady = isReady;
+            const game = games[gameCode];
+            if (isHost) game.hostReady = isReady;
+            else game.opponentReady = isReady;
 
             console.log(`[GAME] ${isHost ? 'Host' : 'Opponent'} is ${isReady ? 'READY' : 'NOT READY'} in ${gameCode}`);
+
+            // Start timer if one is ready and other is not
+            if ((game.hostReady && !game.opponentReady) || (!game.hostReady && game.opponentReady)) {
+                if (!game.selectionTimer) {
+                    game.selectionTimerValue = 60;
+                    game.selectionTimer = setInterval(() => {
+                        game.selectionTimerValue--;
+                        io.to(gameCode).emit('selection-timer-update', { timeLeft: game.selectionTimerValue });
+
+                        if (game.selectionTimerValue <= 0) {
+                            clearInterval(game.selectionTimer);
+                            game.selectionTimer = null;
+                            console.log(`[GAME] Selection timer expired for ${gameCode}. Forcing start.`);
+                            io.to(gameCode).emit('force-finish-selection');
+                        }
+                    }, 1000);
+                    console.log(`[GAME] Started selection timer for ${gameCode}`);
+                }
+            } else if (!game.hostReady && !game.opponentReady) {
+                // Both not ready, stop timer
+                if (game.selectionTimer) {
+                    clearInterval(game.selectionTimer);
+                    game.selectionTimer = null;
+                    console.log(`[GAME] Stopped selection timer for ${gameCode} (both not ready)`);
+                    io.to(gameCode).emit('selection-timer-stopped');
+                }
+            } else if (game.hostReady && game.opponentReady) {
+                // Both ready, stop timer and start immediately if needed (usually client triggers this)
+                if (game.selectionTimer) {
+                    clearInterval(game.selectionTimer);
+                    game.selectionTimer = null;
+                    console.log(`[GAME] Stopped selection timer for ${gameCode} (both ready)`);
+                }
+            }
 
             const targetId = isHost ? (games[gameCode].players[0]) : games[gameCode].host;
             if (targetId) {

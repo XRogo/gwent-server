@@ -2545,7 +2545,7 @@ const cards = [
         nazwa: "Młody berserk",
         karta: "/gwent/assets/karty/Skellige/mlody_berserker.webp",
         dkarta: "/gwent/assets/dkarty/6/524.webp",
-        opis: "WORK.",
+        opis: '"Wperdol?"',
         bohater: false,
         moc: "berserk",
         frakcja: "5",

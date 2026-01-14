@@ -162,3 +162,19 @@ Budowa planszy
     przeciwnik {483, 569 - 850, 602}
     ty {483, 1498 x 850, 1532}
 
+
+
+--- DIAŁANIE STRONY ---
+ wejście z index.html do game.html
+  serwer sprawdza połączenie między graczami {[obecznie działa]}
+  jeśli jeden z graczy da gotowośc przeciwnik ma 60s na wybranie swojej tali kart i danie Gotowość  {[obecznie działa]}
+   jeśli tego nie zrobi to po upływie czasu serwer sam doda odpowiednią ilość kart z nie wybrachyb z wybraniej tali (jeśli ma np X to dodaj tyle kart żeby miał 22) {[obecznie działa]}
+  po upływie czasu serwer powinien stworzyć w swojej bazie danych tymczasowych odpowiednią kategornie {nick gracza 1} i {nick gracza 2} i zapiasć dla tych wartości wybrane przez graczy karty w (Będą potrzebne do działania gry te dane) po zapisaniu tych danych serwer powinien przenięść graczy na gra.html
+przejście z game.html do gra.html
+  po wejściu na gra.html serwer powinien 
+   sprawdzić tymczasową baze danych i sprawdzić co gracze wybrali i dla gracza A dać 10 losowych kart z tej bazy A i graczowi B dać 10 losowych kart z tej bazy B 
+   po przekazaniu 10 kart serwer powinien teraz nabierząco zapisywać stan kart czyli czy znajdują sie na kupce kart w tali (tych co są w grze ale nie zostały wylosowane) znajdujące sie w ręce (czyli te co są w ręce) i karty odrzucone (czyli te karty które odpadły z gry ale w niej dalej są) 
+   gracze po dostaniu kart powinni dostać możliwość wymienienia 2 kart (2 karty z ręki można wymienić z kartami z kupki kart w talii)
+   
+   
+ 
