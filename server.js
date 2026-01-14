@@ -338,7 +338,8 @@ io.on('connection', (socket) => {
     socket.on('get-game-state', (data) => {
         const { gameCode, isPlayer1 } = data;
         if (games[gameCode] && games[gameCode].gameState) {
-            const state = games[gameCode].gameState;
+            const game = games[gameCode];
+            const state = game.gameState;
             socket.emit('init-game-state', {
                 hand: isPlayer1 ? state.p1Hand : state.p2Hand,
                 deck: isPlayer1 ? state.p1Deck : state.p2Deck,
@@ -405,20 +406,6 @@ io.on('connection', (socket) => {
             if (targetId) {
                 io.to(targetId).emit('opponent-played-card', { card, rowIndex });
             }
-        }
-    });
-
-    socket.on('get-game-state', (data) => {
-        const { gameCode, isHost } = data;
-        if (games[gameCode] && games[gameCode].gameState) {
-            const state = games[gameCode].gameState;
-            socket.emit('init-game-state', {
-                hand: isHost ? state.hostHand : state.oppHand,
-                deck: isHost ? state.hostDeck : state.oppDeck,
-                graveyard: isHost ? state.hostGraveyard : state.oppGraveyard,
-                opponentHandCount: isHost ? (state.oppHand ? state.oppHand.length : 0) : (state.hostHand ? state.hostHand.length : 0),
-                opponentDeckCount: isHost ? (state.oppDeck ? state.oppDeck.length : 0) : (state.hostDeck ? state.hostDeck.length : 0)
-            });
         }
     });
 
