@@ -19,14 +19,14 @@ const wybraneKartyText = document.querySelector('.wybrane_karty-text');
 const nicknameInput = document.querySelector('.nickname-input');
 
 let selectedMode = null;
-let isHost = false;
+let isPlayer1 = false;
 let isJoined = false;
 let hasJoined = false;
 let opponentJoined = false;
-let opponentId = null;
-let hostId = null;
-let hostNickname = null;
-let opponentNickname = null;
+let player2Id = null;
+let player1Id = null;
+let player1Nickname = null;
+let player2Nickname = null;
 let currentGameCode = null;
 
 const nicknames = [
@@ -104,10 +104,8 @@ function fadeIn(element) {
 function showHostScreen() {
     fadeOut(mainMenu, () => {
         fadeIn(hostScreen);
-        isHost = true;
-        generateGameCode();
-        currentGameCode = gameCodeElement.textContent;
-        socket.emit('create-game', { gameCode: currentGameCode });
+        isPlayer1 = true;
+        socket.emit('create-game');
         if (playerIcon) {
             playerIcon.style.display = 'block';
             playerIcon.src = 'assets/ludekn.png';
@@ -139,7 +137,7 @@ function showLoadingScreen() {
 }
 
 function showNicknameScreen() {
-    if (isHost) {
+    if (isPlayer1) {
         fadeOut(hostScreen, () => {
             fadeIn(nicknameScreen);
             setRandomNickname();
@@ -175,10 +173,14 @@ function showNicknameScreen() {
 }
 
 function generateGameCode() {
-    const code = Math.floor(100000 + Math.random() * 900000);
-    gameCodeElement.textContent = code;
-    gameLinkElement.textContent = `https://gwent-1vs1.onrender.com/?game=${code}`;
+    // No longer generating code locally for host
 }
+
+socket.on('game-created', (data) => {
+    currentGameCode = data.gameCode;
+    gameCodeElement.textContent = currentGameCode;
+    gameLinkElement.textContent = `https://gwent-1vs1.onrender.com/?game=${currentGameCode}`;
+});
 
 function copyCode() {
     navigator.clipboard.writeText(gameCodeElement.textContent).then(() => {
@@ -217,13 +219,13 @@ function joinGame() {
 }
 
 function selectMode(mode) {
-    if (!isHost) return;
-    if (!opponentJoined || !opponentId) {
+    if (!isPlayer1) return;
+    if (!opponentJoined || !player2Id) {
         alert('Przeciwnik opuścił grę. Czekaj na nowego gracza.');
         return;
     }
     selectedMode = mode;
-    socket.emit('send-to-opponent', { opponentId, message: { type: 'mode-selected', mode } });
+    socket.emit('send-to-p2', { player2Id, message: { type: 'mode-selected', mode } });
     showNicknameScreen();
 }
 
@@ -302,27 +304,27 @@ function startGame() {
         alert('Błąd: utracono kod gry. Spróbuj dołączyć ponownie.');
         return;
     }
-    const nick = isHost ? hostNickname : opponentNickname;
-    window.location.href = `/gwent/game.html?code=${gameCode}&host=${isHost}&nick=${encodeURIComponent(nick || '')}`;
+    const nick = isPlayer1 ? player1Nickname : player2Nickname;
+    window.location.href = `/gwent/game.html?code=${gameCode}&host=${isPlayer1}&nick=${encodeURIComponent(nick || '')}`;
 }
 
 function resetGameState() {
     selectedMode = null;
-    isHost = false;
+    isPlayer1 = false;
     isJoined = false;
-    hasJoined = false; // Upewniamy się, że hasJoined jest zresetowane
+    hasJoined = false;
     opponentJoined = false;
-    opponentId = null;
-    hostId = null;
-    hostNickname = null;
-    opponentNickname = null;
+    player2Id = null;
+    player1Id = null;
+    player1Nickname = null;
+    player2Nickname = null;
     // Resetowanie UI hosta
     resetHostUI();
     // Resetowanie inputu kodu, aby można było wpisać nowy kod
     const codeInput = document.querySelector('.code-input');
     if (codeInput) {
         codeInput.value = '';
-        codeInput.disabled = false; // Upewniamy się, że pole kodu jest aktywne
+        codeInput.disabled = false;
     }
 }
 
@@ -330,12 +332,12 @@ socket.on('join-success', (data) => {
     console.log('Dołączono do gry:', data.gameCode);
     isJoined = true;
     hasJoined = true;
-    if (data.isHost) {
-        console.log('Jesteś hostem.');
-        isHost = true;
+    if (data.isPlayer1) {
+        console.log('Jesteś Player 1.');
+        isPlayer1 = true;
     } else {
-        console.log('Przeciwnik dołączył, przechodzę na stronę C.5');
-        hostId = data.hostId;
+        console.log('Przeciwnik dołączył.');
+        player1Id = data.player1Id;
         if (playerIcon) {
             playerIcon.style.display = 'block';
             playerIcon.src = 'assets/ludeka.png?cache=' + Date.now();
@@ -363,7 +365,7 @@ socket.on('join-error', (message) => {
 
 socket.on('opponent-joined', (data) => {
     console.log('Odebrano opponent-joined:', data);
-    opponentId = data.opponentId;
+    player2Id = data.opponentId;
     opponentJoined = true;
     setTimeout(updateHostUI, 100);
 });
@@ -378,14 +380,14 @@ socket.on('public-game-found', (data) => {
 
 socket.on('opponent-left', (message) => {
     alert(message);
-    if (isHost) {
+    if (isPlayer1) {
         selectedMode = null;
         isJoined = false;
         hasJoined = false;
         opponentJoined = false;
-        opponentId = null;
-        hostNickname = null;
-        opponentNickname = null;
+        player2Id = null;
+        player1Nickname = null;
+        player2Nickname = null;
         resetHostUI();
         nicknameScreen.style.display = 'none';
         gameScreen.style.display = 'none';
@@ -402,35 +404,35 @@ socket.on('opponent-left', (message) => {
     }
 });
 
-socket.on('message-from-opponent', (data) => {
-    const { opponentId: senderId, message } = data;
+socket.on('message-from-p2', (data) => {
+    const { player2Id: senderId, message } = data;
     if (message.type === 'submit-nickname') {
-        opponentNickname = message.nickname;
-        console.log(`Przeciwnik wybrał nick: ${opponentNickname}`);
+        player2Nickname = message.nickname;
+        console.log(`P2 wybrał nick: ${player2Nickname}`);
         const opponentIcon = document.querySelector('.opponent-player-icon img');
         if (opponentIcon) {
             opponentIcon.src = 'assets/ludeka.png?cache=' + Date.now();
         }
-        if (hostNickname && opponentNickname) {
-            socket.emit('send-to-opponent', { opponentId: senderId, message: { type: 'nicknames-confirmed', hostNickname, opponentNickname } });
+        if (player1Nickname && player2Nickname) {
+            socket.emit('send-to-p2', { player2Id: senderId, message: { type: 'nicknames-confirmed', player1Nickname, player2Nickname } });
             startGame();
         }
     }
 });
 
-socket.on('message-from-host', (message) => {
+socket.on('message-from-p1', (message) => {
     if (message.type === 'mode-selected') {
         selectedMode = message.mode;
-        console.log(`Host wybrał tryb: ${selectedMode}`);
+        console.log(`P1 wybrał tryb: ${selectedMode}`);
         showNicknameScreen();
     } else if (message.type === 'nicknames-confirmed') {
-        hostNickname = message.hostNickname;
-        opponentNickname = message.opponentNickname;
-        console.log(`Nicki potwierdzone: Host - ${hostNickname}, Przeciwnik - ${opponentNickname}`);
+        player1Nickname = message.player1Nickname;
+        player2Nickname = message.player2Nickname;
+        console.log(`Nicki potwierdzone: P1 - ${player1Nickname}, P2 - ${player2Nickname}`);
         startGame();
-    } else if (message.type === 'host-nickname-confirmed') {
-        hostNickname = message.nickname;
-        console.log(`Host potwierdził nick: ${hostNickname}`);
+    } else if (message.type === 'p1-nickname-confirmed') {
+        player1Nickname = message.nickname;
+        console.log(`P1 potwierdził nick: ${player1Nickname}`);
         const hostIcon = document.querySelector('.host-player-icon img');
         if (hostIcon) {
             hostIcon.src = 'assets/ludeka.png?cache=' + Date.now();
@@ -439,14 +441,14 @@ socket.on('message-from-host', (message) => {
 });
 
 socket.on('test-game-joined', (data) => {
-    isHost = data.isHost;
+    isPlayer1 = data.isHost;
     currentGameCode = data.gameCode;
     const nick = data.nickname;
-    if (isHost) hostNickname = nick;
-    else opponentNickname = nick;
+    if (isPlayer1) player1Nickname = nick;
+    else player2Nickname = nick;
 
     localStorage.setItem('nickname', nick);
-    window.location.href = `/gwent/game.html?code=${currentGameCode}&host=${isHost}&nick=${encodeURIComponent(nick)}`;
+    window.location.href = `/gwent/game.html?code=${currentGameCode}&host=${isPlayer1}&nick=${encodeURIComponent(nick)}`;
 });
 
 socket.on('test-game-error', (msg) => {
@@ -466,25 +468,25 @@ function submitNickname() {
     }
     nicknameInput.disabled = true;
 
-    if (isHost) {
-        hostNickname = nickname;
-        localStorage.setItem('nickname', nickname); // Save for reconnection
-        console.log(`Host wybrał nick: ${hostNickname}`);
+    if (isPlayer1) {
+        player1Nickname = nickname;
+        localStorage.setItem('nickname', nickname);
+        console.log(`P1 wybrał nick: ${player1Nickname}`);
         const hostIcon = document.querySelector('.host-player-icon img');
         if (hostIcon) {
             hostIcon.src = 'assets/ludeka.png?cache=' + Date.now();
         }
-        if (opponentId) {
-            socket.emit('send-to-opponent', { opponentId, message: { type: 'host-nickname-confirmed', nickname: hostNickname } });
+        if (player2Id) {
+            socket.emit('send-to-p2', { player2Id, message: { type: 'p1-nickname-confirmed', nickname: player1Nickname } });
         }
-        if (opponentNickname) {
-            socket.emit('send-to-opponent', { opponentId, message: { type: 'nicknames-confirmed', hostNickname, opponentNickname } });
+        if (player2Nickname) {
+            socket.emit('send-to-p2', { player2Id, message: { type: 'nicknames-confirmed', player1Nickname, player2Nickname } });
             startGame();
         }
     } else {
-        localStorage.setItem('nickname', nickname); // Save for reconnection
+        localStorage.setItem('nickname', nickname);
         const gameCode = document.querySelector('.code-input').value.trim();
-        socket.emit('send-to-host', { gameCode, message: { type: 'submit-nickname', nickname } });
+        socket.emit('send-to-p1', { gameCode, message: { type: 'submit-nickname', nickname } });
         const opponentIcon = document.querySelector('.opponent-player-icon img');
         if (opponentIcon) {
             opponentIcon.src = 'assets/ludeka.png?cache=' + Date.now();
@@ -512,10 +514,10 @@ function showMainMenu() {
 // Funkcje powrotu
 function goBackFromHostScreen() {
     fadeOut(hostScreen, () => {
-        fadeIn(mainMenu); // Host wraca na stronę A
-        if (isHost) {
-            socket.emit('hostLeft');
-            socket.disconnect(); // Rozłączamy hosta
+        fadeIn(mainMenu);
+        if (isPlayer1) {
+            socket.emit('p1Left');
+            socket.disconnect();
         }
         resetGameState();
     });
@@ -523,43 +525,43 @@ function goBackFromHostScreen() {
 
 function goBackFromJoinScreen() {
     fadeOut(joinScreen, () => {
-        fadeIn(mainMenu); // Przeciwnik wraca na stronę A
-        if (!isHost) {
-            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
-            socket.disconnect(); // Rozłączamy przeciwnika
+        fadeIn(mainMenu);
+        if (!isPlayer1) {
+            socket.emit('p2Left', 'Przeciwnik opuścił grę.');
+            socket.disconnect();
         }
-        resetGameState(); // Resetujemy stan gry
+        resetGameState();
     });
 }
 
 function goBackFromLoadingScreen() {
     fadeOut(loadingScreen, () => {
-        fadeIn(mainMenu); // Przeciwnik wraca na stronę A
-        if (!isHost) {
-            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
-            socket.disconnect(); // Rozłączamy przeciwnika
+        fadeIn(mainMenu);
+        if (!isPlayer1) {
+            socket.emit('p2Left', 'Przeciwnik opuścił grę.');
+            socket.disconnect();
         }
-        resetGameState(); // Resetujemy stan gry
+        resetGameState();
     });
 }
 
 function goBackFromNicknameScreen() {
-    if (isHost) {
+    if (isPlayer1) {
         fadeOut(nicknameScreen, () => {
-            fadeIn(hostScreen); // Host wraca na stronę B
-            socket.emit('hostLeft');
+            fadeIn(hostScreen);
+            socket.emit('p1Left');
         });
     } else {
         fadeOut(nicknameScreen, () => {
-            fadeIn(mainMenu); // Przeciwnik wraca na stronę A
-            socket.emit('opponentLeft', 'Przeciwnik opuścił grę.');
-            socket.disconnect(); // Rozłączamy przeciwnika
-            resetGameState(); // Resetujemy stan gry
+            fadeIn(mainMenu);
+            socket.emit('p2Left', 'Przeciwnik opuścił grę.');
+            socket.disconnect();
+            resetGameState();
         });
     }
 }
 
-socket.on('hostLeft', () => {
+socket.on('opponent-left', (message) => {
     fadeOut(nicknameScreen, () => {
         fadeIn(loadingScreen);
     });

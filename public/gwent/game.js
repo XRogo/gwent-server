@@ -23,19 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const socket = typeof io !== 'undefined' ? io() : null;
     const urlParams = new URLSearchParams(window.location.search);
     const gameCode = urlParams.get('code');
-    const isHost = urlParams.get('host') === 'true';
+    const isPlayer1 = urlParams.get('host') === 'true'; // URL param might still be 'host'
+
 
     if (socket && gameCode) {
-        const defaultNick = isHost ? 'Gospodarz' : 'Gość';
+        const defaultNick = isPlayer1 ? 'Gospodarz' : 'Gość';
         const nickFromUrl = urlParams.get('nick');
         const nick = nickFromUrl || localStorage.getItem('nickname') || defaultNick;
 
         if (window.ConnectionUI) {
-            window.ConnectionUI.init(socket, gameCode, isHost, nick);
+            window.ConnectionUI.init(socket, gameCode, isPlayer1, nick);
         }
 
-        socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
-        console.log(`Reconnecting to game ${gameCode} as ${isHost ? 'host' : 'opponent'}`);
+        socket.emit('rejoin-game', { gameCode, isPlayer1, nickname: nick });
+        console.log(`Reconnecting to game ${gameCode} as ${isPlayer1 ? 'P1' : 'P2'}`);
 
         // Listen for opponent readiness
         socket.on('opponent-ready-status', (data) => {
@@ -66,23 +67,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fade) {
                 fade.style.opacity = '1';
                 setTimeout(() => {
-                    window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}&nick=${nickParam}`;
+                    window.location.href = `gra.html?code=${gameCode}&host=${window.isPlayer1Local}&nick=${nickParam}`;
                 }, 600);
             } else {
-                window.location.href = `gra.html?code=${gameCode}&host=${window.isHostLocal}&nick=${nickParam}`;
+                window.location.href = `gra.html?code=${gameCode}&host=${window.isPlayer1Local}&nick=${nickParam}`;
             }
         });
 
         // Receive authoritative status
         socket.on('opponent-status', (data) => {
-            if (data.hostId) {
-                window.isHostLocal = (socket.id === data.hostId);
+            if (data.player1Id) {
+                window.isPlayer1Local = (socket.id === data.player1Id);
             }
         });
     }
 
-    // Default value for isHostLocal
-    window.isHostLocal = isHost;
+    // Default value for isPlayer1Local
+    window.isPlayer1Local = isPlayer1;
 
 
     function applyAutoFillAndSave() {
@@ -114,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function finishSelection() {
         applyAutoFillAndSave();
-        socket.emit('save-full-deck', { gameCode, isHost, deck });
+        socket.emit('save-full-deck', { gameCode, isPlayer1: window.isPlayer1Local, deck });
         socket.emit('force-start-game', { gameCode });
     }
 
@@ -810,7 +811,6 @@ document.addEventListener('DOMContentLoaded', () => {
         goToGameButton.textContent = 'Gotowość';
         let amIReady = false;
         goToGameButton.addEventListener('click', () => {
-            // Licz tylko karty walki (z punktami, ale nie pogodowe)
             const unitCardsCount = deck.filter(card => {
                 const isUnit = typeof card.punkty === 'number';
                 const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
             goToGameButton.textContent = amIReady ? 'Odwołaj Gotowość' : 'Gotowość';
             goToGameButton.style.color = amIReady ? '#35a842' : '';
 
-            socket.emit('player-ready', { gameCode, isHost, isReady: amIReady });
+            socket.emit('player-ready', { gameCode, isPlayer1: window.isPlayer1Local, isReady: amIReady });
 
             if (amIReady && window.opponentReady) {
                 // Both ready!

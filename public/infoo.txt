@@ -164,17 +164,25 @@ Budowa planszy
 
 
 
---- DIAŁANIE STRONY ---
- wejście z index.html do game.html
-  serwer sprawdza połączenie między graczami {[obecznie działa]}
-  jeśli jeden z graczy da gotowośc przeciwnik ma 60s na wybranie swojej tali kart i danie Gotowość  {[obecznie działa]}
-   jeśli tego nie zrobi to po upływie czasu serwer sam doda odpowiednią ilość kart z nie wybrachyb z wybraniej tali (jeśli ma np X to dodaj tyle kart żeby miał 22) {[obecznie działa]}
-  po upływie czasu serwer powinien stworzyć w swojej bazie danych tymczasowych odpowiednią kategornie {nick gracza 1} i {nick gracza 2} i zapiasć dla tych wartości wybrane przez graczy karty w (Będą potrzebne do działania gry te dane) po zapisaniu tych danych serwer powinien przenięść graczy na gra.html
-przejście z game.html do gra.html
-  po wejściu na gra.html serwer powinien 
-   sprawdzić tymczasową baze danych i sprawdzić co gracze wybrali i dla gracza A dać 10 losowych kart z tej bazy A i graczowi B dać 10 losowych kart z tej bazy B 
-   po przekazaniu 10 kart serwer powinien teraz nabierząco zapisywać stan kart czyli czy znajdują sie na kupce kart w tali (tych co są w grze ale nie zostały wylosowane) znajdujące sie w ręce (czyli te co są w ręce) i karty odrzucone (czyli te karty które odpadły z gry ale w niej dalej są) 
-   gracze po dostaniu kart powinni dostać możliwość wymienienia 2 kart (2 karty z ręki można wymienić z kartami z kupki kart w talii)
-   
-   
+CO MA ROBIĆ SERWER?
+ Po wejściu na strone zostaje utworzony kod : {6 cyforwy}
+inny gracz powinien mieć możliwość dołączenia do tego kodu (obecnie dziala) ma sie dziac po stronie serwera (aby uniknąć lików ip przeciwnika)
+Po połączeniu obu graczy osoba tworząca gre (host) wybiera tryb gry (obecnie jest tylko 1)
+Po wybraniu serwer powinien traktować obu graczy jako gracz 1 i gracz 2 (nie jako host/dołączajacy) 
+Gracz 1 i gracz 2 wybieraja sobie nicki (serwer powinien zapisać to w stanie gry)
+Gdy oboje graczy wybiorą nick serwer wysyła informacje do graczy zeby strona przezóciła ich na game.html
+Po przeniesieniu graczy na game.html  serwer sprawdza polączenie między graczami i wysyła do graczy niki przeciwników 
+Gracze w game.html wybierają karty i frakcje i po wyborze i klilnięciu gotowość gracz wysyła informacje do serwera o swoim wyborze talli gry (a server ma zapisać wybór gracza który to wybrał, nie ma sie ten wybór mieszać z przeciwnikiem) chyba ze kilknie anuluj gotowość wtedy serwer kasuje ten stan (tylko dla gracza który anulował)
+Jesli oboje graczy da gotowość i serwer zapisze stan wyboru kart dla gracza A  i dla gracza B poczym przenosi graczy do gra.html
+Po przejściu na gra.html 
+ Gracze powinni dostać od serwera 
+   10 losowych kart do ręki (z talli gry) (dla gracza A z zapisu dla grqcza A. A dla gracza B z B)
+   Resztę kart do talli 
+   Wybrany dowódca obu graczy 
+   Informacje o ilości kart w ręce przeciwnika
+   Informacje o frakcji przeciwnika
+   Informacje o ilości kart w tlai przeciwnika 
+   (Przeciwnicy nie powinni wiedzieć jakie karty ma przeciwnik)
+SERWER POWINIEN ZAPISYWAĆ WSZYSTKIE ZMIANY NA PLANSZY GRY informacje o ruchach pozycjach ilości kart w tali... (Żeby gracz nie był w stanie dodać sobie kart do ręki czy oszukiwać w jakis sposób za pomocą konsoli)
+ Jesli gracz zechce może wymienić 1 wybrana karte, klikając na  niechciane kartę  wysyła informacje do serwera o tym, serwer usuwa tą kartę z ręki i losuje 1 losową z kupku poczym wysyla informacje o tym do gracza, a u gracza zamienai sie ta karta (Może to zrobić max 2 razy) poczym 2 odrzucone karty wracają do talli gry
  

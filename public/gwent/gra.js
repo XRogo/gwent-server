@@ -14,8 +14,11 @@ let opponentGraveyard = [];
 const socket = typeof io !== 'undefined' ? io() : null;
 const urlParams = new URLSearchParams(window.location.search);
 const gameCode = urlParams.get('code');
-const isHost = urlParams.get('host') === 'true';
-const nick = urlParams.get('nick') || (isHost ? 'Gospodarz' : 'Gość');
+const isPlayer1 = urlParams.get('host') === 'true';
+const nick = urlParams.get('nick') || (isPlayer1 ? 'Gospodarz' : 'Gość');
+
+// State tracking for mulligan
+let swapsCount = 0;
 
 // Board State
 let board = {
@@ -25,11 +28,11 @@ let board = {
 
 if (socket && gameCode) {
     if (window.ConnectionUI) {
-        window.ConnectionUI.init(socket, gameCode, isHost, nick);
+        window.ConnectionUI.init(socket, gameCode, isPlayer1, nick);
     }
 
-    socket.emit('rejoin-game', { gameCode, isHost, nickname: nick });
-    socket.emit('get-game-state', { gameCode, isHost });
+    socket.emit('rejoin-game', { gameCode, isPlayer1, nickname: nick });
+    socket.emit('get-game-state', { gameCode, isPlayer1 });
 
     socket.on('init-game-state', (data) => {
         if (data.hand) {
@@ -38,21 +41,47 @@ if (socket && gameCode) {
             playerGraveyard = data.graveyard || [];
             opponentHandCount = data.opponentHandCount;
             opponentDeckCount = data.opponentDeckCount;
-            opponentGraveyard = data.opponentGraveyard || [];
+            opponentGraveyardCount = data.opponentGraveyardCount || 0;
             window.opponentFaction = data.opponentFaction;
-            renderAll();
+            swapsCount = data.swapsPerformed || 0;
+
+            // Check if we need to start mulligan
+            if (!window.gameStarted && data.status === 'playing') {
+                window.gameStarted = true;
+                startMulligan();
+            } else {
+                renderAll();
+            }
         } else {
-            // First time entering the board
-            startNewGame();
+            console.error("No hand data from server!");
         }
     });
 
     socket.on('opponent-status', (data) => {
-        // Refresh nicknames if changed
-        const oppNick = isHost ? data.opponentNickname : data.hostNickname;
+        const oppNick = isPlayer1 ? data.player2Nickname : data.player1Nickname;
         if (oppNick) {
             window.opponentNickname = oppNick;
             renderNicknames();
+        }
+    });
+
+    socket.on('mulligan-swap-success', (data) => {
+        const { newCard, swapsLeft, cardIndex } = data;
+        playerHand[cardIndex] = newCard;
+        swapsCount = 2 - swapsLeft;
+
+        playerHand.sort((a, b) => {
+            const idxA = cards.findIndex(c => c.numer === a.numer);
+            const idxB = cards.findIndex(c => c.numer === b.numer);
+            return idxA - idxB;
+        });
+
+        if (swapsLeft <= 0) {
+            setTimeout(() => {
+                closeMulligan();
+            }, 500);
+        } else {
+            startMulligan(playerHand.indexOf(newCard));
         }
     });
 
@@ -65,127 +94,54 @@ if (socket && gameCode) {
     });
 
     socket.on('opponent-played-card', (data) => {
-        // Basic sync for opponent playing a card (logical stub)
         console.log('Opponent played card:', data.card, 'to row:', data.rowIndex);
-        // In a real implementation, we'd add it to a board state and render
+    });
+
+    socket.on('message-from-p1', (msg) => {
+        console.log("P1 says:", msg);
+    });
+
+    socket.on('message-from-p2', (data) => {
+        console.log("P2 says:", data.message);
     });
 }
 
 function startNewGame() {
-    // If the server already provided a hand via init-game-state, we don't need to generate it
-    if (playerHand && playerHand.length > 0) {
-        console.log("Using server-provided hand");
-        startMulligan();
-        return;
-    }
-
-    const fullDeck = JSON.parse(localStorage.getItem('deck') || '[]');
-    if (fullDeck.length < 22) {
-        alert('Talia jest niekompletna!');
-        window.location.href = `game.html?code=${gameCode}&host=${isHost}&nick=${encodeURIComponent(nick)}`;
-        return;
-    }
-
-    // Sort deck by cards.js index to maintain order
-    const sortedDeck = [...fullDeck].sort((a, b) => {
-        const idxA = cards.findIndex(c => c.numer === a.numer);
-        const idxB = cards.findIndex(c => c.numer === b.numer);
-        return idxA - idxB;
-    });
-
-    // Draw 10 cards (Fallback)
-    let deckCopy = [...sortedDeck];
-    playerHand = [];
-    for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
-        const randIdx = Math.floor(Math.random() * deckCopy.length);
-        playerHand.push(deckCopy.splice(randIdx, 1)[0]);
-    }
-
-    // Sort hand by cards.js index
-    playerHand.sort((a, b) => {
-        const idxA = cards.findIndex(c => c.numer === a.numer);
-        const idxB = cards.findIndex(c => c.numer === b.numer);
-        return idxA - idxB;
-    });
-
-    drawPile = deckCopy;
-
-    // Save to server
-    saveState();
-
-    // Start Mulligan
-    startMulligan();
+    console.log("Waiting for server state...");
 }
 
 function saveState() {
     socket.emit('save-game-state', {
         gameCode,
-        isHost,
+        isPlayer1,
         gameState: {
             hand: playerHand,
-            deck: drawPile,
-            graveyard: playerGraveyard,
             faction: localStorage.getItem('faction') || "1"
         }
     });
 }
 
-function startMulligan() {
-    let swaps = 0;
-    let selectedIdx = 0;
-
-    function refreshMulligan() {
-        showPowiek(playerHand, selectedIdx, 'hand', {
-            isMulligan: true,
-            swapsLeft: 2 - swaps,
-            onSwap: (idx) => {
-                if (swaps < 2 && drawPile.length > 0) {
-                    const newCardIdx = Math.floor(Math.random() * drawPile.length);
-                    const newCard = drawPile.splice(newCardIdx, 1)[0];
-                    const oldCard = playerHand[idx];
-
-                    playerHand[idx] = newCard;
-                    drawPile.push(oldCard);
-
-                    // Re-sort hand only if you want, but user might prefer to see the new card in the same spot
-                    // Let's re-sort to keep it consistent with game rules
-                    playerHand.sort((a, b) => {
-                        const idxA = cards.findIndex(c => c.numer === a.numer);
-                        const idxB = cards.findIndex(c => c.numer === b.numer);
-                        return idxA - idxB;
-                    });
-
-                    swaps++;
-                    selectedIdx = playerHand.indexOf(newCard);
-
-                    // Save state "nabierząco" after each swap
-                    saveState();
-
-                    if (swaps >= 2) {
-                        setTimeout(() => {
-                            closeMulligan();
-                        }, 500); // Small delay to show the last card
-                    } else {
-                        refreshMulligan();
-                    }
-                } else {
-                    closeMulligan();
-                }
-            },
-            onClose: () => {
-                // If it's closed via ESC, we accept the current hand
+function startMulligan(selectedIndex = 0) {
+    showPowiek(playerHand, selectedIndex, 'hand', {
+        isMulligan: true,
+        swapsLeft: 2 - swapsCount,
+        onSwap: (idx) => {
+            if (swapsCount < 2) {
+                socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx });
+            } else {
                 closeMulligan();
             }
-        });
-    }
+        },
+        onClose: () => {
+            closeMulligan();
+        }
+    });
+}
 
-    function closeMulligan() {
-        if (window.closePowiek) window.closePowiek();
-        saveState();
-        renderAll();
-    }
-
-    refreshMulligan();
+function closeMulligan() {
+    if (window.hidePowiek) window.hidePowiek();
+    else if (window.closePowiek) window.closePowiek();
+    renderAll();
 }
 
 function renderAll() {

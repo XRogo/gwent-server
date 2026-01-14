@@ -1,9 +1,9 @@
 // connectionUI.js - Status połączenia z przeciwnikiem
 const ConnectionUI = {
-    init(socket, gameCode, isHost, currentNickname) {
+    init(socket, gameCode, isPlayer1, currentNickname) {
         this.socket = socket;
         this.gameCode = gameCode;
-        this.isHost = isHost;
+        this.isPlayer1 = isPlayer1;
         this.nickname = currentNickname;
         this.opponentNickname = null;
         this.status = 'connecting'; // connecting, connected, disconnected
@@ -11,9 +11,6 @@ const ConnectionUI = {
         this.injectUI();
         this.setupListeners();
 
-        // Nie wysyłamy set-nickname tutaj, bo i tak zostanie wysłane 
-        // przy rejoin-game zaraz po init() w game.js/gra.js
-        // lub przy zdarzeniu 'connect' w setupListeners.
         console.log('ConnectionUI zainicjalizowane dla:', this.nickname);
     },
 
@@ -117,30 +114,24 @@ const ConnectionUI = {
         this.socket.on('connect', () => {
             console.log('ConnectionUI: Połączono z serwerem');
             if (this.nickname) {
-                this.socket.emit('set-nickname', { gameCode: this.gameCode, isHost: this.isHost, nickname: this.nickname });
+                this.socket.emit('set-nickname', { gameCode: this.gameCode, isPlayer1: this.isPlayer1, nickname: this.nickname });
             }
         });
 
         this.socket.on('opponent-status', (data) => {
-            // Re-verify isHost based on authoritative server data
-            if (data.hostId && this.socket.id) {
-                this.isHost = (this.socket.id === data.hostId);
-            } else {
-                // Fallback to initial value if socket info not ready
-                console.warn('ConnectionUI: socket.id missing during status update, using initial role:', this.isHost);
+            if (data.player1Id && this.socket.id) {
+                this.isPlayer1 = (this.socket.id === data.player1Id);
             }
 
-            // If I am Host, I want to see the Opponent's name.
-            // If I am Opponent, I want to see the Host's name.
-            const oppNick = this.isHost ? data.opponentNickname : data.hostNickname;
-            const opponentConnected = this.isHost ? data.opponentConnected : data.hostConnected;
+            const oppNick = this.isPlayer1 ? data.player2Nickname : data.player1Nickname;
+            const opponentConnected = this.isPlayer1 ? data.player2Connected : data.player1Connected;
 
             if (oppNick) {
                 this.opponentNickname = oppNick;
                 window.opponentNickname = oppNick;
                 if (this.oppLabel) this.oppLabel.textContent = oppNick;
             } else if (!this.opponentNickname) {
-                this.opponentNickname = this.isHost ? "Gość" : "Gospodarz";
+                this.opponentNickname = this.isPlayer1 ? "Gość" : "Gospodarz";
                 window.opponentNickname = this.opponentNickname;
                 if (this.oppLabel) this.oppLabel.textContent = this.opponentNickname;
             }

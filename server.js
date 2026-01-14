@@ -17,25 +17,23 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log(`[CONN] Nowy użytkownik połączony: ${socket.id}`);
 
-    socket.on('create-game', (data) => {
-        const { gameCode } = data;
-        if (!games[gameCode]) {
-            games[gameCode] = {
-                host: socket.id,
-                players: [],
-                isClosed: false,
-                hostNickname: null,
-                opponentNickname: null,
-                status: 'waiting',
-                hostReady: false,
-                opponentReady: false
-            };
-            socket.join(gameCode);
-            socket.emit('join-success', { gameCode, isHost: true });
-            console.log(`[LOBBY] Host utworzył grę ${gameCode}: ${socket.id}`);
-        } else {
-            socket.emit('join-error', 'Kod gry już istnieje!');
-        }
+    socket.on('create-game', () => {
+        const gameCode = Math.floor(100000 + Math.random() * 900000).toString();
+        games[gameCode] = {
+            player1: socket.id,
+            player2: null,
+            isClosed: false,
+            player1Nickname: null,
+            player2Nickname: null,
+            status: 'lobby', // lobby, naming, selecting, game, gra
+            player1Ready: false,
+            player2Ready: false,
+            gameMode: null,
+            gameState: null
+        };
+        socket.join(gameCode);
+        socket.emit('game-created', { gameCode, isPlayer1: true });
+        console.log(`[LOBBY] Player 1 utworzył grę ${gameCode}: ${socket.id}`);
     });
 
     socket.on('join-game', (data) => {
@@ -46,28 +44,28 @@ io.on('connection', (socket) => {
             return;
         }
 
-        if (games[gameCode].isClosed && games[gameCode].host !== socket.id && !games[gameCode].players.includes(socket.id)) {
-            socket.emit('join-error', 'Gra jest już zamknieta i pełna!');
+        if (games[gameCode].player2 && games[gameCode].player2 !== socket.id && games[gameCode].player1 !== socket.id) {
+            socket.emit('join-error', 'Gra jest już pełna!');
             return;
         }
 
-        if (games[gameCode].host !== socket.id && !games[gameCode].players.includes(socket.id)) {
-            if (games[gameCode].players.length >= 1) {
-                socket.emit('join-error', 'Gra jest pełna!');
-                return;
-            }
-            games[gameCode].players.push(socket.id);
+        if (games[gameCode].player1 !== socket.id && games[gameCode].player2 !== socket.id) {
+            games[gameCode].player2 = socket.id;
             games[gameCode].isClosed = true;
-            console.log(`[LOBBY] Gracz ${socket.id} dołączył do gry ${gameCode}`);
+            console.log(`[LOBBY] Player 2 ${socket.id} dołączył do gry ${gameCode}`);
+            io.to(games[gameCode].player1).emit('opponent-joined', { opponentId: socket.id });
         }
 
         socket.join(gameCode);
-        socket.emit('join-success', { gameCode, isHost: games[gameCode].host === socket.id, hostId: games[gameCode].host });
+        const isPlayer1 = games[gameCode].player1 === socket.id;
+        socket.emit('join-success', {
+            gameCode,
+            isPlayer1,
+            player1Id: games[gameCode].player1,
+            player2Id: games[gameCode].player2
+        });
 
-        if (games[gameCode].host !== socket.id) {
-            io.to(games[gameCode].host).emit('opponent-joined', { opponentId: socket.id });
-            broadcastStatus(gameCode);
-        }
+        broadcastStatus(gameCode);
     });
 
     socket.on('find-public-game', () => {
@@ -141,19 +139,20 @@ io.on('connection', (socket) => {
         const game = games[gameCode];
         if (!game) return;
 
-        const hostSocket = io.sockets.sockets.get(game.host);
-        const opponentId = game.players[0];
-        const opponentSocket = opponentId ? io.sockets.sockets.get(opponentId) : null;
+        const p1Socket = io.sockets.sockets.get(game.player1);
+        const p2Socket = game.player2 ? io.sockets.sockets.get(game.player2) : null;
 
         const statusData = {
-            hostId: game.host,
-            hostConnected: !!(hostSocket && hostSocket.connected),
-            opponentConnected: !!(opponentSocket && opponentSocket.connected),
-            hostNickname: game.hostNickname,
-            opponentNickname: game.opponentNickname
+            player1Id: game.player1,
+            player2Id: game.player2,
+            player1Connected: !!(p1Socket && p1Socket.connected),
+            player2Connected: !!(p2Socket && p2Socket.connected),
+            player1Nickname: game.player1Nickname,
+            player2Nickname: game.player2Nickname,
+            status: game.status
         };
 
-        console.log(`[STATUS] Rozsyłam status dla ${gameCode}. Host: ${statusData.hostConnected}, Opp: ${statusData.opponentConnected}`);
+        console.log(`[STATUS] Rozsyłam status dla ${gameCode}. P1: ${statusData.player1Connected}, P2: ${statusData.player2Connected}`);
 
         if (specificSocket) {
             specificSocket.emit('opponent-status', statusData);
@@ -163,60 +162,58 @@ io.on('connection', (socket) => {
     };
 
     socket.on('rejoin-game', (data) => {
-        let { gameCode, isHost, nickname } = data;
+        let { gameCode, isPlayer1, nickname } = data;
         if (games[gameCode]) {
             const game = games[gameCode];
 
-            // Server-side authority check:
-            // If the requester claims to be a host, but there's already a different host
-            // who is currently connected, force the requester to be an opponent.
-            if (isHost && game.host && game.host !== socket.id) {
-                const hostSocket = io.sockets.sockets.get(game.host);
-                if (hostSocket && hostSocket.connected) {
-                    console.log(`[LOBBY] Forcing ${socket.id} to OPPONENT role during rejoin.`);
-                    isHost = false;
+            // Host check
+            if (isPlayer1 && game.player1 && game.player1 !== socket.id) {
+                const p1Socket = io.sockets.sockets.get(game.player1);
+                if (p1Socket && p1Socket.connected) {
+                    console.log(`[LOBBY] Forcing ${socket.id} to PLAYER 2 role during rejoin.`);
+                    isPlayer1 = false;
                 }
             }
 
             socket.join(gameCode);
-            if (isHost) {
-                game.host = socket.id;
-                game.hostReady = false;
-                if (nickname) game.hostNickname = nickname;
+            if (isPlayer1) {
+                game.player1 = socket.id;
+                game.player1Ready = false;
+                if (nickname) game.player1Nickname = nickname;
             } else {
-                game.players = [socket.id];
-                game.opponentReady = false;
-                if (nickname) game.opponentNickname = nickname;
+                game.player2 = socket.id;
+                game.player2Ready = false;
+                if (nickname) game.player2Nickname = nickname;
             }
-            console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isHost ? 'host' : 'opponent'} (nick: ${nickname || 'brak'})`);
+            console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isPlayer1 ? 'P1' : 'P2'} (nick: ${nickname || 'brak'})`);
             broadcastStatus(gameCode, socket);
 
-            const oppId = isHost ? (game.players[0]) : game.host;
+            const oppId = isPlayer1 ? game.player2 : game.player1;
             if (oppId) io.to(oppId).emit('opponent-ready-status', { isReady: false });
         }
     });
 
     socket.on('set-nickname', (data) => {
-        const { gameCode, isHost, nickname } = data;
+        const { gameCode, isPlayer1, nickname } = data;
         if (games[gameCode]) {
-            if (isHost) games[gameCode].hostNickname = nickname;
-            else games[gameCode].opponentNickname = nickname;
-            console.log(`[LOBBY] Ustawiono nick dla ${isHost ? 'hosta' : 'przeciwnika'} w ${gameCode}: ${nickname}`);
+            if (isPlayer1) games[gameCode].player1Nickname = nickname;
+            else games[gameCode].player2Nickname = nickname;
+            console.log(`[LOBBY] Ustawiono nick dla ${isPlayer1 ? 'P1' : 'P2'} w ${gameCode}: ${nickname}`);
             broadcastStatus(gameCode);
         }
     });
 
     socket.on('player-ready', (data) => {
-        const { gameCode, isHost, isReady } = data;
+        const { gameCode, isPlayer1, isReady } = data;
         if (games[gameCode]) {
             const game = games[gameCode];
-            if (isHost) game.hostReady = isReady;
-            else game.opponentReady = isReady;
+            if (isPlayer1) game.player1Ready = isReady;
+            else game.player2Ready = isReady;
 
-            console.log(`[GAME] ${isHost ? 'Host' : 'Opponent'} is ${isReady ? 'READY' : 'NOT READY'} in ${gameCode}`);
+            console.log(`[GAME] ${isPlayer1 ? 'P1' : 'P2'} is ${isReady ? 'READY' : 'NOT READY'} in ${gameCode}`);
 
-            // Start timer if one is ready and other is not
-            if ((game.hostReady && !game.opponentReady) || (!game.hostReady && game.opponentReady)) {
+            // Selection timer logic
+            if ((game.player1Ready && !game.player2Ready) || (!game.player1Ready && game.player2Ready)) {
                 if (!game.selectionTimer) {
                     game.selectionTimerValue = 60;
                     game.selectionTimer = setInterval(() => {
@@ -232,16 +229,14 @@ io.on('connection', (socket) => {
                     }, 1000);
                     console.log(`[GAME] Started selection timer for ${gameCode}`);
                 }
-            } else if (!game.hostReady && !game.opponentReady) {
-                // Both not ready, stop timer
+            } else if (!game.player1Ready && !game.player2Ready) {
                 if (game.selectionTimer) {
                     clearInterval(game.selectionTimer);
                     game.selectionTimer = null;
                     console.log(`[GAME] Stopped selection timer for ${gameCode} (both not ready)`);
                     io.to(gameCode).emit('selection-timer-stopped');
                 }
-            } else if (game.hostReady && game.opponentReady) {
-                // Both ready, stop timer and start immediately if needed (usually client triggers this)
+            } else if (game.player1Ready && game.player2Ready) {
                 if (game.selectionTimer) {
                     clearInterval(game.selectionTimer);
                     game.selectionTimer = null;
@@ -249,7 +244,7 @@ io.on('connection', (socket) => {
                 }
             }
 
-            const targetId = isHost ? (games[gameCode].players[0]) : games[gameCode].host;
+            const targetId = isPlayer1 ? game.player2 : game.player1;
             if (targetId) {
                 io.to(targetId).emit('opponent-ready-status', { isReady });
             }
@@ -257,11 +252,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on('save-full-deck', (data) => {
-        const { gameCode, isHost, deck } = data;
+        const { gameCode, isPlayer1, deck } = data;
         if (games[gameCode]) {
-            if (isHost) games[gameCode].hostFullDeck = deck;
-            else games[gameCode].oppFullDeck = deck;
-            console.log(`[GAME] Full deck saved for ${isHost ? 'Host' : 'Opponent'} in ${gameCode}`);
+            if (isPlayer1) games[gameCode].player1FullDeck = deck;
+            else games[gameCode].player2FullDeck = deck;
+            console.log(`[GAME] Full deck saved for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}`);
         }
     });
 
@@ -272,21 +267,19 @@ io.on('connection', (socket) => {
             const game = games[gameCode];
             game.status = 'playing';
 
-            // Initialize empty state if not exists
             if (!game.gameState) {
                 game.gameState = {
-                    hostHand: null,
-                    hostDeck: null,
-                    hostGraveyard: [],
-                    oppHand: null,
-                    oppDeck: null,
-                    oppGraveyard: [],
+                    p1Hand: null,
+                    p1Deck: null,
+                    p1Graveyard: [],
+                    p2Hand: null,
+                    p2Deck: null,
+                    p2Graveyard: [],
                     board: {}
                 };
             }
 
-            // Server-side card dealing if decks are available
-            if (game.hostFullDeck && game.oppFullDeck) {
+            if (game.player1FullDeck && game.player2FullDeck) {
                 const dealCards = (fullDeck) => {
                     let deckCopy = [...fullDeck];
                     let hand = [];
@@ -297,13 +290,13 @@ io.on('connection', (socket) => {
                     return { hand, remainingDeck: deckCopy };
                 };
 
-                const hostResult = dealCards(game.hostFullDeck);
-                game.gameState.hostHand = hostResult.hand;
-                game.gameState.hostDeck = hostResult.remainingDeck;
+                const p1Result = dealCards(game.player1FullDeck);
+                game.gameState.p1Hand = p1Result.hand;
+                game.gameState.p1Deck = p1Result.remainingDeck;
 
-                const oppResult = dealCards(game.oppFullDeck);
-                game.gameState.oppHand = oppResult.hand;
-                game.gameState.oppDeck = oppResult.remainingDeck;
+                const p2Result = dealCards(game.player2FullDeck);
+                game.gameState.p2Hand = p2Result.hand;
+                game.gameState.p2Deck = p2Result.remainingDeck;
 
                 console.log(`[GAME] Cards dealt server-side for ${gameCode}`);
             }
@@ -312,25 +305,25 @@ io.on('connection', (socket) => {
     });
 
     socket.on('save-game-state', (data) => {
-        const { gameCode, isHost, gameState } = data;
+        const { gameCode, isPlayer1, gameState } = data;
         if (games[gameCode]) {
             if (!games[gameCode].gameState) games[gameCode].gameState = {};
+            const state = games[gameCode].gameState;
 
-            if (isHost) {
-                if (gameState.hand) games[gameCode].gameState.hostHand = gameState.hand;
-                if (gameState.deck) games[gameCode].gameState.hostDeck = gameState.deck;
-                if (gameState.graveyard) games[gameCode].gameState.hostGraveyard = gameState.graveyard;
-                if (gameState.faction) games[gameCode].gameState.hostFaction = gameState.faction;
+            if (isPlayer1) {
+                if (gameState.hand) state.p1Hand = gameState.hand;
+                if (gameState.deck) state.p1Deck = gameState.deck;
+                if (gameState.graveyard) state.p1Graveyard = gameState.graveyard;
+                if (gameState.faction) state.p1Faction = gameState.faction;
             } else {
-                if (gameState.hand) games[gameCode].gameState.oppHand = gameState.hand;
-                if (gameState.deck) games[gameCode].gameState.oppDeck = gameState.deck;
-                if (gameState.graveyard) games[gameCode].gameState.oppGraveyard = gameState.graveyard;
-                if (gameState.faction) games[gameCode].gameState.oppFaction = gameState.faction;
+                if (gameState.hand) state.p2Hand = gameState.hand;
+                if (gameState.deck) state.p2Deck = gameState.deck;
+                if (gameState.graveyard) state.p2Graveyard = gameState.graveyard;
+                if (gameState.faction) state.p2Faction = gameState.faction;
             }
-            console.log(`[GAME] State saved for ${isHost ? 'Host' : 'Opponent'} in ${gameCode}`);
+            console.log(`[GAME] State saved for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}`);
 
-            // Broadcast update to the other player for counts/reversos
-            const targetId = isHost ? (games[gameCode].players ? games[gameCode].players[0] : null) : games[gameCode].host;
+            const targetId = isPlayer1 ? games[gameCode].player2 : games[gameCode].player1;
             if (targetId) {
                 io.to(targetId).emit('opponent-game-update', {
                     handCount: gameState.hand ? gameState.hand.length : undefined,
@@ -343,27 +336,72 @@ io.on('connection', (socket) => {
     });
 
     socket.on('get-game-state', (data) => {
-        const { gameCode, isHost } = data;
+        const { gameCode, isPlayer1 } = data;
         if (games[gameCode] && games[gameCode].gameState) {
             const state = games[gameCode].gameState;
             socket.emit('init-game-state', {
-                hand: isHost ? state.hostHand : state.oppHand,
-                deck: isHost ? state.hostDeck : state.oppDeck,
-                graveyard: isHost ? state.hostGraveyard : state.oppGraveyard,
-                faction: isHost ? state.hostFaction : state.oppFaction,
-                opponentHandCount: isHost ? (state.oppHand ? state.oppHand.length : 0) : (state.hostHand ? state.hostHand.length : 0),
-                opponentDeckCount: isHost ? (state.oppDeck ? state.oppDeck.length : 0) : (state.hostDeck ? state.hostDeck.length : 0),
-                opponentGraveyardCount: isHost ? (state.oppGraveyard ? state.oppGraveyard.length : 0) : (state.hostGraveyard ? state.hostGraveyard.length : 0),
-                opponentFaction: isHost ? state.oppFaction : state.hostFaction
+                hand: isPlayer1 ? state.p1Hand : state.p2Hand,
+                deck: isPlayer1 ? state.p1Deck : state.p2Deck,
+                graveyard: isPlayer1 ? state.p1Graveyard : state.p2Graveyard,
+                faction: isPlayer1 ? state.p1Faction : state.p2Faction,
+                swapsPerformed: isPlayer1 ? (game.p1Swaps || 0) : (game.p2Swaps || 0),
+                opponentHandCount: isPlayer1 ? (state.p2Hand ? state.p2Hand.length : 0) : (state.p1Hand ? state.p1Hand.length : 0),
+                opponentDeckCount: isPlayer1 ? (state.p2Deck ? state.p2Deck.length : 0) : (state.p1Deck ? state.p1Deck.length : 0),
+                opponentGraveyardCount: isPlayer1 ? (state.p2Graveyard ? state.p2Graveyard.length : 0) : (state.p1Graveyard ? state.p1Graveyard.length : 0),
+                opponentFaction: isPlayer1 ? state.p2Faction : state.p1Faction,
+                status: game.status
             });
         }
     });
 
-    socket.on('play-card', (data) => {
-        const { gameCode, isHost, card, rowIndex } = data;
+    socket.on('mulligan-swap', (data) => {
+        const { gameCode, isPlayer1, cardIndex } = data;
         if (games[gameCode]) {
-            // Broadcast the move to the opponent
-            const targetId = isHost ? (games[gameCode].players ? games[gameCode].players[0] : null) : games[gameCode].host;
+            const game = games[gameCode];
+            const state = game.gameState;
+            if (!state) return;
+
+            const playerSwapsKey = isPlayer1 ? 'p1Swaps' : 'p2Swaps';
+            if (!game[playerSwapsKey]) game[playerSwapsKey] = 0;
+
+            if (game[playerSwapsKey] < 2) {
+                const hand = isPlayer1 ? state.p1Hand : state.p2Hand;
+                const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
+
+                if (hand && deck && deck.length > 0) {
+                    const oldCard = hand[cardIndex];
+                    const randIdx = Math.floor(Math.random() * deck.length);
+                    const newCard = deck.splice(randIdx, 1)[0];
+
+                    hand[cardIndex] = newCard;
+                    deck.push(oldCard);
+
+                    game[playerSwapsKey]++;
+                    console.log(`[GAME] ${isPlayer1 ? 'P1' : 'P2'} swapped card in ${gameCode}. Swaps: ${game[playerSwapsKey]}/2`);
+
+                    socket.emit('mulligan-swap-success', {
+                        newCard,
+                        swapsLeft: 2 - game[playerSwapsKey],
+                        cardIndex
+                    });
+
+                    // Update opponent on counts
+                    const targetId = isPlayer1 ? game.player2 : game.player1;
+                    if (targetId) {
+                        io.to(targetId).emit('opponent-game-update', {
+                            handCount: hand.length,
+                            deckCount: deck.length
+                        });
+                    }
+                }
+            }
+        }
+    });
+
+    socket.on('play-card', (data) => {
+        const { gameCode, isPlayer1, card, rowIndex } = data;
+        if (games[gameCode]) {
+            const targetId = isPlayer1 ? games[gameCode].player2 : games[gameCode].player1;
             if (targetId) {
                 io.to(targetId).emit('opponent-played-card', { card, rowIndex });
             }
@@ -384,39 +422,37 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('send-to-host', (data) => {
+    socket.on('send-to-p1', (data) => {
         const { gameCode, message } = data;
-        if (games[gameCode] && games[gameCode].host) {
-            io.to(games[gameCode].host).emit('message-from-opponent', { opponentId: socket.id, message });
+        if (games[gameCode] && games[gameCode].player1) {
+            io.to(games[gameCode].player1).emit('message-from-p2', { player2Id: socket.id, message });
         }
     });
 
-    socket.on('send-to-opponent', (data) => {
-        const { opponentId, message } = data;
-        io.to(opponentId).emit('message-from-host', message);
+    socket.on('send-to-p2', (data) => {
+        const { player2Id, message } = data;
+        io.to(player2Id).emit('message-from-p1', message);
     });
 
-    socket.on('hostLeft', () => {
-        console.log(`[LOBBY] Host ${socket.id} zamknął lobby.`);
+    socket.on('p1Left', () => {
+        console.log(`[LOBBY] Player 1 ${socket.id} zamknął lobby.`);
         for (const gameCode in games) {
-            if (games[gameCode].host === socket.id) {
-                const players = games[gameCode].players;
-                players.forEach(player => {
-                    io.to(player).emit('hostLeft');
-                });
+            if (games[gameCode].player1 === socket.id) {
+                if (games[gameCode].player2) {
+                    io.to(games[gameCode].player2).emit('opponent-left', 'Host zamknął lobby.');
+                }
                 delete games[gameCode];
             }
         }
     });
 
-    socket.on('opponentLeft', (message) => {
-        console.log(`[LOBBY] Przeciwnik ${socket.id} opuścił grę. Wiadomość: ${message}`);
+    socket.on('p2Left', (message) => {
+        console.log(`[LOBBY] Player 2 ${socket.id} opuścił grę. Wiadomość: ${message}`);
         for (const gameCode in games) {
-            const playerIndex = games[gameCode].players.findIndex(player => player === socket.id);
-            if (playerIndex !== -1) {
-                games[gameCode].players.splice(playerIndex, 1);
+            if (games[gameCode].player2 === socket.id) {
+                games[gameCode].player2 = null;
                 games[gameCode].isClosed = false;
-                io.to(games[gameCode].host).emit('opponentLeft', message);
+                io.to(games[gameCode].player1).emit('opponentLeft', message);
                 broadcastStatus(gameCode);
             }
         }
@@ -425,26 +461,23 @@ io.on('connection', (socket) => {
     socket.on('disconnect', (reason) => {
         console.log(`[CONN] Użytkownik rozłączony: ${socket.id}, powód: ${reason}`);
         for (const gameCode in games) {
-            if (games[gameCode].host === socket.id) {
-                console.log(`[LOBBY] Host rozłączony w grze ${gameCode}. Czekam na powrót.`);
+            const game = games[gameCode];
+            if (game.player1 === socket.id) {
+                console.log(`[LOBBY] P1 rozłączony w grze ${gameCode}. Czekam na powrót.`);
                 broadcastStatus(gameCode);
 
                 setTimeout(() => {
-                    if (games[gameCode] && games[gameCode].host === socket.id && !io.sockets.sockets.get(socket.id)) {
-                        console.log(`[LOBBY] Gra ${gameCode} usunięta z powodu długiego rozłączenia hosta.`);
-                        const players = games[gameCode].players;
-                        players.forEach(player => {
-                            io.to(player).emit('opponent-left', 'Host opuścił grę na stałe.');
-                        });
+                    if (games[gameCode] && games[gameCode].player1 === socket.id && !io.sockets.sockets.get(socket.id)) {
+                        console.log(`[LOBBY] Gra ${gameCode} usunięta z powodu długiego rozłączenia P1.`);
+                        if (game.player2) {
+                            io.to(game.player2).emit('opponent-left', 'Host opuścił grę na stałe.');
+                        }
                         delete games[gameCode];
                     }
                 }, 30000);
-            } else {
-                const playerIndex = games[gameCode].players.findIndex(player => player === socket.id);
-                if (playerIndex !== -1) {
-                    console.log(`[LOBBY] Przeciwnik rozłączony w grze ${gameCode}.`);
-                    broadcastStatus(gameCode);
-                }
+            } else if (game.player2 === socket.id) {
+                console.log(`[LOBBY] P2 rozłączony w grze ${gameCode}.`);
+                broadcastStatus(gameCode);
             }
         }
     });
