@@ -247,6 +247,23 @@ function renderNicknames() {
     const oppNickDisplay = window.opponentNickname || 'PRZECIWNIK';
     overlay.appendChild(createNick(oppNickDisplay, oppX, oppY, oppW, oppH));
     overlay.appendChild(createNick(nick, selfX, selfY, selfW, selfH));
+
+    // Licznik kart w ręce przeciwnika
+    const oppHandCountDiv = document.createElement('div');
+    oppHandCountDiv.style.position = 'absolute';
+    oppHandCountDiv.style.left = `${oppX}px`;
+    oppHandCountDiv.style.top = `${oppY + 45 * scale}px`;
+    oppHandCountDiv.style.width = `${oppW}px`;
+    oppHandCountDiv.style.height = `${oppH}px`;
+    oppHandCountDiv.style.display = 'flex';
+    oppHandCountDiv.style.alignItems = 'center';
+    oppHandCountDiv.style.justifyContent = 'center';
+    oppHandCountDiv.style.color = '#fff';
+    oppHandCountDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+    oppHandCountDiv.style.fontSize = `${24 * scale}px`;
+    oppHandCountDiv.style.textShadow = '1px 1px 2px #000';
+    oppHandCountDiv.textContent = `Karty: ${opponentHandCount}`;
+    overlay.appendChild(oppHandCountDiv);
 }
 
 function renderGraveyards() {
