@@ -305,48 +305,58 @@ function renderPiles() {
     const myFaction = localStorage.getItem('faction') || "1";
     const pileAsset = getFactionReverse(myFaction);
 
-    // Twoja talia: 3457, 1654
-    const selfX = 3457 * scale + boardLeft;
-    const selfY = 1654 * scale + boardTop;
+    // Pozycje 4K: 3458, 1655 (Ty) i 3458, 132 (Przeciwnik)
+    const selfArea = { left: 3458, top: 1655, right: 3632, bottom: 1954 };
+    const oppArea = { left: 3458, top: 132, right: 3632, bottom: 431 };
 
-    // Talia przeciwnika: 3457, 131
-    const oppX = 3457 * scale + boardLeft;
-    const oppY = 131 * scale + boardTop;
+    const scaleW = window.innerWidth / 3837;
+    const scaleH = window.innerHeight / 2158;
 
-    const cardW = 180 * scale;
-    const cardH = 240 * scale;
+    const cardW = (selfArea.right - selfArea.left) * scaleW;
+    const cardH = (selfArea.bottom - selfArea.top) * scaleH;
 
-    const renderPile = (x, y, count, isOpponent) => {
+    const renderPile = (area, count, isOpponent) => {
         const container = document.createElement('div');
         container.style.position = 'absolute';
-        container.style.left = `${x}px`;
-        container.style.top = `${y}px`;
+        container.style.left = `${area.left * scaleW}px`;
+        container.style.top = `${area.top * scaleH}px`;
         container.style.width = `${cardW}px`;
         container.style.height = `${cardH}px`;
 
-        const img = document.createElement('img');
-        img.src = isOpponent ? getFactionReverse(window.opponentFaction || "0") : pileAsset;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        img.style.objectPosition = 'top';
-        img.style.borderRadius = `${8 * scale}px`;
-        container.appendChild(img);
+        const factionId = isOpponent ? (window.opponentFaction || "0") : myFaction;
+        const asset = getFactionReverse(factionId);
 
-        // Count overlay coordinates based on faction reverso layout
-        // ty: 3487, 1889 x 3587, 1963
-        // przeciwnik: 3483, 358 x 3583, 433
+        // Renderowanie kart w stosie (przesunięcie 0.5px na kartę)
+        // Maksymalnie np. 10 kart wizualnie, żeby nie obciążać DOM
+        const visualCount = Math.min(count, 15);
+        for (let i = 0; i < visualCount; i++) {
+            const img = document.createElement('img');
+            img.src = asset;
+            img.style.position = 'absolute';
+            img.style.left = `-${i * 0.5 * scaleW}px`;
+            img.style.top = `-${i * 0.5 * scaleH}px`;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = `${8 * scaleW}px`;
+            img.style.zIndex = i;
+            container.appendChild(img);
+        }
+
+        // Czarny obszar na licznik (90% krycia) - pozycje z infoo.txt skalowane do kontenera
+        // Gracz: 3487, 1889 x 3587, 1963 wewnątrz 3458, 1655 x 3632, 1954
+        // Przeciwnik: 3483, 358 x 3583, 433 wewnątrz 3458, 132 x 3632, 431
         let badgeX, badgeY, badgeW, badgeH;
         if (isOpponent) {
-            badgeX = (3483 - 3457) * scale;
-            badgeY = (358 - 131) * scale;
-            badgeW = (3583 - 3483) * scale;
-            badgeH = (433 - 358) * scale;
+            badgeX = (3483 - 3458) * scaleW;
+            badgeY = (358 - 132) * scaleH;
+            badgeW = (3583 - 3483) * scaleW;
+            badgeH = (433 - 358) * scaleH;
         } else {
-            badgeX = (3487 - 3457) * scale;
-            badgeY = (1889 - 1654) * scale;
-            badgeW = (3587 - 3487) * scale;
-            badgeH = (1963 - 1889) * scale;
+            badgeX = (3487 - 3458) * scaleW;
+            badgeY = (1889 - 1655) * scaleH;
+            badgeW = (3587 - 3487) * scaleW;
+            badgeH = (1963 - 1889) * scaleH;
         }
 
         const badge = document.createElement('div');
@@ -358,23 +368,24 @@ function renderPiles() {
         badge.style.background = 'rgba(0,0,0,0.9)';
         badge.style.color = '#c7a76e';
         badge.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-        badge.style.fontSize = `${38 * scale}px`;
+        badge.style.fontSize = `${38 * scaleW}px`;
         badge.style.fontWeight = 'bold';
         badge.style.display = 'flex';
         badge.style.alignItems = 'center';
         badge.style.justifyContent = 'center';
+        badge.style.zIndex = 1000;
         badge.textContent = count;
         container.appendChild(badge);
 
         return container;
     };
 
-    overlay.appendChild(renderPile(selfX, selfY, drawPile.length, false));
-    overlay.appendChild(renderPile(oppX, oppY, opponentDeckCount, true));
+    overlay.appendChild(renderPile(selfArea, drawPile.length, false));
+    overlay.appendChild(renderPile(oppArea, opponentDeckCount, true));
 }
 
 function getFactionReverse(factionId) {
-    switch (factionId) {
+    switch (String(factionId)) {
         case "1": return "/gwent/assets/asety/polnoc.webp";
         case "2": return "/gwent/assets/asety/nilftgard_rewers.webp";
         case "3": return "/gwent/assets/asety/scoia'tel_rewers.webp";
