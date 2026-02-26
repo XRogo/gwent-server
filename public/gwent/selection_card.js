@@ -28,6 +28,8 @@ export function initSelection(socket, gameCode, isPlayer1) {
         const countInDeck = deck.filter(c => c.numer === numer).length;
         if (countInDeck < (card.ilosc || 1)) {
             deck.push({ ...card });
+            const snd = document.getElementById('addCardSound');
+            if (snd) { snd.currentTime = 0; snd.play().catch(() => { }); }
             updateSelectionUI();
             return true;
         }
@@ -38,6 +40,8 @@ export function initSelection(socket, gameCode, isPlayer1) {
         const idx = deck.findIndex(c => c.numer === numer);
         if (idx >= 0) {
             deck.splice(idx, 1);
+            const snd = document.getElementById('removeCardSound');
+            if (snd) { snd.currentTime = 0; snd.play().catch(() => { }); }
             updateSelectionUI();
             return true;
         }
@@ -60,21 +64,18 @@ export function initSelection(socket, gameCode, isPlayer1) {
         updateStats(stats);
         updatePositionsAndScaling();
     }
+    window.updateSelectionUI = updateSelectionUI;
 
     document.querySelector('.page-left').onclick = () => {
-        if (currentPage > 1) {
-            currentPage--;
-            loadDeckForFaction(factions[currentPage - 1].id);
-            updateSelectionUI();
-        }
+        currentPage = currentPage > 1 ? currentPage - 1 : factions.length;
+        loadDeckForFaction(factions[currentPage - 1].id);
+        updateSelectionUI();
     };
 
     document.querySelector('.page-right').onclick = () => {
-        if (currentPage < factions.length) {
-            currentPage++;
-            loadDeckForFaction(factions[currentPage - 1].id);
-            updateSelectionUI();
-        }
+        currentPage = currentPage < factions.length ? currentPage + 1 : 1;
+        loadDeckForFaction(factions[currentPage - 1].id);
+        updateSelectionUI();
     };
 
     document.querySelectorAll('.button.collection, .button.deck').forEach(btn => {
@@ -85,6 +86,22 @@ export function initSelection(socket, gameCode, isPlayer1) {
             displayCards(filter, area, factions[currentPage - 1].id, cardList, false, deck);
         };
     });
+
+    const saveBtn = document.getElementById('saveDeckButton');
+    if (saveBtn) {
+        saveBtn.onclick = () => {
+            if (window.saveDecks) {
+                const currentFactionId = factions[currentPage - 1].id;
+                const talie = window.loadDecks ? window.loadDecks() : {};
+                talie[currentFactionId] = {
+                    karty: deck.map(c => c.numer),
+                    dowodca: selectedLeader ? selectedLeader.numer : null
+                };
+                window.saveDecks(talie);
+                alert('Talia zapisana!');
+            }
+        };
+    }
 
     loadDeckForFaction(factions[currentPage - 1].id);
     updateSelectionUI();
@@ -198,16 +215,20 @@ function updateStats(statsContainer) {
         el.style.position = 'absolute';
         el.style.top = `${topPct}%`;
         el.style.height = `${heightPct}%`;
-        el.style.left = '50.39%'; // 1935/3840
+        el.style.left = '50%';
+        el.style.width = '100%';
         el.style.color = color;
         el.style.display = 'flex';
         el.style.alignItems = 'center';
         el.style.whiteSpace = 'nowrap';
         const bgH = statsContainer.offsetHeight || window.innerHeight;
-        el.style.fontSize = `${(bgH * heightPct / 100) * 0.8}px`;
+        el.style.fontSize = `${(bgH * heightPct / 100) * 0.9}px`;
         if (alignCenter) {
             el.style.transform = 'translate(-50%, 0)';
             el.style.justifyContent = 'center';
+        } else {
+            el.style.transform = 'translate(-50%, 0)';
+            el.style.justifyContent = 'center'; // User wants them visible and centered
         }
         statsContainer.appendChild(el);
     };
@@ -227,6 +248,10 @@ function updateStats(statsContainer) {
 
     if (window.opponentReady) {
         createStat("PRZECIWNIK GOTOWY", 1800, 1850, C_SILA);
+    }
+
+    if (window.opponentReadyTimer !== undefined && window.opponentReadyTimer !== null) {
+        createStat(`START ZA: ${window.opponentReadyTimer}`, 1730, 1780, C_RED);
     }
 }
 
@@ -352,6 +377,15 @@ export function updatePositionsAndScaling() {
     if (factionInfo) {
         factionInfo.style.left = `${backgroundLeft}px`;
         factionInfo.style.top = `${backgroundTop + ((174 - 60) / GUI_HEIGHT) * backgroundHeight}px`;
+        factionInfo.style.width = `${backgroundWidth}px`;
+        factionInfo.style.textAlign = 'center';
+
+        const header = factionInfo.querySelector('.faction-header');
+        if (header) {
+            header.style.display = 'flex';
+            header.style.justifyContent = 'center';
+            header.style.alignItems = 'center';
+        }
     }
 
     const name = document.querySelector('.faction-name');
@@ -359,15 +393,18 @@ export function updatePositionsAndScaling() {
         name.innerText = faction.name;
         name.style.fontSize = `${Math.min((48 / GUI_WIDTH) * backgroundWidth, (72 / GUI_WIDTH) * backgroundWidth)}px`;
         name.style.lineHeight = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
+        name.style.margin = '0';
+        name.style.display = 'inline-block';
     }
 
     const ability = document.querySelector('.faction-ability');
     if (ability) {
         ability.innerText = faction.ability;
         ability.style.fontSize = `${Math.min((29 / GUI_WIDTH) * backgroundWidth, (43 / GUI_WIDTH) * backgroundWidth)}px`;
-        ability.style.left = `${(GUI_WIDTH / 2) * scale}px`;
+        ability.style.left = '50%';
         ability.style.top = `${((276 - (174 - 60)) / GUI_HEIGHT) * backgroundHeight}px`;
         ability.style.transform = `translateX(-50%)`;
+        ability.style.width = '100%';
     }
 
     const pageLeft = document.querySelector('.page-left');
@@ -458,6 +495,19 @@ export function updatePositionsAndScaling() {
         saveDeckButton.style.padding = `${(8 / GUI_HEIGHT) * backgroundHeight}px ${(16 / GUI_WIDTH) * backgroundWidth}px`;
         saveDeckButton.style.fontSize = `${(24 / GUI_WIDTH) * backgroundWidth}px`;
         saveDeckButton.style.transform = `translateX(-50%)`;
+
+        saveDeckButton.onclick = () => {
+            if (window.saveDecks) {
+                const currentFactionId = factions[currentPage - 1].id;
+                const talie = window.loadDecks ? window.loadDecks() : {};
+                talie[currentFactionId] = {
+                    karty: deck.map(c => c.numer),
+                    dowodca: selectedLeader ? selectedLeader.numer : null
+                };
+                window.saveDecks(talie);
+                alert('Talia zapisana!');
+            }
+        };
     }
 }
 

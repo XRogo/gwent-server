@@ -65,7 +65,7 @@ export function renderCardHTML(card, options = {}) {
         <div class="card-content">
             <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
             <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-            <div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>
+            ${!card.isKing ? `<div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>` : ''}
             <div class="name">${card.nazwa}</div>
     `;
 
@@ -112,7 +112,7 @@ export function renderCardHTML(card, options = {}) {
 
     html += `
         </div>
-        <img class="ilosc-layer" src="assets/dkarty/ilosc.webp">
+        ${!card.isKing ? `<img class="ilosc-layer" src="assets/dkarty/ilosc.webp">` : ''}
     `;
 
     return html;

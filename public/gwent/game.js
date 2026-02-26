@@ -18,7 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.on('opponent-ready-status', (data) => {
             window.opponentReady = data.isReady;
-            // Trigger UI update in selection if active
+            if (window.updateSelectionUI) window.updateSelectionUI();
+            else updatePositionsAndScaling(); // Fallback to update UI
+        });
+
+        socket.on('selection-timer-update', (data) => {
+            window.opponentReadyTimer = data.timeLeft;
+            if (window.updateSelectionUI) window.updateSelectionUI();
+        });
+
+        socket.on('selection-timer-stopped', () => {
+            window.opponentReadyTimer = null;
+            if (window.updateSelectionUI) window.updateSelectionUI();
         });
 
         socket.on('start-game-now', () => {
@@ -43,8 +54,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('goToGameButton').onclick = () => {
         const deck = getSelectedDeck();
-        socket.emit('save-full-deck', { gameCode, isPlayer1: isP1, deck });
-        // Optionally wait for server confirmation or just switch if local
+        const leader = getSelectedLeader();
+        const factionId = window.selectedFaction || '1';
+
+        // Mark self as ready
+        window.localReady = !window.localReady;
+        const btn = document.getElementById('goToGameButton');
+        if (btn) {
+            btn.innerText = window.localReady ? 'GOTOWY' : 'Przejdź do gry';
+            btn.style.backgroundColor = window.localReady ? 'rgba(53, 168, 66, 0.5)' : 'rgba(0, 0, 0, 0.5)';
+        }
+
+        socket.emit('save-full-deck', {
+            gameCode,
+            isPlayer1: isP1,
+            deck: deck.map(c => c.numer),
+            leader: leader ? leader.numer : null,
+            faction: factionId,
+            isReady: window.localReady
+        });
     };
 
     window.addEventListener('resize', () => {

@@ -17,6 +17,9 @@ export function showPowiek(deck, index, mode = 'cards', options = {}) {
     powiekOptions = options;
     if (mode === 'hand' || mode === 'game') {
         powiekDeck = deck;
+    } else if (mode === 'leaders') {
+        const factionId = localStorage.getItem('faction') || window.selectedFaction || '1';
+        powiekDeck = deck.filter(k => k.frakcja === factionId);
     } else {
         const uniqueDeck = [];
         const seenNumbers = new Set();
