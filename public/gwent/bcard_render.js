@@ -44,12 +44,10 @@ export function renderCardHTML(card, options = {}) {
         isLargeView = false,
         isDeckView = false,
         isCollectionView = false,
-        deckCount = 0,
         availableCount = 0
     } = options;
 
     let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
-    // Special case for Bies card
     if (card.nazwa === "Bies" && playerFaction !== "4") {
         bannerFaction = playerFaction;
     }
@@ -113,8 +111,8 @@ export function renderCardHTML(card, options = {}) {
     }
 
     html += `
-            <img class="ilosc-layer" src="assets/dkarty/ilosc.webp">
         </div>
+        <img class="ilosc-layer" src="assets/dkarty/ilosc.webp">
     `;
 
     return html;

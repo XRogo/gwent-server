@@ -81,17 +81,17 @@ function renderPowiek() {
     let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
 
     if (windowAspectRatio > tloAspectRatio) {
-        scale = guiRect.height / TLO_H;
+        scale = window.innerHeight / TLO_H;
         backgroundWidth = TLO_W * scale;
-        backgroundHeight = guiRect.height;
-        backgroundLeft = guiRect.left + (guiRect.width - backgroundWidth) / 2;
-        backgroundTop = guiRect.top;
+        backgroundHeight = window.innerHeight;
+        backgroundLeft = (window.innerWidth - backgroundWidth) / 2;
+        backgroundTop = 0;
     } else {
-        scale = guiRect.width / TLO_W;
-        backgroundWidth = guiRect.width;
+        scale = window.innerWidth / TLO_W;
+        backgroundWidth = window.innerWidth;
         backgroundHeight = TLO_H * scale;
-        backgroundLeft = guiRect.left;
-        backgroundTop = guiRect.top + (guiRect.height - backgroundHeight) / 2;
+        backgroundLeft = 0;
+        backgroundTop = (window.innerHeight - backgroundHeight) / 2;
     }
 
     const powiekBg = document.createElement('div');

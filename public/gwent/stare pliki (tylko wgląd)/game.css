@@ -1,0 +1,458 @@
+@font-face {
+    font-family: 'PFDinTextCondPro';
+    src: url('assets/fonts/PFDinTextCondPro-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'PFDinTextCondPro-Bold';
+    src: url('assets/fonts/PFDinTextCondPro-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Cinzel';
+    src: url('assets/fonts/Cinzel-Regular.ttf') format('truetype');
+}
+
+html {
+    font-size: 1vw;
+    /* Fallback */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    overflow: hidden;
+    height: 100vh;
+    font-family: 'PFDinTextCondPro', sans-serif;
+}
+
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('assets/wybor/hmory.webp') repeat-x;
+    background-size: 100% auto;
+    animation: moveBackground 192s linear infinite;
+    z-index: 1;
+}
+
+@keyframes moveBackground {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: -3840px 0;
+    }
+}
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('assets/wybor/gui.webp') no-repeat center;
+    background-size: contain;
+    background-position: center;
+    z-index: 2;
+}
+
+.content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+}
+
+.button {
+    position: absolute;
+    cursor: pointer;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.button:hover {
+    opacity: 1;
+}
+
+.button.active {
+    opacity: 1;
+}
+
+.card-area {
+    position: absolute;
+    width: 100vw;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    overflow-x: hidden !important;
+    /* blokuje scroll w poziomie */
+    overflow-y: auto;
+    max-height: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    /* gap ustawiamy z JS */
+    align-content: flex-start;
+    justify-content: flex-start;
+    /* Dodaj clipping tylko od dołu, a boki i góra widoczne */
+    clip-path: none;
+    /* pozwól wychodzić na prawo */
+}
+
+.card-area::-webkit-scrollbar {
+    display: none;
+}
+
+.card-area .card {
+    position: relative;
+    /* width i height ustawiane przez JS */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* aspect-ratio: 523 / 992;  <- JS to kontroluje */
+    z-index: auto;
+    overflow: visible !important;
+    background: none;
+    /* usunięto background-size: cover */
+    cursor: pointer;
+}
+
+#global-glow {
+    position: fixed;
+    /* Fixed, żeby pływał nad wszystkim */
+    z-index: 1000;
+    /* Najwyżej */
+    pointer-events: none;
+    display: none;
+    /* Domyślnie ukryte */
+    /* width/height/left/top ustawiane JS */
+}
+
+.global-glow-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+/* KONTENER NA TREŚĆ KARTY - z-index wyższy niż glow */
+.card-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.card-hover-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+.podsw {
+    z-index: 1;
+    opacity: 1;
+}
+
+.podsw2 {
+    z-index: 2;
+    animation: pulse 1.5s infinite;
+    /* Pulsowanie 1.5s */
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.1;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+.card-area .card .card-image {
+    position: absolute;
+    z-index: 2 !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.card-area .card .beton,
+.card-area .card .faction-banner,
+.card-area .card .position-icon,
+.card-area .card .points-bg,
+.card-area .card .power-icon {
+    position: absolute;
+    z-index: 3 !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    /* Zmieniono na contain zeby sie skalowalo poprawnie */
+    background-repeat: no-repeat;
+}
+
+/* UWAGA: Selektory muszą teraz uwzględniać .card-content */
+.card-content .ilosc-layer {
+    z-index: 5 !important;
+}
+
+.card-content .name {
+    z-index: 11 !important;
+    position: absolute;
+    left: 21.76%;
+    width: 76.34%;
+    top: 76%;
+    text-align: center;
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.1;
+    padding: 0 4px;
+    transform: none;
+}
+
+.card-content .points {
+    z-index: 13 !important;
+    position: absolute;
+    top: 7.8%;
+    left: 14.5%;
+    width: 23.61%;
+    height: 8.84%;
+    font-size: 220%;
+    color: #fff;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-content .hero-icon {
+    position: absolute;
+    top: -1.912386%;
+    left: -4.389313%;
+    width: 59.160305%;
+    height: 31.017121%;
+    object-fit: contain;
+    z-index: 12 !important;
+}
+
+.card-content .description {
+    position: absolute;
+    top: 90.533837%;
+    left: 3%;
+    width: 92.129771%;
+    height: 7.653575%;
+    font-size: 3.435115%;
+    color: #333333;
+    text-align: center;
+    display: none;
+    z-index: 7;
+}
+
+.card-area .card.large .description {
+    display: block;
+}
+
+@font-face {
+    font-family: 'PFDinTextCondPro';
+    src: url('assets/fonts/PFDinTextCondPro-Regular.ttf') format('truetype');
+}
+
+.stats {
+    position: absolute;
+    /* Styles are set dynamically in JS */
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* Remove old stat classes if not needed, or keep empty */
+.total-cards,
+.unit-cards,
+.special-cards,
+.total-strength,
+.hero-cards {
+    display: none;
+}
+
+.page-left,
+.page-right {
+    position: absolute;
+    cursor: pointer;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.page-left:hover,
+.page-right:hover {
+    opacity: 1;
+}
+
+.page-indicators {
+    position: absolute;
+    display: flex;
+}
+
+.page-dot {
+    position: absolute;
+    background: url('assets/wybor/strona.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.page-dot.active {
+    opacity: 1;
+    filter: brightness(1.5);
+}
+
+.faction-info {
+    position: absolute;
+    display: block;
+    width: 100%;
+    margin: 0;
+}
+
+.faction-header {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.faction-shield {
+    object-fit: contain;
+    margin: 0;
+}
+
+.faction-name {
+    color: #fff;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+    margin-left: 10px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.faction-ability {
+    position: absolute;
+    color: #b9a385;
+    white-space: normal;
+    text-align: center;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.leader-card {
+    position: absolute;
+    background: url('assets/dkarty/beton.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#goToGameButton {
+    position: absolute;
+    cursor: pointer;
+    z-index: 4;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    max-width: 300px;
+    max-height: 60px;
+    box-sizing: border-box;
+}
+
+.game-content {
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+#saveDeckButton {
+    position: absolute;
+    cursor: pointer;
+    z-index: 4;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid #7d6a45;
+    border-radius: 5px;
+    box-sizing: border-box;
+    /* Dynamic positioning in JS */
+}
+
+#saveDeckButton:hover {
+    background-color: rgba(40, 40, 40, 0.7);
+}
+
+.card-content .ilosc-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 5 !important;
+    /* nad beton/bbeton, pod punkty i inne ikony */
+    pointer-events: none;
+    /* żeby nie blokowało interakcji */
+}
+
+.card-content .ilosc-text {
+    position: absolute;
+    top: 91.4%;
+    /* poniżej nazwy, możesz dostosować */
+    left: 17%;
+    /* 89px przy szerokości 524px ≈ 17% */
+    color: #5a451f;
+    font-size: 1.2em;
+    /* jak nazwa */
+    font-family: 'PFDinTextCondPro', sans-serif;
+    font-weight: normal;
+    z-index: 20;
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 0 1px 2px #fff8, 0 0 2px #fff4;
+}
+
+#fadeScreen {
+    position: fixed;
+    z-index: 0;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, #111 0%, #000 100%);
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}

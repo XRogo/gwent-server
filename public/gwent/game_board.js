@@ -125,14 +125,65 @@ function renderNicknames(overlay, nick) {
 }
 
 function renderGraveyards(overlay) {
-    // Logic from gra.js renderGraveyards
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const gy = document.createElement('div');
+    gy.className = 'graveyard-container';
+    gy.style.left = `${3142 * scale + boardLeft}px`;
+    gy.style.top = `${1691 * scale + boardTop}px`;
+    gy.style.width = `${184 * scale}px`;
+    gy.style.height = `${241 * scale}px`;
+
+    if (playerGraveyard.length > 0) {
+        const topCard = playerGraveyard[playerGraveyard.length - 1];
+        gy.style.backgroundImage = `url('${topCard.karta}')`;
+        gy.style.backgroundSize = 'contain';
+        gy.style.cursor = 'pointer';
+        gy.onclick = () => showPowiek(playerGraveyard, playerGraveyard.length - 1, 'game');
+    }
+    overlay.appendChild(gy);
+
+    const ogy = document.createElement('div');
+    ogy.className = 'graveyard-container o-graveyard';
+    ogy.style.left = `${3142 * scale + boardLeft}px`;
+    ogy.style.top = `${222 * scale + boardTop}px`;
+    ogy.style.width = `${184 * scale}px`;
+    ogy.style.height = `${241 * scale}px`;
+    ogy.style.transform = 'rotate(180deg)';
+    overlay.appendChild(ogy);
 }
 
 function renderPiles(overlay) {
-    // Logic from gra.js renderPiles
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const deckPile = document.createElement('div');
+    deckPile.className = 'deck-pile';
+    deckPile.style.left = `${3401 * scale + boardLeft}px`;
+    deckPile.style.top = `${1691 * scale + boardTop}px`;
+    deckPile.style.width = `${184 * scale}px`;
+    deckPile.style.height = `${241 * scale}px`;
+    const factionId = localStorage.getItem('faction') || '1';
+    deckPile.style.backgroundImage = `url('${getFactionReverse(factionId)}')`;
+    deckPile.style.backgroundSize = 'contain';
+    overlay.appendChild(deckPile);
+
+    const oDeckPile = document.createElement('div');
+    oDeckPile.className = 'deck-pile o-deck-pile';
+    oDeckPile.style.left = `${3401 * scale + boardLeft}px`;
+    oDeckPile.style.top = `${222 * scale + boardTop}px`;
+    oDeckPile.style.width = `${184 * scale}px`;
+    oDeckPile.style.height = `${241 * scale}px`;
+    oDeckPile.style.backgroundImage = `url('${getFactionReverse(window.opponentFaction || '1')}')`;
+    oDeckPile.style.backgroundSize = 'contain';
+    overlay.appendChild(oDeckPile);
 }
 
 function getFactionReverse(factionId) {
-    const map = { "1": "polnoc", "2": "nilftgard", "3": "scoia'tel", "4": "potwory", "5": "skelige" };
-    return `/gwent/assets/asety/${map[factionId] || 'polnoc'}_rewers.webp`;
+    const map = { "1": "polnoc", "2": "nilfgaard", "3": "scoiatael", "4": "potwory", "5": "skellige" };
+    const name = map[factionId] || 'polnoc';
+    return `assets/asety/${name}_rewers.webp`;
 }

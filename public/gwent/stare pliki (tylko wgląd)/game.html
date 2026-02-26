@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwent</title>
+    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+    <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/icons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/icons/android-chrome-512x512.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="game.css">
+</head>
+
+<body>
+    <link rel="stylesheet" href="powiek.css">
+    <script type="module" src="powiek.js"></script>
+    <div id="fadeScreen"></div>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="content">
+        <div id="cardSelectionScreen" style="display: block;">
+            <div class="faction-info">
+                <div class="faction-header">
+                    <img class="faction-shield" src="" alt="Faction Shield">
+                    <span class="faction-name"></span>
+                </div>
+                <span class="faction-ability"></span>
+            </div>
+            <div class="card-area collection"></div>
+            <div class="card-area deck"></div>
+            <div class="button collection all" data-filter="all"></div>
+            <div class="button collection mecz" data-filter="miecz"></div>
+            <div class="button collection lok" data-filter="luk"></div>
+            <div class="button collection obl" data-filter="oblezenie"></div>
+            <div class="button collection hero" data-filter="bohater"></div>
+            <div class="button collection pogoda" data-filter="pogoda"></div>
+            <div class="button collection specjalne" data-filter="specjalne"></div>
+            <div class="button deck all" data-filter="all"></div>
+            <div class="button deck mecz" data-filter="miecz"></div>
+            <div class="button deck lok" data-filter="luk"></div>
+            <div class="button deck obl" data-filter="oblezenie"></div>
+            <div class="button deck hero" data-filter="bohater"></div>
+            <div class="button deck pogoda" data-filter="pogoda"></div>
+            <div class="button deck specjalne" data-filter="specjalne"></div>
+            <div class="stats">
+                <div>Liczba kart: <span class="total-cards">0</span></div>
+                <div>Karty jednostek: <span class="unit-cards">0/22</span></div>
+                <div>Karty specjalne: <span class="special-cards">0/10</span></div>
+                <div>Całkowita siła: <span class="total-strength">0</span></div>
+                <div>Karty bohaterów: <span class="hero-cards">0</span></div>
+            </div>
+            <div class="page-left"></div>
+            <div class="page-right"></div>
+            <div class="page-indicators">
+                <div class="page-dot" data-page="1"></div>
+                <div class="page-dot" data-page="2"></div>
+                <div class="page-dot" data-page="3"></div>
+                <div class="page-dot" data-page="4"></div>
+                <div class="page-dot" data-page="5"></div>
+            </div>
+            <div class="leader-card"></div>
+            <button id="goToGameButton">Przejdź do gry</button>
+            <button id="saveDeckButton">Zapisz talię</button>
+        </div>
+        <div id="gameScreen" style="display: none;">
+            <div class="game-content">
+                <h1>Rozgrywka</h1>
+                <p>Witaj w grze Gwent! Tutaj toczy się rozgrywka.</p>
+            </div>
+        </div>
+    </div>
+    <audio id="hoverSound" src="assets/klik.mp3"></audio>
+    <audio id="joinSound" src="assets/dolaczeni.mp3"></audio>
+    <audio id="addCardSound" src="assets/dodanie_karty.mp3"></audio>
+    <audio id="removeCardSound" src="assets/zabranie_karty.mp3"></audio>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="deckStorage.js"></script>
+    <script src="connectionUI.js"></script>
+    <script type="module" src="game.js"></script>
+</body>
+
+</html>

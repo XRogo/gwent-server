@@ -232,50 +232,272 @@ function updateStats(statsContainer) {
 
 export function updatePositionsAndScaling() {
     const overlay = document.querySelector('.overlay');
-    const container = document.getElementById('cardSelectionScreen');
-    if (!overlay || !container || container.style.display === 'none') return;
+    if (!overlay) return;
 
     const overlayRect = overlay.getBoundingClientRect();
-    const scale = overlayRect.height / GUI_HEIGHT;
-    const backgroundWidth = GUI_WIDTH * scale;
-    const backgroundHeight = overlayRect.height;
-    const backgroundLeft = overlayRect.left + (overlayRect.width - backgroundWidth) / 2;
-    const backgroundTop = overlayRect.top;
+    const overlayWidth = overlayRect.width;
+    const overlayHeight = overlayRect.height;
+    const overlayLeft = overlayRect.left;
+    const overlayTop = overlayRect.top;
+
+    const windowAspectRatio = window.innerWidth / window.innerHeight;
+    const guiAspectRatio = GUI_WIDTH / GUI_HEIGHT;
+
+    let scale, backgroundWidth, backgroundHeight, backgroundLeft, backgroundTop;
+
+    if (windowAspectRatio > guiAspectRatio) {
+        scale = overlayHeight / GUI_HEIGHT;
+        backgroundWidth = GUI_WIDTH * scale;
+        backgroundHeight = overlayHeight;
+        backgroundLeft = overlayLeft + (overlayWidth - backgroundWidth) / 2;
+        backgroundTop = overlayTop;
+    } else {
+        scale = overlayWidth / GUI_WIDTH;
+        backgroundWidth = overlayWidth;
+        backgroundHeight = GUI_HEIGHT * scale;
+        backgroundLeft = overlayLeft;
+        backgroundTop = overlayTop + (overlayHeight - backgroundHeight) / 2;
+    }
 
     const buttons = [
-        { selector: '.button.collection.all', left: 9.71, top: 16.38, img: 'all' },
-        { selector: '.button.collection.mecz', left: 14.32, top: 16.48, img: 'mecz' },
-        { selector: '.button.collection.lok', left: 19.14, top: 16.43, img: 'lok' },
-        { selector: '.button.collection.obl', left: 23.85, top: 16.43, img: 'kapatulta' },
-        { selector: '.button.collection.hero', left: 28.59, top: 16.48, img: 'boharer' },
-        { selector: '.button.collection.pogoda', left: 33.28, top: 16.25, img: 'pogoda' },
-        { selector: '.button.collection.specjalne', left: 38.02, top: 16.71, img: 'inne' }
+        { selector: '.button.collection.all', left: 9.713542, top: 16.388889, image: 'assets/wybor/all.webp' },
+        { selector: '.button.collection.mecz', left: 14.322917, top: 16.481481, image: 'assets/wybor/mecz.webp' },
+        { selector: '.button.collection.lok', left: 19.140625, top: 16.435185, image: 'assets/wybor/lok.webp' },
+        { selector: '.button.collection.obl', left: 23.854167, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
+        { selector: '.button.collection.hero', left: 28.593750, top: 16.481481, image: 'assets/wybor/boharer.webp' },
+        { selector: '.button.collection.pogoda', left: 33.281250, top: 16.250000, image: 'assets/wybor/pogoda.webp' },
+        { selector: '.button.collection.specjalne', left: 38.020833, top: 16.712963, image: 'assets/wybor/inne.webp' },
+        { selector: '.button.deck.all', left: 59.869792, top: 16.388889, image: 'assets/wybor/all.webp' },
+        { selector: '.button.deck.mecz', left: 64.401042, top: 16.481481, image: 'assets/wybor/mecz.webp' },
+        { selector: '.button.deck.lok', left: 69.218750, top: 16.435185, image: 'assets/wybor/lok.webp' },
+        { selector: '.button.deck.obl', left: 73.958333, top: 16.435185, image: 'assets/wybor/kapatulta.webp' },
+        { selector: '.button.deck.hero', left: 78.697917, top: 16.481481, image: 'assets/wybor/boharer.webp' },
+        { selector: '.button.deck.pogoda', left: 83.390625, top: 16.250000, image: 'assets/wybor/pogoda.webp' },
+        { selector: '.button.deck.specjalne', left: 88.020833, top: 16.712963, image: 'assets/wybor/inne.webp' },
     ];
-    // ... similarly for deck buttons (index 59.86+)
+
+    buttons.forEach(({ selector, left, top, image }) => {
+        const button = document.querySelector(selector);
+        if (button) {
+            button.style.width = `${(97 / GUI_WIDTH) * 100}%`;
+            button.style.height = `${(80 / GUI_HEIGHT) * 100}%`;
+            button.style.left = `${backgroundLeft + (left * backgroundWidth) / 100}px`;
+            button.style.top = `${backgroundTop + (top * backgroundHeight) / 100}px`;
+            button.style.backgroundImage = `url('${image}')`;
+        }
+    });
+
+    const stats = document.querySelector('.stats');
+    if (stats) {
+        stats.style.width = `${backgroundWidth}px`;
+        stats.style.height = `${backgroundHeight}px`;
+        stats.style.left = `${backgroundLeft}px`;
+        stats.style.top = `${backgroundTop}px`;
+    }
+
+    const collectionArea = document.querySelector('.card-area.collection');
+    const deckArea = document.querySelector('.card-area.deck');
+
+    if (collectionArea || deckArea) {
+        const SCROLLBAR_BASE_4K = 25;
+        const PADDING_BASE_4K = 5;
+        const GAP_BASE_4K = 34;
+        const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
+        const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
+        const PADDING_TOP = (10 / GUI_HEIGHT) * backgroundHeight;
+        const PADDING_BOTTOM = (20 / GUI_HEIGHT) * backgroundHeight;
+
+        const cLeft = 366, cTop = 491, cRight = 1561;
+        const dLeft = 2290, dTop = 491, dRight = 3484;
+
+        const areaWidth = ((cRight - cLeft) / GUI_WIDTH) * backgroundWidth;
+        const effectiveWidth = areaWidth - ((SCROLLBAR_BASE_4K / GUI_WIDTH) * backgroundWidth) - ((PADDING_BASE_4K / GUI_WIDTH) * backgroundWidth);
+        const cardWidth = (effectiveWidth - (2 * GAP_X)) / 3;
+        const cardHeight = cardWidth / (523 / 992);
+
+        const newAreaHeight = PADDING_TOP + (cardHeight * 2) + GAP_Y + PADDING_BOTTOM;
+
+        if (collectionArea) {
+            const aLeft = backgroundLeft + (cLeft / GUI_WIDTH) * backgroundWidth;
+            const aTop = backgroundTop + (cTop / GUI_HEIGHT) * backgroundHeight;
+            collectionArea.style.left = `${aLeft}px`;
+            collectionArea.style.top = `${aTop}px`;
+            collectionArea.style.width = `${areaWidth}px`;
+            collectionArea.style.height = `${newAreaHeight}px`;
+            collectionArea.style.maxHeight = `${newAreaHeight}px`;
+            updateCardArea(collectionArea, areaWidth, newAreaHeight, backgroundWidth, backgroundHeight);
+        }
+
+        if (deckArea) {
+            const aLeft = backgroundLeft + (dLeft / GUI_WIDTH) * backgroundWidth;
+            const aTop = backgroundTop + (dTop / GUI_HEIGHT) * backgroundHeight;
+            deckArea.style.left = `${aLeft}px`;
+            deckArea.style.top = `${aTop}px`;
+            deckArea.style.width = `${areaWidth}px`;
+            deckArea.style.height = `${newAreaHeight}px`;
+            deckArea.style.maxHeight = `${newAreaHeight}px`;
+            updateCardArea(deckArea, areaWidth, newAreaHeight, backgroundWidth, backgroundHeight);
+        }
+    }
 
     const faction = factions[currentPage - 1];
     const shield = document.querySelector('.faction-shield');
-    if (shield) shield.src = faction.shield;
+    if (shield) {
+        shield.src = faction.shield;
+        shield.style.width = `${106 * scale}px`;
+        shield.style.height = `${110 * scale}px`;
+    }
+
+    const factionInfo = document.querySelector('.faction-info');
+    if (factionInfo) {
+        factionInfo.style.left = `${backgroundLeft}px`;
+        factionInfo.style.top = `${backgroundTop + ((174 - 60) / GUI_HEIGHT) * backgroundHeight}px`;
+    }
+
     const name = document.querySelector('.faction-name');
     if (name) {
         name.innerText = faction.name;
-        name.style.fontSize = `${48 * scale}px`;
+        name.style.fontSize = `${Math.min((48 / GUI_WIDTH) * backgroundWidth, (72 / GUI_WIDTH) * backgroundWidth)}px`;
+        name.style.lineHeight = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
     }
+
     const ability = document.querySelector('.faction-ability');
     if (ability) {
         ability.innerText = faction.ability;
-        ability.style.fontSize = `${29 * scale}px`;
+        ability.style.fontSize = `${Math.min((29 / GUI_WIDTH) * backgroundWidth, (43 / GUI_WIDTH) * backgroundWidth)}px`;
+        ability.style.left = `${(GUI_WIDTH / 2) * scale}px`;
+        ability.style.top = `${((276 - (174 - 60)) / GUI_HEIGHT) * backgroundHeight}px`;
+        ability.style.transform = `translateX(-50%)`;
+    }
+
+    const pageLeft = document.querySelector('.page-left');
+    if (pageLeft) {
+        pageLeft.style.width = `${(49 / GUI_WIDTH) * 100}%`;
+        pageLeft.style.height = `${(43 / GUI_HEIGHT) * 100}%`;
+        pageLeft.style.left = `${backgroundLeft + (1452 / GUI_WIDTH) * backgroundWidth}px`;
+        pageLeft.style.top = `${backgroundTop + (155 / GUI_HEIGHT) * backgroundHeight}px`;
+        pageLeft.style.backgroundImage = `url('assets/wybor/wlewo.webp')`;
+    }
+
+    const pageRight = document.querySelector('.page-right');
+    if (pageRight) {
+        pageRight.style.width = `${(49 / GUI_WIDTH) * 100}%`;
+        pageRight.style.height = `${(43 / GUI_HEIGHT) * 100}%`;
+        pageRight.style.left = `${backgroundLeft + (2338 / GUI_WIDTH) * backgroundWidth}px`;
+        pageRight.style.top = `${backgroundTop + (154 / GUI_HEIGHT) * backgroundHeight}px`;
+        pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
     }
 
     const leaderCard = document.querySelector('.leader-card');
     if (leaderCard && selectedLeader) {
-        leaderCard.innerHTML = `<img src="${selectedLeader.dkarta}" style="width:100%;height:100%;object-fit:contain;border-radius:12px;">`;
+        leaderCard.innerHTML = '';
         const guiLeft = 1792, guiTop = 538, guiW = 2051 - 1792, guiH = 1029 - 538;
-        leaderCard.style.left = (backgroundLeft + guiLeft * scale) + 'px';
-        leaderCard.style.top = (backgroundTop + guiTop * scale) + 'px';
-        leaderCard.style.width = (guiW * scale) + 'px';
-        leaderCard.style.height = (guiH * scale) + 'px';
+        const scaleW = backgroundWidth / GUI_WIDTH;
+        const scaleH = backgroundHeight / GUI_HEIGHT;
+        leaderCard.style.position = 'absolute';
+        leaderCard.style.left = (backgroundLeft + guiLeft * scaleW) + 'px';
+        leaderCard.style.top = (backgroundTop + guiTop * scaleH) + 'px';
+        leaderCard.style.width = (guiW * scaleW) + 'px';
+        leaderCard.style.height = (guiH * scaleH) + 'px';
+
+        const beton = document.createElement('div');
+        beton.className = 'beton';
+        beton.style.position = 'absolute';
+        beton.style.left = '0';
+        beton.style.top = '0';
+        beton.style.width = '100%';
+        beton.style.height = '100%';
+        beton.style.backgroundImage = "url('assets/dkarty/beton.webp')";
+        beton.style.backgroundSize = 'cover';
+        beton.style.backgroundRepeat = 'no-repeat';
+        beton.style.zIndex = '1';
+        leaderCard.appendChild(beton);
+
+        const img = document.createElement('img');
+        img.src = selectedLeader.dkarta;
+        img.style.position = 'absolute';
+        img.style.left = '0';
+        img.style.top = '0';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.borderRadius = '12px';
+        img.style.boxShadow = '0 0 16px #000';
+        img.style.zIndex = '2';
+        leaderCard.appendChild(img);
+
+        const nameDiv = document.createElement('div');
+        nameDiv.innerText = selectedLeader.nazwa;
+        nameDiv.style.position = 'absolute';
+        nameDiv.style.left = '50%';
+        nameDiv.style.top = ((guiH - 60) * scaleH) + 'px';
+        nameDiv.style.transform = 'translateX(-50%)';
+        nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
+        nameDiv.style.fontWeight = 'bold';
+        nameDiv.style.color = '#474747';
+        nameDiv.style.fontSize = (32 * scaleW) + 'px';
+        nameDiv.style.textAlign = 'center';
+        nameDiv.style.zIndex = '3';
+        leaderCard.appendChild(nameDiv);
     }
+
+    const goToGameButton = document.getElementById('goToGameButton');
+    if (goToGameButton) {
+        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
+        goToGameButton.style.bottom = `${(43 / GUI_HEIGHT) * backgroundHeight}px`;
+        goToGameButton.style.padding = `${(10 / GUI_HEIGHT) * backgroundHeight}px ${(20 / GUI_WIDTH) * backgroundWidth}px`;
+        goToGameButton.style.fontSize = `${(30 / GUI_WIDTH) * backgroundWidth}px`;
+        goToGameButton.style.transform = `translateX(-50%)`;
+    }
+
+    const saveDeckButton = document.getElementById('saveDeckButton');
+    if (saveDeckButton) {
+        const saveY = 1850;
+        saveDeckButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
+        saveDeckButton.style.top = `${backgroundTop + (saveY / GUI_HEIGHT) * backgroundHeight}px`;
+        saveDeckButton.style.padding = `${(8 / GUI_HEIGHT) * backgroundHeight}px ${(16 / GUI_WIDTH) * backgroundWidth}px`;
+        saveDeckButton.style.fontSize = `${(24 / GUI_WIDTH) * backgroundWidth}px`;
+        saveDeckButton.style.transform = `translateX(-50%)`;
+    }
+}
+
+function updateCardArea(area, areaWidth, areaHeight, backgroundWidth, backgroundHeight) {
+    const COLS = 3;
+    const GAP_BASE_4K = 34;
+    const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
+    const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
+    const SCROLLBAR_BASE_4K = 25;
+    const SCROLLBAR_WIDTH = (SCROLLBAR_BASE_4K / GUI_WIDTH) * backgroundWidth;
+    const PADDING_BASE_4K = 5;
+    const PADDING_LEFT = (PADDING_BASE_4K / GUI_WIDTH) * backgroundWidth;
+
+    const effectiveWidth = areaWidth - SCROLLBAR_WIDTH - PADDING_LEFT;
+    let cardWidth = (effectiveWidth - (2 * GAP_X)) / COLS;
+
+    area.style.overflowY = 'auto';
+    area.style.overflowX = 'hidden';
+    area.style.display = 'flex';
+    area.style.flexWrap = 'wrap';
+    area.style.alignContent = 'flex-start';
+    area.style.justifyContent = 'flex-start';
+    area.style.paddingLeft = `${PADDING_LEFT}px`;
+    area.style.paddingRight = `${SCROLLBAR_WIDTH}px`;
+    area.style.paddingTop = `${(10 / GUI_HEIGHT) * backgroundHeight}px`;
+    area.style.paddingBottom = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
+    area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+
+    area.querySelectorAll('.card').forEach(card => {
+        card.style.width = `${cardWidth}px`;
+        const aspectRatio = 523 / 992;
+        const cardHeight = cardWidth / aspectRatio;
+        card.style.height = `${cardHeight}px`;
+        card.style.margin = '0';
+        card.style.padding = '0';
+        card.style.boxSizing = 'border-box';
+        card.style.flex = `0 0 ${cardWidth}px`;
+        card.style.maxWidth = `${cardWidth}px`;
+        card.style.fontSize = `${cardWidth / 12}px`;
+    });
 }
 
 export function getSelectedDeck() { return deck; }
