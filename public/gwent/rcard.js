@@ -17,9 +17,6 @@ export function showPowiek(deck, index, mode = 'cards', options = {}) {
     powiekOptions = options;
     if (mode === 'hand' || mode === 'game') {
         powiekDeck = deck;
-    } else if (mode === 'leaders') {
-        const factionId = localStorage.getItem('faction') || window.selectedFaction || '1';
-        powiekDeck = deck.filter(k => k.frakcja === factionId);
     } else {
         const uniqueDeck = [];
         const seenNumbers = new Set();
@@ -228,7 +225,8 @@ function renderPowiek() {
         const factionId = localStorage.getItem('faction') || window.selectedFaction || '1';
         inner.innerHTML = renderCardHTML(card, {
             playerFaction: factionId,
-            isLargeView: true
+            isLargeView: true,
+            isKing: powiekMode === 'leaders'
         });
 
         // Override some styles for zoom view
@@ -398,7 +396,9 @@ window.addEventListener('contextmenu', (e) => {
             showPowiek(uniqueCards, idx >= 0 ? idx : 0);
         } else if (e.target.classList.contains('leader-card') || e.target.closest('.leader-card')) {
             e.preventDefault();
-            showPowiek(krole, 0, 'leaders');
+            const factionId = localStorage.getItem('faction') || window.selectedFaction || '1';
+            const filteredLeaders = krole.filter(k => k.frakcja === factionId);
+            showPowiek(filteredLeaders, 0, 'leaders');
             window.powiekSourceArea = 'leaders';
         }
     }

@@ -28,8 +28,7 @@ export function initSelection(socket, gameCode, isPlayer1) {
         const countInDeck = deck.filter(c => c.numer === numer).length;
         if (countInDeck < (card.ilosc || 1)) {
             deck.push({ ...card });
-            const snd = document.getElementById('addCardSound');
-            if (snd) { snd.currentTime = 0; snd.play().catch(() => { }); }
+            if (window.playSound) window.playSound('addCardSound');
             updateSelectionUI();
             return true;
         }
@@ -40,18 +39,20 @@ export function initSelection(socket, gameCode, isPlayer1) {
         const idx = deck.findIndex(c => c.numer === numer);
         if (idx >= 0) {
             deck.splice(idx, 1);
-            const snd = document.getElementById('removeCardSound');
-            if (snd) { snd.currentTime = 0; snd.play().catch(() => { }); }
+            if (window.playSound) window.playSound('removeCardSound');
             updateSelectionUI();
             return true;
         }
         return false;
     };
 
+    window.scaleStats = scaleStats;
+
     window.selectLeader = (numer) => {
         const leader = krole.find(k => k.numer === numer);
         if (leader) {
             selectedLeader = leader;
+            if (window.playSound) window.playSound('hoverSound');
             updateSelectionUI();
         }
     };
@@ -64,7 +65,6 @@ export function initSelection(socket, gameCode, isPlayer1) {
         updateStats(stats);
         updatePositionsAndScaling();
     }
-    window.updateSelectionUI = updateSelectionUI;
 
     document.querySelector('.page-left').onclick = () => {
         currentPage = currentPage > 1 ? currentPage - 1 : factions.length;
@@ -79,29 +79,20 @@ export function initSelection(socket, gameCode, isPlayer1) {
     };
 
     document.querySelectorAll('.button.collection, .button.deck').forEach(btn => {
-        btn.onclick = () => {
+        btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
             const area = btn.classList.contains('collection') ? collectionArea : deckArea;
             const cardList = btn.classList.contains('collection') ? cards : groupDeck(deck);
             displayCards(filter, area, factions[currentPage - 1].id, cardList, false, deck);
-        };
+            if (window.playSound) window.playSound('hoverSound');
+        });
     });
 
-    const saveBtn = document.getElementById('saveDeckButton');
-    if (saveBtn) {
-        saveBtn.onclick = () => {
-            if (window.saveDecks) {
-                const currentFactionId = factions[currentPage - 1].id;
-                const talie = window.loadDecks ? window.loadDecks() : {};
-                talie[currentFactionId] = {
-                    karty: deck.map(c => c.numer),
-                    dowodca: selectedLeader ? selectedLeader.numer : null
-                };
-                window.saveDecks(talie);
-                alert('Talia zapisana!');
-            }
-        };
-    }
+    document.querySelectorAll('.page-left, .page-right').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (window.playSound) window.playSound('hoverSound');
+        });
+    });
 
     loadDeckForFaction(factions[currentPage - 1].id);
     updateSelectionUI();
@@ -198,7 +189,8 @@ function displayCards(filter = 'all', area, playerFaction, cardList, isLargeView
 function updateStats(statsContainer) {
     if (!statsContainer) return;
     statsContainer.innerHTML = '';
-    const faction = factions[currentPage - 1];
+
+    // Data calculation
     const totalCards = deck.length;
     const unitCards = deck.filter(c => typeof c.punkty === 'number').length;
     const specNums = ['001', '002', '003', '004', '005', '006', '007', '008', '000'];
@@ -206,53 +198,65 @@ function updateStats(statsContainer) {
     const totalStrength = deck.reduce((sum, c) => sum + (typeof c.punkty === 'number' ? c.punkty : 0), 0);
     const heroCardsCount = deck.filter(c => c.bohater).length;
 
-    const createStat = (text, y1, y2, color, alignCenter = true) => {
+    const C_BERZ = '#a69377', C_GOLD = '#a27e3d', C_SILA = '#35a842', C_RED = '#ff1a1a';
+
+    const statsData = [
+        { text: "Dowódca", y1: 457, y2: 496, color: C_GOLD, center: true },
+        { text: "Wszystkie karty w talii", y1: 1119, y2: 1158, color: C_BERZ, center: true },
+        { text: totalCards, y1: 1180, y2: 1212, color: C_GOLD, center: false },
+        { text: "Liczba kart jednostek", y1: 1238, y2: 1277, color: C_BERZ, center: true },
+        { text: unitCards < 22 ? `${unitCards}/22` : unitCards, y1: 1300, y2: 1332, color: unitCards < 22 ? C_RED : C_GOLD, center: false },
+        { text: "Karty specjalne", y1: 1360, y2: 1399, color: C_BERZ, center: true },
+        { text: `${specialCardsCount}/10`, y1: 1420, y2: 1455, color: C_SILA, center: false },
+        { text: "Całkowita Siła Jednostek", y1: 1480, y2: 1519, color: C_BERZ, center: true },
+        { text: totalStrength, y1: 1539, y2: 1572, color: C_GOLD, center: false },
+        { text: "Karty bohaterów", y1: 1598, y2: 1637, color: C_BERZ, center: true },
+        { text: heroCardsCount, y1: 1660, y2: 1692, color: C_GOLD, center: false }
+    ];
+
+    if (window.opponentReady) {
+        statsData.push({ text: "PRZECIWNIK GOTOWY", y1: 1800, y2: 1850, color: C_SILA, center: true });
+    }
+
+    statsData.forEach(d => {
         const el = document.createElement('div');
         el.className = 'stat-item';
-        el.innerHTML = text;
-        const topPct = (y1 / GUI_HEIGHT) * 100;
-        const heightPct = ((y2 - y1) / GUI_HEIGHT) * 100;
+        el.dataset.y1 = d.y1;
+        el.dataset.y2 = d.y2;
+        el.dataset.center = d.center;
+        el.innerHTML = d.text;
         el.style.position = 'absolute';
-        el.style.top = `${topPct}%`;
-        el.style.height = `${heightPct}%`;
-        el.style.left = '50%';
-        el.style.width = '100%';
-        el.style.color = color;
+        el.style.left = '50.39%';
+        el.style.color = d.color;
         el.style.display = 'flex';
         el.style.alignItems = 'center';
         el.style.whiteSpace = 'nowrap';
-        const bgH = statsContainer.offsetHeight || window.innerHeight;
-        el.style.fontSize = `${(bgH * heightPct / 100) * 0.9}px`;
-        if (alignCenter) {
+        if (d.center) {
             el.style.transform = 'translate(-50%, 0)';
             el.style.justifyContent = 'center';
-        } else {
-            el.style.transform = 'translate(-50%, 0)';
-            el.style.justifyContent = 'center'; // User wants them visible and centered
         }
         statsContainer.appendChild(el);
-    };
+    });
 
-    const C_BERZ = '#a69377', C_GOLD = '#a27e3d', C_SILA = '#35a842', C_RED = '#ff1a1a';
-    createStat("Dowódca", 457, 496, C_GOLD);
-    createStat("Wszystkie karty w talii", 1119, 1158, C_BERZ);
-    createStat(totalCards, 1180, 1212, C_GOLD, false);
-    createStat("Liczba kart jednostek", 1238, 1277, C_BERZ);
-    createStat(unitCards < 22 ? `${unitCards}/22` : unitCards, 1300, 1332, unitCards < 22 ? C_RED : C_GOLD, false);
-    createStat("Karty specjalne", 1360, 1399, C_BERZ);
-    createStat(`${specialCardsCount}/10`, 1420, 1455, C_SILA, false);
-    createStat("Całkowita Siła Jednostek", 1480, 1519, C_BERZ);
-    createStat(totalStrength, 1539, 1572, C_GOLD, false);
-    createStat("Karty bohaterów", 1598, 1637, C_BERZ);
-    createStat(heroCardsCount, 1660, 1692, C_GOLD, false);
+    // Initial scaling
+    scaleStats(statsContainer);
+}
 
-    if (window.opponentReady) {
-        createStat("PRZECIWNIK GOTOWY", 1800, 1850, C_SILA);
-    }
+function scaleStats(statsContainer) {
+    if (!statsContainer) return;
+    const bgH = statsContainer.offsetHeight;
+    if (bgH <= 0) return;
 
-    if (window.opponentReadyTimer !== undefined && window.opponentReadyTimer !== null) {
-        createStat(`START ZA: ${window.opponentReadyTimer}`, 1730, 1780, C_RED);
-    }
+    statsContainer.querySelectorAll('.stat-item').forEach(el => {
+        const y1 = parseFloat(el.dataset.y1);
+        const y2 = parseFloat(el.dataset.y2);
+        const topPct = (y1 / GUI_HEIGHT) * 100;
+        const heightPct = ((y2 - y1) / GUI_HEIGHT) * 100;
+
+        el.style.top = `${topPct}%`;
+        el.style.height = `${heightPct}%`;
+        el.style.fontSize = `${(bgH * heightPct / 100) * 0.9}px`;
+    });
 }
 
 export function updatePositionsAndScaling() {
@@ -318,6 +322,7 @@ export function updatePositionsAndScaling() {
         stats.style.height = `${backgroundHeight}px`;
         stats.style.left = `${backgroundLeft}px`;
         stats.style.top = `${backgroundTop}px`;
+        if (window.scaleStats) window.scaleStats(stats);
     }
 
     const collectionArea = document.querySelector('.card-area.collection');
@@ -375,17 +380,9 @@ export function updatePositionsAndScaling() {
 
     const factionInfo = document.querySelector('.faction-info');
     if (factionInfo) {
+        factionInfo.style.width = `${backgroundWidth}px`;
         factionInfo.style.left = `${backgroundLeft}px`;
         factionInfo.style.top = `${backgroundTop + ((174 - 60) / GUI_HEIGHT) * backgroundHeight}px`;
-        factionInfo.style.width = `${backgroundWidth}px`;
-        factionInfo.style.textAlign = 'center';
-
-        const header = factionInfo.querySelector('.faction-header');
-        if (header) {
-            header.style.display = 'flex';
-            header.style.justifyContent = 'center';
-            header.style.alignItems = 'center';
-        }
     }
 
     const name = document.querySelector('.faction-name');
@@ -393,18 +390,15 @@ export function updatePositionsAndScaling() {
         name.innerText = faction.name;
         name.style.fontSize = `${Math.min((48 / GUI_WIDTH) * backgroundWidth, (72 / GUI_WIDTH) * backgroundWidth)}px`;
         name.style.lineHeight = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
-        name.style.margin = '0';
-        name.style.display = 'inline-block';
     }
 
     const ability = document.querySelector('.faction-ability');
     if (ability) {
         ability.innerText = faction.ability;
         ability.style.fontSize = `${Math.min((29 / GUI_WIDTH) * backgroundWidth, (43 / GUI_WIDTH) * backgroundWidth)}px`;
-        ability.style.left = '50%';
+        ability.style.left = `${(GUI_WIDTH / 2) * scale}px`;
         ability.style.top = `${((276 - (174 - 60)) / GUI_HEIGHT) * backgroundHeight}px`;
         ability.style.transform = `translateX(-50%)`;
-        ability.style.width = '100%';
     }
 
     const pageLeft = document.querySelector('.page-left');
@@ -495,19 +489,6 @@ export function updatePositionsAndScaling() {
         saveDeckButton.style.padding = `${(8 / GUI_HEIGHT) * backgroundHeight}px ${(16 / GUI_WIDTH) * backgroundWidth}px`;
         saveDeckButton.style.fontSize = `${(24 / GUI_WIDTH) * backgroundWidth}px`;
         saveDeckButton.style.transform = `translateX(-50%)`;
-
-        saveDeckButton.onclick = () => {
-            if (window.saveDecks) {
-                const currentFactionId = factions[currentPage - 1].id;
-                const talie = window.loadDecks ? window.loadDecks() : {};
-                talie[currentFactionId] = {
-                    karty: deck.map(c => c.numer),
-                    dowodca: selectedLeader ? selectedLeader.numer : null
-                };
-                window.saveDecks(talie);
-                alert('Talia zapisana!');
-            }
-        };
     }
 }
 

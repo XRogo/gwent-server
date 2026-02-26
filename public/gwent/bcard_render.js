@@ -44,8 +44,11 @@ export function renderCardHTML(card, options = {}) {
         isLargeView = false,
         isDeckView = false,
         isCollectionView = false,
-        availableCount = 0
+        availableCount = 0,
+        isKing = false
     } = options;
+
+    const actualIsKing = isKing || card.isKing || (card.numer && (card.numer.startsWith('K') || (parseInt(card.numer) >= 1000 && parseInt(card.numer) <= 6000)));
 
     let bannerFaction = card.frakcja === "nie" ? playerFaction : card.frakcja;
     if (card.nazwa === "Bies" && playerFaction !== "4") {
@@ -65,7 +68,7 @@ export function renderCardHTML(card, options = {}) {
         <div class="card-content">
             <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
             <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
-            ${!card.isKing ? `<div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>` : ''}
+            ${!actualIsKing ? `<div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>` : ''}
             <div class="name">${card.nazwa}</div>
     `;
 
@@ -79,7 +82,7 @@ export function renderCardHTML(card, options = {}) {
         html += `<div class="description">${card.opis || ''}</div>`;
     }
 
-    if (!card.isKing) {
+    if (!actualIsKing) {
         const isWeatherCard = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(card.moc);
 
         if (card.punkty !== undefined || isWeatherCard || ['rog', 'porz', 'iporz', 'medyk', 'morale', 'szpieg', 'manek', 'wezwanie', 'wezwarniezza', 'wiez', 'grzybki'].includes(card.moc)) {
@@ -112,7 +115,7 @@ export function renderCardHTML(card, options = {}) {
 
     html += `
         </div>
-        ${!card.isKing ? `<img class="ilosc-layer" src="assets/dkarty/ilosc.webp">` : ''}
+        ${!actualIsKing ? `<img class="ilosc-layer" src="assets/dkarty/ilosc.webp">` : ''}
     `;
 
     return html;

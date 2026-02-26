@@ -18,30 +18,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.on('opponent-ready-status', (data) => {
             window.opponentReady = data.isReady;
-            if (window.updateSelectionUI) window.updateSelectionUI();
-            else updatePositionsAndScaling(); // Fallback to update UI
-        });
-
-        socket.on('selection-timer-update', (data) => {
-            window.opponentReadyTimer = data.timeLeft;
-            if (window.updateSelectionUI) window.updateSelectionUI();
-        });
-
-        socket.on('selection-timer-stopped', () => {
-            window.opponentReadyTimer = null;
-            if (window.updateSelectionUI) window.updateSelectionUI();
+            if (data.isReady) playSound('joinSound');
+            initSelection(socket, gameCode, isP1); // Refresh UI to show opponent status
         });
 
         socket.on('start-game-now', () => {
             switchToGame();
         });
 
+        let countdownInterval = null;
+        socket.on('start-game-countdown', (data) => {
+            let count = data.seconds || 3;
+            const btn = document.getElementById('goToGameButton');
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            countdownInterval = setInterval(() => {
+                btn.innerText = `Start za ${count}...`;
+                count--;
+                if (count < 0) {
+                    clearInterval(countdownInterval);
+                    btn.innerText = 'Start!';
+                }
+            }, 1000);
+        });
+
         socket.on('force-finish-selection', () => {
             const deck = getSelectedDeck();
-            socket.emit('save-full-deck', { gameCode, isPlayer1: isP1, deck });
+            const leader = getSelectedLeader();
+            socket.emit('save-full-deck', {
+                gameCode,
+                isPlayer1: isP1,
+                deck: deck.map(c => c.numer),
+                leader: leader ? leader.numer : null
+            });
             socket.emit('force-start-game', { gameCode });
         });
     }
+
+    function playSound(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.currentTime = 0;
+            el.play().catch(() => { });
+        }
+    }
+    window.playSound = playSound;
+
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('button') || e.target.closest('.button') || e.target.closest('.page-left') || e.target.closest('.page-right')) {
+            playSound('hoverSound');
+        }
+    });
 
     initSelection(socket, gameCode, isP1);
 
@@ -53,26 +80,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('goToGameButton').onclick = () => {
-        const deck = getSelectedDeck();
-        const leader = getSelectedLeader();
-        const factionId = window.selectedFaction || '1';
+        const currentDeckCards = getSelectedDeck();
+        const currentLeader = getSelectedLeader();
+        const factionId = localStorage.getItem('faction') || '1';
 
-        // Mark self as ready
-        window.localReady = !window.localReady;
-        const btn = document.getElementById('goToGameButton');
-        if (btn) {
-            btn.innerText = window.localReady ? 'GOTOWY' : 'Przejdź do gry';
-            btn.style.backgroundColor = window.localReady ? 'rgba(53, 168, 66, 0.5)' : 'rgba(0, 0, 0, 0.5)';
-        }
-
+        // Save to server
         socket.emit('save-full-deck', {
             gameCode,
             isPlayer1: isP1,
-            deck: deck.map(c => c.numer),
-            leader: leader ? leader.numer : null,
-            faction: factionId,
-            isReady: window.localReady
+            deck: currentDeckCards.map(c => c.numer),
+            leader: currentLeader ? currentLeader.numer : null
         });
+
+        // Mark as ready
+        socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
+    };
+
+    document.getElementById('saveDeckButton').onclick = () => {
+        const currentDeckCards = getSelectedDeck();
+        const currentLeader = getSelectedLeader();
+        const factionId = localStorage.getItem('faction') || '1';
+
+        if (window.saveDeck) {
+            window.saveDeck(factionId, currentLeader ? currentLeader.numer : null, currentDeckCards.map(c => c.numer));
+            alert('Talia zapisana!');
+        }
     };
 
     window.addEventListener('resize', () => {
