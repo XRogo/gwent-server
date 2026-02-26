@@ -1,0 +1,29 @@
+#gameScreen .overlay {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: url('assets/asety/plansza.webp') no-repeat center;
+    background-size: contain;
+    z-index: 2;
+}
+
+.game-nick {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c7a76e;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+    font-weight: bold;
+    text-shadow: 2px 2px 2px #000;
+}
+
+.row-area {
+    pointer-events: none;
+}
+
+.small-card {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
