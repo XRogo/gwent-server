@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (countdownInterval) clearInterval(countdownInterval);
 
             countdownInterval = setInterval(() => {
-                btn.innerText = `Start za ${count}...`;
+                btn.innerText = `GOTOWOŚĆ (${count}s)`;
                 count--;
                 if (count < 0) {
                     clearInterval(countdownInterval);
-                    btn.innerText = 'Start!';
+                    btn.innerText = 'GOTOWOŚĆ';
                 }
             }, 1000);
         });
@@ -80,19 +80,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('goToGameButton').onclick = () => {
+        const btn = document.getElementById('goToGameButton');
+        if (btn.classList.contains('ready')) {
+            // Already ready, maybe toggle off? Original request says "GOTOWOŚĆ" button.
+            // Let's stick to the flow.
+        }
+        btn.classList.add('ready');
+        btn.innerText = 'OCZEKIWANIE';
+
         const currentDeckCards = getSelectedDeck();
         const currentLeader = getSelectedLeader();
-        const factionId = localStorage.getItem('faction') || '1';
+        const factionId = window.selectedFaction || '1';
 
         // Save to server
         socket.emit('save-full-deck', {
             gameCode,
             isPlayer1: isP1,
             deck: currentDeckCards.map(c => c.numer),
-            leader: currentLeader ? currentLeader.numer : null
+            leader: currentLeader ? currentLeader.numer : null,
+            faction: factionId
         });
 
-        // Mark as ready
         socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
     };
 

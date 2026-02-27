@@ -1,4 +1,8 @@
-import cards from './cards.js';
+const cards = [
+    // ... existing cards ...
+];
+if (typeof module !== 'undefined') module.exports = cards;
+export default cards;
 import { krole } from './krole.js';
 import { showPowiek } from './rcard.js';
 import { renderCardHTML } from './bcard_render.js';
@@ -6,6 +10,8 @@ import { renderCardHTML } from './bcard_render.js';
 let currentPage = 1;
 let deck = [];
 let selectedLeader = null;
+let currentCollectionFilter = 'all';
+let currentDeckFilter = 'all';
 const GUI_WIDTH = 3840;
 const GUI_HEIGHT = 2160;
 
@@ -58,12 +64,24 @@ export function initSelection(socket, gameCode, isPlayer1) {
     };
 
     function updateSelectionUI() {
-        displayCards('all', collectionArea, factions[currentPage - 1].id, cards, false, deck);
+        displayCards(currentCollectionFilter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
         const grouped = groupDeck(deck);
         window.currentDeckCards = grouped;
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
+        displayCards(currentDeckFilter, deckArea, factions[currentPage - 1].id, grouped, false, deck);
         updateStats(stats);
         updatePositionsAndScaling();
+        updateFilterButtonStates();
+    }
+
+    function updateFilterButtonStates() {
+        document.querySelectorAll('.button.collection').forEach(btn => {
+            if (btn.dataset.filter === currentCollectionFilter) btn.classList.add('active-filter');
+            else btn.classList.remove('active-filter');
+        });
+        document.querySelectorAll('.button.deck').forEach(btn => {
+            if (btn.dataset.filter === currentDeckFilter) btn.classList.add('active-filter');
+            else btn.classList.remove('active-filter');
+        });
     }
 
     document.querySelector('.page-left').onclick = () => {
@@ -81,9 +99,14 @@ export function initSelection(socket, gameCode, isPlayer1) {
     document.querySelectorAll('.button.collection, .button.deck').forEach(btn => {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
-            const area = btn.classList.contains('collection') ? collectionArea : deckArea;
-            const cardList = btn.classList.contains('collection') ? cards : groupDeck(deck);
-            displayCards(filter, area, factions[currentPage - 1].id, cardList, false, deck);
+            if (btn.classList.contains('collection')) {
+                currentCollectionFilter = filter;
+                displayCards(currentCollectionFilter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
+            } else {
+                currentDeckFilter = filter;
+                displayCards(currentDeckFilter, deckArea, factions[currentPage - 1].id, groupDeck(deck), false, deck);
+            }
+            updateFilterButtonStates();
             if (window.playSound) window.playSound('hoverSound');
         });
     });
@@ -101,9 +124,18 @@ export function initSelection(socket, gameCode, isPlayer1) {
 function loadDeckForFaction(factionId) {
     const talie = window.loadDecks ? window.loadDecks() : {};
     if (talie && talie[factionId]) {
-        deck = (talie[factionId].karty || [])
+        // Find cards and sort them according to their order in cards.js
+        const loadedCards = (talie[factionId].karty || [])
             .map(numer => cards.find(c => c.numer === numer))
             .filter(Boolean);
+
+        // Sort based on original cards array index
+        deck = loadedCards.sort((a, b) => {
+            const indexA = cards.findIndex(c => c.numer === a.numer);
+            const indexB = cards.findIndex(c => c.numer === b.numer);
+            return indexA - indexB;
+        });
+
         selectedLeader = krole.find(krol => krol.numer === talie[factionId].dowodca) || null;
     } else {
         deck = [];
@@ -111,6 +143,9 @@ function loadDeckForFaction(factionId) {
     }
     window.taliaPowiek = deck;
     window.selectedFaction = factionId;
+    // Reset filters when changing faction
+    currentCollectionFilter = 'all';
+    currentDeckFilter = 'all';
 }
 
 function groupDeck(deck) {

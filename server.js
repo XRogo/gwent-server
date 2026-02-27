@@ -118,6 +118,8 @@ io.on('connection', (socket) => {
             games[testCode].opponentReady = true;
             socket.join(testCode);
             socket.emit('test-game-joined', { gameCode: testCode, isHost: false, nickname: "test2" });
+            games[testCode].player1Faction = "1"; // Default for tests
+            games[testCode].player2Faction = "1";
             io.to(games[testCode].host).emit('opponent-joined', { opponentId: socket.id });
             console.log(`[TEST] Gracz ${socket.id} dołączył jako test2`);
             broadcastStatus(testCode);
@@ -215,7 +217,7 @@ io.on('connection', (socket) => {
             // Selection timer logic
             if ((game.player1Ready && !game.player2Ready) || (!game.player1Ready && game.player2Ready)) {
                 if (!game.selectionTimer) {
-                    game.selectionTimerValue = 60;
+                    game.selectionTimerValue = 15;
                     game.selectionTimer = setInterval(() => {
                         game.selectionTimerValue--;
                         io.to(gameCode).emit('selection-timer-update', { timeLeft: game.selectionTimerValue });
@@ -251,14 +253,17 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('save-full-deck', (data) => {
-        const { gameCode, isPlayer1, deck } = data;
-        if (games[gameCode]) {
-            if (isPlayer1) games[gameCode].player1FullDeck = deck;
-            else games[gameCode].player2FullDeck = deck;
-            console.log(`[GAME] Full deck saved for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}`);
+    const { gameCode, isPlayer1, deck, faction } = data;
+    if (games[gameCode]) {
+        if (isPlayer1) {
+            games[gameCode].player1FullDeck = deck;
+            games[gameCode].player1Faction = faction;
+        } else {
+            games[gameCode].player2FullDeck = deck;
+            games[gameCode].player2Faction = faction;
         }
-    });
+        console.log(`[GAME] Full deck saved for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}`);
+    }
 
     socket.on('force-start-game', (data) => {
         const { gameCode } = data;
@@ -280,6 +285,38 @@ io.on('connection', (socket) => {
             }
 
             if (game.player1FullDeck && game.player2FullDeck) {
+                const allCards = require('./public/gwent/cards.js');
+
+                const ensureValidDeck = (deck, faction) => {
+                    let fullDeck = [...deck];
+                    const unitCards = fullDeck.filter(num => {
+                        const c = allCards.find(card => card.numer === num);
+                        return c && typeof c.punkty === 'number';
+                    });
+
+                    if (unitCards.length < 22) {
+                        const availableUnits = allCards.filter(c =>
+                            (c.frakcja === faction || c.frakcja === "nie") &&
+                            typeof c.punkty === 'number' &&
+                            !fullDeck.includes(c.numer)
+                        );
+
+                        while (unitCards.length < 22 && availableUnits.length > 0) {
+                            const randIdx = Math.floor(Math.random() * availableUnits.length);
+                            const picked = availableUnits.splice(randIdx, 1)[0];
+                            fullDeck.push(picked.numer);
+                            unitCards.push(picked.numer);
+                        }
+                    }
+                    return fullDeck;
+                };
+
+                const p1Faction = game.player1Faction || "1";
+                const p2Faction = game.player2Faction || "1";
+
+                const p1EnsuredDeck = ensureValidDeck(game.player1FullDeck, p1Faction);
+                const p2EnsuredDeck = ensureValidDeck(game.player2FullDeck, p2Faction);
+
                 const dealCards = (fullDeck) => {
                     let deckCopy = [...fullDeck];
                     let hand = [];
@@ -290,11 +327,11 @@ io.on('connection', (socket) => {
                     return { hand, remainingDeck: deckCopy };
                 };
 
-                const p1Result = dealCards(game.player1FullDeck);
+                const p1Result = dealCards(p1EnsuredDeck);
                 game.gameState.p1Hand = p1Result.hand;
                 game.gameState.p1Deck = p1Result.remainingDeck;
 
-                const p2Result = dealCards(game.player2FullDeck);
+                const p2Result = dealCards(p2EnsuredDeck);
                 game.gameState.p2Hand = p2Result.hand;
                 game.gameState.p2Deck = p2Result.remainingDeck;
 
