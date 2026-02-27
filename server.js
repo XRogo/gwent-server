@@ -212,36 +212,32 @@ io.on('connection', (socket) => {
 
             console.log(`[GAME] ${isPlayer1 ? 'P1' : 'P2'} is ${isReady ? 'READY' : 'NOT READY'} in ${gameCode}`);
 
-            // Selection timer logic
-            if ((game.player1Ready && !game.player2Ready) || (!game.player1Ready && game.player2Ready)) {
-                if (!game.selectionTimer) {
-                    game.selectionTimerValue = 60;
-                    game.selectionTimer = setInterval(() => {
-                        game.selectionTimerValue--;
-                        io.to(gameCode).emit('selection-timer-update', { timeLeft: game.selectionTimerValue });
+            // Clear any existing timer
+            if (game.selectionTimer) {
+                clearInterval(game.selectionTimer);
+                game.selectionTimer = null;
+            }
 
-                        if (game.selectionTimerValue <= 0) {
-                            clearInterval(game.selectionTimer);
-                            game.selectionTimer = null;
-                            console.log(`[GAME] Selection timer expired for ${gameCode}. Forcing start.`);
-                            io.to(gameCode).emit('force-finish-selection');
-                        }
-                    }, 1000);
-                    console.log(`[GAME] Started selection timer for ${gameCode}`);
-                }
-            } else if (!game.player1Ready && !game.player2Ready) {
-                if (game.selectionTimer) {
-                    clearInterval(game.selectionTimer);
-                    game.selectionTimer = null;
-                    console.log(`[GAME] Stopped selection timer for ${gameCode} (both not ready)`);
-                    io.to(gameCode).emit('selection-timer-stopped');
-                }
-            } else if (game.player1Ready && game.player2Ready) {
-                if (game.selectionTimer) {
-                    clearInterval(game.selectionTimer);
-                    game.selectionTimer = null;
-                    console.log(`[GAME] Stopped selection timer for ${gameCode} (both ready)`);
-                }
+            if (game.player1Ready && game.player2Ready) {
+                // Both ready - start immediately
+                io.to(gameCode).emit('force-finish-selection');
+                console.log(`[GAME] Both ready in ${gameCode}, starting immediately.`);
+            } else if (game.player1Ready || game.player2Ready) {
+                // One player ready - start 15s timer
+                let count = 15;
+                game.selectionTimer = setInterval(() => {
+                    io.to(gameCode).emit('start-game-countdown', { seconds: count });
+                    count--;
+                    if (count < 0) {
+                        clearInterval(game.selectionTimer);
+                        game.selectionTimer = null;
+                        io.to(gameCode).emit('force-finish-selection');
+                    }
+                }, 1000);
+                console.log(`[GAME] One player ready in ${gameCode}, started 15s timer.`);
+            } else {
+                // Neither ready - ensure client timer stops
+                io.to(gameCode).emit('start-game-countdown', { seconds: null });
             }
 
             const targetId = isPlayer1 ? game.player2 : game.player1;

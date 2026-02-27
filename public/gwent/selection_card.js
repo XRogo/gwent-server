@@ -6,6 +6,8 @@ import { renderCardHTML } from './bcard_render.js';
 let currentPage = 1;
 let deck = [];
 let selectedLeader = null;
+let currentCollectionFilter = 'all';
+let currentDeckFilter = 'all';
 const GUI_WIDTH = 3840;
 const GUI_HEIGHT = 2160;
 
@@ -57,13 +59,22 @@ export function initSelection(socket, gameCode, isPlayer1) {
         }
     };
 
-    function updateSelectionUI() {
-        displayCards('all', collectionArea, factions[currentPage - 1].id, cards, false, deck);
+    window.updateSelectionUI = () => {
+        deck.sort((a, b) => {
+            const indexA = cards.findIndex(c => c.numer === a.numer);
+            const indexB = cards.findIndex(c => c.numer === b.numer);
+            return indexA - indexB;
+        });
+        displayCards(currentCollectionFilter, collectionArea, factions[currentPage - 1].id, cards, false, deck);
         const grouped = groupDeck(deck);
         window.currentDeckCards = grouped;
-        displayCards('all', deckArea, factions[currentPage - 1].id, grouped, false, deck);
+        displayCards(currentDeckFilter, deckArea, factions[currentPage - 1].id, grouped, false, deck);
         updateStats(stats);
         updatePositionsAndScaling();
+    };
+
+    function updateSelectionUI() {
+        window.updateSelectionUI();
     }
 
     document.querySelector('.page-left').onclick = () => {
@@ -81,12 +92,27 @@ export function initSelection(socket, gameCode, isPlayer1) {
     document.querySelectorAll('.button.collection, .button.deck').forEach(btn => {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
-            const area = btn.classList.contains('collection') ? collectionArea : deckArea;
-            const cardList = btn.classList.contains('collection') ? cards : groupDeck(deck);
+            const isCollection = btn.classList.contains('collection');
+            const area = isCollection ? collectionArea : deckArea;
+
+            if (isCollection) {
+                currentCollectionFilter = filter;
+                document.querySelectorAll('.button.collection').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+            } else {
+                currentDeckFilter = filter;
+                document.querySelectorAll('.button.deck').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+            }
+
+            const cardList = isCollection ? cards : groupDeck(deck);
             displayCards(filter, area, factions[currentPage - 1].id, cardList, false, deck);
+            updatePositionsAndScaling();
+
             if (window.playSound) window.playSound('hoverSound');
         });
     });
+
+    // Initial active states
+    document.querySelectorAll('.button.collection.all, .button.deck.all').forEach(btn => btn.classList.add('active'));
 
     document.querySelectorAll('.page-left, .page-right').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -104,6 +130,14 @@ function loadDeckForFaction(factionId) {
         deck = (talie[factionId].karty || [])
             .map(numer => cards.find(c => c.numer === numer))
             .filter(Boolean);
+
+        // Sort deck based on index in cards.js
+        deck.sort((a, b) => {
+            const indexA = cards.findIndex(c => c.numer === a.numer);
+            const indexB = cards.findIndex(c => c.numer === b.numer);
+            return indexA - indexB;
+        });
+
         selectedLeader = krole.find(krol => krol.numer === talie[factionId].dowodca) || null;
     } else {
         deck = [];
@@ -128,7 +162,7 @@ function groupDeck(deck) {
 
 function displayCards(filter = 'all', area, playerFaction, cardList, isLargeView, currentDeck) {
     if (!area) return;
-    const scrollTop = area.scrollTop;
+    area.dataset.savedScrollTop = area.scrollTop;
     area.innerHTML = '';
 
     let filteredCards = cardList.filter(card => {
@@ -182,8 +216,6 @@ function displayCards(filter = 'all', area, playerFaction, cardList, isLargeView
 
         area.appendChild(cardElement);
     });
-
-    area.scrollTop = scrollTop;
 }
 
 function updateStats(statsContainer) {
@@ -529,6 +561,11 @@ function updateCardArea(area, areaWidth, areaHeight, backgroundWidth, background
         card.style.maxWidth = `${cardWidth}px`;
         card.style.fontSize = `${cardWidth / 12}px`;
     });
+
+    if (area.dataset.savedScrollTop) {
+        area.scrollTop = parseFloat(area.dataset.savedScrollTop);
+        delete area.dataset.savedScrollTop;
+    }
 }
 
 export function getSelectedDeck() { return deck; }

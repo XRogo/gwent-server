@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('opponent-ready-status', (data) => {
             window.opponentReady = data.isReady;
             if (data.isReady) playSound('joinSound');
-            initSelection(socket, gameCode, isP1); // Refresh UI to show opponent status
+            if (window.updateSelectionUI) window.updateSelectionUI();
         });
 
         socket.on('start-game-now', () => {
@@ -28,18 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let countdownInterval = null;
         socket.on('start-game-countdown', (data) => {
-            let count = data.seconds || 3;
             const btn = document.getElementById('goToGameButton');
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            countdownInterval = setInterval(() => {
-                btn.innerText = `Start za ${count}...`;
-                count--;
-                if (count < 0) {
-                    clearInterval(countdownInterval);
-                    btn.innerText = 'Start!';
-                }
-            }, 1000);
+            if (data.seconds === null) {
+                btn.innerText = 'Przejdź do gry';
+                return;
+            }
+            btn.innerText = `Start za ${data.seconds}...`;
         });
 
         socket.on('force-finish-selection', () => {
@@ -82,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('goToGameButton').onclick = () => {
         const currentDeckCards = getSelectedDeck();
         const currentLeader = getSelectedLeader();
-        const factionId = localStorage.getItem('faction') || '1';
+        const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
 
         // Save to server
         socket.emit('save-full-deck', {
@@ -94,12 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Mark as ready
         socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
+        document.getElementById('goToGameButton').innerText = "Oczekiwanie...";
     };
 
     document.getElementById('saveDeckButton').onclick = () => {
         const currentDeckCards = getSelectedDeck();
         const currentLeader = getSelectedLeader();
-        const factionId = localStorage.getItem('faction') || '1';
+        const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
 
         if (window.saveDeck) {
             window.saveDeck(factionId, currentLeader ? currentLeader.numer : null, currentDeckCards.map(c => c.numer));
