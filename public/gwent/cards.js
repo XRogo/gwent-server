@@ -2608,6 +2608,4 @@ const cards = [
         numer: "528"
     },
 ];
-
-if (typeof module !== 'undefined') module.exports = cards;
 export default cards;
