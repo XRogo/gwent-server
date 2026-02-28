@@ -39,6 +39,8 @@ export function showPowiek(deck, index, mode = 'cards', options = {}) {
     window.addEventListener('wheel', powiekBlockScroll, { passive: false });
     window.addEventListener('touchmove', powiekBlockScroll, { passive: false });
     window.addEventListener('keydown', powiekBlockScroll, { passive: false });
+    window.showPowiek = showPowiek;
+    window.hidePowiek = hidePowiek;
     renderPowiek();
 }
 

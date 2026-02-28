@@ -248,11 +248,19 @@ io.on('connection', (socket) => {
     });
 
     socket.on('save-full-deck', (data) => {
-        const { gameCode, isPlayer1, deck } = data;
+        const { gameCode, isPlayer1, deck, factionId, leader } = data;
         if (games[gameCode]) {
-            if (isPlayer1) games[gameCode].player1FullDeck = deck;
-            else games[gameCode].player2FullDeck = deck;
-            console.log(`[GAME] Full deck saved for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}`);
+            const game = games[gameCode];
+            if (isPlayer1) {
+                game.player1FullDeck = deck;
+                game.player1Faction = factionId;
+                game.player1Leader = leader;
+            } else {
+                game.player2FullDeck = deck;
+                game.player2Faction = factionId;
+                game.player2Leader = leader;
+            }
+            console.log(`[GAME] Full deck (${deck.length} cards), faction (${factionId}), and leader (${leader}) saved for ${isPlayer1 ? game.player1Nickname : game.player2Nickname} in ${gameCode}`);
         }
     });
 
@@ -265,36 +273,46 @@ io.on('connection', (socket) => {
 
             if (!game.gameState) {
                 game.gameState = {
-                    p1Hand: null,
-                    p1Deck: null,
+                    p1Hand: [],
+                    p1Deck: [],
                     p1Graveyard: [],
-                    p2Hand: null,
-                    p2Deck: null,
+                    p1MulliganRejects: [], // Buffer for swaps
+                    p1Faction: game.player1Faction,
+                    p2Hand: [],
+                    p2Deck: [],
                     p2Graveyard: [],
+                    p2MulliganRejects: [], // Buffer for swaps
+                    p2Faction: game.player2Faction,
                     board: {}
                 };
             }
 
             if (game.player1FullDeck && game.player2FullDeck) {
-                const dealCards = (fullDeck) => {
+                const dealCards = (fullDeck, playerNick) => {
                     let deckCopy = [...fullDeck];
                     let hand = [];
                     for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
                         const randIdx = Math.floor(Math.random() * deckCopy.length);
                         hand.push(deckCopy.splice(randIdx, 1)[0]);
                     }
+                    console.log(`[GAME] Hand dealt for ${playerNick}: ${hand.join(', ')}`);
+                    console.log(`[GAME] Remaining deck for ${playerNick}: ${deckCopy.length} cards`);
                     return { hand, remainingDeck: deckCopy };
                 };
 
-                const p1Result = dealCards(game.player1FullDeck);
+                console.log(`[GAME] Dealing cards for P1: ${game.player1Nickname}`);
+                const p1Result = dealCards(game.player1FullDeck, game.player1Nickname);
                 game.gameState.p1Hand = p1Result.hand;
                 game.gameState.p1Deck = p1Result.remainingDeck;
 
-                const p2Result = dealCards(game.player2FullDeck);
+                console.log(`[GAME] Dealing cards for P2: ${game.player2Nickname}`);
+                const p2Result = dealCards(game.player2FullDeck, game.player2Nickname);
                 game.gameState.p2Hand = p2Result.hand;
                 game.gameState.p2Deck = p2Result.remainingDeck;
 
                 console.log(`[GAME] Cards dealt server-side for ${gameCode}`);
+            } else {
+                console.warn(`[GAME] Missing full decks for ${gameCode}. P1: ${!!game.player1FullDeck}, P2: ${!!game.player2FullDeck}`);
             }
         }
         io.to(gameCode).emit('start-game-now');
@@ -341,6 +359,10 @@ io.on('connection', (socket) => {
                 deck: isPlayer1 ? state.p1Deck : state.p2Deck,
                 graveyard: isPlayer1 ? state.p1Graveyard : state.p2Graveyard,
                 faction: isPlayer1 ? state.p1Faction : state.p2Faction,
+                nickname: isPlayer1 ? game.player1Nickname : game.player2Nickname,
+                opponentNickname: isPlayer1 ? game.player2Nickname : game.player1Nickname,
+                leader: isPlayer1 ? game.player1Leader : game.player2Leader,
+                opponentLeader: isPlayer1 ? game.player2Leader : game.player1Leader,
                 swapsPerformed: isPlayer1 ? (game.p1Swaps || 0) : (game.p2Swaps || 0),
                 opponentHandCount: isPlayer1 ? (state.p2Hand ? state.p2Hand.length : 0) : (state.p1Hand ? state.p1Hand.length : 0),
                 opponentDeckCount: isPlayer1 ? (state.p2Deck ? state.p2Deck.length : 0) : (state.p1Deck ? state.p1Deck.length : 0),
@@ -371,10 +393,14 @@ io.on('connection', (socket) => {
                     const newCard = deck.splice(randIdx, 1)[0];
 
                     hand[cardIndex] = newCard;
-                    deck.push(oldCard);
+
+                    // Buffer rejected cards instead of immediate reshuffle
+                    const rejectsKey = isPlayer1 ? 'p1MulliganRejects' : 'p2MulliganRejects';
+                    game.gameState[rejectsKey].push(oldCard);
 
                     game[playerSwapsKey]++;
-                    console.log(`[GAME] ${isPlayer1 ? 'P1' : 'P2'} swapped card in ${gameCode}. Swaps: ${game[playerSwapsKey]}/2`);
+                    const playerNick = isPlayer1 ? game.player1Nickname : game.player2Nickname;
+                    console.log(`[GAME] ${playerNick} swapped ${oldCard} for ${newCard} in ${gameCode}. Swaps: ${game[playerSwapsKey]}/2`);
 
                     socket.emit('mulligan-swap-success', {
                         newCard,
@@ -391,6 +417,41 @@ io.on('connection', (socket) => {
                         });
                     }
                 }
+            }
+        }
+    });
+
+    socket.on('end-mulligan', (data) => {
+        const { gameCode, isPlayer1 } = data;
+        if (games[gameCode] && games[gameCode].gameState) {
+            const game = games[gameCode];
+            const state = game.gameState;
+            const rejectsKey = isPlayer1 ? 'p1MulliganRejects' : 'p2MulliganRejects';
+            const deckKey = isPlayer1 ? 'p1Deck' : 'p2Deck';
+
+            if (state[rejectsKey].length > 0) {
+                console.log(`[GAME] Returning ${state[rejectsKey].length} rejects to ${isPlayer1 ? 'P1' : 'P2'} deck and shuffling.`);
+                state[deckKey] = [...state[deckKey], ...state[rejectsKey]];
+                state[rejectsKey] = [];
+
+                // Simple shuffle
+                for (let i = state[deckKey].length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [state[deckKey][i], state[deckKey][j]] = [state[deckKey][j], state[deckKey][i]];
+                }
+            }
+
+            // Send updated deck to the player who finished
+            socket.emit('update-deck', {
+                deck: state[deckKey]
+            });
+
+            // Sync deck count for opponent
+            const opponentId = isPlayer1 ? game.player2 : game.player1;
+            if (opponentId) {
+                io.to(opponentId).emit('opponent-game-update', {
+                    deckCount: state[deckKey].length
+                });
             }
         }
     });

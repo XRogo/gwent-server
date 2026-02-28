@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameCode,
                 isPlayer1: isP1,
                 deck: deck.map(c => c.numer),
-                leader: leader ? leader.numer : null
+                leader: leader ? leader.numer : null,
+                factionId: window.selectedFaction || localStorage.getItem('faction') || '1'
             });
             socket.emit('force-start-game', { gameCode });
         });
@@ -83,7 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
             gameCode,
             isPlayer1: isP1,
             deck: currentDeckCards.map(c => c.numer),
-            leader: currentLeader ? currentLeader.numer : null
+            leader: currentLeader ? currentLeader.numer : null,
+            factionId: factionId
         });
 
         // Mark as ready
