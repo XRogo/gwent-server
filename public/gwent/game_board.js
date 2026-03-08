@@ -12,6 +12,14 @@ let swapsCount = 0;
 let playerLeaderObj = null;
 let opponentLeaderObj = null;
 
+const factionInfo = {
+    "1": { name: "Królestwa Północy", logo: "tpolnoc.webp", reverse: "polnoc_rewers.webp" },
+    "2": { name: "Cesarstwo Nilfgaardu", logo: "tnilfgaard.webp", reverse: "nilftgard_rewers.webp" },
+    "3": { name: "Scoia'tael", logo: "tscoiatael.webp", reverse: "scoia'tel_rewers.webp" },
+    "4": { name: "Potwory", logo: "tpotwory.webp", reverse: "potwory_rewers.webp" },
+    "5": { name: "Skellige", logo: "tskellige.webp", reverse: "skelige_rewers.webp" }
+};
+
 function sortHand() {
     playerHand.sort((a, b) => {
         const idxA = cards.findIndex(c => c.numer === a.numer);
@@ -58,20 +66,33 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     socket.on('mulligan-swap-success', (data) => {
         const { newCard, swapsLeft, cardIndex } = data;
         const cardObj = cards.find(c => c.numer === newCard);
+
         if (cardObj) {
             playerHand[cardIndex] = cardObj;
+            console.log(`[BOARD] Swap successful: Index ${cardIndex} -> ${cardObj.nazwa}`);
         }
         swapsCount = 2 - swapsLeft;
 
+        if (window.isPowiekOpen) {
+            // Update the zoom view immediately with the new card
+            showPowiek(playerHand, cardIndex, 'hand', {
+                isMulligan: true,
+                swapsLeft: swapsLeft,
+                onSwap: (idx) => socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx }),
+                onClose: () => {
+                    sortHand(); // Sort ONLY after closing
+                    socket.emit('end-mulligan', { gameCode, isPlayer1 });
+                    renderAll(nick);
+                }
+            });
+        }
+
         if (swapsLeft <= 0) {
-            sortHand();
-            socket.emit('end-mulligan', { gameCode, isPlayer1 });
             setTimeout(() => {
                 if (window.hidePowiek) window.hidePowiek();
-                renderAll(nick);
-            }, 500);
+            }, 800);
         } else {
-            startMulligan(socket, gameCode, isPlayer1, cardIndex);
+            renderAll(nick);
         }
     });
 
@@ -97,173 +118,93 @@ function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
         isMulligan: true,
         swapsLeft: 2 - swapsCount,
         onSwap: (idx) => socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx }),
-        onClose: () => renderAll()
+        onClose: () => {
+            sortHand();
+            socket.emit('end-mulligan', { gameCode, isPlayer1 });
+            renderAll();
+        }
     });
 }
-
-// ─── Helpers ────────────────────────────────────────────────
-
-const GUI_W = 3840, GUI_H = 2160;
-
-function getScale() {
-    return Math.min(window.innerWidth / GUI_W, window.innerHeight / GUI_H);
-}
-function getBoardOffset() {
-    const s = getScale();
-    return {
-        left: (window.innerWidth - GUI_W * s) / 2,
-        top: (window.innerHeight - GUI_H * s) / 2
-    };
-}
-
-/** Place an element at 4K coordinates */
-function place(el, x, y, w, h) {
-    const s = getScale();
-    const o = getBoardOffset();
-    el.style.position = 'absolute';
-    el.style.left = `${x * s + o.left}px`;
-    el.style.top = `${y * s + o.top}px`;
-    if (w !== undefined) el.style.width = `${w * s}px`;
-    if (h !== undefined) el.style.height = `${h * s}px`;
-}
-
-// ─── Faction assets helpers ─────────────────────────────────
-
-const FACTION_NAMES = { '1': 'Północ', '2': 'Nilfgaard', '3': "Scoia'tael", '4': 'Potwory', '5': 'Skellige' };
-
-function getFactionEmblem(factionId) {
-    const map = { '1': 'tpolnoc', '2': 'tnilfgaard', '3': 'tscoiatael', '4': 'tpotwory', '5': 'tskellige' };
-    return `assets/asety/${map[factionId] || 'tpolnoc'}.webp`;
-}
-
-function getFactionReverse(factionId) {
-    const map = { '1': 'polnoc_rewers', '2': 'nilftgard_rewers', '3': "scoia'tel_rewers", '4': 'potwory_rewers', '5': 'skelige_rewers' };
-    return `assets/asety/${map[factionId] || 'polnoc_rewers'}.webp`;
-}
-
-// ─── Render All ─────────────────────────────────────────────
 
 export function renderAll(nick) {
     const overlay = document.querySelector('#gameScreen .overlay');
     if (!overlay) return;
     overlay.innerHTML = '';
     renderHand(overlay);
-    renderPlayerPanels(overlay, nick);
+    renderNicknames(overlay, nick);
+    renderStats(overlay);
     renderLives(overlay);
     renderGraveyards(overlay);
     renderPiles(overlay);
     renderLeaders(overlay);
 }
 
-// ─── Player Panels (nick, faction emblem, faction name, card count) ──
+function renderStats(overlay) {
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-function renderPlayerPanels(overlay, nick) {
-    const s = getScale();
+    const createStat = (val, x, y) => {
+        const div = document.createElement('div');
+        div.className = 'game-stat-number';
+        div.style.position = 'absolute';
+        div.style.left = `${x * scale + boardLeft}px`;
+        div.style.top = `${y * scale + boardTop}px`;
+        div.style.width = 'auto'; // Auto width for centering logic
+        div.style.minWidth = `${100 * scale}px`;
+        div.style.textAlign = 'center';
+        div.style.fontSize = `${64 * scale}px`;
+        div.style.color = '#b18941';
+        div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        div.style.transform = 'translate(-50%, -50%)'; // Center on Y coordinate
+        div.textContent = val;
+        return div;
+    };
 
-    // --- Opponent panel ---
-    // Faction emblem
-    const oEmblem = document.createElement('img');
-    oEmblem.src = getFactionEmblem(window.opponentFaction || '1');
-    place(oEmblem, 441, 544, 100, 100);
-    overlay.appendChild(oEmblem);
-
-    // Opponent nickname
-    const oNick = document.createElement('div');
-    oNick.className = 'game-nick';
-    place(oNick, 549, 550, 300, 40);
-    oNick.style.fontSize = `${36 * s}px`;
-    oNick.textContent = window.opponentNickname || 'PRZECIWNIK';
-    overlay.appendChild(oNick);
-
-    // Opponent faction name
-    const oFaction = document.createElement('div');
-    oFaction.className = 'game-nick';
-    place(oFaction, 549, 590, 300, 30);
-    oFaction.style.fontSize = `${26 * s}px`;
-    oFaction.style.opacity = '0.7';
-    oFaction.textContent = FACTION_NAMES[window.opponentFaction] || '';
-    overlay.appendChild(oFaction);
-
-    // Opponent card count icon + number
-    const oCount = createCardCount(opponentHandCount);
-    place(oCount, 560, 620, undefined, undefined);
-    oCount.style.fontSize = `${40 * s}px`;
-    overlay.appendChild(oCount);
-
-    // --- Player panel ---
-    const pEmblem = document.createElement('img');
-    pEmblem.src = getFactionEmblem(window.playerFaction || '1');
-    place(pEmblem, 441, 1402, 100, 100);
-    overlay.appendChild(pEmblem);
-
-    // Player nickname
-    const pNick = document.createElement('div');
-    pNick.className = 'game-nick';
-    place(pNick, 549, 1408, 300, 40);
-    pNick.style.fontSize = `${36 * s}px`;
-    pNick.textContent = nick || '';
-    overlay.appendChild(pNick);
-
-    // Player faction name
-    const pFaction = document.createElement('div');
-    pFaction.className = 'game-nick';
-    place(pFaction, 549, 1448, 300, 30);
-    pFaction.style.fontSize = `${26 * s}px`;
-    pFaction.style.opacity = '0.7';
-    pFaction.textContent = FACTION_NAMES[window.playerFaction] || '';
-    overlay.appendChild(pFaction);
-
-    // Player card count
-    const pCount = createCardCount(playerHand.length);
-    place(pCount, 560, 1478, undefined, undefined);
-    pCount.style.fontSize = `${40 * s}px`;
-    overlay.appendChild(pCount);
+    // Card counts in hand - [550, 738] (Opponent), [550, 1418] (Player)
+    // 550 is the left boundary "za którą liczby nie mogą wyjść w lewo"
+    overlay.appendChild(createStat(opponentHandCount, 550 + 50, 738));
+    overlay.appendChild(createStat(playerHand.length, 550 + 50, 1418));
 }
-
-function createCardCount(num) {
-    const span = document.createElement('span');
-    span.className = 'game-stat-number';
-    span.style.color = '#b18941';
-    span.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-    span.textContent = `🃏 ${num}`;
-    return span;
-}
-
-// ─── Lives (Round Gems) ──────────────────────────────────────
 
 function renderLives(overlay) {
-    const s = getScale();
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const createLive = (x, y) => {
         const img = document.createElement('img');
         img.src = 'assets/asety/live.webp';
-        // live.webp is designed for 4K – render at its native size relative to the board
-        place(img, x, y, 62, 62);
+        img.style.position = 'absolute';
+        img.style.left = `${x * scale + boardLeft}px`;
+        img.style.top = `${y * scale + boardTop}px`;
+        img.style.width = `${100 * scale}px`; // Doubled size
+        img.style.height = `${100 * scale}px`;
         return img;
     };
 
-    // Opponent lives
+    // Opponent lives (2 gems for now)
     overlay.appendChild(createLive(636, 695));
     overlay.appendChild(createLive(721, 695));
 
-    // Player lives
+    // Player lives (2 gems for now)
     overlay.appendChild(createLive(636, 1369));
     overlay.appendChild(createLive(721, 1369));
 }
 
-// ─── Hand ────────────────────────────────────────────────────
-
 function renderHand(overlay) {
-    const s = getScale();
-    const o = getBoardOffset();
+    const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
     const areaLeft = 1163, areaTop = 1691, areaRight = 3018, areaBottom = 1932;
+    const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
+    const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
+    const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
 
     const container = document.createElement('div');
     container.style.position = 'absolute';
-    container.style.left = `${areaLeft * s + o.left}px`;
-    container.style.top = `${areaTop * s + o.top}px`;
-    container.style.width = `${(areaRight - areaLeft) * s}px`;
-    container.style.height = `${(areaBottom - areaTop) * s}px`;
+    container.style.left = `${areaLeft * scale + boardLeft}px`;
+    container.style.top = `${areaTop * scale + boardTop}px`;
+    container.style.width = `${(areaRight - areaLeft) * scale}px`;
+    container.style.height = `${(areaBottom - areaTop) * scale}px`;
     container.style.display = 'flex';
     container.style.justifyContent = 'center';
     container.style.alignItems = 'center';
@@ -271,8 +212,8 @@ function renderHand(overlay) {
     playerHand.forEach((card, i) => {
         const img = document.createElement('img');
         img.src = card.karta;
-        img.style.width = `${180 * s}px`;
-        img.style.height = `${240 * s}px`;
+        img.style.width = `${180 * scale}px`;
+        img.style.height = `${240 * scale}px`;
         img.style.cursor = 'pointer';
         img.oncontextmenu = (e) => { e.preventDefault(); showPowiek(playerHand, i, 'hand'); };
         container.appendChild(img);
@@ -280,14 +221,74 @@ function renderHand(overlay) {
     overlay.appendChild(container);
 }
 
-// ─── Graveyards ──────────────────────────────────────────────
+function renderNicknames(overlay, nick) {
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const createNick = (name, x, y, fact_w, fact_h, factionId) => {
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = `${483 * scale + boardLeft}px`;
+        container.style.top = `${y * scale + boardTop}px`;
+        container.style.width = `${(850 - 483) * scale}px`;
+        container.style.height = `${(fact_h - y) * scale}px`;
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.justifyContent = 'center';
+
+        const fInfo = factionInfo[factionId] || factionInfo["1"];
+
+        const headerGroup = document.createElement('div');
+        headerGroup.style.display = 'flex';
+        headerGroup.style.alignItems = 'center';
+
+        // Faction Logo
+        const logo = document.createElement('img');
+        logo.src = `assets/asety/${fInfo.logo}`;
+        logo.style.width = `${60 * scale}px`;
+        logo.style.marginRight = `${15 * scale}px`;
+        headerGroup.appendChild(logo);
+
+        // Nickname
+        const nickDiv = document.createElement('div');
+        nickDiv.className = 'game-nick';
+        nickDiv.style.fontSize = `${32 * scale}px`;
+        nickDiv.style.color = '#b28a41'; // Requested color
+        nickDiv.style.fontWeight = 'bold';
+        nickDiv.textContent = name;
+        headerGroup.appendChild(nickDiv);
+
+        container.appendChild(headerGroup);
+
+        // Faction Name
+        const factDiv = document.createElement('div');
+        factDiv.style.fontSize = `${24 * scale}px`;
+        factDiv.style.color = '#b08948'; // Requested color
+        factDiv.style.marginTop = `${5 * scale}px`;
+        factDiv.textContent = fInfo.name;
+        container.appendChild(factDiv);
+
+        return container;
+    };
+
+    // Opponent: {483, 569 - 850, 602}
+    overlay.appendChild(createNick(window.opponentNickname || 'PRZECIWNIK', 483, 569, 850, 602, window.opponentFaction));
+    // Player: {483, 1498 x 850, 1532}
+    overlay.appendChild(createNick(nick, 483, 1498, 850, 1532, window.playerFaction));
+}
 
 function renderGraveyards(overlay) {
-    const s = getScale();
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const gy = document.createElement('div');
     gy.className = 'graveyard-container';
-    place(gy, 3142, 1691, 184, 241);
+    gy.style.left = `${3142 * scale + boardLeft}px`;
+    gy.style.top = `${1691 * scale + boardTop}px`;
+    gy.style.width = `${180 * scale}px`;
+    gy.style.height = `${240 * scale}px`;
 
     if (playerGraveyard.length > 0) {
         const topCard = playerGraveyard[playerGraveyard.length - 1];
@@ -300,102 +301,94 @@ function renderGraveyards(overlay) {
 
     const ogy = document.createElement('div');
     ogy.className = 'graveyard-container o-graveyard';
-    place(ogy, 3142, 222, 184, 241);
+    ogy.style.left = `${3142 * scale + boardLeft}px`;
+    ogy.style.top = `${222 * scale + boardTop}px`;
+    ogy.style.width = `${180 * scale}px`;
+    ogy.style.height = `${240 * scale}px`;
     ogy.style.transform = 'rotate(180deg)';
     overlay.appendChild(ogy);
 }
 
-// ─── Deck Piles (stacked reverses + count box) ──────────────
-
 function renderPiles(overlay) {
-    const s = getScale();
-    const o = getBoardOffset();
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const renderStackedPile = (baseX, baseY, count, factionId, isOpponent) => {
-        const reverseUrl = getFactionReverse(factionId || '1');
-        const cardW = 184, cardH = 241;
+    const renderPileGroup = (x, y, count, factionId, isOpponent) => {
+        const fInfo = factionInfo[factionId || '1'] || factionInfo["1"];
+        const reverseSrc = `assets/asety/${fInfo.reverse}`;
 
-        // Container to hold stacked cards
-        const pileContainer = document.createElement('div');
-        pileContainer.style.position = 'absolute';
-        // Reserve space for the 1px offsets
-        const offsetTotal = Math.max(0, count - 1);
-        pileContainer.style.left = `${(baseX - offsetTotal) * s + o.left}px`;
-        pileContainer.style.top = `${(baseY - offsetTotal) * s + o.top}px`;
-        pileContainer.style.width = `${(cardW + offsetTotal) * s}px`;
-        pileContainer.style.height = `${(cardH + offsetTotal) * s}px`;
-        pileContainer.style.pointerEvents = 'none';
-
-        // Render each card in the stack (bottom to top)
+        // Render stack (bottom card i=0 at [X, Y])
         for (let i = 0; i < count; i++) {
-            const card = document.createElement('div');
-            card.style.position = 'absolute';
-            // Each card offset 1px from previous (bottom-right to top-left)
-            const off = (count - 1 - i);
-            card.style.left = `${off * s}px`;
-            card.style.top = `${off * s}px`;
-            card.style.width = `${cardW * s}px`;
-            card.style.height = `${cardH * s}px`;
-            card.style.backgroundImage = `url('${reverseUrl}')`;
-            card.style.backgroundSize = 'cover';
-            card.style.backgroundRepeat = 'no-repeat';
-            if (i === count - 1) {
-                // Top card is interactive (for player only)
-                card.style.pointerEvents = 'auto';
+            const pile = document.createElement('img');
+            pile.src = reverseSrc;
+            pile.style.position = 'absolute';
+            // Each next card shifts 1px left and top relative to the bottom one
+            const offset = i; 
+            pile.style.left = `${(x - offset) * scale + boardLeft}px`;
+            pile.style.top = `${(y - offset) * scale + boardTop}px`;
+            pile.style.width = `${175 * scale}px`;
+            pile.style.height = `${300 * scale}px`;
+            pile.style.zIndex = 100 + i;
+            overlay.appendChild(pile);
+
+            if (i === count - 1) { // Top card interaction
+                if (!isOpponent) {
+                    pile.style.cursor = 'pointer';
+                    pile.oncontextmenu = (e) => {
+                        e.preventDefault();
+                        if (window.showPowiek) window.showPowiek(drawPile, 0, 'game');
+                    };
+                }
             }
-            pileContainer.appendChild(card);
         }
 
-        // Right-click on player's pile to zoom
-        if (!isOpponent && count > 0) {
-            pileContainer.style.cursor = 'pointer';
-            pileContainer.style.pointerEvents = 'auto';
-            pileContainer.oncontextmenu = (e) => {
-                e.preventDefault();
-                if (window.showPowiek) window.showPowiek(drawPile, 0, 'game');
-            };
-        }
-
-        overlay.appendChild(pileContainer);
-
-        // Count box below/above the pile
+        // Count box
         const boxX = isOpponent ? 3484 : 3493;
         const boxY = isOpponent ? 358 : 1901;
         const boxW = isOpponent ? (3583 - 3484) : (3591 - 3493);
         const boxH = isOpponent ? (432 - 358) : (1974 - 1901);
 
         const box = document.createElement('div');
-        place(box, boxX, boxY, boxW, boxH);
+        box.style.position = 'absolute';
+        box.style.left = `${boxX * scale + boardLeft}px`;
+        box.style.top = `${boxY * scale + boardTop}px`;
+        box.style.width = `${boxW * scale}px`;
+        box.style.height = `${boxH * scale}px`;
         box.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
         box.style.display = 'flex';
         box.style.justifyContent = 'center';
         box.style.alignItems = 'center';
+        box.style.zIndex = 200;
 
         const countText = document.createElement('div');
-        countText.style.color = '#c7a76e';
-        countText.style.fontSize = `${boxH * 0.5 * s}px`;
+        countText.style.color = '#c7a76e'; // Deck count color
+        countText.style.fontSize = `${boxH * 0.5 * scale}px`;
         countText.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
         countText.textContent = count;
         box.appendChild(countText);
         overlay.appendChild(box);
     };
 
-    // Player pile
-    renderStackedPile(3459, 1656, drawPile.length, window.playerFaction, false);
-    // Opponent pile
-    renderStackedPile(3459, 132, opponentDeckCount, window.opponentFaction, true);
+    // Corrected positions for stacking offset base (bottom card)
+    renderPileGroup(3459, 1656, drawPile.length, window.playerFaction, false);
+    renderPileGroup(3459, 132, opponentDeckCount, window.opponentFaction, true);
 }
 
-// ─── Leaders ─────────────────────────────────────────────────
-
 function renderLeaders(overlay) {
-    const s = getScale();
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const createLeader = (leaderObj, x, y) => {
         if (!leaderObj) return;
         const img = document.createElement('img');
         img.src = leaderObj.karta;
-        place(img, x, y, 184, 241);
+        img.style.position = 'absolute';
+        img.style.left = `${x * scale + boardLeft}px`;
+        img.style.top = `${y * scale + boardTop}px`;
+        img.style.width = `${180 * scale}px`;
+        img.style.height = `${240 * scale}px`;
         img.style.cursor = 'pointer';
         img.onclick = () => {
             if (window.showPowiek) window.showPowiek([leaderObj], 0, 'leaders');
@@ -406,3 +399,4 @@ function renderLeaders(overlay) {
     createLeader(playerLeaderObj, 286, 1679);
     createLeader(opponentLeaderObj, 286, 174);
 }
+
