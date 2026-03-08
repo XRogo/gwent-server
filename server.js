@@ -283,7 +283,13 @@ io.on('connection', (socket) => {
                     p2Graveyard: [],
                     p2MulliganRejects: [], // Buffer for swaps
                     p2Faction: game.player2Faction,
-                    board: {}
+                    currentTurn: game.player1, // P1 starts
+                    board: {
+                        p1R1: [], p1R2: [], p1R3: [],
+                        p2R1: [], p2R2: [], p2R3: [],
+                        p1S1: null, p1S2: null, p1S3: null,
+                        p2S1: null, p2S2: null, p2S3: null
+                    }
                 };
             }
 
@@ -354,6 +360,18 @@ io.on('connection', (socket) => {
         if (games[gameCode] && games[gameCode].gameState) {
             const game = games[gameCode];
             const state = game.gameState;
+
+            // Sync socket IDs on reconnect
+            const oldId = isPlayer1 ? game.player1 : game.player2;
+            if (isPlayer1) game.player1 = socket.id;
+            else game.player2 = socket.id;
+
+            if (state.currentTurn === oldId) {
+                state.currentTurn = socket.id;
+            }
+
+            socket.join(gameCode);
+
             socket.emit('init-game-state', {
                 hand: isPlayer1 ? state.p1Hand : state.p2Hand,
                 deck: isPlayer1 ? state.p1Deck : state.p2Deck,
@@ -368,8 +386,12 @@ io.on('connection', (socket) => {
                 opponentDeckCount: isPlayer1 ? (state.p2Deck ? state.p2Deck.length : 0) : (state.p1Deck ? state.p1Deck.length : 0),
                 opponentGraveyardCount: isPlayer1 ? (state.p2Graveyard ? state.p2Graveyard.length : 0) : (state.p1Graveyard ? state.p1Graveyard.length : 0),
                 opponentFaction: isPlayer1 ? state.p2Faction : state.p1Faction,
-                status: game.status
+                status: game.status,
+                currentTurn: state.currentTurn,
+                board: state.board
             });
+
+            console.log(`[GAME] [${gameCode}] ID Sync: ${isPlayer1 ? 'P1' : 'P2'} reconn as ${socket.id}. Turn: ${state.currentTurn}`);
         }
     });
 
@@ -457,11 +479,68 @@ io.on('connection', (socket) => {
     });
 
     socket.on('play-card', (data) => {
-        const { gameCode, isPlayer1, card, rowIndex } = data;
-        if (games[gameCode]) {
-            const targetId = isPlayer1 ? games[gameCode].player2 : games[gameCode].player1;
-            if (targetId) {
-                io.to(targetId).emit('opponent-played-card', { card, rowIndex });
+        const { gameCode, isPlayer1, cardNumer, pozycja, isSpecial } = data;
+        const game = games[gameCode];
+        if (game && game.gameState) {
+            const state = game.gameState;
+            if (state.currentTurn !== socket.id) {
+                console.log(`[GAME] Blocked play: Not ${socket.id}'s turn.`);
+                return;
+            }
+
+            const hand = isPlayer1 ? state.p1Hand : state.p2Hand;
+            const cardIdx = hand.findIndex(c => (typeof c === 'object' ? c.numer === cardNumer : c === cardNumer));
+            
+            if (cardIdx !== -1) {
+                const side = isPlayer1 ? 'p1' : 'p2';
+                let targetRow;
+
+                // Handle position carefully, especially for Agile (4)
+                let finalPos = pozycja;
+                if (!isSpecial && finalPos === 4) {
+                    finalPos = 1; // Default to Melee if not specified otherwise
+                }
+
+                if (isSpecial) {
+                    targetRow = `${side}S${finalPos}`;
+                    state.board[targetRow] = cardNumer;
+                } else {
+                    targetRow = `${side}R${finalPos}`;
+                    if (state.board[targetRow]) {
+                        state.board[targetRow].push(cardNumer);
+                    } else {
+                        console.error(`[GAME] Target row ${targetRow} does not exist in board state!`);
+                        // Fallback to row 1
+                        state.board[`${side}R1`].push(cardNumer);
+                    }
+                }
+
+                hand.splice(cardIdx, 1);
+                
+                // Switch turn
+                const nextPlayer = isPlayer1 ? game.player2 : game.player1;
+                state.currentTurn = nextPlayer;
+                
+                console.log(`[GAME] [${gameCode}] ${isPlayer1 ? 'P1' : 'P2'} played ${cardNumer} at ${targetRow}. Next turn: ${nextPlayer}`);
+
+                // Synchronize all clients
+                io.to(gameCode).emit('board-updated', {
+                    board: state.board,
+                    currentTurn: state.currentTurn,
+                    p1HandCount: state.p1Hand.length,
+                    p2HandCount: state.p2Hand.length
+                });
+
+                // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
+                const targetId = isPlayer1 ? game.player2 : game.player1;
+                if (targetId) {
+                    io.to(targetId).emit('opponent-game-update', {
+                        handCount: hand.length,
+                        board: state.board
+                    });
+                }
+            } else {
+                console.warn(`[GAME] Card ${cardNumer} not found in hand for ${isPlayer1 ? 'P1' : 'P2'}`);
             }
         }
     });
@@ -525,6 +604,19 @@ io.on('connection', (socket) => {
             }
         }
     });
+});
+
+// --- SERVER CONSOLE COMMANDS ---
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', (data) => {
+    const input = data.trim().toLowerCase();
+    if (input === 'rt') {
+        console.log('[SYSTEM] Restarting TEST game because of console command.');
+        if (games['TEST']) {
+            io.to('TEST').emit('opponent-left', 'Lobby zostało zrestartowane przez system.');
+            delete games['TEST'];
+        }
+    }
 });
 
 server.listen(3000, '0.0.0.0', () => {
