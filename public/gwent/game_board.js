@@ -1,6 +1,7 @@
 import cards from './cards.js';
 import { showPowiek } from './rcard.js';
 import { krole } from './krole.js';
+import { showPrzejscie } from './przejsciakod.js';
 
 let playerHand = [];
 let drawPile = [];
@@ -131,10 +132,17 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('board-updated', (data) => {
         console.log("[BOARD] Received board-updated:", data);
+        const prevTurn = currentTurn;
         boardState = data.board;
         currentTurn = data.currentTurn;
         opponentHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
         renderAll(currentNick);
+
+        // Pokaż baner przejściowy przy zmianie tury
+        if (currentTurn) {
+            const isMyTurn = currentTurn === window.socket.id;
+            showPrzejscie(isMyTurn ? 't01' : 't02');
+        }
     });
 }
 
@@ -147,6 +155,12 @@ function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
             sortHand();
             socket.emit('end-mulligan', { gameCode, isPlayer1 });
             renderAll();
+
+            // Pokaż baner początkowej tury po mulliganie
+            if (currentTurn) {
+                const isMyTurn = currentTurn === window.socket.id;
+                showPrzejscie(isMyTurn ? 't01' : 't02');
+            }
         }
     });
 }
@@ -165,7 +179,7 @@ export function renderAll(nick) {
     renderLeaders(overlay);
     renderRows(overlay);
     
-    // Turn indicator
+    // Turn indicator (mały napis u góry - uzupełnienie do banerów)
     if (currentTurn) {
         const turnDiv = document.createElement('div');
         turnDiv.style.position = 'absolute';
@@ -173,8 +187,9 @@ export function renderAll(nick) {
         turnDiv.style.left = '50%';
         turnDiv.style.transform = 'translateX(-50%)';
         turnDiv.style.color = '#c7a76e';
-        turnDiv.style.fontSize = '32px';
+        turnDiv.style.fontSize = `${28 * Math.min(window.innerWidth / 3840, window.innerHeight / 2160)}px`;
         turnDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        turnDiv.style.opacity = '0.6';
         const isMyTurn = currentTurn === window.socket.id;
         turnDiv.textContent = isMyTurn ? 'TWOJA TURA' : 'TURA PRZECIWNIKA';
         overlay.appendChild(turnDiv);
@@ -234,6 +249,56 @@ function renderLives(overlay) {
     overlay.appendChild(createLive(721, 1369));
 }
 
+/**
+ * Dodaje overlay z punktami na karcie.
+ * @param {HTMLElement} wrapper - kontener karty (div z position: relative)
+ * @param {object} card - obiekt karty z cards.js
+ * @param {number} cardW - szerokość karty w px (po skalowaniu)
+ * @param {number} cardH - wysokość karty w px (po skalowaniu)
+ */
+function addCardPointsOverlay(wrapper, card, cardW, cardH) {
+    // Nie wyświetlaj punktów dla kart specjalnych (pogoda, róg dowódcy itp.)
+    if (typeof card.punkty !== 'number') return;
+
+    // Proporcja skalowania: oryginalna karta ma 523px szerokości
+    const cardScale = cardW / 523;
+
+    // Bohater: najpierw obrazek bohater.webp na pozycji -8, -8
+    if (card.bohater) {
+        const heroIcon = document.createElement('img');
+        heroIcon.src = '/gwent/assets/karty/bohater.webp';
+        heroIcon.style.position = 'absolute';
+        heroIcon.style.left = `${-8 * cardScale}px`;
+        heroIcon.style.top = `${-8 * cardScale}px`;
+        // Skaluj proporcjonalnie do karty (1px bohater.webp = 1px karty)
+        heroIcon.style.width = 'auto';
+        heroIcon.style.height = 'auto';
+        heroIcon.style.transform = `scale(${cardScale})`;
+        heroIcon.style.transformOrigin = 'top left';
+        heroIcon.style.pointerEvents = 'none';
+        heroIcon.style.zIndex = '2';
+        wrapper.appendChild(heroIcon);
+    }
+
+    // Liczba punktów
+    const pointsDiv = document.createElement('div');
+    pointsDiv.style.position = 'absolute';
+    pointsDiv.style.left = `${30 * cardScale}px`;
+    pointsDiv.style.top = `${30 * cardScale}px`;
+    pointsDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+    pointsDiv.style.fontSize = `${44 * cardScale}px`;
+    pointsDiv.style.fontWeight = 'bold';
+    pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
+    pointsDiv.style.textShadow = card.bohater
+        ? '0 1px 3px rgba(0,0,0,0.8)'
+        : '0 1px 2px rgba(255,255,255,0.3)';
+    pointsDiv.style.pointerEvents = 'none';
+    pointsDiv.style.zIndex = '3';
+    pointsDiv.style.lineHeight = '1';
+    pointsDiv.textContent = card.punkty;
+    wrapper.appendChild(pointsDiv);
+}
+
 function renderHand(overlay) {
     const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
     const areaLeft = 1163, areaTop = 1691, areaRight = 3018, areaBottom = 1932;
@@ -253,30 +318,43 @@ function renderHand(overlay) {
     container.style.alignItems = 'center';
 
     playerHand.forEach((card, i) => {
+        const cardW = 180 * scale;
+        const cardH = 240 * scale;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'hand-card-img';
+        wrapper.dataset.index = i;
+        wrapper.style.width = `${cardW}px`;
+        wrapper.style.height = `${cardH}px`;
+        wrapper.style.cursor = 'pointer';
+        wrapper.style.position = 'relative';
+        wrapper.style.flexShrink = '0';
+
         const img = document.createElement('img');
-        img.className = 'hand-card-img';
-        img.dataset.index = i; // Store index for easier lookup
         img.src = card.karta;
-        img.style.width = `${180 * scale}px`;
-        img.style.height = `${240 * scale}px`;
-        img.style.cursor = 'pointer';
-        img.style.position = 'relative';
-        
-        img.onmouseenter = () => {
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.display = 'block';
+        wrapper.appendChild(img);
+
+        // Punkty na karcie
+        addCardPointsOverlay(wrapper, card, cardW, cardH);
+
+        wrapper.onmouseenter = () => {
             selectedHandIndex = i;
             updateHandVisuals(container, scale);
         };
-        img.onmouseleave = () => {
+        wrapper.onmouseleave = () => {
             selectedHandIndex = -1;
             updateHandVisuals(container, scale);
         };
 
-        img.oncontextmenu = (e) => { e.preventDefault(); showPowiek(playerHand, i, 'hand'); };
-        img.onclick = (e) => {
+        wrapper.oncontextmenu = (e) => { e.preventDefault(); showPowiek(playerHand, i, 'hand'); };
+        wrapper.onclick = (e) => {
             e.stopPropagation();
             playCardAtIndex(i);
         };
-        container.appendChild(img);
+        container.appendChild(wrapper);
     });
     updateHandVisuals(container, scale); // Apply initial selection style if any
     overlay.appendChild(container);
@@ -487,12 +565,27 @@ function renderRows(overlay) {
         cardsInRow.forEach(numer => {
             const card = cards.find(c => c.numer === numer);
             if (card) {
+                const rowCardH = coords.h * scale;
+                const rowCardW = rowCardH * (180 / 240);
+
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.height = '100%';
+                wrapper.style.width = 'auto';
+                wrapper.style.margin = `0 ${5 * scale}px`;
+                wrapper.style.flexShrink = '0';
+
                 const img = document.createElement('img');
                 img.src = card.karta;
                 img.style.height = '100%';
                 img.style.width = 'auto';
-                img.style.margin = `0 ${5 * scale}px`;
-                rowDiv.appendChild(img);
+                img.style.display = 'block';
+                wrapper.appendChild(img);
+
+                // Punkty na karcie
+                addCardPointsOverlay(wrapper, card, rowCardW, rowCardH);
+
+                rowDiv.appendChild(wrapper);
             }
         });
         overlay.appendChild(rowDiv);
