@@ -24,7 +24,6 @@ let boardState = {
     p1S1: null, p1S2: null, p1S3: null, // Horn slots
     p2S1: null, p2S2: null, p2S3: null
 };
-
 const factionInfo = {
     "1": { name: "Królestwa Północy", logo: "tpolnoc.webp", reverse: "polnoc_rewers.webp" },
     "2": { name: "Cesarstwo Nilfgaardu", logo: "tnilfgaard.webp", reverse: "nilftgard_rewers.webp" },
@@ -33,8 +32,31 @@ const factionInfo = {
     "5": { name: "Skellige", logo: "tskellige.webp", reverse: "skelige_rewers.webp" }
 };
 
+window.leaderAnimated = false;
+window.cardsAnimated = false;
+window.arrivedHandIndices = new Set();
+
 function sortHand() {
     playerHand.sort((a, b) => {
+        const isSpecialA = (typeof a.punkty !== 'number' || a.typ === 'specjalna');
+        const isSpecialB = (typeof b.punkty !== 'number' || b.typ === 'specjalna');
+
+        if (isSpecialA && !isSpecialB) return -1;
+        if (!isSpecialA && isSpecialB) return 1;
+
+        if (isSpecialA && isSpecialB) {
+            // Obie specjalne - kolejność z cards.js
+            const idxA = cards.findIndex(c => c.numer === a.numer);
+            const idxB = cards.findIndex(c => c.numer === b.numer);
+            return idxA - idxB;
+        }
+
+        // Obie jednostki - sortuj po punktach rosnąco
+        if (a.punkty !== b.punkty) {
+            return a.punkty - b.punkty;
+        }
+
+        // Tyle samo punktów - fallback do cards.js
         const idxA = cards.findIndex(c => c.numer === a.numer);
         const idxB = cards.findIndex(c => c.numer === b.numer);
         return idxA - idxB;
@@ -105,28 +127,81 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                         hidePrzejscie(true); // Natychmiast ukryj ewentualne komunikaty t13
                         
                         // Animacja dowódcy z kupki na pozycję (jednocześnie z banerem)
-                        animateLeaderFromDeck(playerLeaderObj);
+                        if (playerLeaderObj) {
+                            animateLeaderFromDeck(playerLeaderObj, () => {
+                                window.leaderAnimated = true;
+                                renderAll(currentNick);
+                            });
+                        }
                         
                         showPrzejscie(startBanner, {
                             customCzas: 2000,
                             onFinish: () => {
-                                // Animacja 10 kart z kupki do ręki (w tle za mulliganem)
-                                animateDeckToHand(10, window.playerFaction || '1');
-                                startMulligan(socket, gameCode, isPlayer1);
+                                // Dopiero po banerze prosimy o karty
+                                socket.emit('request-initial-draw', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
                             }
                         });
                     } else {
                         // Fallback
                         window.gameStarted = true;
-                        animateLeaderFromDeck(playerLeaderObj);
-                        animateDeckToHand(10, window.playerFaction || '1');
-                        startMulligan(socket, gameCode, isPlayer1);
+                        if (playerLeaderObj) {
+                            animateLeaderFromDeck(playerLeaderObj, () => {
+                                window.leaderAnimated = true;
+                                renderAll(currentNick);
+                            });
+                        }
+                        socket.emit('request-initial-draw', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
                     }
                 }
             } else {
                 renderAll(nick);
             }
         }
+    });
+
+    socket.on('initial-cards-dealt', (data) => {
+        const { hand } = data;
+        const handObjects = hand.map(num => cards.find(c => c.numer === num)).filter(Boolean);
+        
+        // Obliczamy pozycje docelowe w ręce (4K)
+        // Logika flex-center:
+        const areaLeft = 1163, areaRight = 3018, areaTop = 1691;
+        const areaWidth = areaRight - areaLeft;
+        const cardW = 180;
+        const count = handObjects.length;
+        const totalCardsWidth = count * cardW;
+        
+        // Centrowanie
+        const startX = areaLeft + (areaWidth - totalCardsWidth) / 2;
+        const targets = handObjects.map((_, i) => ({
+            x: startX + i * cardW,
+            y: areaTop
+        }));
+
+        // Natychmiast otwórz mulligan (animacje lecą "pod" nim)
+        playerHand = handObjects;
+        sortHand(); // Sortujemy zanim wyliczymy pozycje docelowe i zaczniemy animację
+        
+        // Ponowne wyliczenie pozycji po posortowaniu
+        const sortedTargets = playerHand.map((_, i) => ({
+            x: startX + i * cardW,
+            y: areaTop
+        }));
+
+        window.arrivedHandIndices.clear();
+
+        // Rozpoczynamy animację kart do ręki (w tle)
+        animateDeckToHand(playerHand, sortedTargets, () => {
+            console.log("[BOARD] All cards have arrived.");
+            window.cardsAnimated = true;
+            renderAll(currentNick);
+        }, (index) => {
+            // Ta konkretna karta doleciała
+            window.arrivedHandIndices.add(index);
+            renderAll(currentNick);
+        });
+
+        startMulligan(socket, gameCodeLocal, isPlayer1Local);
     });
 
     socket.on('start-phase-resolved', () => {
@@ -379,7 +454,7 @@ function renderLives(overlay) {
  * @param {number} cardW - szerokość karty w px (po skalowaniu)
  * @param {number} cardH - wysokość karty w px (po skalowaniu)
  */
-function addCardPointsOverlay(wrapper, card, cardW, cardH) {
+export function addCardPointsOverlay(wrapper, card, cardW, cardH) {
     // Nie wyświetlaj punktów dla kart specjalnych (pogoda, róg dowódcy itp.)
     if (typeof card.punkty !== 'number') return;
 
@@ -422,6 +497,8 @@ function addCardPointsOverlay(wrapper, card, cardW, cardH) {
 }
 
 function renderHand(overlay) {
+    if (!window.cardsAnimated && window.arrivedHandIndices.size === 0) return; // Ukryj rękę dopóki nic nie doleci
+
     const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
     const areaLeft = 1163, areaTop = 1691, areaRight = 3018, areaBottom = 1932;
     const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
@@ -451,6 +528,11 @@ function renderHand(overlay) {
         wrapper.style.cursor = 'pointer';
         wrapper.style.position = 'relative';
         wrapper.style.flexShrink = '0';
+
+        // Ukryj kartę jeśli jeszcze nie doleciała podczas animacji startowej
+        if (!window.cardsAnimated && !window.arrivedHandIndices.has(i)) {
+            wrapper.style.visibility = 'hidden';
+        }
 
         const img = document.createElement('img');
         img.src = card.karta;
@@ -832,8 +914,11 @@ function renderLeaders(overlay) {
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const createLeader = (leaderObj, x, y) => {
+    const createLeader = (leaderObj, x, y, isOpponent) => {
         if (!leaderObj) return;
+        // Jeśli to dowódca gracza, nie renderuj go dopóki animacja się nie skończy
+        if (!isOpponent && !window.leaderAnimated) return;
+
         const img = document.createElement('img');
         img.src = leaderObj.karta;
         img.style.position = 'absolute';
@@ -848,7 +933,7 @@ function renderLeaders(overlay) {
         overlay.appendChild(img);
     };
 
-    createLeader(playerLeaderObj, 286, 1679);
-    createLeader(opponentLeaderObj, 286, 174);
+    createLeader(playerLeaderObj, 286, 1679, false);
+    createLeader(opponentLeaderObj, 286, 174, true);
 }
 

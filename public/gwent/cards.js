@@ -718,7 +718,7 @@ const cards = [
         karta: "/gwent/assets/karty/nilftgard/menno_coehoorn.webp",
         dkarta: "/gwent/assets/dkarty/3/202.webp",
         opis: '"Albo wrócę z rekonesansu z\ninformacją o formacji wroga - albo was\npowieszą".',
-        bohater: false,
+        bohater: true,
         moc: "medyk",
         frakcja: "2",
         punkty: 10,

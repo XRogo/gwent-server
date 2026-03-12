@@ -42,49 +42,63 @@ function calcDuration(fromX, fromY, toX, toY) {
     return dist / speed; // sekundy
 }
 
+// Pre-load common assets
+const heroIconImg = new Image();
+heroIconImg.src = '/gwent/assets/karty/bohater.webp';
+
 /**
- * Animuje kartę (obraz) z pozycji A do B.
- * @param {string} imgSrc - ścieżka do obrazka
+ * Animuje element (kratę) z pozycji A do B.
+ * @param {HTMLElement} el - element do animowania
  * @param {{x:number,y:number}} from4K - pozycja źródłowa w skali 4K
  * @param {{x:number,y:number}} to4K - pozycja docelowa w skali 4K
  * @param {number} w4K - szerokość karty w skali 4K
  * @param {number} h4K - wysokość karty w skali 4K
  * @param {function} [onDone] - callback po zakończeniu
- * @returns {HTMLElement} - element animacji (do ewentualnego usunięcia)
  */
-export function animateCard(imgSrc, from4K, to4K, w4K, h4K, onDone) {
+export function animateElement(el, from4K, to4K, w4K, h4K, onDone) {
     const scale = getScale();
     const fromScreen = toScreenPos(from4K.x, from4K.y);
     const toScreen = toScreenPos(to4K.x, to4K.y);
     const duration = calcDuration(from4K.x, from4K.y, to4K.x, to4K.y);
 
-    const el = document.createElement('img');
-    el.src = imgSrc;
     el.style.position = 'fixed';
     el.style.left = `${fromScreen.x}px`;
     el.style.top = `${fromScreen.y}px`;
     el.style.width = `${w4K * scale}px`;
     el.style.height = `${h4K * scale}px`;
-    el.style.zIndex = '50000';
+    el.style.zIndex = '5000'; // Pod UI (które ma ~100k)
     el.style.pointerEvents = 'none';
     el.style.transition = `left ${duration}s ease-in-out, top ${duration}s ease-in-out`;
     document.body.appendChild(el);
 
-    // Uruchom animację w następnej klatce
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            el.style.left = `${toScreen.x}px`;
-            el.style.top = `${toScreen.y}px`;
-        });
-    });
+    el._targetPos = toScreen;
+    el._onDone = onDone;
+    el._duration = duration;
 
     // Cleanup po zakończeniu
     setTimeout(() => {
         if (el.parentNode) el.parentNode.removeChild(el);
         if (onDone) onDone();
     }, duration * 1000 + 50);
+}
 
-    return el;
+import { addCardPointsOverlay } from './game_board.js';
+
+/**
+ * Animuje kartę (obraz) z pozycji A do B. (Legacy support)
+ */
+export function animateCard(imgSrc, from4K, to4K, w4K, h4K, onDone) {
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    animateElement(img, from4K, to4K, w4K, h4K, onDone);
+    
+    // Start manually since this is a single call
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            img.style.left = `${img._targetPos.x}px`;
+            img.style.top = `${img._targetPos.y}px`;
+        });
+    });
 }
 
 /**
@@ -104,39 +118,62 @@ export function animateLeaderFromDeck(leaderObj, onDone) {
 }
 
 /**
- * Animuje N kart z kupki do ręki (z opóźnieniami).
- * @param {number} count - ile kart
- * @param {string} factionId - frakcja (do wybrania rewersu)
- * @param {function} [onAllDone] - callback po wszystkich
+ * Tworzy element karty identyczny jak ten w ręce.
  */
-const factionReverseMap = {
-    "1": "polnoc_rewers.webp",
-    "2": "nilftgard_rewers.webp",
-    "3": "scoia'tel_rewers.webp",
-    "4": "potwory_rewers.webp",
-    "5": "skelige_rewers.webp"
-};
+function createCardElement(card, w4K, h4K) {
+    const scale = getScale();
+    const wrapper = document.createElement('div');
+    wrapper.style.width = `${w4K * scale}px`;
+    wrapper.style.height = `${h4K * scale}px`;
+    wrapper.style.position = 'relative';
 
-export function animateDeckToHand(count, factionId, onAllDone) {
-    const reverseSrc = `assets/asety/${factionReverseMap[factionId] || factionReverseMap["1"]}`;
-    let done = 0;
-    const delay = 100; // ms między kolejnymi kartami
+    const img = document.createElement('img');
+    img.src = card.karta;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.display = 'block';
+    wrapper.appendChild(img);
 
-    for (let i = 0; i < count; i++) {
-        setTimeout(() => {
-            animateCard(
-                reverseSrc,
-                PILE_PLAYER,
-                HAND_CENTER,
-                175, 300,
-                () => {
-                    done++;
-                    if (done >= count && onAllDone) onAllDone();
-                }
-            );
-        }, i * delay);
+    addCardPointsOverlay(wrapper, card, w4K * scale, h4K * scale);
+    
+    return wrapper;
+}
+
+/**
+ * Animuje karty z kupki do rąk (wszystkie naraz).
+ * @param {Array} handCards - tablica obiektów kart
+ * @param {Array} targets4K - tablica pozycji docelowych {x, y}
+ * @param {function} [onAllDone] - callback po wszystkich
+ * @param {function} [onCardDone] - callback po każdej karcie (przekazuje indeks)
+ */
+export function animateDeckToHand(handCards, targets4K, onAllDone, onCardDone) {
+    if (!handCards || handCards.length === 0) {
+        if (onAllDone) onAllDone();
+        return;
     }
+    
+    let done = 0;
+    const count = handCards.length;
+    const elements = [];
 
-    // Fallback jeśli count = 0
-    if (count === 0 && onAllDone) onAllDone();
+    handCards.forEach((card, i) => {
+        const target = targets4K[i] || HAND_CENTER;
+        const el = createCardElement(card, 180, 240);
+        animateElement(el, PILE_PLAYER, target, 180, 240, () => {
+            if (onCardDone) onCardDone(i);
+            done++;
+            if (done >= count && onAllDone) onAllDone();
+        });
+        elements.push(el);
+    });
+
+    // Jedno wywołanie dla wszystkich, aby ruszyły w tym samym momencie
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            elements.forEach(el => {
+                el.style.left = `${el._targetPos.x}px`;
+                el.style.top = `${el._targetPos.y}px`;
+            });
+        });
+    });
 }

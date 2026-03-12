@@ -2,13 +2,13 @@ const przejscia = [
     {
         numer: "t01",
         opis: "Zaczynasz jako pierwszy.",
-        obraz: "assets/asety/przejscia/coin2.webp",
+        obraz: "assets/asety/przejscia/coin2.png",
         czas: 2000
     },
     {
         numer: "t02",
         opis: "Przeciwnik zaczyna jako pierwszy.",
-        obraz: "assets/asety/przejscia/coin1.webp",
+        obraz: "assets/asety/przejscia/coin1.png",
         czas: 2000
     },
     {
@@ -58,25 +58,25 @@ const przejscia = [
         czas: 2000
     },
     {
-        numer: "t01",
+        numer: "t21",
         opis: "Twój ruch!",
         obraz: "assets/asety/przejscia/ty.webp",
         czas: 2000
     },
     {
-        numer: "t02",
+        numer: "t22",
         opis: "'Ruch przeciwnika'",
         obraz: "assets/asety/przejscia/ludzik.webp",
         czas: 2000
     },
     {
-        numer: "t08",
+        numer: "t28",
         opis: "SPASOWAŁEŚ",
         obraz: "assets/asety/przejscia/pass.webp",
         czas: 2000
     },
     {
-        numer: "t09",
+        numer: "t29",
         opis: "ZWYCIĘSTWO!",
         obraz: "assets/asety/przejscia/ty.webp",
         czas: 4000

@@ -312,32 +312,54 @@ io.on('connection', (socket) => {
                 game.gameState.currentTurn = Math.random() < 0.5 ? game.player1 : game.player2;
             }
 
-            // 3. Rozdanie kart (jeśli pełne talie są dostępne)
+            // 3. Zainicjuj talie (pełne) - losowanie nastąpi później na żądanie klienta
             if (game.player1FullDeck && game.player2FullDeck) {
-                const dealCards = (fullDeck, playerNick) => {
-                    let deckCopy = [...fullDeck];
-                    let hand = [];
-                    for (let i = 0; i < 10 && deckCopy.length > 0; i++) {
-                        const randIdx = Math.floor(Math.random() * deckCopy.length);
-                        hand.push(deckCopy.splice(randIdx, 1)[0]);
-                    }
-                    console.log(`[GAME] Hand dealt for ${playerNick}: ${hand.join(', ')}`);
-                    console.log(`[GAME] Remaining deck for ${playerNick}: ${deckCopy.length} cards`);
-                    return { hand, remainingDeck: deckCopy };
-                };
-
-                const p1Result = dealCards(game.player1FullDeck, game.player1Nickname);
-                game.gameState.p1Hand = p1Result.hand;
-                game.gameState.p1Deck = p1Result.remainingDeck;
-
-                const p2Result = dealCards(game.player2FullDeck, game.player2Nickname);
-                game.gameState.p2Hand = p2Result.hand;
-                game.gameState.p2Deck = p2Result.remainingDeck;
-
-                console.log(`[GAME] Cards dealt server-side for ${gameCode}`);
+                game.gameState.p1Hand = [];
+                game.gameState.p1Deck = [...game.player1FullDeck];
+                game.gameState.p2Hand = [];
+                game.gameState.p2Deck = [...game.player2FullDeck];
+                console.log(`[GAME] State initialized with full decks for ${gameCode}. Waiting for draw request.`);
             }
 
             io.to(gameCode).emit('start-game-now');
+        }
+    });
+
+    socket.on('request-initial-draw', (data) => {
+        const { gameCode, isPlayer1 } = data;
+        const game = games[gameCode];
+        if (game && game.gameState) {
+            const state = game.gameState;
+            const hand = isPlayer1 ? state.p1Hand : state.p2Hand;
+            const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
+
+            // Jeśli już rozdano karty, wyślij te co są
+            if (hand.length > 0) {
+                socket.emit('initial-cards-dealt', { hand });
+                return;
+            }
+
+            // Losujemy 10 kart
+            const drawCount = 10;
+            let drawn = [];
+            for (let i = 0; i < drawCount && deck.length > 0; i++) {
+                const randIdx = Math.floor(Math.random() * deck.length);
+                drawn.push(deck.splice(randIdx, 1)[0]);
+            }
+
+            if (isPlayer1) state.p1Hand = drawn;
+            else state.p2Hand = drawn;
+
+            console.log(`[GAME] Initial cards drawn for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}: ${drawn.length} cards.`);
+            socket.emit('initial-cards-dealt', { hand: drawn });
+
+            // Notify opponent about updated deck count
+            const opponentId = isPlayer1 ? game.player2 : game.player1;
+            if (opponentId) {
+                io.to(opponentId).emit('opponent-game-update', {
+                    deckCount: deck.length
+                });
+            }
         }
     });
 
