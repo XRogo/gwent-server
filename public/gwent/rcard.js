@@ -409,7 +409,7 @@ window.addEventListener('contextmenu', (e) => {
 window.addEventListener('keydown', (event) => {
     if (!powiekActive) {
         if (event.key === 'x' || event.key === 'X') {
-            let factionId = localStorage.getItem('faction') || '1';
+            let factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
             let leaders = krole.filter(krol => krol.frakcja === factionId);
             if (leaders.length === 0) return;
             showPowiek(leaders, 0, 'leaders');

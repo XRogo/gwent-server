@@ -1,7 +1,8 @@
 import cards from './cards.js';
 import { showPowiek } from './rcard.js';
 import { krole } from './krole.js';
-import { showPrzejscie } from './przejsciakod.js';
+import { showPrzejscie, hidePrzejscie } from './przejsciakod.js';
+import { animateLeaderFromDeck, animateDeckToHand } from './animacje.js';
 
 let playerHand = [];
 let drawPile = [];
@@ -41,6 +42,14 @@ function sortHand() {
 }
 
 export function initGameBoard(socket, gameCode, isPlayer1, nick) {
+    // Guard: zapobiegaj wielokrotnemu rejestrowaniu listenerów
+    if (window._gameBoardInitialized) {
+        console.warn('[BOARD] initGameBoard already called, skipping listener setup.');
+        socket.emit('get-game-state', { gameCode, isPlayer1 });
+        return;
+    }
+    window._gameBoardInitialized = true;
+
     window.socket = socket;
     isPlayer1Local = isPlayer1;
     gameCodeLocal = gameCode;
@@ -70,15 +79,59 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             if (data.board) boardState = data.board;
 
             sortHand();
-            console.log(`[BOARD] Game state initialized. Local: ${nick}, Opponent: ${window.opponentNickname}`);
+            console.log(`[BOARD] Game state initialized. Local: ${nick}, Opponent: ${window.opponentNickname}, Status: ${data.status}`);
 
-            if (!window.gameStarted && data.status === 'playing') {
-                window.gameStarted = true;
-                startMulligan(socket, gameCode, isPlayer1);
+            if (!window.gameStarted) {
+                if (data.status === 'scoia-decision') {
+                    renderAll(nick); // Zawsze wyrenderuj stan (pusta plansza)
+                    handleScoiaDecision(socket, gameCode, data.scoiaDecider);
+                } else if (data.status === 'playing') {
+                    // Mamy ostateczny 'playing' i nie wystartowaliśmy jeszcze gry.
+                    hideScoiaUI();
+                    renderAll(nick); // Zawsze wyrenderuj stan (pusta plansza)
+                    
+                    // Decydujemy jaki baner użyć na wejście
+                    let startBanner = null;
+                    const isMyTurn = data.currentTurn === window.socket.id;
+                    
+                    if (data.startReason === 'random') {
+                        startBanner = isMyTurn ? 't01' : 't02';
+                    } else if (data.startReason === 'scoia') {
+                        startBanner = isMyTurn ? 't03' : 't04';
+                    }
+
+                    if (startBanner) {
+                        window.gameStarted = true;
+                        hidePrzejscie(true); // Natychmiast ukryj ewentualne komunikaty t13
+                        
+                        // Animacja dowódcy z kupki na pozycję (jednocześnie z banerem)
+                        animateLeaderFromDeck(playerLeaderObj);
+                        
+                        showPrzejscie(startBanner, {
+                            customCzas: 2000,
+                            onFinish: () => {
+                                // Animacja 10 kart z kupki do ręki (w tle za mulliganem)
+                                animateDeckToHand(10, window.playerFaction || '1');
+                                startMulligan(socket, gameCode, isPlayer1);
+                            }
+                        });
+                    } else {
+                        // Fallback
+                        window.gameStarted = true;
+                        animateLeaderFromDeck(playerLeaderObj);
+                        animateDeckToHand(10, window.playerFaction || '1');
+                        startMulligan(socket, gameCode, isPlayer1);
+                    }
+                }
             } else {
                 renderAll(nick);
             }
         }
+    });
+
+    socket.on('start-phase-resolved', () => {
+        // Serwer zakończył fazę decyzji i rozdał karty, prosimy o nowy stan
+        socket.emit('get-game-state', { gameCode, isPlayer1 });
     });
 
     socket.on('mulligan-swap-success', (data) => {
@@ -99,6 +152,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 onSwap: (idx) => socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx }),
                 onClose: () => {
                     sortHand(); // Sort ONLY after closing
+                    window.mulliganFinished = true; // Zaznacz, że faza jest skończona
                     socket.emit('end-mulligan', { gameCode, isPlayer1 });
                     renderAll(nick);
                 }
@@ -138,12 +192,86 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         opponentHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
         renderAll(currentNick);
 
-        // Pokaż baner przejściowy przy zmianie tury
-        if (currentTurn) {
-            const isMyTurn = currentTurn === window.socket.id;
-            showPrzejscie(isMyTurn ? 't01' : 't02');
+        // Pokaż baner przejściowy przy zmianie tury (tylko w trakcie gry, nie na starcie)
+        if (currentTurn && window.gameStarted && window.mulliganFinished) {
+            // Unikaj banerów jeśli to nie jest faktyczna zmiana tury
+            if (prevTurn !== currentTurn) {
+                const isMyTurn = currentTurn === window.socket.id;
+                showPrzejscie(isMyTurn ? 't01' : 't02');
+            }
         }
     });
+}
+
+let scoiaTimerInterval = null;
+
+function hideScoiaUI() {
+    const overlay = document.getElementById('scoia-decision-overlay');
+    if (overlay) overlay.remove();
+    if (scoiaTimerInterval) clearInterval(scoiaTimerInterval);
+    hidePrzejscie(true);
+}
+
+function handleScoiaDecision(socket, gameCode, deciderId) {
+    // Zapobiegaj wielokrotnemu tworzeniu
+    if (document.getElementById('scoia-decision-overlay')) return;
+
+    if (deciderId === window.socket.id) {
+        // Ja decyduję
+        const overlay = document.createElement('div');
+        overlay.id = 'scoia-decision-overlay';
+
+        const box = document.createElement('div');
+        box.id = 'scoia-decision-box';
+
+        const title = document.createElement('div');
+        title.id = 'scoia-decision-title';
+        title.textContent = 'Kto rozpoczyna grę?';
+
+        const btnsBox = document.createElement('div');
+        
+        const btnFirst = document.createElement('button');
+        btnFirst.className = 'scoia-btn';
+        btnFirst.textContent = 'Będę zaczynać ja';
+        
+        const btnSecond = document.createElement('button');
+        btnSecond.className = 'scoia-btn';
+        btnSecond.textContent = 'Przeciwnik zaczyna';
+
+        let timerText = document.createElement('div');
+        timerText.id = 'scoia-decision-timer';
+        
+        box.appendChild(title);
+        btnsBox.appendChild(btnFirst);
+        btnsBox.appendChild(btnSecond);
+        box.appendChild(btnsBox);
+        box.appendChild(timerText);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+
+        let timeLeft = 10;
+        timerText.textContent = `Pozostały czas: ${timeLeft}s`;
+        
+        const makeDecision = (startFirst) => {
+            if (scoiaTimerInterval) clearInterval(scoiaTimerInterval);
+            socket.emit('scoia-decision-made', { gameCode, startFirst });
+            hideScoiaUI();
+        };
+
+        btnFirst.onclick = () => makeDecision(true);
+        btnSecond.onclick = () => makeDecision(false);
+
+        scoiaTimerInterval = setInterval(() => {
+            timeLeft--;
+            timerText.textContent = `Pozostały czas: ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                makeDecision(Math.random() < 0.5); // Przypadkowy wybór po czasie
+            }
+        }, 1000);
+    } else {
+        // Przeciwnik decyduje - wymuś pokazanie komunikatu t13 twardo aż do start-phase-resolved
+        showPrzejscie('t13', { customCzas: 15000 });
+    }
 }
 
 function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
@@ -153,14 +281,9 @@ function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
         onSwap: (idx) => socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx }),
         onClose: () => {
             sortHand();
+            window.mulliganFinished = true;
             socket.emit('end-mulligan', { gameCode, isPlayer1 });
             renderAll();
-
-            // Pokaż baner początkowej tury po mulliganie
-            if (currentTurn) {
-                const isMyTurn = currentTurn === window.socket.id;
-                showPrzejscie(isMyTurn ? 't01' : 't02');
-            }
         }
     });
 }
@@ -260,34 +383,33 @@ function addCardPointsOverlay(wrapper, card, cardW, cardH) {
     // Nie wyświetlaj punktów dla kart specjalnych (pogoda, róg dowódcy itp.)
     if (typeof card.punkty !== 'number') return;
 
-    // Proporcja skalowania: oryginalna karta ma 523px szerokości
-    const cardScale = cardW / 523;
+    // Proporcja skalowania: wszystkie pozycje podane przez użytkownika są podane dla karty 180x240
+    const cardScale = cardW / 180;
 
-    // Bohater: najpierw obrazek bohater.webp na pozycji -8, -8
+    // Bohater: najpierw obrazek bohater.webp 
+    // ma być od -8, -8 do 116, 118 (czyli szerokość: 124, wysokość: 126)
     if (card.bohater) {
         const heroIcon = document.createElement('img');
         heroIcon.src = '/gwent/assets/karty/bohater.webp';
         heroIcon.style.position = 'absolute';
         heroIcon.style.left = `${-8 * cardScale}px`;
         heroIcon.style.top = `${-8 * cardScale}px`;
-        // Skaluj proporcjonalnie do karty (1px bohater.webp = 1px karty)
-        heroIcon.style.width = 'auto';
-        heroIcon.style.height = 'auto';
-        heroIcon.style.transform = `scale(${cardScale})`;
-        heroIcon.style.transformOrigin = 'top left';
+        heroIcon.style.width = `${124 * cardScale}px`;
+        heroIcon.style.height = `${126 * cardScale}px`;
         heroIcon.style.pointerEvents = 'none';
         heroIcon.style.zIndex = '2';
         wrapper.appendChild(heroIcon);
     }
 
-    // Liczba punktów
+    // Liczba punktów - środek na 30, 30
     const pointsDiv = document.createElement('div');
     pointsDiv.style.position = 'absolute';
     pointsDiv.style.left = `${30 * cardScale}px`;
     pointsDiv.style.top = `${30 * cardScale}px`;
-    pointsDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-    pointsDiv.style.fontSize = `${44 * cardScale}px`;
-    pointsDiv.style.fontWeight = 'bold';
+    pointsDiv.style.transform = 'translate(-50%, -50%)'; // Wyśrodkowanie tekstu dokładnie na 30,30
+    pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif'; 
+    pointsDiv.style.fontSize = `${44 * cardScale}px`; // 44px na bazowym 180px
+    pointsDiv.style.fontWeight = 'normal'; // Czcionka niepogrubiona
     pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
     pointsDiv.style.textShadow = card.bohater
         ? '0 1px 3px rgba(0,0,0,0.8)'

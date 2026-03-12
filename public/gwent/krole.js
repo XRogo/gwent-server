@@ -5,7 +5,7 @@
 const krole = [
 
     // Północ ██████████████████████████████████████████████████████████████████████████████████████████████████
-     
+
     {
         ////////////////////////////////////////////////////////////////////
         nazwa: "Foltest Król Temerii",
@@ -47,7 +47,7 @@ const krole = [
             //urzywa rogu dowódcy dla katapult (dodaje karte a nie zabiera z tali czy kupki)
         }
     },
-    
+
     {
         /////////////////////////////////////////////////////////////
         nazwa: "Foltest Żelazny Władca",
@@ -91,7 +91,7 @@ const krole = [
             // sprzawdza czy w kupce i w talli gry znajduje sie karta deszcz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)    
         }
     },
-    
+
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Cesarz Nilfgaardu",
@@ -105,7 +105,7 @@ const krole = [
             // w podglądzie widzisz 3 losowe karty z ręki przeciwnika nic więcej nie możesz z nimi zrobić
         }
     },
-    
+
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Biały Płomień Tańczący na Kurhanach Wrogów",
@@ -119,7 +119,7 @@ const krole = [
             //blokuje umiejątnośc dowódcy twojego przeciwnika (czyli nie może on użyć swojej umiejętności) jest odrazu aktywowane
         }
     },
-    
+
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Pan Południa",
@@ -133,7 +133,7 @@ const krole = [
             // ...kod efektu...
         }
     },
-    
+
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Najeźca Północy",
@@ -153,21 +153,21 @@ const krole = [
     {
         //////////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Elfka czystej krwi",
-        karta: "/gwent/assets/karty/scio'tel/ffrancesca_findabair1.webp",
+        karta: "/gwent/assets/karty/scio'tel/francesca_findabair1.webp",
         dkarta: "/gwent/assets/dkarty/kure/3001.webp",
         opis: '"Znowu jesteśmy Ludem, aie wygnańcami. A popiół użyźnia".',
         frakcja: "3",
         numer: "3001",
         umiejetnosc: "Znajdz w swojej talli kartę Trzaskający Mróz i natychmiast ją zagraj.",
         funkcja: function (gameState) {
-                //sprzawdza czy w kupce i w talli gry znajduje sie karta tzrzaskający mróz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)
+            //sprzawdza czy w kupce i w talli gry znajduje sie karta tzrzaskający mróz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)
         }
     },
 
-        {
+    {
         /////////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Stokrotka z Dolin",
-        karta: "/gwent/assets/karty/scio'tel/ffrancesca_findabair2.webp",
+        karta: "/gwent/assets/karty/scio'tel/francesca_findabair2.webp",
         dkarta: "/gwent/assets/dkarty/kure/3002.webp",
         opis: '"Powszechnei uważa się ją za najpiękniejszą kobietę świata".',
         frakcja: "3",
@@ -178,10 +178,10 @@ const krole = [
         }
     },
 
-        {
+    {
         ///////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Najpiękniejsza kobieta na świecie",
-        karta: "/gwent/assets/karty/scio'tel/ffrancesca_findabair3.webp",
+        karta: "/gwent/assets/karty/scio'tel/francesca_findabair3.webp",
         dkarta: "/gwent/assets/dkarty/kure/3003.webp",
         opis: '"Komanda muszą nadal prowadzić walkę".',
         frakcja: "3",
@@ -192,10 +192,10 @@ const krole = [
         }
     },
 
-        {
+    {
         /////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Królowa Dol Blathanna",
-        karta: "/gwent/assets/karty/scio'tel/ffrancesca_findabair4.webp",
+        karta: "/gwent/assets/karty/scio'tel/francesca_findabair4.webp",
         dkarta: "/gwent/assets/dkarty/kure/3004.webp",
         opis: '"Wszystko ma swoją cenę. Wojna wymaga ofiar. Pokój, jak się okazuje, również".',
         frakcja: "3",
@@ -206,10 +206,10 @@ const krole = [
         }
     },
 
-        {
+    {
         ////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Nadzieja Dol Blathanna",
-        karta: "/gwent/assets/karty/scio'tel/ffrancesca_findabair5.webp",
+        karta: "/gwent/assets/karty/scio'tel/francesca_findabair5.webp",
         dkarta: "/gwent/assets/dkarty/kure/3005.webp",
         opis: '"Daede sian caente, Aen Seidhe en\'allane ael coeden...".',
         frakcja: "3",
@@ -236,7 +236,7 @@ const krole = [
         }
     },
 
-        {
+    {
         ////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Dowódca Czerwonych Jeźdźców",
         karta: "/gwent/assets/karty/potwory/eredin2.webp",
@@ -250,7 +250,7 @@ const krole = [
         }
     },
 
-        {
+    {
         //////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Władca Tir ná Lia",
         karta: "/gwent/assets/karty/potwory/eredin3.webp",
@@ -264,7 +264,7 @@ const krole = [
         }
     },
 
-        {
+    {
         ////////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Zabujca Auberona",
         karta: "/gwent/assets/karty/potwory/eredin4.webp",
@@ -278,7 +278,7 @@ const krole = [
         }
     },
 
-        {
+    {
         //////////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Zdradziecki",
         karta: "/gwent/assets/karty/potwory/eredin5.webp",

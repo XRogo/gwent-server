@@ -269,21 +269,23 @@ io.on('connection', (socket) => {
         console.log(`[GAME] Forcing game start for ${gameCode}`);
         if (games[gameCode]) {
             const game = games[gameCode];
-            game.status = 'playing';
 
+            // Guard: jeśli gra już została zainicjalizowana, nie rób tego ponownie
+            if (game.gameState && (game.status === 'playing' || game.status === 'scoia-decision')) {
+                console.log(`[GAME] Game ${gameCode} already initialized (status: ${game.status}), skipping.`);
+                return;
+            }
+
+            // 1. Inicjalizacja pustego stanu gry (jeśli nie istnieje)
             if (!game.gameState) {
                 game.gameState = {
-                    p1Hand: [],
-                    p1Deck: [],
-                    p1Graveyard: [],
-                    p1MulliganRejects: [], // Buffer for swaps
+                    p1Hand: [], p1Deck: [], p1Graveyard: [], p1MulliganRejects: [], 
                     p1Faction: game.player1Faction,
-                    p2Hand: [],
-                    p2Deck: [],
-                    p2Graveyard: [],
-                    p2MulliganRejects: [], // Buffer for swaps
+                    p2Hand: [], p2Deck: [], p2Graveyard: [], p2MulliganRejects: [], 
                     p2Faction: game.player2Faction,
-                    currentTurn: game.player1, // P1 starts
+                    currentTurn: null,
+                    scoiaDecider: null,
+                    startReason: null,
                     board: {
                         p1R1: [], p1R2: [], p1R3: [],
                         p2R1: [], p2R2: [], p2R3: [],
@@ -293,6 +295,24 @@ io.on('connection', (socket) => {
                 };
             }
 
+            // 2. Kto zaczyna? (Losowanie vs Scoia'tael)
+            const p1Scoia = game.player1Faction === "3";
+            const p2Scoia = game.player2Faction === "3";
+
+            if (p1Scoia && !p2Scoia) {
+                game.status = 'scoia-decision';
+                game.gameState.scoiaDecider = game.player1;
+            } else if (!p1Scoia && p2Scoia) {
+                game.status = 'scoia-decision';
+                game.gameState.scoiaDecider = game.player2;
+            } else {
+                // Losowo
+                game.status = 'playing';
+                game.gameState.startReason = 'random';
+                game.gameState.currentTurn = Math.random() < 0.5 ? game.player1 : game.player2;
+            }
+
+            // 3. Rozdanie kart (jeśli pełne talie są dostępne)
             if (game.player1FullDeck && game.player2FullDeck) {
                 const dealCards = (fullDeck, playerNick) => {
                     let deckCopy = [...fullDeck];
@@ -306,22 +326,37 @@ io.on('connection', (socket) => {
                     return { hand, remainingDeck: deckCopy };
                 };
 
-                console.log(`[GAME] Dealing cards for P1: ${game.player1Nickname}`);
                 const p1Result = dealCards(game.player1FullDeck, game.player1Nickname);
                 game.gameState.p1Hand = p1Result.hand;
                 game.gameState.p1Deck = p1Result.remainingDeck;
 
-                console.log(`[GAME] Dealing cards for P2: ${game.player2Nickname}`);
                 const p2Result = dealCards(game.player2FullDeck, game.player2Nickname);
                 game.gameState.p2Hand = p2Result.hand;
                 game.gameState.p2Deck = p2Result.remainingDeck;
 
                 console.log(`[GAME] Cards dealt server-side for ${gameCode}`);
-            } else {
-                console.warn(`[GAME] Missing full decks for ${gameCode}. P1: ${!!game.player1FullDeck}, P2: ${!!game.player2FullDeck}`);
             }
+
+            io.to(gameCode).emit('start-game-now');
         }
-        io.to(gameCode).emit('start-game-now');
+    });
+
+    socket.on('scoia-decision-made', (data) => {
+        const { gameCode, startFirst } = data;
+        const game = games[gameCode];
+        if (game && game.status === 'scoia-decision') {
+            game.status = 'playing';
+            game.gameState.startReason = 'scoia';
+            
+            // socket.id to gracz który decyduje
+            if (startFirst) {
+                game.gameState.currentTurn = socket.id;
+            } else {
+                game.gameState.currentTurn = (socket.id === game.player1) ? game.player2 : game.player1;
+            }
+            
+            io.to(gameCode).emit('start-phase-resolved');
+        }
     });
 
     socket.on('save-game-state', (data) => {
@@ -388,6 +423,8 @@ io.on('connection', (socket) => {
                 opponentFaction: isPlayer1 ? state.p2Faction : state.p1Faction,
                 status: game.status,
                 currentTurn: state.currentTurn,
+                scoiaDecider: state.scoiaDecider,
+                startReason: state.startReason,
                 board: state.board
             });
 

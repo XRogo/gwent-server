@@ -1,52 +1,73 @@
 const przejscia = [
     {
         numer: "t01",
-        opis: "TWÓJ RUCH",
+        opis: "Zaczynasz jako pierwszy.",
+        obraz: "assets/asety/przejscia/coin2.webp",
+        czas: 2000
+    },
+    {
+        numer: "t02",
+        opis: "Przeciwnik zaczyna jako pierwszy.",
+        obraz: "assets/asety/przejscia/coin1.webp",
+        czas: 2000
+    },
+    {
+        numer: "t03",
+        opis: "Zaczynasz jako pierwszy.",
+        czas: 2000
+    },
+    {
+        numer: "t04",
+        opis: "Przeciwnik zaczyna jako pierwszy.",
+        czas: 2000
+    },
+    {
+        numer: "t00",
+        opis: "Początek rundy",
+        obraz: "assets/asety/przejscia/klepsydra.webp",
+        czas: 2000
+    },
+    {
+        numer: "t11",
+        opis: "Dzięki zdolności talii Królestw Północy po wygranej\nrundzie dobiera się dodatkową kartę.",
+        obraz: "assets/asety/przejscia/umienentnosc_polnoc.webp",
+        czas: 2000
+    },
+    {
+        numer: "t12",
+        opis: "Dzięki zdolności talii .",
+        obraz: "assets/asety/przejscia/umiejentnosc_nilfgardu.webp",
+        czas: 2000
+    },
+    {
+        numer: "t13",
+        opis: "Przeciwnik użył zdolności specjalnej talii Scoia'tael, by\nrozpocząć jako pierwszy.",
+        obraz: "assets/asety/przejscia/umiejentnosc_wiewiurki.webp",
+        czas: 2000
+    },
+    {
+        numer: "t14",
+        opis: "umiem potwory",
+        obraz: "assets/asety/przejscia/umiejentnosc_potwory.webp",
+        czas: 2000
+    },
+    {
+        numer: "t15",
+        opis: "Zdolność talii Skellige została aktywowana!",
+        obraz: "assets/asety/przejscia/umiejentnosc_skelige.webp",
+        czas: 2000
+    },
+    {
+        numer: "t01",
+        opis: "Twój ruch!",
         obraz: "assets/asety/przejscia/ty.webp",
         czas: 2000
     },
     {
         numer: "t02",
-        opis: "RUCH PRZECIWNIKA",
-        obraz: "assets/asety/przejscia/klepsydra.webp",
+        opis: "'Ruch przeciwnika'",
+        obraz: "assets/asety/przejscia/ludzik.webp",
         czas: 2000
-    },
-    {
-        numer: "t03",
-        opis: "PRZECIWNIK SPASOWAŁ",
-        obraz: "assets/asety/przejscia/pass.webp",
-        czas: 2500
-    },
-    {
-        numer: "t04",
-        opis: "WYGRAŁEŚ TĘ RUNDĘ!",
-        obraz: "assets/asety/przejscia/ty.webp",
-        czas: 3000
-    },
-    {
-        numer: "t05",
-        opis: "PRZEGRAŁEŚ TĘ RUNDĘ",
-        obraz: "assets/asety/przejscia/lostr.webp",
-        czas: 3000
-    },
-    {
-        numer: "t06",
-        opis: "REMIS",
-        obraz: "assets/asety/przejscia/remisr.webp",
-        czas: 3000
-    },
-    {
-        numer: "t07",
-        opis: "UŻYJ UMIEJĘTNOŚCI DOWÓDCY",
-        obraz: null, // dynamiczne - ustawiane wg frakcji
-        czas: 2500,
-        obrazFrakcji: {
-            "1": "assets/asety/przejscia/umiejentnosc_polnoc.webp",
-            "2": "assets/asety/przejscia/umiejentnosc_nilfgard.webp",
-            "3": "assets/asety/przejscia/umiejentnosc_wiewiurki.webp",
-            "4": "assets/asety/przejscia/umiejentnosc_potwory.webp",
-            "5": "assets/asety/przejscia/umiejentnosc_skelige.webp"
-        }
     },
     {
         numer: "t08",

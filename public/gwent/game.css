@@ -456,3 +456,56 @@ body {
     pointer-events: none;
     transition: opacity 0.5s ease;
 }
+
+#scoia-decision-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #c7a76e;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+}
+
+#scoia-decision-box {
+    text-align: center;
+}
+
+#scoia-decision-title {
+    font-size: 3vw;
+    margin-bottom: 2vw;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px #000;
+}
+
+.scoia-btn {
+    background: url('assets/dkarty/beton.webp') center/cover;
+    border: 2px solid #7d6a45;
+    color: #fff;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+    font-size: 1.5vw;
+    padding: 1vw 2vw;
+    margin: 0 1vw;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: filter 0.2s, transform 0.2s;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+}
+
+.scoia-btn:hover {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+}
+
+#scoia-decision-timer {
+    margin-top: 2vw;
+    font-size: 2vw;
+    color: #fff;
+}

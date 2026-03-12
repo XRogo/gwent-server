@@ -92,13 +92,31 @@ function displayBanner(item) {
     // Tekst
     const text = document.createElement('div');
     text.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-    text.style.fontSize = `${72 * scale}px`;
     text.style.color = '#c7a76e';
     text.style.letterSpacing = `${4 * scale}px`;
-    text.style.textTransform = 'uppercase';
     text.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.8)';
-    text.style.whiteSpace = 'nowrap';
-    text.textContent = item.opcje.customOpis || item.opis;
+    
+    // Jeśli podano opis z \n, zamieniamy go na <br> i wyśrodkowujemy
+    const contentText = item.opcje.customOpis || item.opis;
+    if (contentText.includes('\n')) {
+        text.innerHTML = contentText.replace(/\n/g, '<br>');
+        text.style.textAlign = 'center';
+        text.style.whiteSpace = 'normal'; // Zezwala na łamanie wierszy
+        text.style.lineHeight = '1.2';
+    } else {
+        text.textContent = contentText;
+        text.style.whiteSpace = 'nowrap';
+    }
+
+    // Specjalne obsłużenie t13 (nie powiększaj, mniejsza czcionka dla długiego tekstu)
+    if (item.numer === 't13' || contentText.includes('\n')) {
+        text.style.textTransform = 'none';
+        text.style.fontSize = `${48 * scale}px`; // mniejsza czcionka dla długich opisów
+    } else {
+        text.style.textTransform = 'uppercase';
+        text.style.fontSize = `${72 * scale}px`;
+    }
+
     inner.appendChild(text);
 
     banner.appendChild(inner);
@@ -151,16 +169,14 @@ function skipCurrentBanner() {
     }, 150);
 }
 
-function hideBanner(callback) {
+function hideBanner(callback, instant = false) {
     if (!currentBanner) {
         isShowing = false;
         if (callback) callback();
         return;
     }
 
-    currentBanner.style.opacity = '0';
-
-    setTimeout(() => {
+    if (instant) {
         if (currentBanner && currentBanner.parentNode) {
             currentBanner.parentNode.removeChild(currentBanner);
         }
@@ -168,7 +184,18 @@ function hideBanner(callback) {
         currentOnFinish = null;
         isShowing = false;
         if (callback) callback();
-    }, 400); // Czas animacji fade-out
+    } else {
+        currentBanner.style.opacity = '0';
+        setTimeout(() => {
+            if (currentBanner && currentBanner.parentNode) {
+                currentBanner.parentNode.removeChild(currentBanner);
+            }
+            currentBanner = null;
+            currentOnFinish = null;
+            isShowing = false;
+            if (callback) callback();
+        }, 400); // Czas animacji fade-out
+    }
 }
 
 function processQueue() {
@@ -181,18 +208,14 @@ function processQueue() {
 /**
  * Natychmiast ukrywa baner (np. przy zmianie ekranu).
  */
-export function hidePrzejscie() {
+export function hidePrzejscie(instant = false) {
     if (currentTimeout) {
         clearTimeout(currentTimeout);
         currentTimeout = null;
     }
     bannerQueue = [];
-    if (currentBanner && currentBanner.parentNode) {
-        currentBanner.parentNode.removeChild(currentBanner);
-    }
-    currentBanner = null;
     currentOnFinish = null;
-    isShowing = false;
+    hideBanner(null, instant);
 }
 
 // Spacją pomijamy aktualny baner
