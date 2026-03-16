@@ -86,7 +86,7 @@ const krole = [
         opis: '"Niebo nie płakało, gdy zabrali mi Pawette".',
         frakcja: "2",
         numer: "2001",
-        umiejetnosc: "Znajdz w swojej talii kartę Deszcz i natychmiast ją zagraj.",
+        umiejetnosc: "Znajdź w swojej talii kartę Deszcz i natychmiast ją zagraj.",
         funkcja: function (gameState) {
             // sprzawdza czy w kupce i w talli gry znajduje sie karta deszcz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)    
         }
@@ -100,7 +100,7 @@ const krole = [
         opis: '"Nie interesują mnie twoje przesłaniki. Oczekikję wyników".',
         frakcja: "2",
         numer: "2002",
-        umiejetnosc: "Obejrzyj 3 losowe karty z ręki przeciwnika",
+        umiejetnosc: "Obejrzyj trzy losowe karty z ręki przeciwnika",
         funkcja: function (gameState) {
             // w podglądzie widzisz 3 losowe karty z ręki przeciwnika nic więcej nie możesz z nimi zrobić
         }
@@ -114,7 +114,7 @@ const krole = [
         opis: '"Miecz jest raptem jednym z narzędzi w dyspozycji cesarza".',
         frakcja: "2",
         numer: "2003",
-        umiejetnosc: "Blokuje umiejętności dowódcy twojego przeciwnika.",
+        umiejetnosc: "Blokuję umiejętności dowódcy twojego przeciwnika.",
         funkcja: function (gameState) {
             //blokuje umiejątnośc dowódcy twojego przeciwnika (czyli nie może on użyć swojej umiejętności) jest odrazu aktywowane
         }
@@ -128,7 +128,7 @@ const krole = [
         opis: '"Nie jestem znany ze swojej cierpliwości. Poczyń, prosze, kroki , abym nie być znanym z braku głowy na karku".',
         frakcja: "2",
         numer: "2004",
-        umiejetnosc: "Wybierz karte ze stosu kart odrzuconych twojego przeciwnika",
+        umiejetnosc: "Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika.",
         funkcja: function (gameState) {
             // ...kod efektu...
         }
@@ -142,7 +142,7 @@ const krole = [
         opis: '"Cesarze władają imperium, ale dwiem rzeczami rządzić nie mogą swojim sercem i swojim czasem".',
         frakcja: "2",
         numer: "2005",
-        umiejetnosc: "Gdy grzcze przywraca kednostkę na pole bitwy, przywrucona zostaje losowa jednostka. Dotyczy obydwu graczy.",
+        umiejetnosc: "Gdy gracz przywraca jednostkę na pole bitwy, przywrócona zostaje losowa jednostka. Dotyczy obu graczy.",
         funkcja: function (gameState) {
             //jak ta to jest aktywan stale i gdy kóryś z graczy urzyje przywrócenia jednostki to przywrócona zostaje losowa jednostka z talii gracza (czyli nie ma podglądu i nie można wybrać karty)
         }
@@ -158,7 +158,7 @@ const krole = [
         opis: '"Znowu jesteśmy Ludem, aie wygnańcami. A popiół użyźnia".',
         frakcja: "3",
         numer: "3001",
-        umiejetnosc: "Znajdz w swojej talli kartę Trzaskający Mróz i natychmiast ją zagraj.",
+        umiejetnosc: "Znajdź w swojej talii kartę Trzaskający Mróz i natychmiast ją zagraj.",
         funkcja: function (gameState) {
             //sprzawdza czy w kupce i w talli gry znajduje sie karta tzrzaskający mróz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)
         }
@@ -202,7 +202,7 @@ const krole = [
         numer: "3004",
         umiejetnosc: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 lub więcej.",
         funkcja: function (gameState) {
-            // Niszczy najsilniejszą jednostke/i wojowników twojego przeciwnika, jeśli suma siły jego wojowników wynosi 10 lub więcej.
+            // Niszczy najsilniejszą jednostke/i wojowników twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej.
         }
     },
 
@@ -214,7 +214,7 @@ const krole = [
         opis: '"Daede sian caente, Aen Seidhe en\'allane ael coeden...".',
         frakcja: "3",
         numer: "3005",
-        umiejetnosc: "Przesuwa jednostki ze zdolnością Zręczności do rzędóow, które maksymalizują ich siłę. (jednostki w optymalnym rzędzie nie zostaną przesunięte)",
+        umiejetnosc: "Przesuwa jednostki ze zdolnością Zręczności do rzędóow, które maksymalizują ich siłę. (jednostki w optymalnych miejscach nie zostaną przesunięte).",
         funkcja: function (gameState) {
             //karty z umiejętnością zręczności zostaną przesunięte do rzędów, które maksymalizują ich siłę (np. łucznicy do rzędu wojowników jeśli w tym rzędzie jest róg który podwoji ich siłę)
         }
