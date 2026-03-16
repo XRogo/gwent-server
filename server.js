@@ -1,10 +1,23 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+// Wczytywanie kart używanych przez backend do zliczania punktów
+let cards = [];
+try {
+    let cardsSource = fs.readFileSync(__dirname + '/public/gwent/cards.js', 'utf8');
+    cardsSource = cardsSource.replace('export default cards;', 'return cards;');
+    const getCards = new Function(cardsSource);
+    cards = getCards();
+    console.log(`[SERVER] Loaded ${cards.length} cards from cards.js`);
+} catch (e) {
+    console.error('[SERVER] Failed to load cards.js', e);
+}
 
 const games = {};
 
@@ -283,6 +296,8 @@ io.on('connection', (socket) => {
                     p1Faction: game.player1Faction,
                     p2Hand: [], p2Deck: [], p2Graveyard: [], p2MulliganRejects: [], 
                     p2Faction: game.player2Faction,
+                    p1Lives: 2, p2Lives: 2,
+                    p1Passed: false, p2Passed: false,
                     currentTurn: null,
                     scoiaDecider: null,
                     startReason: null,
@@ -576,18 +591,29 @@ io.on('connection', (socket) => {
 
                 hand.splice(cardIdx, 1);
                 
-                // Switch turn
-                const nextPlayer = isPlayer1 ? game.player2 : game.player1;
-                state.currentTurn = nextPlayer;
+                // Sprawdź czy przeciwnik spasował. Jeśli tak, tura wraca do zagrywającego
+                const oppSide = isPlayer1 ? 'p2' : 'p1';
+                if (state[oppSide + 'Passed']) {
+                    // Tura zostaje u obecnego gracza
+                    console.log(`[GAME] [${gameCode}] ${oppSide} has passed, so turn stays with ${isPlayer1 ? 'P1' : 'P2'}`);
+                } else {
+                    // Normalna zmiana tury
+                    const nextPlayer = isPlayer1 ? game.player2 : game.player1;
+                    state.currentTurn = nextPlayer;
+                }
                 
-                console.log(`[GAME] [${gameCode}] ${isPlayer1 ? 'P1' : 'P2'} played ${cardNumer} at ${targetRow}. Next turn: ${nextPlayer}`);
+                console.log(`[GAME] [${gameCode}] ${isPlayer1 ? 'P1' : 'P2'} played ${cardNumer} at ${targetRow}. Next turn: ${state.currentTurn}`);
 
                 // Synchronize all clients
                 io.to(gameCode).emit('board-updated', {
                     board: state.board,
                     currentTurn: state.currentTurn,
                     p1HandCount: state.p1Hand.length,
-                    p2HandCount: state.p2Hand.length
+                    p2HandCount: state.p2Hand.length,
+                    p1Lives: state.p1Lives,
+                    p2Lives: state.p2Lives,
+                    p1Passed: state.p1Passed,
+                    p2Passed: state.p2Passed
                 });
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
@@ -603,6 +629,102 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on('pass-turn', (data) => {
+        const { gameCode, isPlayer1 } = data;
+        const game = games[gameCode];
+        if (game && game.gameState) {
+            const state = game.gameState;
+            if (state.currentTurn !== socket.id) return;
+
+            const mySide = isPlayer1 ? 'p1' : 'p2';
+            state[mySide + 'Passed'] = true;
+
+            console.log(`[GAME] [${gameCode}] ${mySide} PASSED.`);
+            io.to(gameCode).emit('player-passed', { isPlayer1 });
+
+            if (state.p1Passed && state.p2Passed) {
+                evaluateRound(gameCode);
+            } else {
+                state.currentTurn = isPlayer1 ? game.player2 : game.player1;
+                io.to(gameCode).emit('board-updated', {
+                    board: state.board,
+                    currentTurn: state.currentTurn,
+                    p1HandCount: state.p1Hand.length,
+                    p2HandCount: state.p2Hand.length,
+                    p1Lives: state.p1Lives,
+                    p2Lives: state.p2Lives,
+                    p1Passed: state.p1Passed,
+                    p2Passed: state.p2Passed
+                });
+            }
+        }
+    });
+
+    function evaluateRound(gameCode) {
+        const game = games[gameCode];
+        const state = game.gameState;
+        
+        const sumRow = (rowArray) => {
+            let sum = 0;
+            if (!rowArray) return sum;
+            rowArray.forEach(cardNum => {
+                const cardObj = cards.find(c => c.numer === cardNum);
+                if (cardObj && typeof cardObj.punkty === 'number') sum += cardObj.punkty;
+            });
+            return sum;
+        };
+        
+        const p1Score = sumRow(state.board.p1R1) + sumRow(state.board.p1R2) + sumRow(state.board.p1R3);
+        const p2Score = sumRow(state.board.p2R1) + sumRow(state.board.p2R2) + sumRow(state.board.p2R3);
+        
+        let roundResult = 'draw';
+        if (p1Score > p2Score) {
+            roundResult = 'p1';
+            state.p2Lives -= 1;
+        } else if (p2Score > p1Score) {
+            roundResult = 'p2';
+            state.p1Lives -= 1;
+        } else {
+            state.p1Lives -= 1;
+            state.p2Lives -= 1;
+        }
+        
+        console.log(`[GAME] [${gameCode}] Round ended. P1: ${p1Score}, P2: ${p2Score}. Result: ${roundResult}`);
+        io.to(gameCode).emit('round-ended', {
+            p1Score, p2Score, roundResult, p1Lives: state.p1Lives, p2Lives: state.p2Lives
+        });
+        
+        // Timeout to start next round assuming game is not over
+        setTimeout(() => {
+            if (state.p1Lives <= 0 || state.p2Lives <= 0) {
+                let gameResult = 'draw';
+                if (state.p1Lives > 0) gameResult = 'p1';
+                if (state.p2Lives > 0) gameResult = 'p2';
+                io.to(gameCode).emit('game-over', { gameResult });
+            } else {
+                // Clear board
+                state.board = {
+                    p1R1: [], p1R2: [], p1R3: [],
+                    p2R1: [], p2R2: [], p2R3: [],
+                    p1S1: null, p1S2: null, p1S3: null,
+                    p2S1: null, p2S2: null, p2S3: null
+                };
+                state.p1Passed = false;
+                state.p2Passed = false;
+                
+                // Winner goes first or random if draw
+                if (roundResult === 'p1') state.currentTurn = game.player1;
+                else if (roundResult === 'p2') state.currentTurn = game.player2;
+                else state.currentTurn = Math.random() < 0.5 ? game.player1 : game.player2;
+
+                io.to(gameCode).emit('next-round-started', {
+                    board: state.board,
+                    currentTurn: state.currentTurn
+                });
+            }
+        }, 5000);
+    }
 
     socket.on('send-to-p1', (data) => {
         const { gameCode, message } = data;

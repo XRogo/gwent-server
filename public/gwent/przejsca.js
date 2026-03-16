@@ -70,8 +70,14 @@ const przejscia = [
         czas: 2000
     },
     {
-        numer: "t28",
-        opis: "SPASOWAŁEŚ",
+        numer: "t23",
+        opis: "Spasowałeś",
+        obraz: "assets/asety/przejscia/pass.webp",
+        czas: 2000
+    },
+    {
+        numer: "t24",
+        opis: "Przeciwnik spasował",
         obraz: "assets/asety/przejscia/pass.webp",
         czas: 2000
     },

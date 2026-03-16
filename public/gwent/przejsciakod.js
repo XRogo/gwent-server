@@ -82,8 +82,14 @@ function displayBanner(item) {
     if (obrazSrc) {
         const icon = document.createElement('img');
         icon.src = obrazSrc;
-        icon.style.height = `${180 * scale}px`;
-        icon.style.width = 'auto';
+        // Zgodnie z wytycznymi, wielkość grafik powiększona do wielkości 4K
+        // Jeśli grafika ma np. 100px na obrazku, to na planszy też ma mieć 100px (przeskalowane proporcjonalnie)
+        icon.onload = () => {
+            icon.style.height = `${icon.naturalHeight * scale}px`;
+            icon.style.width = `${icon.naturalWidth * scale}px`;
+        };
+        // Fallback zanim się załaduje
+        icon.style.height = `${200 * scale}px`;
         icon.style.objectFit = 'contain';
         icon.style.filter = 'drop-shadow(0 0 12px rgba(199, 167, 110, 0.5))';
         inner.appendChild(icon);

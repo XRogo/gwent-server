@@ -11,6 +11,10 @@ let opponentHandCount = 10;
 let opponentDeckCount = 12;
 let opponentGraveyardCount = 0;
 let swapsCount = 0;
+let playerLives = 2;
+let opponentLives = 2;
+let playerPassed = false;
+let opponentPassed = false;
 let playerLeaderObj = null;
 let opponentLeaderObj = null;
 let currentTurn = null;
@@ -96,6 +100,11 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
             if (data.leader) playerLeaderObj = krole.find(k => k.numer === data.leader);
             if (data.opponentLeader) opponentLeaderObj = krole.find(k => k.numer === data.opponentLeader);
+
+            playerLives = isPlayer1Local ? (data.p1Lives !== undefined ? data.p1Lives : 2) : (data.p2Lives !== undefined ? data.p2Lives : 2);
+            opponentLives = isPlayer1Local ? (data.p2Lives !== undefined ? data.p2Lives : 2) : (data.p1Lives !== undefined ? data.p1Lives : 2);
+            playerPassed = isPlayer1Local ? data.p1Passed : data.p2Passed;
+            opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
 
             if (data.currentTurn) currentTurn = data.currentTurn;
             if (data.board) boardState = data.board;
@@ -265,6 +274,14 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         boardState = data.board;
         currentTurn = data.currentTurn;
         opponentHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
+        
+        if (data.p1Lives !== undefined) {
+            playerLives = isPlayer1Local ? data.p1Lives : data.p2Lives;
+            opponentLives = isPlayer1Local ? data.p2Lives : data.p1Lives;
+            playerPassed = isPlayer1Local ? data.p1Passed : data.p2Passed;
+            opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
+        }
+        
         renderAll(currentNick);
 
         // Pokaż baner przejściowy przy zmianie tury (tylko w trakcie gry, nie na starcie)
@@ -371,6 +388,7 @@ export function renderAll(nick) {
     renderHand(overlay);
     renderNicknames(overlay, nick);
     renderStats(overlay);
+    renderScores(overlay);
     renderLives(overlay);
     renderGraveyards(overlay);
     renderPiles(overlay);
@@ -422,6 +440,77 @@ function renderStats(overlay) {
     overlay.appendChild(createStat(playerHand.length, 550 + 50, 1418));
 }
 
+function calculateScores() {
+    const scores = { p1: { R1: 0, R2: 0, R3: 0, total: 0 }, p2: { R1: 0, R2: 0, R3: 0, total: 0 } };
+    
+    // Helper do zliczania punktów w danym rzędzie
+    const sumRow = (rowArray) => {
+        let sum = 0;
+        if (!rowArray) return sum;
+        rowArray.forEach(cardNum => {
+            const cardObj = cards.find(c => c.numer === cardNum);
+            if (cardObj && typeof cardObj.punkty === 'number') {
+                sum += cardObj.punkty;
+            }
+        });
+        return sum;
+    };
+
+    scores.p1.R1 = sumRow(boardState.p1R1);
+    scores.p1.R2 = sumRow(boardState.p1R2);
+    scores.p1.R3 = sumRow(boardState.p1R3);
+    scores.p1.total = scores.p1.R1 + scores.p1.R2 + scores.p1.R3;
+
+    scores.p2.R1 = sumRow(boardState.p2R1);
+    scores.p2.R2 = sumRow(boardState.p2R2);
+    scores.p2.R3 = sumRow(boardState.p2R3);
+    scores.p2.total = scores.p2.R1 + scores.p2.R2 + scores.p2.R3;
+
+    return scores;
+}
+
+function renderScores(overlay) {
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+    
+    const scores = calculateScores();
+    const isP1 = isPlayer1Local;
+
+    // Przypisanie wyników do gracza lokalnego i przeciwnika
+    const myScores = isP1 ? scores.p1 : scores.p2;
+    const oppScores = isP1 ? scores.p2 : scores.p1;
+
+    const createScoreValue = (val, x, y, isTotal) => {
+        const div = document.createElement('div');
+        div.className = 'game-score-number';
+        div.style.position = 'absolute';
+        div.style.left = `${x * scale + boardLeft}px`;
+        div.style.top = `${y * scale + boardTop}px`;
+        div.style.textAlign = 'center';
+        div.style.fontSize = isTotal ? `${56 * scale}px` : `${44 * scale}px`;
+        div.style.color = '#383021'; // Ciemny brąz na pergamin
+        div.style.fontFamily = 'PFDinTextCondPro-Medium, sans-serif';
+        div.style.transform = 'translate(-50%, -50%)';
+        div.style.fontWeight = isTotal ? 'bold' : 'normal';
+        div.style.pointerEvents = 'none';
+        div.textContent = val;
+        return div;
+    };
+
+    // Przeciwnik (Góra planszy) - R3 (Siege), R2 (Ranged), R1 (Melee)
+    overlay.appendChild(createScoreValue(oppScores.R3, 1071, 146, false));
+    overlay.appendChild(createScoreValue(oppScores.R2, 1071, 410, false));
+    overlay.appendChild(createScoreValue(oppScores.R1, 1071, 686, false));
+    overlay.appendChild(createScoreValue(oppScores.total, 907, 663, true));
+
+    // Gracz (Dół planszy) - R3 (Siege), R2 (Ranged), R1 (Melee)
+    overlay.appendChild(createScoreValue(myScores.R3, 1071, 982, false));
+    overlay.appendChild(createScoreValue(myScores.R2, 1071, 1247, false));
+    overlay.appendChild(createScoreValue(myScores.R1, 1071, 1524, false));
+    overlay.appendChild(createScoreValue(myScores.total, 907, 1467, true));
+}
+
 function renderLives(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
@@ -438,13 +527,15 @@ function renderLives(overlay) {
         return img;
     };
 
-    // Opponent lives (2 gems for now)
-    overlay.appendChild(createLive(636, 695));
-    overlay.appendChild(createLive(721, 695));
+    // Opponent lives
+    const oppYs = 695;
+    if (opponentLives >= 1) overlay.appendChild(createLive(721, oppYs));
+    if (opponentLives >= 2) overlay.appendChild(createLive(636, oppYs));
 
-    // Player lives (2 gems for now)
-    overlay.appendChild(createLive(636, 1369));
-    overlay.appendChild(createLive(721, 1369));
+    // Player lives
+    const playerYs = 1369;
+    if (playerLives >= 1) overlay.appendChild(createLive(721, playerYs));
+    if (playerLives >= 2) overlay.appendChild(createLive(636, playerYs));
 }
 
 /**
@@ -935,5 +1026,44 @@ function renderLeaders(overlay) {
 
     createLeader(playerLeaderObj, 286, 1679, false);
     createLeader(opponentLeaderObj, 286, 174, true);
+
+    // Przycisk PASS obok dowódcy gracza
+    if (window.gameStarted && !playerPassed) {
+        const passBtn = document.createElement('button');
+        passBtn.className = 'game-pass-btn';
+        passBtn.style.position = 'absolute';
+        passBtn.style.left = `${490 * scale + boardLeft}px`; 
+        passBtn.style.top = `${1779 * scale + boardTop}px`; // Wyrównanie do dolnej połowy karty dowódcy
+        passBtn.style.width = `${120 * scale}px`;
+        passBtn.style.height = `${50 * scale}px`;
+        passBtn.style.backgroundColor = '#1a1a1a';
+        passBtn.style.border = `${2 * scale}px solid #b28a41`;
+        passBtn.style.borderRadius = `${4 * scale}px`;
+        passBtn.style.color = '#b28a41';
+        passBtn.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        passBtn.style.fontSize = `${28 * scale}px`;
+        passBtn.style.boxShadow = '0 0 10px rgba(0,0,0,0.8)';
+        passBtn.style.cursor = 'pointer';
+        passBtn.textContent = 'PASS';
+        
+        const isMyTurn = currentTurn === window.socket.id;
+        if (!isMyTurn) {
+            passBtn.style.opacity = '0.5';
+            passBtn.style.cursor = 'not-allowed';
+        } else {
+            passBtn.onmouseenter = () => passBtn.style.backgroundColor = '#2a2a2a';
+            passBtn.onmouseleave = () => passBtn.style.backgroundColor = '#1a1a1a';
+        }
+
+        passBtn.onclick = () => {
+            if (currentTurn === window.socket.id) {
+                window.socket.emit('pass-turn', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+            } else {
+                console.log("[BOARD] Cannot pass, not your turn.");
+            }
+        };
+
+        overlay.appendChild(passBtn);
+    }
 }
 
