@@ -1365,7 +1365,7 @@ const cards = [
         nazwa: "Bryada Vrihedd",
         karta: "/gwent/assets/karty/scio'tel/brygada_vrihedd2.webp",
         dkarta: "/gwent/assets/dkarty/5/318.webp",
-        opis: "WORK.",
+        opis: '"Jak przetrwać słowo Vrihedd? Nie\nwiem. Ale oznacza kłopoty".',
         bohater: false,
         frakcja: "3",
         punkty: 5,
