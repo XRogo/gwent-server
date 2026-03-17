@@ -11,6 +11,8 @@ const SPEED_4K = 3480; // px/s w skali 4K
 const PILE_PLAYER = { x: 3459, y: 1656 };
 const HAND_CENTER = { x: 2090, y: 1811 };
 const LEADER_PLAYER = { x: 286, y: 1679 };
+const GRAVEYARD_PLAYER = { x: 3110, y: 1682 };
+const GRAVEYARD_OPPONENT = { x: 3110, y: 168 };
 
 function getScale() {
     return Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
@@ -177,3 +179,67 @@ export function animateDeckToHand(handCards, targets4K, onAllDone, onCardDone) {
         });
     });
 }
+
+/**
+ * Animuje karty z pola walki do cmentarza.
+ * @param {Array} cardsOnBoard - tablica {card, currentPos4K}
+ * @param {boolean} isOpponent - czy to karty przeciwnika
+ * @param {number} currentGraveyardCount - ile kart już jest w trupach
+ * @param {function} [onAllDone] - callback
+ */
+export function animateBoardToGraveyard(cardsOnBoard, isOpponent, currentGraveyardCount, onAllDone) {
+    if (!cardsOnBoard || cardsOnBoard.length === 0) {
+        if (onAllDone) onAllDone();
+        return;
+    }
+
+    const targetBase = isOpponent ? GRAVEYARD_OPPONENT : GRAVEYARD_PLAYER;
+    let done = 0;
+    const count = cardsOnBoard.length;
+    const elements = [];
+
+    cardsOnBoard.forEach((item, i) => {
+        const card = item.card;
+        const fromPos = item.currentPos4K;
+        const offset = currentGraveyardCount + i;
+        const target = {
+            x: targetBase.x - offset,
+            y: targetBase.y - offset
+        };
+
+        const el = createCardElement(card, 180, 240);
+        animateElement(el, fromPos, target, 180, 240, () => {
+            done++;
+            if (done >= count && onAllDone) onAllDone();
+        });
+        elements.push(el);
+    });
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            elements.forEach(el => {
+                el.style.left = `${el._targetPos.x}px`;
+                el.style.top = `${el._targetPos.y}px`;
+            });
+        });
+    });
+}
+
+/**
+ * Animuje kartę (obraz) z ręki z powrotem do talii.
+ * @param {object} card - obiekt karty
+ * @param {{x:number, y:number}} from4K - pozycja startowa w 4K
+ * @param {function} [onDone] - callback
+ */
+export function animateCardToDeck(card, from4K, onDone) {
+    const el = createCardElement(card, 180, 240);
+    animateElement(el, from4K, PILE_PLAYER, 180, 240, onDone);
+    
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            el.style.left = `${el._targetPos.x}px`;
+            el.style.top = `${el._targetPos.y}px`;
+        });
+    });
+}
+

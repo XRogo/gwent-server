@@ -61,7 +61,7 @@ export function hidePowiek() {
     if (powiekOptions && powiekOptions.onClose) powiekOptions.onClose();
 }
 
-function renderPowiek() {
+export function renderPowiek() {
     const oldOverlay = document.getElementById('powiekOverlay');
     if (oldOverlay) oldOverlay.remove();
     const oldBg = document.getElementById('powiekBg');
@@ -168,7 +168,7 @@ function renderPowiek() {
                 };
             } else if (powiekOptions && powiekOptions.isMulligan) {
                 cardDiv.style.cursor = 'pointer';
-                cardDiv.onclick = (e) => {
+                cardDiv.onmousedown = (e) => {
                     e.stopPropagation();
                     if (powiekOptions.onSwap) powiekOptions.onSwap(powiekIndex);
                 };
@@ -336,6 +336,19 @@ function renderPowiek() {
         helpInfo.style.zIndex = 300;
         helpInfo.textContent = 'Kliknij / Enter - wymień | Esc - zakończ';
         overlay.appendChild(helpInfo);
+
+        const timerUI = document.createElement('div');
+        timerUI.id = 'powiek-timer';
+        timerUI.style.position = 'absolute';
+        timerUI.style.top = '5%';
+        timerUI.style.left = '50%';
+        timerUI.style.transform = 'translateX(-50%)';
+        timerUI.style.color = '#ff4d4d';
+        timerUI.style.fontFamily = 'PFDinTextCondPro-Bold';
+        timerUI.style.fontSize = relW(48) + 'px';
+        timerUI.style.textShadow = '2px 2px 4px #000';
+        timerUI.style.zIndex = 300;
+        overlay.appendChild(timerUI);
     }
 }
 

@@ -1,8 +1,8 @@
 import cards from './cards.js';
-import { showPowiek } from './rcard.js';
+import { showPowiek, renderPowiek } from './rcard.js';
 import { krole } from './krole.js';
-import { showPrzejscie, hidePrzejscie } from './przejsciakod.js';
-import { animateLeaderFromDeck, animateDeckToHand } from './animacje.js';
+import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
+import { animateLeaderFromDeck, animateDeckToHand, animateBoardToGraveyard, animateCardToDeck } from './animacje.js';
 
 let playerHand = [];
 let drawPile = [];
@@ -220,36 +220,84 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('mulligan-swap-success', (data) => {
         const { newCard, swapsLeft, cardIndex } = data;
+        const oldCardObj = playerHand[cardIndex]; // Save old card for animation
         const cardObj = cards.find(c => c.numer === newCard);
 
         if (cardObj) {
             playerHand[cardIndex] = cardObj;
             console.log(`[BOARD] Swap successful: Index ${cardIndex} -> ${cardObj.nazwa}`);
+            if (window.renderPowiek) window.renderPowiek();
         }
         swapsCount = 2 - swapsLeft;
 
-        if (window.isPowiekOpen) {
-            // Update the zoom view immediately with the new card
-            showPowiek(playerHand, cardIndex, 'hand', {
-                isMulligan: true,
-                swapsLeft: swapsLeft,
-                onSwap: (idx) => socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx }),
-                onClose: () => {
-                    sortHand(); // Sort ONLY after closing
-                    window.mulliganFinished = true; // Zaznacz, że faza jest skończona
-                    socket.emit('end-mulligan', { gameCode, isPlayer1 });
-                    renderAll(nick);
-                }
-            });
+        // Visual background animation
+        const areaLeft = 1163, areaRight = 3018, areaTop = 1691, cardW = 180;
+        const totalCardsWidth = playerHand.length * cardW;
+        const startXInHand = areaLeft + (areaRight - areaLeft - totalCardsWidth) / 2 + cardIndex * cardW;
+
+        // Old card back to deck
+        if (oldCardObj) {
+            animateCardToDeck(oldCardObj, { x: startXInHand, y: areaTop });
         }
 
         if (swapsLeft <= 0) {
-            setTimeout(() => {
-                if (window.hidePowiek) window.hidePowiek();
-            }, 800);
+            // Immediate close after 2nd swap (don't wait for animation to end)
+            if (window.hidePowiek) window.hidePowiek();
+            
+            window.arrivedHandIndices.delete(cardIndex);
+            
+            animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
+                window.arrivedHandIndices.add(cardIndex);
+                sortHand(); // Sort ONLY after closing
+                window.arrivedHandIndices = new Set(playerHand.map((_, i) => i)); // Reveal all after sort
+                window.mulliganFinished = true; // Zaznacz, że faza jest skończona
+                socket.emit('end-mulligan', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+                renderAll(currentNick);
+            });
+
         } else {
-            renderAll(nick);
+            // Animacja dla pojedynczej wymiany
+            window.arrivedHandIndices.delete(cardIndex);
+            animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
+                window.arrivedHandIndices.add(cardIndex);
+                renderAll(currentNick);
+            });
         }
+    });
+
+    socket.on('start-mulligan-timer', (data) => {
+        // Przeciwnik skończył, masz 60s
+        // Update timer safely without overriding the mulligan screen
+        const timerUI = document.getElementById('powiek-timer');
+        if (timerUI) timerUI.textContent = `Pozostały czas: ${data.timeLeft}s`;
+    });
+
+    socket.on('wait-for-mulligan', (data) => {
+        // Ty skończyłeś, czekasz na przeciwnika
+        if (window.mulliganFinished) {
+            showPrzejscie('t06', { customOpis: "Czekasz na przeciwnika... {czas}", countDown: data.timeLeft });
+        }
+    });
+
+    socket.on('mulligan-timer-expired', () => {
+        if (window.hidePowiek) window.hidePowiek();
+        sortHand();
+        window.mulliganFinished = true;
+        socket.emit('end-mulligan', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+        renderAll(currentNick);
+    });
+
+    socket.on('mulligan-finished-all', () => {
+        hidePrzejscie(true); // Close t06 instantly
+        showPrzejscie('t05', { onFinish: () => {
+            // Po t05 (początek rundy) pokazujemy kto zaczyna
+            socket.emit('get-turn-info', { gameCode: gameCodeLocal });
+        }});
+    });
+
+    socket.on('turn-info', (data) => {
+        const { myTurn } = data;
+        showPrzejscie(myTurn ? 't07' : 't08');
     });
 
     socket.on('opponent-game-update', (data) => {
@@ -287,11 +335,45 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         // Pokaż baner przejściowy przy zmianie tury (tylko w trakcie gry, nie na starcie)
         if (currentTurn && window.gameStarted && window.mulliganFinished) {
             // Unikaj banerów jeśli to nie jest faktyczna zmiana tury
-            if (prevTurn !== currentTurn) {
+            if (prevTurn !== currentTurn && !playerPassed && !opponentPassed) {
                 const isMyTurn = currentTurn === window.socket.id;
-                showPrzejscie(isMyTurn ? 't01' : 't02');
+                showPrzejscie(isMyTurn ? 't07' : 't08');
             }
         }
+    });
+
+    socket.on('player-passed', () => {
+        playerPassed = true;
+        showPrzejscie('t21', { onFinish: () => {
+            // After I pass, it's opponent's turn automatically
+            if (!opponentPassed) showPrzejscie('t08');
+        }});
+        renderAll(currentNick);
+    });
+
+    socket.on('opponent-passed', () => {
+        opponentPassed = true;
+        showPrzejscie('t20', { onFinish: () => {
+            // After opponent passes, it's my turn
+            if (!playerPassed) showPrzejscie('t07');
+        }});
+        renderAll(currentNick);
+    });
+
+    socket.on('round-ended', (data) => {
+        handleRoundEnd(data);
+    });
+
+    socket.on('next-round-started', (data) => {
+        console.log("[BOARD] Przejście do nowej rundy...");
+        boardState = data.board;
+        currentTurn = data.currentTurn;
+        playerPassed = false;
+        opponentPassed = false;
+        renderAll(currentNick);
+        // Show who starts
+        const isMyTurn = currentTurn === window.socket.id;
+        showPrzejscie(isMyTurn ? 't07' : 't08');
     });
 }
 
@@ -370,7 +452,13 @@ function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
     showPowiek(playerHand, selectedIndex, 'hand', {
         isMulligan: true,
         swapsLeft: 2 - swapsCount,
-        onSwap: (idx) => socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx }),
+        onSwap: (idx) => {
+            swapsCount++;
+            if (swapsCount >= 2) {
+                if (window.hidePowiek) window.hidePowiek();
+            }
+            socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx });
+        },
         onClose: () => {
             sortHand();
             window.mulliganFinished = true;
@@ -488,12 +576,18 @@ function renderScores(overlay) {
         div.style.left = `${x * scale + boardLeft}px`;
         div.style.top = `${y * scale + boardTop}px`;
         div.style.textAlign = 'center';
-        div.style.fontSize = isTotal ? `${56 * scale}px` : `${44 * scale}px`;
-        div.style.color = '#383021'; // Ciemny brąz na pergamin
-        div.style.fontFamily = 'PFDinTextCondPro-Medium, sans-serif';
+        // Powiększone o 25% (bazowe 56 i 44)
+        div.style.fontSize = isTotal ? `${56 * 1.25 * scale}px` : `${44 * 1.25 * scale}px`;
+        div.style.color = '#000000'; // Kolor czarny
+        div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif'; // Fix: Poproszona czcionka Bold
         div.style.transform = 'translate(-50%, -50%)';
         div.style.fontWeight = isTotal ? 'bold' : 'normal';
         div.style.pointerEvents = 'none';
+        // Biała poświata (glow)
+        div.style.textShadow = `
+            0 0 ${10 * scale}px #ffffff,
+            0 0 ${20 * scale}px #ffffff
+        `;
         div.textContent = val;
         return div;
     };
@@ -682,6 +776,14 @@ function playCardAtIndex(index) {
     console.log(`[BOARD] playCardAtIndex: turn=${currentTurn}, myID=${window.socket.id}, isMyTurn=${isMyTurn}`);
     if (!isMyTurn) {
         console.log("[BOARD] Blocked move: Not your turn!");
+        return;
+    }
+    if (getIsShowing()) {
+        console.log("[BOARD] Próba zagrania karty podczas wyświetlania baneru - zablokowano.");
+        return;
+    }
+    if (playerPassed) {
+        console.log("[BOARD] Cannot play card, player has passed.");
         return;
     }
 
@@ -1050,7 +1152,6 @@ function renderLeaders(overlay) {
         if (!isMyTurn) {
             passBtn.style.opacity = '0.5';
             passBtn.style.cursor = 'not-allowed';
-        } else {
             passBtn.onmouseenter = () => passBtn.style.backgroundColor = '#2a2a2a';
             passBtn.onmouseleave = () => passBtn.style.backgroundColor = '#1a1a1a';
         }
@@ -1067,3 +1168,57 @@ function renderLeaders(overlay) {
     }
 }
 
+function collectCardsOnBoard(isOpponent) {
+    const side = isOpponent ? (isPlayer1Local ? 'p2' : 'p1') : (isPlayer1Local ? 'p1' : 'p2');
+    const boardCards = [];
+    
+    // Rows 1, 2, 3
+    [1, 2, 3].forEach(rowIdx => {
+        const rowKey = `${side}R${rowIdx}`;
+        const rowCards = boardState[rowKey] || [];
+        rowCards.forEach((cardNum, i) => {
+            const cardObj = cards.find(c => c.numer === cardNum);
+            if (cardObj) {
+                // Approximate position for animation
+                const areaLeft = 1412, areaTop = isOpponent ? (29 + (3-rowIdx)*265) : (863 + (rowIdx-1)*265);
+                boardCards.push({
+                    card: cardObj,
+                    currentPos4K: { x: areaLeft + i * 150, y: areaTop }
+                });
+            }
+        });
+    });
+    return boardCards;
+}
+
+function handleRoundEnd(data) {
+    const { winner, p1Score, p2Score, p1Lives, p2Lives } = data;
+    
+    // Collect all cards currently on the board
+    const myBoardCards = collectCardsOnBoard(false);
+    const oppBoardCards = collectCardsOnBoard(true);
+
+    // Animate to graveyards
+    animateBoardToGraveyard(myBoardCards, false, playerGraveyard.length, () => {
+        console.log("[BOARD] Player cards moved to graveyard.");
+    });
+    animateBoardToGraveyard(oppBoardCards, true, opponentGraveyardCount, () => {
+        console.log("[BOARD] Opponent cards moved to graveyard.");
+    });
+
+    // Show result banner after a short delay for animation
+    setTimeout(() => {
+        playerLives = isPlayer1Local ? p1Lives : p2Lives;
+        opponentLives = isPlayer1Local ? p2Lives : p1Lives;
+
+        let bannerCode = 't24'; // Remis
+        if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23'; // Wygrana
+        else if (winner) bannerCode = 't22'; // Przegrana
+
+        showPrzejscie(bannerCode, {
+            onFinish: () => {
+                // Re-render handled by board-updated from server
+            }
+        });
+    }, 1500);
+}

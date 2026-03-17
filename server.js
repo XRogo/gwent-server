@@ -522,6 +522,11 @@ io.on('connection', (socket) => {
         if (games[gameCode] && games[gameCode].gameState) {
             const game = games[gameCode];
             const state = game.gameState;
+            
+            // Mark player as finished
+            if (isPlayer1) game.p1MulliganDone = true;
+            else game.p2MulliganDone = true;
+
             const rejectsKey = isPlayer1 ? 'p1MulliganRejects' : 'p2MulliganRejects';
             const deckKey = isPlayer1 ? 'p1Deck' : 'p2Deck';
 
@@ -529,26 +534,57 @@ io.on('connection', (socket) => {
                 console.log(`[GAME] Returning ${state[rejectsKey].length} rejects to ${isPlayer1 ? 'P1' : 'P2'} deck and shuffling.`);
                 state[deckKey] = [...state[deckKey], ...state[rejectsKey]];
                 state[rejectsKey] = [];
-
-                // Simple shuffle
                 for (let i = state[deckKey].length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [state[deckKey][i], state[deckKey][j]] = [state[deckKey][j], state[deckKey][i]];
                 }
             }
 
-            // Send updated deck to the player who finished
-            socket.emit('update-deck', {
-                deck: state[deckKey]
-            });
+            socket.emit('update-deck', { deck: state[deckKey] });
 
-            // Sync deck count for opponent
             const opponentId = isPlayer1 ? game.player2 : game.player1;
+            const oppMulliganDone = isPlayer1 ? game.p2MulliganDone : game.p1MulliganDone;
+
+            if (!oppMulliganDone && opponentId) {
+                // Opponent is still mulliganing. Start 60s timer if not started.
+                if (!game.mulliganTimer) {
+                    game.mulliganTimeLeft = 60;
+                    game.mulliganTimer = setInterval(() => {
+                        game.mulliganTimeLeft--;
+                        if (game.mulliganTimeLeft <= 0) {
+                            clearInterval(game.mulliganTimer);
+                            // Force end
+                            io.to(gameCode).emit('mulligan-timer-expired');
+                        }
+                    }, 1000);
+                    // Notify opponent they have 60s
+                    io.to(opponentId).emit('start-mulligan-timer', { timeLeft: 60 });
+                    // Notify finisher to wait
+                    socket.emit('wait-for-mulligan', { timeLeft: 60 });
+                }
+            } else if (oppMulliganDone) {
+                // Both done! Clear timer and start game
+                if (game.mulliganTimer) {
+                    clearInterval(game.mulliganTimer);
+                    game.mulliganTimer = null;
+                }
+                io.to(gameCode).emit('mulligan-finished-all');
+            }
+
             if (opponentId) {
                 io.to(opponentId).emit('opponent-game-update', {
                     deckCount: state[deckKey].length
                 });
             }
+        }
+    });
+
+    socket.on('get-turn-info', (data) => {
+        const { gameCode } = data;
+        const game = games[gameCode];
+        if (game && game.gameState) {
+            const myTurn = game.gameState.currentTurn === socket.id;
+            socket.emit('turn-info', { myTurn });
         }
     });
 

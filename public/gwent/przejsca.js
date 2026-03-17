@@ -22,10 +22,28 @@ const przejscia = [
         czas: 2000
     },
     {
-        numer: "t00",
+        numer: "t05",
         opis: "Początek rundy",
         obraz: "assets/asety/przejscia/klepsydra.webp",
         czas: 2000
+    },
+    {
+        numer: "t07",
+        opis: "Twój ruch!",
+        obraz: "assets/asety/przejscia/ty.webp",
+        czas: 2000
+    },
+    {
+        numer: "t08",
+        opis: "Ruch przeciwnika",
+        obraz: "assets/asety/przejscia/ludzik.png",
+        czas: 2000
+    },
+    {
+        numer: "t06",
+        opis: "Przeciwnik wymienia karty {czas 60s}",
+        obraz: "assets/asety/przejscia/klepsydra.webp",
+        czas: 60000
     },
     {
         numer: "t11",
@@ -58,39 +76,33 @@ const przejscia = [
         czas: 2000
     },
     {
-        numer: "t21",
-        opis: "Twój ruch!",
-        obraz: "assets/asety/przejscia/ty.webp",
-        czas: 2000
-    },
-    {
-        numer: "t22",
-        opis: "'Ruch przeciwnika'",
-        obraz: "assets/asety/przejscia/ludzik.webp",
-        czas: 2000
-    },
-    {
-        numer: "t23",
-        opis: "Spasowałeś",
-        obraz: "assets/asety/przejscia/pass.webp",
-        czas: 2000
-    },
-    {
-        numer: "t24",
+        numer: "t20",
         opis: "Przeciwnik spasował",
         obraz: "assets/asety/przejscia/pass.webp",
         czas: 2000
     },
     {
-        numer: "t29",
-        opis: "ZWYCIĘSTWO!",
-        obraz: "assets/asety/przejscia/ty.webp",
+        numer: "t21",
+        opis: "Spasowałeś",
+        obraz: "assets/asety/przejscia/pass.webp",
+        czas: 2000
+    },
+    {
+        numer: "t22",
+        opis: "Przeciwnik wygrał tę rundę.",
+        obraz: "assets/asety/przejscia/lostr.webp",
         czas: 4000
     },
     {
-        numer: "t10",
-        opis: "PORAŻKA",
-        obraz: "assets/asety/przejscia/lostr.webp",
+        numer: "t23",
+        opis: "Wygrałeś tę rundę!",
+        obraz: "assets/asety/przejscia/winr.webp",
+        czas: 4000
+    },
+    {
+        numer: "t24",
+        opis: "Remis",
+        obraz: "assets/asety/przejscia/remisr.webp",
         czas: 4000
     }
 ];

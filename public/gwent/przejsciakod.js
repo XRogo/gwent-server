@@ -11,6 +11,8 @@ let isShowing = false;
 let currentTimeout = null;
 let currentOnFinish = null;
 
+export function getIsShowing() { return isShowing; }
+
 /**
  * Wyświetla baner przejściowy na środku ekranu.
  * @param {string} numer - numer przejścia z przejsca.js
@@ -103,14 +105,35 @@ function displayBanner(item) {
     text.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.8)';
     
     // Jeśli podano opis z \n, zamieniamy go na <br> i wyśrodkowujemy
-    const contentText = item.opcje.customOpis || item.opis;
+    let contentText = item.opcje.customOpis || item.opis;
+    
+    // Obsługa placeholderu {czas}
+    if (contentText.includes('{czas}')) {
+        const remaining = item.opcje.countDown || 60;
+        contentText = contentText.replace('{czas}', `${remaining}s`);
+        
+        // Jeśli to banner z odliczaniem, zróbmy go dynamicznym
+        if (item.opcje.countDown !== undefined) {
+             const timerId = setInterval(() => {
+                 const current = parseInt(text.dataset.seconds || remaining) - 1;
+                 if (current < 0) {
+                     clearInterval(timerId);
+                     return;
+                 }
+                 text.dataset.seconds = current;
+                 text.innerHTML = (item.opcje.customOpis || item.opis).replace('{czas}', `${current}s`).replace(/\n/g, '<br>');
+             }, 1000);
+             text.dataset.seconds = remaining;
+             banner.dataset.timerId = timerId;
+        }
+    }
+
+    text.innerHTML = contentText.replace(/\n/g, '<br>');
     if (contentText.includes('\n')) {
-        text.innerHTML = contentText.replace(/\n/g, '<br>');
         text.style.textAlign = 'center';
         text.style.whiteSpace = 'normal'; // Zezwala na łamanie wierszy
         text.style.lineHeight = '1.2';
     } else {
-        text.textContent = contentText;
         text.style.whiteSpace = 'nowrap';
     }
 
@@ -139,14 +162,28 @@ function displayBanner(item) {
     });
 
     // Automatyczne zniknięcie
-    const czas = item.opcje.customCzas || item.czas;
+    const displayTime = item.opcje.customCzas || item.czas || 2000;
     currentTimeout = setTimeout(() => {
-        currentTimeout = null;
-        hideBanner(() => {
+        // Fade Out
+        banner.style.opacity = '0';
+        inner.style.transform = 'translateX(30px)';
+        
+        setTimeout(() => {
+            if (banner.dataset.timerId) clearInterval(parseInt(banner.dataset.timerId));
+            banner.remove();
+            currentBanner = null;
+            currentOnFinish = null;
+            isShowing = false;
+            
             if (item.opcje.onFinish) item.opcje.onFinish();
-            processQueue();
-        });
-    }, czas);
+
+            // Pokaż następny z kolejki
+            if (bannerQueue.length > 0) {
+                const next = bannerQueue.shift();
+                displayBanner(next);
+            }
+        }, 400);
+    }, displayTime);
 }
 
 function skipCurrentBanner() {
