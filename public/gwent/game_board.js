@@ -7,9 +7,11 @@ import { animateLeaderFromDeck, animateDeckToHand, animateBoardToGraveyard, anim
 let playerHand = [];
 let drawPile = [];
 let playerGraveyard = [];
+let opponentGraveyard = []; // Now full array
 let opponentHandCount = 10;
 let opponentDeckCount = 12;
-let opponentGraveyardCount = 0;
+let isMulliganActive = false;
+let isProcessingMove = false; // Flag to prevent rapid clicks / double playing
 let swapsCount = 0;
 let playerLives = 2;
 let opponentLives = 2;
@@ -88,10 +90,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             playerHand = mapToObjects(data.hand);
             drawPile = mapToObjects(data.deck);
             playerGraveyard = mapToObjects(data.graveyard);
+            opponentGraveyard = mapToObjects(data.opponentGraveyard || []);
 
             opponentHandCount = data.opponentHandCount;
             opponentDeckCount = data.opponentDeckCount;
-            opponentGraveyardCount = data.opponentGraveyardCount || 0;
             window.playerFaction = data.faction || localStorage.getItem('faction') || '1';
             window.opponentFaction = data.opponentFaction;
             swapsCount = data.swapsPerformed || 0;
@@ -168,6 +170,18 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
     });
 
+    socket.on('card-moved-to-graveyard', (data) => {
+        const { card, side } = data;
+        const cardObj = cards.find(c => c.numer === card.numer);
+        if (cardObj) {
+            if (side === 'p1') {
+                playerGraveyard.push(cardObj);
+            } else {
+                opponentGraveyard.push(cardObj);
+            }
+        }
+    });
+
     socket.on('initial-cards-dealt', (data) => {
         const { hand } = data;
         const handObjects = hand.map(num => cards.find(c => c.numer === num)).filter(Boolean);
@@ -226,7 +240,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         if (cardObj) {
             playerHand[cardIndex] = cardObj;
             console.log(`[BOARD] Swap successful: Index ${cardIndex} -> ${cardObj.nazwa}`);
-            if (window.renderPowiek) window.renderPowiek();
+            renderPowiek();
         }
         swapsCount = 2 - swapsLeft;
 
@@ -245,6 +259,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             if (window.hidePowiek) window.hidePowiek();
             
             window.arrivedHandIndices.delete(cardIndex);
+            renderAll(currentNick);
             
             animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
                 window.arrivedHandIndices.add(cardIndex);
@@ -258,6 +273,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         } else {
             // Animacja dla pojedynczej wymiany
             window.arrivedHandIndices.delete(cardIndex);
+            renderAll(currentNick);
             animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
                 window.arrivedHandIndices.add(cardIndex);
                 renderAll(currentNick);
@@ -290,8 +306,8 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     socket.on('mulligan-finished-all', () => {
         hidePrzejscie(true); // Close t06 instantly
         showPrzejscie('t05', { onFinish: () => {
-            // Po t05 (początek rundy) pokazujemy kto zaczyna
-            socket.emit('get-turn-info', { gameCode: gameCodeLocal });
+            const isMyTurn = currentTurn === window.socket.id;
+            showPrzejscie(isMyTurn ? 't07' : 't08');
         }});
     });
 
@@ -303,7 +319,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     socket.on('opponent-game-update', (data) => {
         if (data.handCount !== undefined) opponentHandCount = data.handCount;
         if (data.deckCount !== undefined) opponentDeckCount = data.deckCount;
-        if (data.graveyardCount !== undefined) opponentGraveyardCount = data.graveyardCount;
+        if (data.graveyard) {
+            const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
+            opponentGraveyard = mapToObjects(data.graveyard);
+        }
         if (data.faction !== undefined) window.opponentFaction = data.faction;
         renderAll(nick);
     });
@@ -323,7 +342,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         currentTurn = data.currentTurn;
         opponentHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
         
-        if (data.p1Lives !== undefined) {
+        if (data.p1Graveyard) {
+            const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
+            playerGraveyard = mapToObjects(isPlayer1Local ? data.p1Graveyard : data.p2Graveyard);
+            opponentGraveyard = mapToObjects(isPlayer1Local ? data.p2Graveyard : data.p1Graveyard);
+        }
+
+        if (prevTurn !== currentTurn && !playerPassed && !opponentPassed) {
             playerLives = isPlayer1Local ? data.p1Lives : data.p2Lives;
             opponentLives = isPlayer1Local ? data.p2Lives : data.p1Lives;
             playerPassed = isPlayer1Local ? data.p1Passed : data.p2Passed;
@@ -340,23 +365,37 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 showPrzejscie(isMyTurn ? 't07' : 't08');
             }
         }
+        isProcessingMove = false; // Reset flag after turn sync
     });
 
-    socket.on('player-passed', () => {
-        playerPassed = true;
-        showPrzejscie('t21', { onFinish: () => {
-            // After I pass, it's opponent's turn automatically
-            if (!opponentPassed) showPrzejscie('t08');
-        }});
-        renderAll(currentNick);
+    socket.on('play-error', (data) => {
+        console.error("[BOARD] Play error:", data.error);
+        isProcessingMove = false; // Unlock if server failed
+        // Re-initialize might be needed here to re-sync
+        socket.emit('get-game-state', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
     });
 
-    socket.on('opponent-passed', () => {
-        opponentPassed = true;
-        showPrzejscie('t20', { onFinish: () => {
-            // After opponent passes, it's my turn
-            if (!playerPassed) showPrzejscie('t07');
-        }});
+    socket.on('player-passed', (data) => {
+        const { isPlayer1 } = data;
+        const passedPlayerIsLocal = isPlayer1 === isPlayer1Local;
+
+        if (passedPlayerIsLocal) {
+            playerPassed = true;
+            // Only show pass banner if opponent hasn't passed yet
+            if (!opponentPassed) {
+                showPrzejscie('t21', { onFinish: () => {
+                    showPrzejscie('t08');
+                }});
+            }
+        } else {
+            opponentPassed = true;
+            // Only show pass banner if player hasn't passed yet
+            if (!playerPassed) {
+                showPrzejscie('t20', { onFinish: () => {
+                    showPrzejscie('t07');
+                }});
+            }
+        }
         renderAll(currentNick);
     });
 
@@ -366,14 +405,26 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('next-round-started', (data) => {
         console.log("[BOARD] Przejście do nowej rundy...");
-        boardState = data.board;
-        currentTurn = data.currentTurn;
+        const { board, currentTurn: newTurn, p1Graveyard, p2Graveyard } = data;
+        const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
+
+        boardState = board;
+        currentTurn = newTurn;
+        if (p1Graveyard) {
+            const gy = isPlayer1Local ? p1Graveyard : p2Graveyard;
+            const ogy = isPlayer1Local ? p2Graveyard : p1Graveyard;
+            playerGraveyard = mapToObjects(gy);
+            opponentGraveyard = mapToObjects(ogy);
+        }
         playerPassed = false;
         opponentPassed = false;
         renderAll(currentNick);
-        // Show who starts
-        const isMyTurn = currentTurn === window.socket.id;
-        showPrzejscie(isMyTurn ? 't07' : 't08');
+        
+        // Faza startowa rundy - t05, potem t07/08
+        showPrzejscie('t05', { onFinish: () => {
+            const isMyTurn = currentTurn === window.socket.id;
+            showPrzejscie(isMyTurn ? 't07' : 't08');
+        }});
     });
 }
 
@@ -417,7 +468,7 @@ function handleScoiaDecision(socket, gameCode, deciderId) {
         
         box.appendChild(title);
         btnsBox.appendChild(btnFirst);
-        btnsBox.appendChild(btnSecond);
+btnsBox.appendChild(btnSecond);
         box.appendChild(btnsBox);
         box.appendChild(timerText);
         overlay.appendChild(box);
@@ -473,6 +524,20 @@ export function renderAll(nick) {
     const overlay = document.querySelector('#gameScreen .overlay');
     if (!overlay) return;
     overlay.innerHTML = '';
+
+    // Turn indicator using images
+    if (currentTurn) {
+        const turnDiv = document.createElement('div');
+        turnDiv.style.position = 'absolute';
+        turnDiv.style.inset = '0';
+        const isMyTurn = currentTurn === window.socket.id;
+        turnDiv.style.background = `url('assets/asety/${isMyTurn ? 'ytruch.webp' : 'przeciwnikruch.webp'}') no-repeat center`;
+        turnDiv.style.backgroundSize = 'contain';
+        turnDiv.style.pointerEvents = 'none';
+        turnDiv.style.zIndex = '1000'; // High z-index to stay above piled cards
+        overlay.appendChild(turnDiv);
+    }
+
     renderHand(overlay);
     renderNicknames(overlay, nick);
     renderStats(overlay);
@@ -482,22 +547,6 @@ export function renderAll(nick) {
     renderPiles(overlay);
     renderLeaders(overlay);
     renderRows(overlay);
-    
-    // Turn indicator (mały napis u góry - uzupełnienie do banerów)
-    if (currentTurn) {
-        const turnDiv = document.createElement('div');
-        turnDiv.style.position = 'absolute';
-        turnDiv.style.top = '10px';
-        turnDiv.style.left = '50%';
-        turnDiv.style.transform = 'translateX(-50%)';
-        turnDiv.style.color = '#c7a76e';
-        turnDiv.style.fontSize = `${28 * Math.min(window.innerWidth / 3840, window.innerHeight / 2160)}px`;
-        turnDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-        turnDiv.style.opacity = '0.6';
-        const isMyTurn = currentTurn === window.socket.id;
-        turnDiv.textContent = isMyTurn ? 'TWOJA TURA' : 'TURA PRZECIWNIKA';
-        overlay.appendChild(turnDiv);
-    }
 }
 
 function renderStats(overlay) {
@@ -714,8 +763,8 @@ function renderHand(overlay) {
         wrapper.style.position = 'relative';
         wrapper.style.flexShrink = '0';
 
-        // Ukryj kartę jeśli jeszcze nie doleciała podczas animacji startowej
-        if (!window.cardsAnimated && !window.arrivedHandIndices.has(i)) {
+        // Ukryj kartę jeśli jeszcze nie doleciała
+        if (!window.arrivedHandIndices.has(i)) {
             wrapper.style.visibility = 'hidden';
         }
 
@@ -768,6 +817,7 @@ function updateHandVisuals(container, scale) {
 }
 
 function playCardAtIndex(index) {
+    if (isProcessingMove) return; // Prevent spamming
     if (index < 0 || index >= playerHand.length) {
         console.log(`[BOARD] Attempted to play card at invalid index: ${index}`);
         return;
@@ -788,6 +838,10 @@ function playCardAtIndex(index) {
     }
 
     const card = playerHand[index];
+    if (!card) return;
+
+    isProcessingMove = true; // Lock the UI until turn changes
+
     const gameCode = gameCodeLocal;
     const isP1 = isPlayer1Local;
     
@@ -902,30 +956,49 @@ function renderGraveyards(overlay) {
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const gy = document.createElement('div');
-    gy.className = 'graveyard-container';
-    gy.style.left = `${3457 * scale + boardLeft}px`;
-    gy.style.top = `${1654 * scale + boardTop}px`;
-    gy.style.width = `${180 * scale}px`;
-    gy.style.height = `${240 * scale}px`;
+    const renderGraveyardGroup = (x, y, cardList, isOpponent) => {
+        const count = cardList.length;
+        if (count === 0) return;
 
-    if (playerGraveyard.length > 0) {
-        const topCard = playerGraveyard[playerGraveyard.length - 1];
-        gy.style.backgroundImage = `url('${topCard.karta}')`;
-        gy.style.backgroundSize = 'contain';
-        gy.style.cursor = 'pointer';
-        gy.onclick = () => showPowiek(playerGraveyard, playerGraveyard.length - 1, 'game');
-    }
-    overlay.appendChild(gy);
+        // Render stack (bottom card i=0 at [X, Y])
+        for (let i = 0; i < count; i++) {
+            const cardObj = cardList[i];
+            const cardW = 179 * scale;
+            const cardH = 239 * scale;
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            const offset = i; 
+            wrapper.style.left = `${(x - offset) * scale + boardLeft}px`;
+            wrapper.style.top = `${(y - offset) * scale + boardTop}px`;
+            wrapper.style.width = `${cardW}px`;
+            wrapper.style.height = `${cardH}px`;
+            wrapper.style.zIndex = 5 + i;
+            
+            const img = document.createElement('img');
+            img.src = cardObj.karta;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.display = 'block';
+            wrapper.appendChild(img);
 
-    const ogy = document.createElement('div');
-    ogy.className = 'graveyard-container o-graveyard';
-    ogy.style.left = `${3457 * scale + boardLeft}px`;
-    ogy.style.top = `${131 * scale + boardTop}px`;
-    ogy.style.width = `${180 * scale}px`;
-    ogy.style.height = `${240 * scale}px`;
-    ogy.style.transform = 'rotate(180deg)';
-    overlay.appendChild(ogy);
+            if (i === count - 1) { // Top card
+                wrapper.style.cursor = 'pointer';
+                wrapper.onclick = () => {
+                    if (window.showPowiek) window.showPowiek(cardList, cardList.length - 1, 'game');
+                };
+                // Dodaj punkty tylko dla górnej karty
+                addCardPointsOverlay(wrapper, cardObj, cardW, cardH);
+            }
+            overlay.appendChild(wrapper);
+        }
+    };
+
+    // Corrected positions for graveyard stacking
+    // Player GY: 3110, 1682
+    renderGraveyardGroup(3110, 1682, playerGraveyard, false);
+    // Opponent GY: 3110, 168 (No rotate, show faces)
+    renderGraveyardGroup(3110, 168, opponentGraveyard, true);
 }
 
 function renderRows(overlay) {
@@ -979,6 +1052,12 @@ function renderRows(overlay) {
                 img.style.display = 'block';
                 wrapper.appendChild(img);
 
+                // Atrybuty do animacji cmentarza
+                wrapper.className = 'board-card-wrapper';
+                wrapper.dataset.numer = card.numer;
+                const rowRealKey = rowKey.startsWith('p1') ? 'p1' : 'p2';
+                wrapper.dataset.side = rowRealKey;
+
                 // Punkty na karcie
                 addCardPointsOverlay(wrapper, card, rowCardW, rowCardH);
 
@@ -996,6 +1075,9 @@ function renderRows(overlay) {
 
         const img = document.createElement('img');
         img.src = card.karta;
+        img.className = 'board-card-wrapper'; // Specjalny slot też jest kartą na planszy
+        img.dataset.numer = card.numer;
+        img.dataset.side = sidePrefix;
         img.style.position = 'absolute';
         // x: 1182 - 1361 (w: 179)
         img.style.left = `${1182 * scale + boardLeft}px`;
@@ -1168,25 +1250,32 @@ function renderLeaders(overlay) {
     }
 }
 
-function collectCardsOnBoard(isOpponent) {
-    const side = isOpponent ? (isPlayer1Local ? 'p2' : 'p1') : (isPlayer1Local ? 'p1' : 'p2');
+function collectCardsOnBoardDOM(isTargetOpponent) {
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
     const boardCards = [];
+    const wrappers = document.querySelectorAll('.board-card-wrapper');
     
-    // Rows 1, 2, 3
-    [1, 2, 3].forEach(rowIdx => {
-        const rowKey = `${side}R${rowIdx}`;
-        const rowCards = boardState[rowKey] || [];
-        rowCards.forEach((cardNum, i) => {
+    wrappers.forEach(w => {
+        const side = w.dataset.side; // 'p1' or 'p2'
+        const isActuallyOpponent = (isPlayer1Local && side === 'p2') || (!isPlayer1Local && side === 'p1');
+        
+        if (isActuallyOpponent === isTargetOpponent) {
+            const rect = w.getBoundingClientRect();
+            const cardNum = w.dataset.numer;
             const cardObj = cards.find(c => c.numer === cardNum);
             if (cardObj) {
-                // Approximate position for animation
-                const areaLeft = 1412, areaTop = isOpponent ? (29 + (3-rowIdx)*265) : (863 + (rowIdx-1)*265);
                 boardCards.push({
                     card: cardObj,
-                    currentPos4K: { x: areaLeft + i * 150, y: areaTop }
+                    currentPos4K: {
+                        x: (rect.left - boardLeft) / scale,
+                        y: (rect.top - boardTop) / scale
+                    }
                 });
             }
-        });
+        }
     });
     return boardCards;
 }
@@ -1194,31 +1283,36 @@ function collectCardsOnBoard(isOpponent) {
 function handleRoundEnd(data) {
     const { winner, p1Score, p2Score, p1Lives, p2Lives } = data;
     
-    // Collect all cards currently on the board
-    const myBoardCards = collectCardsOnBoard(false);
-    const oppBoardCards = collectCardsOnBoard(true);
+    // 1. Zidentyfikuj karty na planszy ZANIM je wyczyścisz
+    const myBoardCards = collectCardsOnBoardDOM(false);
+    const oppBoardCards = collectCardsOnBoardDOM(true);
 
-    // Animate to graveyards
+    // 2. Wybierz kod banera
+    let bannerCode = 't24'; // Remis
+    if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23'; // Wygrana
+    else if (winner) bannerCode = 't22'; // Przegrana
+
+    // 3. Pokaz baner i RÓWNOLEGLE zacznij animację czyszczenia
+    showPrzejscie(bannerCode);
+    
+    // Lokalne czyszczenie stanu, żeby karta zniknęła z "tła" a została tylko animacja
+    boardState = {
+        p1R1:[], p1R2:[], p1R3:[], p2R1:[], p2R2:[], p2R3:[],
+        p1S1:null, p1S2:null, p1S3:null, p2S1:null, p2S2:null, p2S3:null
+    };
+    renderAll(currentNick);
+
+    // Animacja trupów
     animateBoardToGraveyard(myBoardCards, false, playerGraveyard.length, () => {
-        console.log("[BOARD] Player cards moved to graveyard.");
+        myBoardCards.forEach(item => playerGraveyard.push(item.card));
+        renderAll(currentNick);
     });
-    animateBoardToGraveyard(oppBoardCards, true, opponentGraveyardCount, () => {
-        console.log("[BOARD] Opponent cards moved to graveyard.");
+    animateBoardToGraveyard(oppBoardCards, true, opponentGraveyard.length, () => {
+        oppBoardCards.forEach(item => opponentGraveyard.push(item.card));
+        renderAll(currentNick);
     });
 
-    // Show result banner after a short delay for animation
-    setTimeout(() => {
-        playerLives = isPlayer1Local ? p1Lives : p2Lives;
-        opponentLives = isPlayer1Local ? p2Lives : p1Lives;
-
-        let bannerCode = 't24'; // Remis
-        if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23'; // Wygrana
-        else if (winner) bannerCode = 't22'; // Przegrana
-
-        showPrzejscie(bannerCode, {
-            onFinish: () => {
-                // Re-render handled by board-updated from server
-            }
-        });
-    }, 1500);
+    // Aktualizacja żyć po animacji (lub w jej trakcie)
+    playerLives = isPlayer1Local ? p1Lives : p2Lives;
+    opponentLives = isPlayer1Local ? p2Lives : p1Lives;
 }

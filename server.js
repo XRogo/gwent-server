@@ -414,13 +414,12 @@ io.on('connection', (socket) => {
                 if (gameState.faction) state.p2Faction = gameState.faction;
             }
             console.log(`[GAME] State saved for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}`);
-
             const targetId = isPlayer1 ? games[gameCode].player2 : games[gameCode].player1;
             if (targetId) {
                 io.to(targetId).emit('opponent-game-update', {
                     handCount: gameState.hand ? gameState.hand.length : undefined,
                     deckCount: gameState.deck ? gameState.deck.length : undefined,
-                    graveyardCount: gameState.graveyard ? gameState.graveyard.length : undefined,
+                    graveyard: isPlayer1 ? state.p1Graveyard : state.p2Graveyard,
                     faction: gameState.faction
                 });
             }
@@ -456,7 +455,7 @@ io.on('connection', (socket) => {
                 swapsPerformed: isPlayer1 ? (game.p1Swaps || 0) : (game.p2Swaps || 0),
                 opponentHandCount: isPlayer1 ? (state.p2Hand ? state.p2Hand.length : 0) : (state.p1Hand ? state.p1Hand.length : 0),
                 opponentDeckCount: isPlayer1 ? (state.p2Deck ? state.p2Deck.length : 0) : (state.p1Deck ? state.p1Deck.length : 0),
-                opponentGraveyardCount: isPlayer1 ? (state.p2Graveyard ? state.p2Graveyard.length : 0) : (state.p1Graveyard ? state.p1Graveyard.length : 0),
+                opponentGraveyard: isPlayer1 ? state.p2Graveyard : state.p1Graveyard,
                 opponentFaction: isPlayer1 ? state.p2Faction : state.p1Faction,
                 status: game.status,
                 currentTurn: state.currentTurn,
@@ -599,7 +598,11 @@ io.on('connection', (socket) => {
             }
 
             const hand = isPlayer1 ? state.p1Hand : state.p2Hand;
-            const cardIdx = hand.findIndex(c => (typeof c === 'object' ? c.numer === cardNumer : c === cardNumer));
+            // Use loose comparison (==) or common type to avoid string/number mismatch
+            const cardIdx = hand.findIndex(c => {
+                const itemNumer = (typeof c === 'object' ? c.numer : c);
+                return String(itemNumer) === String(cardNumer);
+            });
             
             if (cardIdx !== -1) {
                 const side = isPlayer1 ? 'p1' : 'p2';
@@ -649,7 +652,9 @@ io.on('connection', (socket) => {
                     p1Lives: state.p1Lives,
                     p2Lives: state.p2Lives,
                     p1Passed: state.p1Passed,
-                    p2Passed: state.p2Passed
+                    p2Passed: state.p2Passed,
+                    p1Graveyard: state.p1Graveyard,
+                    p2Graveyard: state.p2Graveyard
                 });
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
@@ -657,11 +662,15 @@ io.on('connection', (socket) => {
                 if (targetId) {
                     io.to(targetId).emit('opponent-game-update', {
                         handCount: hand.length,
-                        board: state.board
+                        board: state.board,
+                        graveyard: isPlayer1 ? state.p1Graveyard : state.p2Graveyard
                     });
                 }
             } else {
-                console.warn(`[GAME] Card ${cardNumer} not found in hand for ${isPlayer1 ? 'P1' : 'P2'}`);
+                const playerSide = isPlayer1 ? 'P1' : 'P2';
+                console.warn(`[GAME] Card ${cardNumer} not found in hand for ${playerSide}. Hand has: ${JSON.stringify(hand)}`);
+                // Optional: Notify client to resync
+                socket.emit('play-error', { error: 'Card not in hand' });
             }
         }
     });
@@ -676,12 +685,13 @@ io.on('connection', (socket) => {
             const mySide = isPlayer1 ? 'p1' : 'p2';
             state[mySide + 'Passed'] = true;
 
-            console.log(`[GAME] [${gameCode}] ${mySide} PASSED.`);
-            io.to(gameCode).emit('player-passed', { isPlayer1 });
-
             if (state.p1Passed && state.p2Passed) {
+                // If both passed, skip the "player-passed" banner and go straight to evaluation
                 evaluateRound(gameCode);
             } else {
+                console.log(`[GAME] [${gameCode}] ${mySide} PASSED.`);
+                io.to(gameCode).emit('player-passed', { isPlayer1 });
+                
                 state.currentTurn = isPlayer1 ? game.player2 : game.player1;
                 io.to(gameCode).emit('board-updated', {
                     board: state.board,
@@ -739,7 +749,19 @@ io.on('connection', (socket) => {
                 if (state.p2Lives > 0) gameResult = 'p2';
                 io.to(gameCode).emit('game-over', { gameResult });
             } else {
-                // Clear board
+                // Before clearing, move board cards to graveyard
+                if (state.board) {
+                    ['p1R1', 'p1R2', 'p1R3'].forEach(r => state.p1Graveyard.push(...(state.board[r] || [])));
+                    if (state.board.p1S1) state.p1Graveyard.push(state.board.p1S1);
+                    if (state.board.p1S2) state.p1Graveyard.push(state.board.p1S2);
+                    if (state.board.p1S3) state.p1Graveyard.push(state.board.p1S3);
+
+                    ['p2R1', 'p2R2', 'p2R3'].forEach(r => state.p2Graveyard.push(...(state.board[r] || [])));
+                    if (state.board.p2S1) state.p2Graveyard.push(state.board.p2S1);
+                    if (state.board.p2S2) state.p2Graveyard.push(state.board.p2S2);
+                    if (state.board.p2S3) state.p2Graveyard.push(state.board.p2S3);
+                }
+
                 state.board = {
                     p1R1: [], p1R2: [], p1R3: [],
                     p2R1: [], p2R2: [], p2R3: [],
@@ -749,14 +771,16 @@ io.on('connection', (socket) => {
                 state.p1Passed = false;
                 state.p2Passed = false;
                 
-                // Winner goes first or random if draw
-                if (roundResult === 'p1') state.currentTurn = game.player1;
-                else if (roundResult === 'p2') state.currentTurn = game.player2;
+                // Loser goes first or random if draw
+                if (roundResult === 'p1') state.currentTurn = game.player2; // P1 won, P2 starts
+                else if (roundResult === 'p2') state.currentTurn = game.player1; // P2 won, P1 starts
                 else state.currentTurn = Math.random() < 0.5 ? game.player1 : game.player2;
 
                 io.to(gameCode).emit('next-round-started', {
                     board: state.board,
-                    currentTurn: state.currentTurn
+                    currentTurn: state.currentTurn,
+                    p1Graveyard: state.p1Graveyard,
+                    p2Graveyard: state.p2Graveyard
                 });
             }
         }, 5000);

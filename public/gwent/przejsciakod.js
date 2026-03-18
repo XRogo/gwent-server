@@ -142,7 +142,7 @@ function displayBanner(item) {
         text.style.textTransform = 'none';
         text.style.fontSize = `${48 * scale}px`; // mniejsza czcionka dla długich opisów
     } else {
-        text.style.textTransform = 'uppercase';
+        text.style.textTransform = 'none'; // Zmiana zgodnie z prośbą (zachowanie oryginalnej wielkości liter)
         text.style.fontSize = `${72 * scale}px`;
     }
 
