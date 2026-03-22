@@ -9,8 +9,10 @@ const SPEED_4K = 3480; // px/s w skali 4K
 
 // Pozycje w skali 4K
 const PILE_PLAYER = { x: 3459, y: 1656 };
+const PILE_OPPONENT = { x: 3459, y: 132 };
 const HAND_CENTER = { x: 2090, y: 1811 };
 const LEADER_PLAYER = { x: 286, y: 1679 };
+const LEADER_OPPONENT = { x: 286, y: 174 };
 const GRAVEYARD_PLAYER = { x: 3110, y: 1682 };
 const GRAVEYARD_OPPONENT = { x: 3110, y: 168 };
 
@@ -119,6 +121,17 @@ export function animateLeaderFromDeck(leaderObj, onDone) {
     );
 }
 
+export function animateOpponentLeaderFromDeck(leaderObj, onDone) {
+    if (!leaderObj) { if (onDone) onDone(); return; }
+    animateCard(
+        leaderObj.karta,
+        PILE_OPPONENT,
+        LEADER_OPPONENT,
+        180, 240,
+        onDone
+    );
+}
+
 /**
  * Tworzy element karty identyczny jak ten w ręce.
  */
@@ -148,12 +161,13 @@ function createCardElement(card, w4K, h4K) {
  * @param {function} [onAllDone] - callback po wszystkich
  * @param {function} [onCardDone] - callback po każdej karcie (przekazuje indeks)
  */
-export function animateDeckToHand(handCards, targets4K, onAllDone, onCardDone) {
+export function animateDeckToHand(handCards, targets4K, onAllDone, onCardDone, isOpponent = false) {
     if (!handCards || handCards.length === 0) {
         if (onAllDone) onAllDone();
         return;
     }
     
+    const source = isOpponent ? PILE_OPPONENT : PILE_PLAYER;
     let done = 0;
     const count = handCards.length;
     const elements = [];
@@ -161,7 +175,7 @@ export function animateDeckToHand(handCards, targets4K, onAllDone, onCardDone) {
     handCards.forEach((card, i) => {
         const target = targets4K[i] || HAND_CENTER;
         const el = createCardElement(card, 180, 240);
-        animateElement(el, PILE_PLAYER, target, 180, 240, () => {
+        animateElement(el, source, target, 180, 240, () => {
             if (onCardDone) onCardDone(i);
             done++;
             if (done >= count && onAllDone) onAllDone();

@@ -1,8 +1,32 @@
 import cards from './cards.js';
+import { renderCardHTML } from './bcard_render.js';
 import { showPowiek, renderPowiek } from './rcard.js';
 import { krole } from './krole.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
-import { animateLeaderFromDeck, animateDeckToHand, animateBoardToGraveyard, animateCardToDeck } from './animacje.js';
+import { animateLeaderFromDeck, animateOpponentLeaderFromDeck, animateDeckToHand, animateBoardToGraveyard, animateCardToDeck } from './animacje.js';
+
+// Preload card images to avoid flickering when they appear in hand/board
+function preloadCardImages() {
+    console.log("[BOARD] Preloading card assets...");
+    cards.forEach(card => {
+        if (card.karta) {
+            const img = new Image();
+            img.src = card.karta;
+        }
+    });
+
+    // Also preload card backs for animations
+    const backs = [
+        'polnoc_rewers.webp', 'nilftgard_rewers.webp', 
+        "scoia'tel_rewers.webp", 'potwory_rewers.webp', 
+        'skelige_rewers.webp'
+    ];
+    backs.forEach(b => {
+        const img = new Image();
+        img.src = `/gwent/assets/asety/${b}`;
+    });
+}
+preloadCardImages();
 
 let playerHand = [];
 let drawPile = [];
@@ -39,8 +63,11 @@ const factionInfo = {
 };
 
 window.leaderAnimated = false;
+window.opponentLeaderAnimated = false;
 window.cardsAnimated = false;
-window.arrivedHandIndices = new Set();
+window.arrivedCards = new Set();
+window.proposedCard = null; // Karta wybrana do potwierdzenia propozycji zagrania
+window.proposedTargetRow = null; 
 
 function sortHand() {
     playerHand.sort((a, b) => {
@@ -85,12 +112,19 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('init-game-state', (data) => {
         if (data.hand) {
-            const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === num)).filter(Boolean);
+            const mapToObjects = (numerArray) => (numerArray || []).map(num => {
+                const c = cards.find(card => card.numer === String(num));
+                return c ? { ...c, _id: Math.random() } : null;
+            }).filter(Boolean);
 
             playerHand = mapToObjects(data.hand);
             drawPile = mapToObjects(data.deck);
             playerGraveyard = mapToObjects(data.graveyard);
             opponentGraveyard = mapToObjects(data.opponentGraveyard || []);
+
+            // Since it's init, all cards in hand are "arrived"
+            playerHand.forEach(c => window.arrivedCards.add(c));
+            window.cardsAnimated = true;
 
             opponentHandCount = data.opponentHandCount;
             opponentDeckCount = data.opponentDeckCount;
@@ -137,10 +171,18 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                         window.gameStarted = true;
                         hidePrzejscie(true); // Natychmiast ukryj ewentualne komunikaty t13
                         
-                        // Animacja dowódcy z kupki na pozycję (jednocześnie z banerem)
+                        // Animacja dowódcy gracza
                         if (playerLeaderObj) {
                             animateLeaderFromDeck(playerLeaderObj, () => {
                                 window.leaderAnimated = true;
+                                renderAll(currentNick);
+                            });
+                        }
+
+                        // Animacja dowódcy przeciwnika
+                        if (opponentLeaderObj) {
+                            animateOpponentLeaderFromDeck(opponentLeaderObj, () => {
+                                window.opponentLeaderAnimated = true;
                                 renderAll(currentNick);
                             });
                         }
@@ -158,6 +200,12 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                         if (playerLeaderObj) {
                             animateLeaderFromDeck(playerLeaderObj, () => {
                                 window.leaderAnimated = true;
+                                renderAll(currentNick);
+                            });
+                        }
+                        if (opponentLeaderObj) {
+                            animateOpponentLeaderFromDeck(opponentLeaderObj, () => {
+                                window.opponentLeaderAnimated = true;
                                 renderAll(currentNick);
                             });
                         }
@@ -182,45 +230,49 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
     });
 
-    socket.on('initial-cards-dealt', (data) => {
+        socket.on('initial-cards-dealt', (data) => {
         const { hand } = data;
-        const handObjects = hand.map(num => cards.find(c => c.numer === num)).filter(Boolean);
+        const handObjects = hand.map(num => {
+            const c = cards.find(card => card.numer === String(num));
+            return c ? { ...c, _id: Math.random() } : null;
+        }).filter(Boolean);
         
-        // Obliczamy pozycje docelowe w ręce (4K)
-        // Logika flex-center:
-        const areaLeft = 1163, areaRight = 3018, areaTop = 1691;
-        const areaWidth = areaRight - areaLeft;
-        const cardW = 180;
-        const count = handObjects.length;
-        const totalCardsWidth = count * cardW;
-        
-        // Centrowanie
-        const startX = areaLeft + (areaWidth - totalCardsWidth) / 2;
-        const targets = handObjects.map((_, i) => ({
-            x: startX + i * cardW,
-            y: areaTop
-        }));
+        // Aktualizacja lokalnej talii (drawPile) - usuń tylko te wystąpienia które doleciały do ręki
+        if (drawPile.length > 0) {
+            handObjects.forEach(hCard => {
+                const idx = drawPile.findIndex(dCard => dCard.numer === hCard.numer);
+                if (idx !== -1) drawPile.splice(idx, 1);
+            });
+        }
 
         // Natychmiast otwórz mulligan (animacje lecą "pod" nim)
         playerHand = handObjects;
-        sortHand(); // Sortujemy zanim wyliczymy pozycje docelowe i zaczniemy animację
+        sortHand(); 
+
+        const areaLeft = 1163, areaRight = 3018, areaTop = 1691, cardW = 180;
+        const count = playerHand.length;
+        const totalAreaWidth = (areaRight - areaLeft);
         
-        // Ponowne wyliczenie pozycji po posortowaniu
+        let cardStep = cardW + 5;
+        if (count * cardStep > totalAreaWidth) {
+            cardStep = (totalAreaWidth - cardW) / (count - 1);
+        }
+        const occupiedWidth = (count - 1) * cardStep + cardW;
+        const startX = (totalAreaWidth - occupiedWidth) / 2;
+
         const sortedTargets = playerHand.map((_, i) => ({
-            x: startX + i * cardW,
+            x: areaLeft + startX + i * cardStep,
             y: areaTop
         }));
 
-        window.arrivedHandIndices.clear();
+        window.arrivedCards.clear();
 
         // Rozpoczynamy animację kart do ręki (w tle)
         animateDeckToHand(playerHand, sortedTargets, () => {
-            console.log("[BOARD] All cards have arrived.");
             window.cardsAnimated = true;
             renderAll(currentNick);
         }, (index) => {
-            // Ta konkretna karta doleciała
-            window.arrivedHandIndices.add(index);
+            window.arrivedCards.add(playerHand[index]);
             renderAll(currentNick);
         });
 
@@ -235,11 +287,17 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     socket.on('mulligan-swap-success', (data) => {
         const { newCard, swapsLeft, cardIndex } = data;
         const oldCardObj = playerHand[cardIndex]; // Save old card for animation
-        const cardObj = cards.find(c => c.numer === newCard);
+        const rawCard = cards.find(c => c.numer === String(newCard));
+        const cardObj = rawCard ? { ...rawCard, _id: Math.random() } : null;
 
         if (cardObj) {
             playerHand[cardIndex] = cardObj;
             console.log(`[BOARD] Swap successful: Index ${cardIndex} -> ${cardObj.nazwa}`);
+            
+            // Sync local drawPile - remove the card that just arrived in hand
+            const dIdx = drawPile.findIndex(c => String(c.numer) === String(newCard));
+            if (dIdx !== -1) drawPile.splice(dIdx, 1);
+
             renderPowiek();
         }
         swapsCount = 2 - swapsLeft;
@@ -255,27 +313,55 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
 
         if (swapsLeft <= 0) {
-            // Immediate close after 2nd swap (don't wait for animation to end)
+            // 1. Zakończenie wymiany (zamknięcie okna)
+            window.mulliganFinished = true; // Set early to avoid onClose redundancy
             if (window.hidePowiek) window.hidePowiek();
             
-            window.arrivedHandIndices.delete(cardIndex);
-            renderAll(currentNick);
+            // 2. Posortowanie kart (zmienia indeksy w playerHand)
+            sortHand();
             
-            animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
-                window.arrivedHandIndices.add(cardIndex);
-                sortHand(); // Sort ONLY after closing
-                window.arrivedHandIndices = new Set(playerHand.map((_, i) => i)); // Reveal all after sort
-                window.mulliganFinished = true; // Zaznacz, że faza jest skończona
+            // Znajdź nowy indeks podmienionej karty po posortowaniu
+            const newIndex = playerHand.findIndex(c => c === cardObj);
+            
+            // Ukryj tylko tę nową kartę dopóki nie doleci (arrivedCards już ma inne)
+            window.arrivedCards.delete(cardObj);
+            
+            // Renderujemy rąkę z "dziurą" na nową kartę
+            renderAll(currentNick);
+
+            // Obliczamy pozycję 4K docelową dla nowej karty w posortowanej ręce
+            // Używamy getBoundingClientRect na ukrytym elemencie (który renderAll właśnie wstawił)
+            const wrappers = document.querySelectorAll('.hand-card-img');
+            const targetEl = Array.from(wrappers).find(el => parseInt(el.dataset.index) === newIndex);
+            
+            const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
+            const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
+            const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
+            const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
+            
+            let finalTarget = { x: startXInHand, y: areaTop }; // Fallback
+            if (targetEl) {
+                const rect = targetEl.getBoundingClientRect();
+                finalTarget = {
+                    x: (rect.left - boardLeft) / scale,
+                    y: (rect.top - boardTop) / scale
+                };
+            }
+
+            // 3. Animacja wymiany do DOCELOWEJ posortowanej pozycji
+            animateDeckToHand([cardObj], [finalTarget], () => {
+                window.arrivedCards.add(cardObj);
+                window.mulliganFinished = true;
                 socket.emit('end-mulligan', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
                 renderAll(currentNick);
             });
 
         } else {
             // Animacja dla pojedynczej wymiany
-            window.arrivedHandIndices.delete(cardIndex);
+            window.arrivedCards.delete(cardObj);
             renderAll(currentNick);
             animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
-                window.arrivedHandIndices.add(cardIndex);
+                window.arrivedCards.add(cardObj);
                 renderAll(currentNick);
             });
         }
@@ -340,7 +426,8 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         const prevTurn = currentTurn;
         boardState = data.board;
         currentTurn = data.currentTurn;
-        opponentHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
+        
+        const newOppHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
         
         if (data.p1Graveyard) {
             const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
@@ -354,18 +441,82 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             playerPassed = isPlayer1Local ? data.p1Passed : data.p2Passed;
             opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
         }
-        
-        renderAll(currentNick);
 
-        // Pokaż baner przejściowy przy zmianie tury (tylko w trakcie gry, nie na starcie)
-        if (currentTurn && window.gameStarted && window.mulliganFinished) {
-            // Unikaj banerów jeśli to nie jest faktyczna zmiana tury
-            if (prevTurn !== currentTurn && !playerPassed && !opponentPassed) {
-                const isMyTurn = currentTurn === window.socket.id;
-                showPrzejscie(isMyTurn ? 't07' : 't08');
+        const finishUpdate = () => {
+            opponentHandCount = newOppHandCount;
+            // Update opponentDeckCount if spy played
+            if (data.spyDrawn && data.spyDrawn.length > 0 && data.spyPlayer !== (isPlayer1Local ? 'p1' : 'p2')) {
+                opponentDeckCount -= data.spyDrawn.length;
             }
+
+            renderAll(currentNick);
+
+            if (currentTurn && window.gameStarted && window.mulliganFinished) {
+                if (prevTurn !== currentTurn && !playerPassed && !opponentPassed) {
+                    const isMyTurn = currentTurn === window.socket.id;
+                    showPrzejscie(isMyTurn ? 't07' : 't08');
+                }
+            }
+            isProcessingMove = false;
+        };
+
+        if (data.spyDrawn && data.spyDrawn.length > 0) {
+            const isLocalSpy = data.spyPlayer === (isPlayer1Local ? 'p1' : 'p2');
+            
+            if (isLocalSpy) {
+                const mapToObjects = (arr) => (arr || []).map(num => {
+                    const c = cards.find(card => card.numer === String(num));
+                    return c ? { ...c, _id: Math.random() } : null;
+                }).filter(Boolean);
+
+                const drawnObjs = mapToObjects(data.spyDrawn);
+
+                playerHand.push(...drawnObjs);
+                sortHand();
+                
+                // Hide them in DOM initially
+                drawnObjs.forEach(obj => window.arrivedCards.delete(obj));
+                
+                const drawnNums = data.spyDrawn.map(n => String(n));
+                drawPile = drawPile.filter(c => !drawnNums.includes(c.numer));
+
+                renderAll(currentNick); // Show hand with holes
+
+                const wrappers = document.querySelectorAll('.hand-card-img');
+                const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+                const boardTop = (window.innerHeight - 2160 * scale) / 2;
+                
+                const targets = drawnObjs.map(obj => {
+                    const idx = playerHand.findIndex(c => c === obj);
+                    const el = Array.from(wrappers).find(w => parseInt(w.dataset.index) === idx);
+                    if (el) {
+                        const rect = el.getBoundingClientRect();
+                        return { x: (rect.left - boardLeft) / scale, y: (rect.top - boardTop) / scale };
+                    }
+                    return { x: 2090, y: 1811 };
+                });
+
+                animateDeckToHand(drawnObjs, targets, () => {
+                    drawnObjs.forEach(obj => window.arrivedCards.add(obj));
+                    finishUpdate();
+                });
+            } else {
+                // Opponent drew cards: use card backs for animation
+                const oppFaction = window.opponentFaction || '1';
+                const fMap = { "1": "polnoc_rewers.webp", "2": "nilftgard_rewers.webp", "3": "scoia'tel_rewers.webp", "4": "potwory_rewers.webp", "5": "skelige_rewers.webp" };
+                const reverseImg = `/gwent/assets/asety/${fMap[oppFaction] || "polnoc_rewers.webp"}`;
+                
+                const fakeCards = data.spyDrawn.map(() => ({ karta: reverseImg, nazwa: 'Rewers', punkty: null }));
+                const oppTarget = { x: 2090, y: 350 }; 
+                
+                animateDeckToHand(fakeCards, fakeCards.map(() => oppTarget), () => {
+                    finishUpdate();
+                }, null, true);
+            }
+        } else {
+            finishUpdate();
         }
-        isProcessingMove = false; // Reset flag after turn sync
     });
 
     socket.on('play-error', (data) => {
@@ -425,6 +576,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             const isMyTurn = currentTurn === window.socket.id;
             showPrzejscie(isMyTurn ? 't07' : 't08');
         }});
+    });
+
+    window.addEventListener('resize', () => {
+        renderAll(currentNick);
     });
 }
 
@@ -511,6 +666,7 @@ function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
             socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx });
         },
         onClose: () => {
+            if (window.mulliganFinished) return; // Jeśli już skończyliśmy przez 2 wymiany, nie dubluj
             sortHand();
             window.mulliganFinished = true;
             socket.emit('end-mulligan', { gameCode, isPlayer1 });
@@ -523,7 +679,13 @@ export function renderAll(nick) {
     if (nick) currentNick = nick;
     const overlay = document.querySelector('#gameScreen .overlay');
     if (!overlay) return;
-    overlay.innerHTML = '';
+    
+    // Nie usuwamy wszystkiego (overlay.innerHTML = ''), 
+    // aby zachować kontenery i umożliwić animacje CSS.
+    // Zamiast tego usuwamy tylko nie-persystentne elementy
+    const toRemove = Array.from(overlay.children).filter(c => !c.classList.contains('persistent'));
+    toRemove.forEach(c => overlay.removeChild(c));
+
 
     // Turn indicator using images
     if (currentTurn) {
@@ -539,6 +701,7 @@ export function renderAll(nick) {
     }
 
     renderHand(overlay);
+    renderProposedCard(overlay); // Nowy krok: wizualizacja potwierdzenia zagrania
     renderNicknames(overlay, nick);
     renderStats(overlay);
     renderScores(overlay);
@@ -548,6 +711,99 @@ export function renderAll(nick) {
     renderLeaders(overlay);
     renderRows(overlay);
 }
+
+function renderProposedCard(overlay) {
+    if (!window.proposedCard) {
+        window._activeProposedId = null;
+        return;
+    }
+
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const card = window.proposedCard;
+    const dkartaW = 523 * scale; 
+    const dkartaH = 992 * scale;
+
+    let wrapper = overlay.querySelector('#proposed-card-preview');
+    const isNew = (!wrapper || window._activeProposedId !== card._id);
+    
+    if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.id = 'proposed-card-preview';
+        wrapper.className = 'persistent';
+        wrapper.style.position = 'absolute';
+        wrapper.style.zIndex = '6000';
+        wrapper.style.cursor = 'default';
+        wrapper.style.transition = 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
+        overlay.appendChild(wrapper);
+    }
+
+    window._activeProposedId = card._id;
+
+    // Pozycja docelowa: ZA 3120, środek
+    const targetLeft = 3120 * scale + boardLeft;
+    const targetTop = 1080 * scale + boardTop; // Środek Y
+
+    if (isNew && window.lastProposedStartRect) {
+        // Startujemy z pozycji karty w ręce
+        wrapper.style.transition = 'none';
+        wrapper.style.left = `${window.lastProposedStartRect.left}px`;
+        wrapper.style.top = `${window.lastProposedStartRect.top}px`;
+        wrapper.style.width = `${window.lastProposedStartRect.width}px`;
+        wrapper.style.height = `${window.lastProposedStartRect.height}px`;
+        wrapper.style.transform = 'none';
+        wrapper.style.opacity = '0.5';
+        
+        // Wymuś reflow
+        wrapper.offsetHeight;
+        
+        // Rozpocznij animację do panelu bocznego
+        wrapper.style.transition = 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
+        wrapper.style.left = `${targetLeft}px`;
+        wrapper.style.top = `${targetTop}px`;
+        wrapper.style.width = `${dkartaW}px`;
+        wrapper.style.height = `${dkartaH}px`;
+        wrapper.style.transform = 'translateY(-50%)';
+        wrapper.style.opacity = '1';
+    } else {
+        // Po prostu aktualizuj pozycję (np. przy resize)
+        wrapper.style.left = `${targetLeft}px`;
+        wrapper.style.top = `${targetTop}px`;
+        wrapper.style.width = `${dkartaW}px`;
+        wrapper.style.height = `${dkartaH}px`;
+        wrapper.style.transform = 'translateY(-50%)';
+    }
+
+    wrapper.style.boxShadow = `0 0 ${40 * scale}px rgba(199, 167, 110, 0.8)`;
+    
+    // Pełny render
+    const factionId = window.playerFaction || '1';
+    wrapper.innerHTML = renderCardHTML(card, {
+        playerFaction: factionId,
+        isLargeView: true
+    });
+
+    const content = wrapper.querySelector('.card-content');
+    if (content) {
+        content.style.width = '100%';
+        content.style.height = '100%';
+        const points = content.querySelector('.points');
+        if (points) points.style.fontSize = (dkartaH * 0.1) + 'px';
+        const name = content.querySelector('.name');
+        if (name) name.style.fontSize = (dkartaH * 0.044) + 'px';
+    }
+
+    // Kliknięcie tła anuluje
+    overlay.onmousedown = (e) => {
+        if (e.target === overlay && window.proposedCard) {
+            window.proposedCard = null;
+            renderAll(currentNick);
+        }
+    };
+}
+
 
 function renderStats(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
@@ -681,44 +937,19 @@ function renderLives(overlay) {
     if (playerLives >= 2) overlay.appendChild(createLive(636, playerYs));
 }
 
-/**
- * Dodaje overlay z punktami na karcie.
- * @param {HTMLElement} wrapper - kontener karty (div z position: relative)
- * @param {object} card - obiekt karty z cards.js
- * @param {number} cardW - szerokość karty w px (po skalowaniu)
- * @param {number} cardH - wysokość karty w px (po skalowaniu)
- */
 export function addCardPointsOverlay(wrapper, card, cardW, cardH) {
-    // Nie wyświetlaj punktów dla kart specjalnych (pogoda, róg dowódcy itp.)
     if (typeof card.punkty !== 'number') return;
-
-    // Proporcja skalowania: wszystkie pozycje podane przez użytkownika są podane dla karty 180x240
     const cardScale = cardW / 180;
 
-    // Bohater: najpierw obrazek bohater.webp 
-    // ma być od -8, -8 do 116, 118 (czyli szerokość: 124, wysokość: 126)
-    if (card.bohater) {
-        const heroIcon = document.createElement('img');
-        heroIcon.src = '/gwent/assets/karty/bohater.webp';
-        heroIcon.style.position = 'absolute';
-        heroIcon.style.left = `${-8 * cardScale}px`;
-        heroIcon.style.top = `${-8 * cardScale}px`;
-        heroIcon.style.width = `${124 * cardScale}px`;
-        heroIcon.style.height = `${126 * cardScale}px`;
-        heroIcon.style.pointerEvents = 'none';
-        heroIcon.style.zIndex = '2';
-        wrapper.appendChild(heroIcon);
-    }
-
-    // Liczba punktów - środek na 30, 30
     const pointsDiv = document.createElement('div');
+    pointsDiv.className = 'card-points-overlay';
     pointsDiv.style.position = 'absolute';
     pointsDiv.style.left = `${30 * cardScale}px`;
     pointsDiv.style.top = `${30 * cardScale}px`;
-    pointsDiv.style.transform = 'translate(-50%, -50%)'; // Wyśrodkowanie tekstu dokładnie na 30,30
+    pointsDiv.style.transform = 'translate(-50%, -50%)';
     pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif'; 
-    pointsDiv.style.fontSize = `${44 * cardScale}px`; // 44px na bazowym 180px
-    pointsDiv.style.fontWeight = 'normal'; // Czcionka niepogrubiona
+    pointsDiv.style.fontSize = `${44 * cardScale}px`;
+    pointsDiv.style.fontWeight = 'normal';
     pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
     pointsDiv.style.textShadow = card.bohater
         ? '0 1px 3px rgba(0,0,0,0.8)'
@@ -728,10 +959,24 @@ export function addCardPointsOverlay(wrapper, card, cardW, cardH) {
     pointsDiv.style.lineHeight = '1';
     pointsDiv.textContent = card.punkty;
     wrapper.appendChild(pointsDiv);
+    
+    if (card.bohater) {
+        const heroIcon = document.createElement('img');
+        heroIcon.src = '/gwent/assets/karty/bohater.webp';
+        heroIcon.className = 'card-points-overlay';
+        heroIcon.style.position = 'absolute';
+        heroIcon.style.left = `${-8 * cardScale}px`;
+        heroIcon.style.top = `${-8 * cardScale}px`;
+        heroIcon.style.width = `${124 * cardScale}px`;
+        heroIcon.style.height = `${126 * cardScale}px`;
+        heroIcon.style.pointerEvents = 'none';
+        heroIcon.style.zIndex = '2';
+        wrapper.appendChild(heroIcon);
+    }
 }
 
 function renderHand(overlay) {
-    if (!window.cardsAnimated && window.arrivedHandIndices.size === 0) return; // Ukryj rękę dopóki nic nie doleci
+    if (!window.cardsAnimated && window.arrivedCards.size === 0) return;
 
     const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
     const areaLeft = 1163, areaTop = 1691, areaRight = 3018, areaBottom = 1932;
@@ -739,44 +984,87 @@ function renderHand(overlay) {
     const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
     const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
 
-    const container = document.createElement('div');
-    container.className = 'hand-container'; // Needed for keyboard nav lookup
-    container.style.position = 'absolute';
+    let container = overlay.querySelector('.hand-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'hand-container persistent';
+        container.style.position = 'absolute';
+        overlay.appendChild(container);
+    }
+    // Update container every time (scale/res might change)
     container.style.left = `${areaLeft * scale + boardLeft}px`;
     container.style.top = `${areaTop * scale + boardTop}px`;
     container.style.width = `${(areaRight - areaLeft) * scale}px`;
     container.style.height = `${(areaBottom - areaTop) * scale}px`;
-    container.style.display = 'flex';
-    container.style.justifyContent = 'center';
-    container.style.alignItems = 'center';
+    
+    const count = playerHand.length;
+    if (selectedHandIndex >= count) selectedHandIndex = -1;
+    const totalAreaWidth = (areaRight - areaLeft) * scale;
+    const cardW = 180 * scale;
+    const cardH = 240 * scale;
+
+    let cardStep = cardW + (5 * scale);
+    if (count * cardStep > totalAreaWidth) {
+        cardStep = (totalAreaWidth - cardW) / (count - 1);
+    }
+    const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
+    const startX = (totalAreaWidth - occupiedWidth) / 2;
+
+    // Uzgadnianie (Reconciliation) DOM
+    const currentWrappers = Array.from(container.querySelectorAll('.hand-card-img'));
+    const handCardIds = playerHand.map(c => c._id);
+
+    // Usuń te, których już nie ma
+    currentWrappers.forEach(w => {
+        if (!handCardIds.includes(parseFloat(w.dataset.id))) {
+            container.removeChild(w);
+        }
+    });
 
     playerHand.forEach((card, i) => {
-        const cardW = 180 * scale;
-        const cardH = 240 * scale;
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'hand-card-img';
-        wrapper.dataset.index = i;
-        wrapper.style.width = `${cardW}px`;
-        wrapper.style.height = `${cardH}px`;
-        wrapper.style.cursor = 'pointer';
-        wrapper.style.position = 'relative';
-        wrapper.style.flexShrink = '0';
-
-        // Ukryj kartę jeśli jeszcze nie doleciała
-        if (!window.arrivedHandIndices.has(i)) {
-            wrapper.style.visibility = 'hidden';
+        const isProposed = window.proposedCard === card;
+        let wrapper = container.querySelector(`.hand-card-img[data-id="${card._id}"]`);
+        
+        if (!wrapper) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'hand-card-img';
+            wrapper.dataset.id = card._id;
+            wrapper.style.position = 'absolute';
+            wrapper.style.cursor = 'pointer';
+            wrapper.style.transition = 'transform 0.2s ease-out, top 0.2s ease-out';
+            
+            const img = document.createElement('img');
+            img.src = card.karta;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.display = 'block';
+            wrapper.appendChild(img);
         }
 
-        const img = document.createElement('img');
-        img.src = card.karta;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.display = 'block';
-        wrapper.appendChild(img);
-
-        // Punkty na karcie
+        // Usuń stare nakładki przed ponownym dodaniem
+        const oldPoints = wrapper.querySelectorAll('.card-points-overlay');
+        oldPoints.forEach(p => p.remove());
         addCardPointsOverlay(wrapper, card, cardW, cardH);
+
+        // Aktualizuj parametry
+        wrapper.style.width = `${cardW}px`;
+        wrapper.style.height = `${cardH}px`;
+        wrapper.dataset.index = i;
+        wrapper.style.left = `${startX + i * cardStep}px`;
+        wrapper.style.zIndex = i + 1;
+        
+        const isHovered = (i === selectedHandIndex);
+        wrapper.style.top = isHovered ? '25%' : '50%';
+        wrapper.style.transform = isHovered ? 'translateY(-75%)' : 'translateY(-50%)';
+        
+        // Ukryj jeśli jeszcze nie doleciała LUB jest właśnie sprawdzana do zagrania
+        if (!window.arrivedCards.has(card) || isProposed) {
+            wrapper.style.visibility = 'hidden';
+            wrapper.style.pointerEvents = 'none';
+        } else {
+            wrapper.style.visibility = 'visible';
+            wrapper.style.pointerEvents = 'auto';
+        }
 
         wrapper.onmouseenter = () => {
             selectedHandIndex = i;
@@ -790,28 +1078,38 @@ function renderHand(overlay) {
         wrapper.oncontextmenu = (e) => { e.preventDefault(); showPowiek(playerHand, i, 'hand'); };
         wrapper.onclick = (e) => {
             e.stopPropagation();
-            playCardAtIndex(i);
+            if (isMulliganActive) return;
+            
+            // Rejestrujemy pozycję startową dla animacji podglądu
+            const rect = wrapper.getBoundingClientRect();
+            window.lastProposedStartRect = {
+                left: rect.left,
+                top: rect.top,
+                width: rect.width,
+                height: rect.height
+            };
+            
+            window.proposedCard = card;
+            renderAll(currentNick);
         };
+        // Always append to sync DOM order with playerHand array
         container.appendChild(wrapper);
     });
-    updateHandVisuals(container, scale); // Apply initial selection style if any
-    overlay.appendChild(container);
 }
 
 function updateHandVisuals(container, scale) {
     if (!container) return;
-    const imgs = container.querySelectorAll('.hand-card-img');
-    imgs.forEach((img, idx) => {
+    const count = playerHand.length;
+    const wrappers = container.querySelectorAll('.hand-card-img');
+    wrappers.forEach((wrapper, idx) => {
         if (idx === selectedHandIndex) {
-            img.style.transition = 'transform 0.1s cubic-bezier(0.1, 0.7, 0.6, 1), box-shadow 0.1s ease';
-            img.style.transform = `translateY(${-60 * scale}px)`;
-            img.style.zIndex = '1000';
-            img.style.boxShadow = `0 0 ${20 * scale}px #c7a76e`;
+            wrapper.style.transform = 'translateY(-75%)'; // Wysunięcie o ok. 1/4 wysokości
+            wrapper.style.zIndex = '5000';
+            wrapper.style.boxShadow = `0 0 ${20 * scale}px #c7a76e`;
         } else {
-            img.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s';
-            img.style.transform = 'none';
-            img.style.zIndex = '';
-            img.style.boxShadow = 'none';
+            wrapper.style.transform = 'translateY(-50%)';
+            wrapper.style.zIndex = idx + 1;
+            wrapper.style.boxShadow = 'none';
         }
     });
 }
@@ -1001,6 +1299,75 @@ function renderGraveyards(overlay) {
     renderGraveyardGroup(3110, 168, opponentGraveyard, true);
 }
 
+function confirmPlayProposed(targetData = {}) {
+    if (!window.proposedCard) return;
+    const card = window.proposedCard;
+    
+    // Ustalanie pozycji zagrania
+    let finalPos = targetData.rowIdx || (card.pozycja === 4 ? 1 : card.pozycja);
+    const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(card.moc);
+    
+    const preview = document.getElementById('proposed-card-preview');
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    if (preview) {
+        const smallProxy = document.createElement('div');
+        smallProxy.style.position = 'absolute';
+        const largeCenter = 3120 + (523 / 2);
+        smallProxy.style.left = `${(largeCenter - (180 / 2)) * scale + boardLeft}px`; 
+        smallProxy.style.top = `${1080 * scale + boardTop}px`;
+        smallProxy.style.transform = 'translateY(-50%)';
+        smallProxy.style.width = `${180 * scale}px`;
+        smallProxy.style.height = `${240 * scale}px`;
+        smallProxy.style.zIndex = '7000';
+        smallProxy.style.transition = 'all 0.5s cubic-bezier(0.19, 1, 0.22, 1)';
+        
+        const img = document.createElement('img');
+        img.src = card.karta;
+        img.style.width = '100%';
+        smallProxy.appendChild(img);
+        document.body.appendChild(smallProxy);
+
+        preview.style.transition = 'opacity 0.2s ease-out, transform 0.2s';
+        preview.style.opacity = '0';
+        preview.style.transform = 'translateY(-50%) scale(0.9)';
+
+        // Animacja do celu
+        setTimeout(() => {
+            // Obliczamy przybliżoną pozycję docelową rzędu
+            let targetX = 1412 + 1609/2;
+            let targetY = 1000; // Środek domyślny
+            
+            const rCoords = {
+                1: 863 + 120,
+                2: 1129 + 120,
+                3: 1407 + 120
+            };
+            if (rCoords[finalPos]) targetY = rCoords[finalPos];
+
+            smallProxy.style.left = `${(targetX - 90) * scale + boardLeft}px`;
+            smallProxy.style.top = `${(targetY - 120) * scale + boardTop}px`;
+            smallProxy.style.opacity = '0';
+            setTimeout(() => smallProxy.remove(), 500);
+        }, 50);
+    }
+
+    // Wywołujemy standardowe zagranie na serwerze
+    window.socket.emit('play-card', {
+        gameCode: gameCodeLocal,
+        isPlayer1: isPlayer1Local,
+        cardNumer: card.numer,
+        pozycja: finalPos,
+        isSpecial: isSpecial
+    });
+
+    window.proposedCard = null;
+    isProcessingMove = true; 
+    renderAll(currentNick);
+}
+
 function renderRows(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
@@ -1018,54 +1385,150 @@ function renderRows(overlay) {
         self2: { x: 1412, y: 1129, w: 1609, h: 239 },
         self3: { x: 1412, y: 1407, w: 1609, h: 239 }
     };
-
     const renderRowCards = (rowKey, coords) => {
-        const cardsInRow = boardState[rowKey] || [];
-        console.log(`[BOARD] renderRowCards: row=${rowKey}, count=${cardsInRow.length}`, cardsInRow);
-        const rowDiv = document.createElement('div');
-        rowDiv.style.position = 'absolute';
+        const cardsInRowNumers = boardState[rowKey] || [];
+        // Map numbers to card objects BUT we need persistent IDs for board cards too
+        // In boardState, we only have numbers.
+        // I'll create stable IDs for cards in rows based on their index in the array? 
+        // No, that fails if someone draws from graveyard.
+        
+        const count = cardsInRowNumers.length;
+        const totalRowWidth = coords.w * scale;
+        const cardH = coords.h * scale;
+        const cardW = cardH * (180 / 240);
+
+        let cardStep = cardW + (5 * scale);
+        if (count * cardStep > totalRowWidth) {
+            cardStep = (totalRowWidth - cardW) / (count - 1);
+        }
+        const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
+        const startX = (totalRowWidth - occupiedWidth) / 2;
+
+        let rowDiv = overlay.querySelector(`.row-container[data-row="${rowKey}"]`);
+        if (!rowDiv) {
+            rowDiv = document.createElement('div');
+            rowDiv.className = 'row-container persistent';
+            rowDiv.dataset.row = rowKey;
+            rowDiv.style.position = 'absolute';
+            overlay.appendChild(rowDiv);
+        }
+
         rowDiv.style.left = `${coords.x * scale + boardLeft}px`;
         rowDiv.style.top = `${coords.y * scale + boardTop}px`;
-        rowDiv.style.width = `${coords.w * scale}px`;
-        rowDiv.style.height = `${coords.h * scale}px`;
-        rowDiv.style.display = 'flex';
-        rowDiv.style.justifyContent = 'center';
-        rowDiv.style.alignItems = 'center';
+        rowDiv.style.width = `${totalRowWidth}px`;
+        rowDiv.style.height = `${cardH}px`;
 
-        cardsInRow.forEach(numer => {
-            const card = cards.find(c => c.numer === numer);
+        // Highlight valid row
+        if (window.proposedCard) {
+            const pCard = window.proposedCard;
+            const isMelee = rowKey.endsWith('1');
+            const isRanged = rowKey.endsWith('2');
+            const isSiege = rowKey.endsWith('3');
+            const isMySide = rowKey.startsWith(isPlayer1Local ? 'p1' : 'p2');
+            
+            let isValid = false;
+            if (isMySide) {
+                if (pCard.pozycja === 1 && isMelee) isValid = true;
+                if (pCard.pozycja === 2 && isRanged) isValid = true;
+                if (pCard.pozycja === 3 && isSiege) isValid = true;
+                if (pCard.pozycja === 4 && (isMelee || isRanged)) isValid = true;
+                // Special cards handled separately usually but for now let's allow row clicks
+                if (pCard.numer === "002" || pCard.moc === "rog") isValid = true;
+            }
+
+            if (isValid) {
+                rowDiv.classList.add('valid-row-hl');
+                rowDiv.style.backgroundColor = 'rgba(199, 167, 110, 0.2)';
+                rowDiv.style.cursor = 'pointer';
+                rowDiv.onclick = (e) => {
+                    e.stopPropagation();
+                    confirmPlayProposed({ rowIdx: isMelee ? 1 : (isRanged ? 2 : 3) });
+                };
+            } else {
+                rowDiv.classList.remove('valid-row-hl');
+                rowDiv.style.backgroundColor = 'transparent';
+                rowDiv.style.cursor = 'default';
+                rowDiv.onclick = null;
+            }
+        } else {
+            rowDiv.classList.remove('valid-row-hl');
+            rowDiv.style.backgroundColor = 'transparent';
+            rowDiv.style.cursor = 'default';
+        }
+
+        // Reconciliation
+        const currentChildren = Array.from(rowDiv.children);
+        // Remove excess
+        if (currentChildren.length > count) {
+            for (let j = count; j < currentChildren.length; j++) {
+                rowDiv.removeChild(currentChildren[j]);
+            }
+        }
+
+        cardsInRowNumers.forEach((numer, i) => {
+            const card = cards.find(c => c.numer === String(numer));
             if (card) {
-                const rowCardH = coords.h * scale;
-                const rowCardW = rowCardH * (180 / 240);
+                let wrapper = rowDiv.children[i];
+                if (!wrapper) {
+                    wrapper = document.createElement('div');
+                    wrapper.className = 'board-card-wrapper';
+                    wrapper.style.position = 'absolute';
+                    wrapper.style.height = '100%';
+                    wrapper.style.width = `${cardW}px`;
+                    wrapper.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
+                    
+                    const img = document.createElement('img');
+                    img.style.height = '100%';
+                    img.style.width = 'auto';
+                    img.style.display = 'block';
+                    wrapper.appendChild(img);
+                    rowDiv.appendChild(wrapper);
+                }
+                
+                // Update
+                wrapper.style.width = `${cardW}px`;
+                if (wrapper.querySelector('img').src.indexOf(card.karta) === -1) {
+                    wrapper.querySelector('img').src = card.karta;
+                }
 
-                const wrapper = document.createElement('div');
-                wrapper.style.position = 'relative';
-                wrapper.style.height = '100%';
-                wrapper.style.width = 'auto';
-                wrapper.style.margin = `0 ${5 * scale}px`;
-                wrapper.style.flexShrink = '0';
+                // Usuń stare punkty/ikony przed odświeżeniem
+                const oldPoints = wrapper.querySelectorAll('.card-points-overlay');
+                oldPoints.forEach(p => p.remove());
+                addCardPointsOverlay(wrapper, card, cardW, cardH);
 
-                const img = document.createElement('img');
-                img.src = card.karta;
-                img.style.height = '100%';
-                img.style.width = 'auto';
-                img.style.display = 'block';
-                wrapper.appendChild(img);
-
-                // Atrybuty do animacji cmentarza
-                wrapper.className = 'board-card-wrapper';
+                wrapper.style.left = `${startX + i * cardStep}px`;
+                wrapper.style.zIndex = i + 1;
                 wrapper.dataset.numer = card.numer;
                 const rowRealKey = rowKey.startsWith('p1') ? 'p1' : 'p2';
                 wrapper.dataset.side = rowRealKey;
 
-                // Punkty na karcie
-                addCardPointsOverlay(wrapper, card, rowCardW, rowCardH);
+                // Target for Decoy
+                if (window.proposedCard && window.proposedCard.moc === 'manek') {
+                    const isMyCard = (rowKey.startsWith('p1') === isPlayer1Local);
+                    if (isMyCard && !card.bohater) {
+                        wrapper.style.cursor = 'pointer';
+                        wrapper.classList.add('valid-target');
+                        wrapper.onclick = (e) => {
+                            e.stopPropagation();
+                            confirmPlayProposed({ targetCardNumer: card.numer, targetRow: rowKey });
+                        };
+                    }
+                }
 
-                rowDiv.appendChild(wrapper);
+                wrapper.onmouseenter = () => {
+                    wrapper.style.zIndex = '5000';
+                    wrapper.style.transform = 'translateY(-15%)';
+                    wrapper.style.boxShadow = `0 0 ${15 * scale}px #c7a76e`;
+                };
+                wrapper.onmouseleave = () => {
+                    wrapper.style.zIndex = i + 1;
+                    wrapper.style.transform = 'none';
+                    wrapper.style.boxShadow = 'none';
+                };
             }
         });
-        overlay.appendChild(rowDiv);
     };
+
 
     const renderSpecialSlot = (rowIdx, sidePrefix, yCoord) => {
         const numer = boardState[`${sidePrefix}S${rowIdx}`];
@@ -1191,8 +1654,9 @@ function renderLeaders(overlay) {
 
     const createLeader = (leaderObj, x, y, isOpponent) => {
         if (!leaderObj) return;
-        // Jeśli to dowódca gracza, nie renderuj go dopóki animacja się nie skończy
+        // Zabezpieczenie przed pokazywaniem dopóki animacja trwa
         if (!isOpponent && !window.leaderAnimated) return;
+        if (isOpponent && !window.opponentLeaderAnimated) return;
 
         const img = document.createElement('img');
         img.src = leaderObj.karta;

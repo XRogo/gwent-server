@@ -21,6 +21,34 @@ try {
 
 const games = {};
 
+function sortHandForPlayer(hand) {
+    hand.sort((aNum, bNum) => {
+        const cardA = cards.find(c => String(c.numer) === String(aNum));
+        const cardB = cards.find(c => String(c.numer) === String(bNum));
+        if (!cardA || !cardB) return 0;
+
+        const isSpecialA = (typeof cardA.punkty !== 'number' || cardA.typ === 'specjalna');
+        const isSpecialB = (typeof cardB.punkty !== 'number' || cardB.typ === 'specjalna');
+
+        if (isSpecialA && !isSpecialB) return -1;
+        if (!isSpecialA && isSpecialB) return 1;
+
+        if (isSpecialA && isSpecialB) {
+            const idxA = cards.findIndex(c => c.numer === cardA.numer);
+            const idxB = cards.findIndex(c => c.numer === cardB.numer);
+            return idxA - idxB;
+        }
+
+        if (cardA.punkty !== cardB.punkty) {
+            return cardA.punkty - cardB.punkty;
+        }
+
+        const idxA = cards.findIndex(c => c.numer === cardA.numer);
+        const idxB = cards.findIndex(c => c.numer === cardB.numer);
+        return idxA - idxB;
+    });
+}
+
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
@@ -362,11 +390,17 @@ io.on('connection', (socket) => {
                 drawn.push(deck.splice(randIdx, 1)[0]);
             }
 
-            if (isPlayer1) state.p1Hand = drawn;
-            else state.p2Hand = drawn;
+            if (isPlayer1) {
+                state.p1Hand = drawn;
+                sortHandForPlayer(state.p1Hand);
+            } else {
+                state.p2Hand = drawn;
+                sortHandForPlayer(state.p2Hand);
+            }
 
-            console.log(`[GAME] Initial cards drawn for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}: ${drawn.length} cards.`);
-            socket.emit('initial-cards-dealt', { hand: drawn });
+            const handToReturn = isPlayer1 ? state.p1Hand : state.p2Hand;
+            console.log(`[GAME] Initial cards drawn and sorted for ${isPlayer1 ? 'P1' : 'P2'} in ${gameCode}: ${handToReturn.length} cards.`);
+            socket.emit('initial-cards-dealt', { hand: handToReturn });
 
             // Notify opponent about updated deck count
             const opponentId = isPlayer1 ? game.player2 : game.player1;
@@ -614,21 +648,35 @@ io.on('connection', (socket) => {
                     finalPos = 1; // Default to Melee if not specified otherwise
                 }
 
+                const cardObj = cards.find(c => String(c.numer) === String(cardNumer));
+                const isSpy = cardObj && cardObj.moc === 'szpieg';
+                const targetSide = isSpy ? (isPlayer1 ? 'p2' : 'p1') : side;
+
                 if (isSpecial) {
-                    targetRow = `${side}S${finalPos}`;
+                    targetRow = `${targetSide}S${finalPos}`;
                     state.board[targetRow] = cardNumer;
                 } else {
-                    targetRow = `${side}R${finalPos}`;
+                    targetRow = `${targetSide}R${finalPos}`;
                     if (state.board[targetRow]) {
                         state.board[targetRow].push(cardNumer);
                     } else {
                         console.error(`[GAME] Target row ${targetRow} does not exist in board state!`);
-                        // Fallback to row 1
-                        state.board[`${side}R1`].push(cardNumer);
+                        state.board[`${targetSide}R1`].push(cardNumer);
                     }
                 }
 
                 hand.splice(cardIdx, 1);
+                
+                let spyDrawn = [];
+                if (isSpy) {
+                    const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
+                    for (let i = 0; i < 2 && deck.length > 0; i++) {
+                        const randIdx = Math.floor(Math.random() * deck.length);
+                        spyDrawn.push(deck.splice(randIdx, 1)[0]);
+                    }
+                    hand.push(...spyDrawn);
+                    console.log(`[GAME] Spy played! ${isPlayer1 ? 'P1' : 'P2'} draws ${spyDrawn.length} cards.`);
+                }
                 
                 // Sprawdź czy przeciwnik spasował. Jeśli tak, tura wraca do zagrywającego
                 const oppSide = isPlayer1 ? 'p2' : 'p1';
@@ -654,7 +702,9 @@ io.on('connection', (socket) => {
                     p1Passed: state.p1Passed,
                     p2Passed: state.p2Passed,
                     p1Graveyard: state.p1Graveyard,
-                    p2Graveyard: state.p2Graveyard
+                    p2Graveyard: state.p2Graveyard,
+                    spyDrawn: spyDrawn, // Send the IDs of cards drawn by the spy
+                    spyPlayer: isPlayer1 ? 'p1' : 'p2'
                 });
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
