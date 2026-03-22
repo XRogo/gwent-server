@@ -74,23 +74,33 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll(nick);
     }
 
+    let isReadyStatus = false;
     document.getElementById('goToGameButton').onclick = () => {
-        const currentDeckCards = getSelectedDeck();
-        const currentLeader = getSelectedLeader();
-        const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
+        isReadyStatus = !isReadyStatus;
+        const btn = document.getElementById('goToGameButton');
 
-        // Save to server
-        socket.emit('save-full-deck', {
-            gameCode,
-            isPlayer1: isP1,
-            deck: currentDeckCards.map(c => c.numer),
-            leader: currentLeader ? currentLeader.numer : null,
-            factionId: factionId
-        });
+        if (isReadyStatus) {
+            const currentDeckCards = getSelectedDeck();
+            const currentLeader = getSelectedLeader();
+            const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
 
-        // Mark as ready
-        socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
-        document.getElementById('goToGameButton').innerText = "Oczekiwanie...";
+            // Save to server
+            socket.emit('save-full-deck', {
+                gameCode,
+                isPlayer1: isP1,
+                deck: currentDeckCards.map(c => c.numer),
+                leader: currentLeader ? currentLeader.numer : null,
+                factionId: factionId
+            });
+
+            // Mark as ready
+            socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
+            btn.innerText = "Oczekiwanie...";
+        } else {
+            // Cancel ready
+            socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: false });
+            btn.innerText = "Przejdź do gry";
+        }
     };
 
     document.getElementById('saveDeckButton').onclick = () => {

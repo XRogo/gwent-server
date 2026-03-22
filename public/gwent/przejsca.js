@@ -48,7 +48,7 @@ const przejscia = [
     {
         numer: "t11",
         opis: "Dzięki zdolności talii Królestw Północy po wygranej\nrundzie dobiera się dodatkową kartę.",
-        obraz: "assets/asety/przejscia/umienentnosc_polnoc.webp",
+        obraz: "assets/asety/przejscia/umiejentnosc_polnoc.webp",
         czas: 2000
     },
     {

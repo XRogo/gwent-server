@@ -125,8 +125,8 @@ io.on('connection', (socket) => {
                 hostNickname: null,
                 opponentNickname: null,
                 status: 'waiting',
-                hostReady: false,
-                opponentReady: false
+                player1Ready: false,
+                player2Ready: false
             };
             socket.join(newCode);
             socket.emit('join-success', { gameCode: newCode, isHost: true });
@@ -145,8 +145,8 @@ io.on('connection', (socket) => {
                 hostNickname: "test1",
                 opponentNickname: null,
                 status: 'waiting',
-                hostReady: true, // Automatycznie gotowi dla testu
-                opponentReady: false
+                player1Ready: true, // Automatycznie gotowi dla testu
+                player2Ready: false
             };
             socket.join(testCode);
             socket.emit('test-game-joined', { gameCode: testCode, isHost: true, nickname: "test1" });
@@ -156,7 +156,7 @@ io.on('connection', (socket) => {
             games[testCode].players.push(socket.id);
             games[testCode].isClosed = true;
             games[testCode].opponentNickname = "test2";
-            games[testCode].opponentReady = true;
+            games[testCode].player2Ready = true;
             socket.join(testCode);
             socket.emit('test-game-joined', { gameCode: testCode, isHost: false, nickname: "test2" });
             io.to(games[testCode].host).emit('opponent-joined', { opponentId: socket.id });
@@ -905,10 +905,28 @@ io.on('connection', (socket) => {
             if (cardIdx !== -1) {
                 // Remove from grave
                 grave.splice(cardIdx, 1);
-                // Assume it goes to normal row (usually Agile, Melee, Ranged, etc.)
-                // In a perfect system we would re-run play-card logic recursively,
-                // but for MVP let's just push it to the row here.
-                const finalRow = targetRow || `${isPlayer1 ? 'p1' : 'p2'}R1`; 
+                let finalRow = targetRow || `${isPlayer1 ? 'p1' : 'p2'}R1`; 
+                
+                const revivedCardObj = cards.find(c => String(c.numer) === String(cardNumer));
+                let spyDrawn = [];
+                let spyPlayer = null;
+
+                if (revivedCardObj && revivedCardObj.moc === 'szpieg') {
+                    // Zmiana strony z p1 na p2 (lub na odwrót)
+                    finalRow = finalRow.startsWith('p1') ? finalRow.replace('p1', 'p2') : finalRow.replace('p2', 'p1');
+                    
+                    const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
+                    const hand = isPlayer1 ? state.p1Hand : state.p2Hand;
+                    
+                    for (let i = 0; i < 2 && deck.length > 0; i++) {
+                        const randIdx = Math.floor(Math.random() * deck.length);
+                        spyDrawn.push(deck.splice(randIdx, 1)[0]);
+                    }
+                    hand.push(...spyDrawn);
+                    spyPlayer = isPlayer1 ? 'p1' : 'p2';
+                    console.log(`[GAME] Medic revived Spy! ${spyPlayer} draws ${spyDrawn.length} cards.`);
+                }
+
                 if (state.board[finalRow]) {
                     state.board[finalRow].push(cardNumer);
                 }
@@ -932,7 +950,11 @@ io.on('connection', (socket) => {
                     p1Passed: state.p1Passed,
                     p2Passed: state.p2Passed,
                     p1Graveyard: state.p1Graveyard,
-                    p2Graveyard: state.p2Graveyard
+                    p2Graveyard: state.p2Graveyard,
+                    spyDrawn: spyDrawn,
+                    spyPlayer: spyPlayer,
+                    p1Hand: state.p1Hand,
+                    p2Hand: state.p2Hand
                 });
             }
         }
@@ -1000,6 +1022,7 @@ io.on('connection', (socket) => {
                     if (!rowDict[card.numer]) rowDict[card.numer] = { count: 0, card: card };
                     rowDict[card.numer].count++;
                     if (!card.bohater && card.moc === 'morale') moraleCount++;
+                    if (!card.bohater && card.moc === 'rog') hornActive = true;
                 }
             });
 
@@ -1050,7 +1073,8 @@ io.on('connection', (socket) => {
         
         console.log(`[GAME] [${gameCode}] Round ended. P1: ${p1Score}, P2: ${p2Score}. Result: ${roundResult}`);
         io.to(gameCode).emit('round-ended', {
-            p1Score, p2Score, roundResult, p1Lives: state.p1Lives, p2Lives: state.p2Lives
+            p1Score, p2Score, roundResult, p1Lives: state.p1Lives, p2Lives: state.p2Lives,
+            p1Hand: state.p1Hand, p2Hand: state.p2Hand
         });
         
         // Timeout to start next round assuming game is not over
@@ -1061,8 +1085,22 @@ io.on('connection', (socket) => {
                 if (state.p2Lives > 0) gameResult = 'p2';
                 io.to(gameCode).emit('game-over', { gameResult });
             } else {
-                // Before clearing, move board cards to graveyard
+                // Before clearing, scan for wezwarniezza effects (Cow/Kambi)
+                const pendingSummons = []; 
                 if (state.board) {
+                    Object.keys(state.board).forEach(rKey => {
+                        const rArray = state.board[rKey];
+                        if (Array.isArray(rArray)) {
+                            rArray.forEach(cNum => {
+                                const c = cards.find(x => String(x.numer) === String(cNum));
+                                if (c && c.moc === 'wezwarniezza' && c.summon) {
+                                    pendingSummons.push({ side: rKey.startsWith('p1') ? 'p1' : 'p2', num: c.summon, row: rKey });
+                                }
+                            });
+                        }
+                    });
+
+                    // Before clearing, move board cards to graveyard
                     ['p1R1', 'p1R2', 'p1R3'].forEach(r => state.p1Graveyard.push(...(state.board[r] || [])));
                     if (state.board.p1S1) state.p1Graveyard.push(state.board.p1S1);
                     if (state.board.p1S2) state.p1Graveyard.push(state.board.p1S2);
@@ -1075,24 +1113,52 @@ io.on('connection', (socket) => {
                 }
 
                 state.board = {
-                    p1R1: [], p1R2: [], p1R3: [],
-                    p2R1: [], p2R2: [], p2R3: [],
-                    p1S1: null, p1S2: null, p1S3: null,
-                    p2S1: null, p2S2: null, p2S3: null
+                    p1R1:[], p1R2:[], p1R3:[], p2R1:[], p2R2:[], p2R3:[],
+                    p1S1:null, p1S2:null, p1S3:null, p2S1:null, p2S2:null, p2S3:null,
+                    weather:[]
                 };
+
+                // Apply wezwarniezza summons to the fresh board
+                pendingSummons.forEach(s => {
+                    if (state.board[s.row]) state.board[s.row].push(s.num);
+                });
                 state.p1Passed = false;
                 state.p2Passed = false;
                 
                 // Loser goes first or random if draw
-                if (roundResult === 'p1') state.currentTurn = game.player2; // P1 won, P2 starts
-                else if (roundResult === 'p2') state.currentTurn = game.player1; // P2 won, P1 starts
+                if (roundResult === 'p1') state.currentTurn = game.player2;
+                else if (roundResult === 'p2') state.currentTurn = game.player1;
                 else state.currentTurn = Math.random() < 0.5 ? game.player1 : game.player2;
+
+                // Northern Realms Ability: Draw card on win
+                let p1NrDraw = false;
+                let p2NrDraw = false;
+                if (roundResult === 'p1' && state.p1Faction === '1') {
+                    if (state.p1Deck.length > 0) {
+                        const card = state.p1Deck.splice(Math.floor(Math.random() * state.p1Deck.length), 1)[0];
+                        state.p1Hand.push(card);
+                        p1NrDraw = true;
+                        console.log(`[GAME] Northern Realms ability: P1 draws a card.`);
+                    }
+                } else if (roundResult === 'p2' && state.p2Faction === '1') {
+                    if (state.p2Deck.length > 0) {
+                        const card = state.p2Deck.splice(Math.floor(Math.random() * state.p2Deck.length), 1)[0];
+                        state.p2Hand.push(card);
+                        p2NrDraw = true;
+                        console.log(`[GAME] Northern Realms ability: P2 draws a card.`);
+                    }
+                }
 
                 io.to(gameCode).emit('next-round-started', {
                     board: state.board,
                     currentTurn: state.currentTurn,
                     p1Graveyard: state.p1Graveyard,
-                    p2Graveyard: state.p2Graveyard
+                    p2Graveyard: state.p2Graveyard,
+                    p1HandCount: state.p1Hand.length,
+                    p2HandCount: state.p2Hand.length,
+                    p1Hand: state.p1Hand,
+                    p2Hand: state.p2Hand,
+                    northernRealmsDraw: { p1: p1NrDraw, p2: p2NrDraw }
                 });
             }
         }, 5000);

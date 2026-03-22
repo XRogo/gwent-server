@@ -429,6 +429,12 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         
         const newOppHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
         
+        // Sync local hand if provided by server
+        const serverHand = isPlayer1Local ? data.p1Hand : data.p2Hand;
+        if (serverHand) {
+            syncHand(serverHand);
+        }
+        
         if (data.p1Graveyard) {
             const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
             playerGraveyard = mapToObjects(isPlayer1Local ? data.p1Graveyard : data.p2Graveyard);
@@ -604,12 +610,27 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
         playerPassed = false;
         opponentPassed = false;
+
+        // Sync local hand if provided
+        const serverHand = isPlayer1Local ? data.p1Hand : data.p2Hand;
+        if (serverHand) {
+            syncHand(serverHand);
+        }
+
         renderAll(currentNick);
         
         // Faza startowa rundy - t05, potem t07/08
         showPrzejscie('t05', { onFinish: () => {
-            const isMyTurn = currentTurn === window.socket.id;
-            showPrzejscie(isMyTurn ? 't07' : 't08');
+            const myNrDraw = data.northernRealmsDraw && (isPlayer1Local ? data.northernRealmsDraw.p1 : data.northernRealmsDraw.p2);
+            if (myNrDraw) {
+                showPrzejscie('t11', { onFinish: () => {
+                    const isMyTurn = currentTurn === window.socket.id;
+                    showPrzejscie(isMyTurn ? 't07' : 't08');
+                }});
+            } else {
+                const isMyTurn = currentTurn === window.socket.id;
+                showPrzejscie(isMyTurn ? 't07' : 't08');
+            }
         }});
     });
 
@@ -658,7 +679,7 @@ function handleScoiaDecision(socket, gameCode, deciderId) {
         
         box.appendChild(title);
         btnsBox.appendChild(btnFirst);
-btnsBox.appendChild(btnSecond);
+        btnsBox.appendChild(btnSecond);
         box.appendChild(btnsBox);
         box.appendChild(timerText);
         overlay.appendChild(box);
@@ -735,7 +756,7 @@ export function renderAll(nick) {
         overlay.appendChild(turnDiv);
     }
 
-    renderHand(overlay);
+    renderHand();
     renderProposedCard(overlay); // Nowy krok: wizualizacja potwierdzenia zagrania
     renderNicknames(overlay, nick);
     renderStats(overlay);
@@ -745,6 +766,7 @@ export function renderAll(nick) {
     renderPiles(overlay);
     renderLeaders(overlay);
     renderRows(overlay);
+    renderWeather(overlay); // Dodajemy renderowanie pogody
 }
 
 function renderProposedCard(overlay) {
@@ -782,7 +804,7 @@ function renderProposedCard(overlay) {
     const targetTop = 1080 * scale + boardTop; // Środek Y
 
     if (isNew && window.lastProposedStartRect) {
-        // Startujemy z pozycji karty w ręce
+        // Animacja startująca z miejsca kliknięcia w łapę
         wrapper.style.transition = 'none';
         wrapper.style.left = `${window.lastProposedStartRect.left}px`;
         wrapper.style.top = `${window.lastProposedStartRect.top}px`;
@@ -791,10 +813,8 @@ function renderProposedCard(overlay) {
         wrapper.style.transform = 'none';
         wrapper.style.opacity = '0.5';
         
-        // Wymuś reflow
-        wrapper.offsetHeight;
+        wrapper.offsetHeight; // force reflow
         
-        // Rozpocznij animację do panelu bocznego
         wrapper.style.transition = 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
         wrapper.style.left = `${targetLeft}px`;
         wrapper.style.top = `${targetTop}px`;
@@ -803,7 +823,6 @@ function renderProposedCard(overlay) {
         wrapper.style.transform = 'translateY(-50%)';
         wrapper.style.opacity = '1';
     } else {
-        // Po prostu aktualizuj pozycję (np. przy resize)
         wrapper.style.left = `${targetLeft}px`;
         wrapper.style.top = `${targetTop}px`;
         wrapper.style.width = `${dkartaW}px`;
@@ -813,13 +832,10 @@ function renderProposedCard(overlay) {
 
     wrapper.style.boxShadow = `0 0 ${40 * scale}px rgba(199, 167, 110, 0.8)`;
     
-    // Pełny render
     const factionId = window.playerFaction || '1';
-    wrapper.innerHTML = renderCardHTML(card, {
-        playerFaction: factionId,
-        isLargeView: true
-    });
+    wrapper.innerHTML = renderCardHTML(card, { playerFaction: factionId, isLargeView: true });
 
+    // Ręczne dopasowanie skali czcionek w dużym podglądzie
     const content = wrapper.querySelector('.card-content');
     if (content) {
         content.style.width = '100%';
@@ -830,7 +846,7 @@ function renderProposedCard(overlay) {
         if (name) name.style.fontSize = (dkartaH * 0.044) + 'px';
     }
 
-    // Kliknięcie tła anuluje
+    // Pozwala odkliknąć wybór
     overlay.onmousedown = (e) => {
         if (e.target === overlay && window.proposedCard) {
             window.proposedCard = null;
@@ -838,7 +854,6 @@ function renderProposedCard(overlay) {
         }
     };
 }
-
 
 function renderStats(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
@@ -851,32 +866,33 @@ function renderStats(overlay) {
         div.style.position = 'absolute';
         div.style.left = `${x * scale + boardLeft}px`;
         div.style.top = `${y * scale + boardTop}px`;
-        div.style.width = 'auto'; // Auto width for centering logic
         div.style.minWidth = `${100 * scale}px`;
         div.style.textAlign = 'center';
         div.style.fontSize = `${64 * scale}px`;
         div.style.color = '#b18941';
         div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-        div.style.transform = 'translate(-50%, -50%)'; // Center on Y coordinate
+        div.style.transform = 'translate(-50%, -50%)';
         div.textContent = val;
         return div;
     };
 
-    // Card counts in hand - [550, 738] (Opponent), [550, 1418] (Player)
-    // 550 is the left boundary "za którą liczby nie mogą wyjść w lewo"
     overlay.appendChild(createStat(opponentHandCount, 550 + 50, 738));
     overlay.appendChild(createStat(playerHand.length, 550 + 50, 1418));
 }
 
 function calculateScores() {
-    const scores = { p1: { R1: 0, R2: 0, R3: 0, total: 0 }, p2: { R1: 0, R2: 0, R3: 0, total: 0 } };
-    
+    const scores = {
+        p1: { R1: 0, R2: 0, R3: 0, total: 0 },
+        p2: { R1: 0, R2: 0, R3: 0, total: 0 }
+    };
+
     if (!boardState) return scores;
 
+    // Helper: sprawdza czy pogoda danego typu jest aktywna
     const checkWeather = (type) => {
         return boardState.weather && boardState.weather.some(wNum => {
-            const wCard = cards.find(c => String(c.numer) === String(wNum));
-            return wCard && (wCard.moc === type || wCard.moc === 'sztorm' && (type === 'mgla' || type === 'deszcz'));
+            const wCard = cards.find(c => String(c.numer) === String(wNum.split('-')[1]));
+            return wCard && (wCard.moc === type || (wCard.moc === 'sztorm' && (type === 'mgla' || type === 'deszcz')));
         });
     };
 
@@ -885,6 +901,7 @@ function calculateScores() {
         let moraleCount = 0;
         let hornActive = false;
 
+        // Róg dowódcy w slocie specjalnym
         if (specialSlotVal) {
             const sCard = cards.find(c => String(c.numer) === String(specialSlotVal));
             if (sCard && sCard.moc === 'rog') hornActive = true;
@@ -895,9 +912,15 @@ function calculateScores() {
         rowCards.forEach(cardNum => {
             const card = cards.find(c => String(c.numer) === String(cardNum));
             if (card && typeof card.punkty === 'number') {
-                if (!rowDict[card.numer]) rowDict[card.numer] = { count: 0, card: card };
+                if (!rowDict[card.numer]) {
+                    rowDict[card.numer] = { count: 0, card: card };
+                }
                 rowDict[card.numer].count++;
+                
+                // Morale buff (liczymy wszystkie jednostki z morale w rzędzie prócz bohaterów)
                 if (!card.bohater && card.moc === 'morale') moraleCount++;
+                // Róg jednostki w rzędzie
+                if (!card.bohater && card.moc === 'rog') hornActive = true;
             }
         });
 
@@ -905,20 +928,26 @@ function calculateScores() {
         Object.values(rowDict).forEach(group => {
             const c = group.card;
             const count = group.count;
-            
+
             if (c.bohater) {
                 sum += c.punkty * count;
             } else {
                 let pts = weatherActive ? 1 : c.punkty;
+
+                // 1. Więź (x2 za każdą kolejną kartę o tej samej nazwie/numerze)
                 if (c.moc === 'wiez') pts *= count;
-                
+
+                // 2. Morale (+1 do bazowej/pogodowej wartości za KAŻDĄ jednostkę morale w rzędzie EXCLUDING self)
                 let mBuff = (c.moc === 'morale') ? (moraleCount - 1) : moraleCount;
                 if (mBuff > 0) pts += mBuff;
-                
+
+                // 3. Róg (x2 całości po więzi i morale)
                 if (hornActive) pts *= 2;
+
                 sum += pts * count;
             }
         });
+
         return sum;
     };
 
@@ -943,11 +972,9 @@ function renderScores(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
-    
+
     const scores = calculateScores();
     const isP1 = isPlayer1Local;
-
-    // Przypisanie wyników do gracza lokalnego i przeciwnika
     const myScores = isP1 ? scores.p1 : scores.p2;
     const oppScores = isP1 ? scores.p2 : scores.p1;
 
@@ -958,29 +985,24 @@ function renderScores(overlay) {
         div.style.left = `${x * scale + boardLeft}px`;
         div.style.top = `${y * scale + boardTop}px`;
         div.style.textAlign = 'center';
-        // Powiększone o 25% (bazowe 56 i 44)
         div.style.fontSize = isTotal ? `${56 * 1.25 * scale}px` : `${44 * 1.25 * scale}px`;
-        div.style.color = '#000000'; // Kolor czarny
-        div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif'; // Fix: Poproszona czcionka Bold
+        div.style.color = '#000000';
+        div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
         div.style.transform = 'translate(-50%, -50%)';
         div.style.fontWeight = isTotal ? 'bold' : 'normal';
         div.style.pointerEvents = 'none';
-        // Biała poświata (glow)
-        div.style.textShadow = `
-            0 0 ${10 * scale}px #ffffff,
-            0 0 ${20 * scale}px #ffffff
-        `;
+        div.style.textShadow = `0 0 ${10 * scale}px #ffffff, 0 0 ${20 * scale}px #ffffff`;
         div.textContent = val;
         return div;
     };
 
-    // Przeciwnik (Góra planszy) - R3 (Siege), R2 (Ranged), R1 (Melee)
+    // Opponent rows
     overlay.appendChild(createScoreValue(oppScores.R3, 1071, 146, false));
     overlay.appendChild(createScoreValue(oppScores.R2, 1071, 410, false));
     overlay.appendChild(createScoreValue(oppScores.R1, 1071, 686, false));
     overlay.appendChild(createScoreValue(oppScores.total, 907, 663, true));
 
-    // Gracz (Dół planszy) - R3 (Siege), R2 (Ranged), R1 (Melee)
+    // Player rows
     overlay.appendChild(createScoreValue(myScores.R3, 1071, 982, false));
     overlay.appendChild(createScoreValue(myScores.R2, 1071, 1247, false));
     overlay.appendChild(createScoreValue(myScores.R1, 1071, 1524, false));
@@ -998,26 +1020,25 @@ function renderLives(overlay) {
         img.style.position = 'absolute';
         img.style.left = `${x * scale + boardLeft}px`;
         img.style.top = `${y * scale + boardTop}px`;
-        img.style.width = `${100 * scale}px`; // Doubled size
+        img.style.width = `${100 * scale}px`;
         img.style.height = `${100 * scale}px`;
         return img;
     };
 
-    // Opponent lives
-    const oppYs = 695;
-    if (opponentLives >= 1) overlay.appendChild(createLive(721, oppYs));
-    if (opponentLives >= 2) overlay.appendChild(createLive(636, oppYs));
-
-    // Player lives
-    const playerYs = 1369;
-    if (playerLives >= 1) overlay.appendChild(createLive(721, playerYs));
-    if (playerLives >= 2) overlay.appendChild(createLive(636, playerYs));
+    if (opponentLives >= 1) overlay.appendChild(createLive(721, 695));
+    if (opponentLives >= 2) overlay.appendChild(createLive(636, 695));
+    if (playerLives >= 1) overlay.appendChild(createLive(721, 1369));
+    if (playerLives >= 2) overlay.appendChild(createLive(636, 1369));
 }
 
+/**
+ * Dodaje dynamiczną nakładkę punktową na kartach na planszy i w ręce.
+ */
 export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore = null) {
     if (typeof card.punkty !== 'number') return;
+    
     const cardScale = cardW / 180;
-
+    
     const pointsDiv = document.createElement('div');
     pointsDiv.className = 'card-points-overlay';
     pointsDiv.style.position = 'absolute';
@@ -1026,27 +1047,29 @@ export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore
     pointsDiv.style.transform = 'translate(-50%, -50%)';
     pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif'; 
     pointsDiv.style.fontSize = `${44 * cardScale}px`;
-    pointsDiv.style.fontWeight = 'normal';
     
-    // User requested coloring based on score deviation from base points
+    // Logika kolorowania punktów (proponowana przez GURU)
     const actualScore = effectiveScore !== null ? effectiveScore : card.punkty;
     let baseColor = card.bohater ? '#fcfdfc' : '#000000';
-    if (!card.bohater && actualScore > card.punkty) {
-        baseColor = '#329420'; // Green buffed
-    } else if (!card.bohater && actualScore < card.punkty) {
-        baseColor = '#942020'; // Red nerfed
+
+    if (!card.bohater) {
+        if (actualScore > card.punkty) {
+            baseColor = '#329420'; // zielony - wzmocnienie
+        } else if (actualScore < card.punkty) {
+            baseColor = '#942020'; // czerwony - osłabienie
+        }
     }
     
     pointsDiv.style.color = baseColor;
-    pointsDiv.style.textShadow = card.bohater
-        ? '0 1px 3px rgba(0,0,0,0.8)'
-        : '0 1px 2px rgba(255,255,255,0.3)';
+    pointsDiv.style.textShadow = card.bohater ? '0 1px 3px rgba(0,0,0,0.8)' : '0 1px 2px rgba(255,255,255,0.3)';
     pointsDiv.style.pointerEvents = 'none';
     pointsDiv.style.zIndex = '3';
     pointsDiv.style.lineHeight = '1';
     pointsDiv.textContent = actualScore;
-    wrapper.appendChild(pointsDiv);
     
+    wrapper.appendChild(pointsDiv);
+
+    // Jeśli bohater, dodajemy ikonkę tarczy po lewo od punktów (lub na pod punkty)
     if (card.bohater) {
         const heroIcon = document.createElement('img');
         heroIcon.src = '/gwent/assets/karty/bohater.webp';
@@ -1062,14 +1085,26 @@ export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore
     }
 }
 
-function renderHand(overlay) {
+function renderHand() {
+    const overlay = document.querySelector('#gameScreen .overlay');
+    if (!overlay) return;
+
+    // Blokada podczas animacji ruchów jeśli potrzebna
+    if (window.isProcessingMove) return;
+
+    // Jeśli jeszcze nie doleciały karty z animacji na wejście, wstrzymaj render
     if (!window.cardsAnimated && window.arrivedCards.size === 0) return;
 
-    const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
-    const areaLeft = 1163, areaTop = 1691, areaRight = 3018, areaBottom = 1932;
+    const GUI_WIDTH = 3840;
+    const GUI_HEIGHT = 2160;
+    const areaLeft = 1163;
+    const areaTop = 1691;
+    const areaRight = 3018;
+    const areaBottom = 1932;
+
     const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
     const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
-    const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     let container = overlay.querySelector('.hand-container');
     if (!container) {
@@ -1078,14 +1113,15 @@ function renderHand(overlay) {
         container.style.position = 'absolute';
         overlay.appendChild(container);
     }
-    // Update container every time (scale/res might change)
+
     container.style.left = `${areaLeft * scale + boardLeft}px`;
     container.style.top = `${areaTop * scale + boardTop}px`;
     container.style.width = `${(areaRight - areaLeft) * scale}px`;
     container.style.height = `${(areaBottom - areaTop) * scale}px`;
-    
+
     const count = playerHand.length;
     if (selectedHandIndex >= count) selectedHandIndex = -1;
+
     const totalAreaWidth = (areaRight - areaLeft) * scale;
     const cardW = 180 * scale;
     const cardH = 240 * scale;
@@ -1097,11 +1133,9 @@ function renderHand(overlay) {
     const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
     const startX = (totalAreaWidth - occupiedWidth) / 2;
 
-    // Uzgadnianie (Reconciliation) DOM
+    // Reconciliation: usuwamy tylko te których nie ma w playerHand
     const currentWrappers = Array.from(container.querySelectorAll('.hand-card-img'));
     const handCardIds = playerHand.map(c => c._id);
-
-    // Usuń te, których już nie ma
     currentWrappers.forEach(w => {
         if (!handCardIds.includes(parseFloat(w.dataset.id))) {
             container.removeChild(w);
@@ -1128,23 +1162,22 @@ function renderHand(overlay) {
             wrapper.appendChild(img);
         }
 
-        // Usuń stare nakładki przed ponownym dodaniem
+        // Punkty nakładka
         const oldPoints = wrapper.querySelectorAll('.card-points-overlay');
         oldPoints.forEach(p => p.remove());
         addCardPointsOverlay(wrapper, card, cardW, cardH);
 
-        // Aktualizuj parametry
         wrapper.style.width = `${cardW}px`;
         wrapper.style.height = `${cardH}px`;
         wrapper.dataset.index = i;
         wrapper.style.left = `${startX + i * cardStep}px`;
         wrapper.style.zIndex = i + 1;
-        
+
         const isHovered = (i === selectedHandIndex);
         wrapper.style.top = isHovered ? '25%' : '50%';
         wrapper.style.transform = isHovered ? 'translateY(-75%)' : 'translateY(-50%)';
-        
-        // Ukryj jeśli jeszcze nie doleciała LUB jest właśnie sprawdzana do zagrania
+
+        // Ukrywamy kartę w łapie jeśli jest "w locie" lub właśnie ją wybieramy do zagrania (proponujemy)
         if (!window.arrivedCards.has(card) || isProposed) {
             wrapper.style.visibility = 'hidden';
             wrapper.style.pointerEvents = 'none';
@@ -1162,35 +1195,35 @@ function renderHand(overlay) {
             updateHandVisuals(container, scale);
         };
 
-        wrapper.oncontextmenu = (e) => { e.preventDefault(); showPowiek(playerHand, i, 'hand'); };
+        wrapper.oncontextmenu = (e) => {
+            e.preventDefault();
+            showPowiek(playerHand, i, 'hand');
+        };
+
         wrapper.onclick = (e) => {
             e.stopPropagation();
             if (isMulliganActive) return;
             
-            // Rejestrujemy pozycję startową dla animacji podglądu
+            // Rejestrujemy ostatnie wymiary dla animacji podglądu
             const rect = wrapper.getBoundingClientRect();
             window.lastProposedStartRect = {
-                left: rect.left,
-                top: rect.top,
-                width: rect.width,
-                height: rect.height
+                left: rect.left, top: rect.top, width: rect.width, height: rect.height
             };
-            
+
             window.proposedCard = card;
             renderAll(currentNick);
         };
-        // Always append to sync DOM order with playerHand array
+
         container.appendChild(wrapper);
     });
 }
 
 function updateHandVisuals(container, scale) {
     if (!container) return;
-    const count = playerHand.length;
     const wrappers = container.querySelectorAll('.hand-card-img');
     wrappers.forEach((wrapper, idx) => {
         if (idx === selectedHandIndex) {
-            wrapper.style.transform = 'translateY(-75%)'; // Wysunięcie o ok. 1/4 wysokości
+            wrapper.style.transform = 'translateY(-75%)';
             wrapper.style.zIndex = '5000';
             wrapper.style.boxShadow = `0 0 ${20 * scale}px #c7a76e`;
         } else {
@@ -1201,57 +1234,37 @@ function updateHandVisuals(container, scale) {
     });
 }
 
+/**
+ * Logika kliknięcia ENTER lub bezpośredniego zagrania (fallback)
+ */
 function playCardAtIndex(index) {
-    if (isProcessingMove) return; // Prevent spamming
-    if (index < 0 || index >= playerHand.length) {
-        console.log(`[BOARD] Attempted to play card at invalid index: ${index}`);
-        return;
-    }
+    if (isProcessingMove) return;
+    if (index < 0 || index >= playerHand.length) return;
+
     const isMyTurn = currentTurn === window.socket.id;
-    console.log(`[BOARD] playCardAtIndex: turn=${currentTurn}, myID=${window.socket.id}, isMyTurn=${isMyTurn}`);
-    if (!isMyTurn) {
-        console.log("[BOARD] Blocked move: Not your turn!");
-        return;
-    }
-    if (getIsShowing()) {
-        console.log("[BOARD] Próba zagrania karty podczas wyświetlania baneru - zablokowano.");
-        return;
-    }
-    if (playerPassed) {
-        console.log("[BOARD] Cannot play card, player has passed.");
-        return;
-    }
+    if (!isMyTurn) return;
+    if (getIsShowing() || playerPassed) return;
 
     const card = playerHand[index];
     if (!card) return;
 
-    isProcessingMove = true; // Lock the UI until turn changes
-
-    const gameCode = gameCodeLocal;
-    const isP1 = isPlayer1Local;
-    
+    // Proste zagranie bez potwierdzenia (np. z klawiatury)
+    isProcessingMove = true;
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(card.moc);
     let posToPlay = card.pozycja || 1; 
-
-    // Handle Agile cards (pozycja: 4) - default to 1 for now
-    if (!isSpecial && posToPlay === 4) {
-        console.log("[BOARD] Agile card detected, defaulting to Melee (1)");
-        posToPlay = 1;
-    }
     
-    console.log(`[BOARD] Emitting play-card: ${card.numer} (${card.nazwa}) at pos ${posToPlay}. isP1: ${isP1}`);
+    // Fallback dla agile (4) -> na przód (1)
+    if (!isSpecial && posToPlay === 4) posToPlay = 1;
+
     window.socket.emit('play-card', {
-        gameCode,
-        isPlayer1: isP1,
+        gameCode: gameCodeLocal,
+        isPlayer1: isPlayer1Local,
         cardNumer: card.numer,
         pozycja: posToPlay,
         isSpecial: isSpecial
     });
 
-    // Local turn block
-    currentTurn = null; 
-
-    // Optimistic update
+    currentTurn = null; // optimistic lock
     playerHand.splice(index, 1);
     selectedHandIndex = -1;
     renderAll();
@@ -1263,19 +1276,22 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         if (e.key === 'ArrowRight') {
             selectedHandIndex = Math.min(selectedHandIndex + 1, playerHand.length - 1);
-            if (selectedHandIndex < 0 && playerHand.length > 0) selectedHandIndex = 0;
         } else {
             selectedHandIndex = Math.max(selectedHandIndex - 1, 0);
         }
-        
+        if (selectedHandIndex < 0 && playerHand.length > 0) selectedHandIndex = 0;
+
         const container = document.querySelector('.hand-container');
         if (container) {
-            const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
+            const GUI_WIDTH = 3840;
+            const GUI_HEIGHT = 2160;
             const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
             updateHandVisuals(container, scale);
         }
     } else if (e.key === 'Enter') {
-        if (selectedHandIndex !== -1) playCardAtIndex(selectedHandIndex);
+        if (selectedHandIndex !== -1) {
+            playCardAtIndex(selectedHandIndex);
+        }
     }
 });
 
@@ -1284,7 +1300,7 @@ function renderNicknames(overlay, nick) {
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const createNick = (name, x, y, fact_w, fact_h, factionId) => {
+    const createNick = (name, x, y, fact_h, factionId) => {
         const container = document.createElement('div');
         container.style.position = 'absolute';
         container.style.left = `${483 * scale + boardLeft}px`;
@@ -1301,28 +1317,25 @@ function renderNicknames(overlay, nick) {
         headerGroup.style.display = 'flex';
         headerGroup.style.alignItems = 'center';
 
-        // Faction Logo
         const logo = document.createElement('img');
         logo.src = `assets/asety/${fInfo.logo}`;
         logo.style.width = `${60 * scale}px`;
         logo.style.marginRight = `${15 * scale}px`;
         headerGroup.appendChild(logo);
 
-        // Nickname
         const nickDiv = document.createElement('div');
         nickDiv.className = 'game-nick';
         nickDiv.style.fontSize = `${32 * scale}px`;
-        nickDiv.style.color = '#b28a41'; // Requested color
+        nickDiv.style.color = '#b28a41';
         nickDiv.style.fontWeight = 'bold';
         nickDiv.textContent = name;
         headerGroup.appendChild(nickDiv);
 
         container.appendChild(headerGroup);
 
-        // Faction Name
         const factDiv = document.createElement('div');
         factDiv.style.fontSize = `${24 * scale}px`;
-        factDiv.style.color = '#b08948'; // Requested color
+        factDiv.style.color = '#b08948';
         factDiv.style.marginTop = `${5 * scale}px`;
         factDiv.textContent = fInfo.name;
         container.appendChild(factDiv);
@@ -1330,10 +1343,8 @@ function renderNicknames(overlay, nick) {
         return container;
     };
 
-    // Opponent: {483, 569 - 850, 602}
-    overlay.appendChild(createNick(window.opponentNickname || 'PRZECIWNIK', 483, 569, 850, 602, window.opponentFaction));
-    // Player: {483, 1498 x 850, 1532}
-    overlay.appendChild(createNick(nick, 483, 1498, 850, 1532, window.playerFaction));
+    overlay.appendChild(createNick(window.opponentNickname || 'PRZECIWNIK', 483, 569, 602, window.opponentFaction));
+    overlay.appendChild(createNick(nick, 483, 1498, 1532, window.playerFaction));
 }
 
 function renderGraveyards(overlay) {
@@ -1341,11 +1352,11 @@ function renderGraveyards(overlay) {
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const renderGraveyardGroup = (x, y, cardList, isOpponent) => {
+    const renderGraveyardGroup = (x, y, cardList) => {
         const count = cardList.length;
         if (count === 0) return;
 
-        // Render stack (bottom card i=0 at [X, Y])
+        // Renderujemy stos (warstwy)
         for (let i = 0; i < count; i++) {
             const cardObj = cardList[i];
             const cardW = 179 * scale;
@@ -1353,57 +1364,55 @@ function renderGraveyards(overlay) {
             
             const wrapper = document.createElement('div');
             wrapper.style.position = 'absolute';
-            const offset = i; 
-            wrapper.style.left = `${(x - offset) * scale + boardLeft}px`;
-            wrapper.style.top = `${(y - offset) * scale + boardTop}px`;
+            wrapper.style.left = `${(x - i) * scale + boardLeft}px`;
+            wrapper.style.top = `${(y - i) * scale + boardTop}px`;
             wrapper.style.width = `${cardW}px`;
             wrapper.style.height = `${cardH}px`;
             wrapper.style.zIndex = 5 + i;
-            
+
             const img = document.createElement('img');
             img.src = cardObj.karta;
             img.style.width = '100%';
             img.style.height = '100%';
-            img.style.display = 'block';
             wrapper.appendChild(img);
 
-            if (i === count - 1) { // Top card
+            // Wierzch stosu clickable
+            if (i === count - 1) {
                 wrapper.style.cursor = 'pointer';
                 wrapper.onclick = () => {
                     if (window.showPowiek) window.showPowiek(cardList, cardList.length - 1, 'game');
                 };
-                // Dodaj punkty tylko dla górnej karty
                 addCardPointsOverlay(wrapper, cardObj, cardW, cardH);
             }
+
             overlay.appendChild(wrapper);
         }
     };
 
-    // Corrected positions for graveyard stacking
-    // Player GY: 3110, 1682
-    renderGraveyardGroup(3110, 1682, playerGraveyard, false);
-    // Opponent GY: 3110, 168 (No rotate, show faces)
-    renderGraveyardGroup(3110, 168, opponentGraveyard, true);
+    renderGraveyardGroup(3110, 1682, playerGraveyard);
+    renderGraveyardGroup(3110, 168, opponentGraveyard);
 }
 
 function confirmPlayProposed(targetData = {}) {
     if (!window.proposedCard) return;
+
     const card = window.proposedCard;
-    
-    // Ustalanie pozycji zagrania
     let finalPos = targetData.rowIdx || (card.pozycja === 4 ? 1 : card.pozycja);
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(card.moc);
-    
+
+    // Animacja przejścia z "dużej" karty na planszę (uproszczona)
     const preview = document.getElementById('proposed-card-preview');
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     if (preview) {
+        // Tworzymy małą kopię która poleci do celu
         const smallProxy = document.createElement('div');
         smallProxy.style.position = 'absolute';
+        
         const largeCenter = 3120 + (523 / 2);
-        smallProxy.style.left = `${(largeCenter - (180 / 2)) * scale + boardLeft}px`; 
+        smallProxy.style.left = `${(largeCenter - 90) * scale + boardLeft}px`; 
         smallProxy.style.top = `${1080 * scale + boardTop}px`;
         smallProxy.style.transform = 'translateY(-50%)';
         smallProxy.style.width = `${180 * scale}px`;
@@ -1421,17 +1430,10 @@ function confirmPlayProposed(targetData = {}) {
         preview.style.opacity = '0';
         preview.style.transform = 'translateY(-50%) scale(0.9)';
 
-        // Animacja do celu
         setTimeout(() => {
-            // Obliczamy przybliżoną pozycję docelową rzędu
             let targetX = 1412 + 1609/2;
-            let targetY = 1000; // Środek domyślny
-            
-            const rCoords = {
-                1: 863 + 120,
-                2: 1129 + 120,
-                3: 1407 + 120
-            };
+            let targetY = 1000;
+            const rCoords = { 1: 863 + 120, 2: 1129 + 120, 3: 1407 + 120 };
             if (rCoords[finalPos]) targetY = rCoords[finalPos];
 
             smallProxy.style.left = `${(targetX - 90) * scale + boardLeft}px`;
@@ -1441,22 +1443,26 @@ function confirmPlayProposed(targetData = {}) {
         }, 50);
     }
 
-    // Wywołujemy standardowe zagranie na serwerze
     window.socket.emit('play-card', {
         gameCode: gameCodeLocal,
         isPlayer1: isPlayer1Local,
         cardNumer: card.numer,
         pozycja: finalPos,
-        isSpecial: isSpecial
+        isSpecial: isSpecial,
+        targetCardNumer: targetData.targetCardNumer,
+        targetRow: targetData.targetRow
     });
 
+    const handIdx = playerHand.findIndex(c => c._id === card._id);
+    if (handIdx !== -1) playerHand.splice(handIdx, 1);
+
     window.proposedCard = null;
-    isProcessingMove = true; 
+    isProcessingMove = true; // Lock ui while server proccesses
     renderAll(currentNick);
 }
 
 function renderWeather(overlay) {
-    if (!boardState || !boardState.weather || boardState.weather.length === 0) return;
+    if (!boardState) return;
 
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
@@ -1464,72 +1470,66 @@ function renderWeather(overlay) {
 
     const weatherW = 549 * scale;
     const weatherH = 239 * scale;
-    const cardH = weatherH;
-    const cardW = cardH * (180 / 240);
-    
+    const cardW = weatherH * (180 / 240);
+
     let container = overlay.querySelector('#weather-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'weather-container';
         container.style.position = 'absolute';
+        container.style.zIndex = 40; // Ma być pod dużym podglądem karty
+        container.style.pointerEvents = 'none'; // Domyślnie klikanie przelatuje pod spód
         overlay.appendChild(container);
     }
-    
+
     container.style.left = `${286 * scale + boardLeft}px`;
     container.style.top = `${917 * scale + boardTop}px`;
     container.style.width = `${weatherW}px`;
     container.style.height = `${weatherH}px`;
-    
-    // Rozkład max 3 kart.
-    const count = Math.min(boardState.weather.length, 3);
-    
-    // Obliczamy krok.
+
+    // Drop area dla kart pogody
+    if (window.proposedCard && ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(window.proposedCard.moc)) {
+        container.style.backgroundColor = 'rgba(199, 167, 110, 0.2)';
+        container.style.pointerEvents = 'auto';
+        container.style.cursor = 'pointer';
+        container.onclick = (e) => {
+            e.stopPropagation();
+            confirmPlayProposed({ rowIdx: 1 }); // Weather always targets 1 on server for convention
+        };
+    } else {
+        container.style.backgroundColor = 'transparent';
+        container.style.pointerEvents = 'none';
+        container.style.cursor = 'default';
+        container.onclick = null;
+    }
+
+    const weatherList = boardState.weather || [];
+    const count = Math.min(weatherList.length, 3);
+
     let cardStep = cardW + (5 * scale);
     if (count * cardStep > weatherW) {
         cardStep = (weatherW - cardW) / Math.max(1, count - 1);
     }
-    const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
-    const startX = (weatherW - occupiedWidth) / 2;
+    const startX = (weatherW - (count > 0 ? (count - 1) * cardStep + cardW : 0)) / 2;
 
-    // Reconciliation
-    const currentChildren = Array.from(container.children);
-    if (currentChildren.length > count) {
-        for (let j = count; j < currentChildren.length; j++) {
-            container.removeChild(currentChildren[j]);
-        }
-    }
-
-    // Wyświetl tylko 3 ostatnie z zagranych pogód
-    const visibleWeather = boardState.weather.slice(-3);
-
-    visibleWeather.forEach((wStr, i) => {
+    container.innerHTML = '';
+    weatherList.slice(-3).forEach((wStr, i) => {
         const wNum = wStr.split('-')[1];
         const card = cards.find(c => String(c.numer) === String(wNum));
         if (card) {
-            let wrapper = container.children[i];
-            if (!wrapper) {
-                wrapper = document.createElement('div');
-                wrapper.className = 'board-card-wrapper pointer-events-none';
-                wrapper.style.position = 'absolute';
-                wrapper.style.height = '100%';
-                wrapper.style.width = `${cardW}px`;
-                wrapper.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
-                
-                const img = document.createElement('img');
-                img.style.height = '100%';
-                img.style.width = 'auto';
-                img.style.display = 'block';
-                wrapper.appendChild(img);
-                container.appendChild(wrapper);
-            }
-            
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.height = '100%';
             wrapper.style.width = `${cardW}px`;
-            if (wrapper.querySelector('img').src.indexOf(card.karta) === -1) {
-                wrapper.querySelector('img').src = card.karta;
-            }
-
             wrapper.style.left = `${startX + i * cardStep}px`;
             wrapper.style.zIndex = i + 1;
+
+            const img = document.createElement('img');
+            img.src = card.karta;
+            img.style.height = '100%';
+            img.style.width = '100%';
+            wrapper.appendChild(img);
+            container.appendChild(wrapper);
         }
     });
 }
@@ -1540,25 +1540,21 @@ function renderRows(overlay) {
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const isP1 = isPlayer1Local;
-    console.log(`[BOARD] renderRows: isP1=${isP1}, boardState=`, boardState);
-
-    // Rows: 1=Melee, 2=Ranged, 3=Siege
+    
+    // Konfiguracja fizycznych współrzędnych rzędów na planszy 4K
     const rowCoords = {
-        opp3: { x: 1412, y: 29, w: 1609, h: 239 },
-        opp2: { x: 1412, y: 294, w: 1609, h: 239 },
-        opp1: { x: 1412, y: 565, w: 1609, h: 239 },
-        self1: { x: 1412, y: 863, w: 1609, h: 239 },
+        opp3:  { x: 1412, y: 29,   w: 1609, h: 239 },
+        opp2:  { x: 1412, y: 294,  w: 1609, h: 239 },
+        opp1:  { x: 1412, y: 565,  w: 1609, h: 239 },
+        self1: { x: 1412, y: 863,  w: 1609, h: 239 },
         self2: { x: 1412, y: 1129, w: 1609, h: 239 },
         self3: { x: 1412, y: 1407, w: 1609, h: 239 }
     };
+
     const renderRowCards = (rowKey, coords) => {
         const cardsInRowNumers = boardState[rowKey] || [];
-        // Map numbers to card objects BUT we need persistent IDs for board cards too
-        // In boardState, we only have numbers.
-        // I'll create stable IDs for cards in rows based on their index in the array? 
-        // No, that fails if someone draws from graveyard.
-        
         const count = cardsInRowNumers.length;
+
         const totalRowWidth = coords.w * scale;
         const cardH = coords.h * scale;
         const cardW = cardH * (180 / 240);
@@ -1578,32 +1574,41 @@ function renderRows(overlay) {
             rowDiv.style.position = 'absolute';
             overlay.appendChild(rowDiv);
         }
-
         rowDiv.style.left = `${coords.x * scale + boardLeft}px`;
         rowDiv.style.top = `${coords.y * scale + boardTop}px`;
         rowDiv.style.width = `${totalRowWidth}px`;
         rowDiv.style.height = `${cardH}px`;
 
-        // Highlight valid row
+        // Podświetlanie rzędów przy zagrywaniu karty
         if (window.proposedCard) {
             const pCard = window.proposedCard;
             const isMelee = rowKey.endsWith('1');
             const isRanged = rowKey.endsWith('2');
             const isSiege = rowKey.endsWith('3');
-            const isMySide = rowKey.startsWith(isPlayer1Local ? 'p1' : 'p2');
-            
-            let isValid = false;
-            if (isMySide) {
-                if (pCard.pozycja === 1 && isMelee) isValid = true;
-                if (pCard.pozycja === 2 && isRanged) isValid = true;
-                if (pCard.pozycja === 3 && isSiege) isValid = true;
-                if (pCard.pozycja === 4 && (isMelee || isRanged)) isValid = true;
-                // Special cards handled separately usually but for now let's allow row clicks
-                if (pCard.numer === "002" || pCard.moc === "rog") isValid = true;
+            const isMySide = rowKey.startsWith(isP1 ? 'p1' : 'p2');
+
+            // Logika walidacji rzędu
+            const isWeather = ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(pCard.moc);
+            const isHornSpecial = (pCard.typ === 'specjalna' && pCard.moc === 'rog');
+
+            let isValidRow = false;
+
+            // WYJĄTEK JASKIER/INNI Z ROGIEM JEDNOSTKI
+            if (pCard.moc === 'rog_jednostki' || pCard.numer === '021' || pCard.numer === '522') {
+                isValidRow = isMySide && (parseInt(rowKey.slice(-1)) === pCard.pozycja);
+            }
+            // Karty jednostek, szpiedzy, medyk itd.
+            else if (isMySide && !isWeather && !isHornSpecial) {
+                if (pCard.pozycja === 1 && isMelee) isValidRow = true;
+                if (pCard.pozycja === 2 && isRanged) isValidRow = true;
+                if (pCard.pozycja === 3 && isSiege) isValidRow = true;
+                if (pCard.pozycja === 4 && (isMelee || isRanged)) isValidRow = true;
+                
+                // Dowódca jako róg w rzędzie (specyficzne karty)
+                if (pCard.numer === "002" || pCard.moc === "rog") isValidRow = true;
             }
 
-            if (isValid) {
-                rowDiv.classList.add('valid-row-hl');
+            if (isValidRow) {
                 rowDiv.style.backgroundColor = 'rgba(199, 167, 110, 0.2)';
                 rowDiv.style.cursor = 'pointer';
                 rowDiv.onclick = (e) => {
@@ -1611,123 +1616,80 @@ function renderRows(overlay) {
                     confirmPlayProposed({ rowIdx: isMelee ? 1 : (isRanged ? 2 : 3) });
                 };
             } else {
-                rowDiv.classList.remove('valid-row-hl');
                 rowDiv.style.backgroundColor = 'transparent';
                 rowDiv.style.cursor = 'default';
                 rowDiv.onclick = null;
             }
         } else {
-            rowDiv.classList.remove('valid-row-hl');
             rowDiv.style.backgroundColor = 'transparent';
             rowDiv.style.cursor = 'default';
+            rowDiv.onclick = null;
         }
 
-        // Reconciliation
-        const currentChildren = Array.from(rowDiv.children);
-        // Remove excess
-        if (currentChildren.length > count) {
-            for (let j = count; j < currentChildren.length; j++) {
-                rowDiv.removeChild(currentChildren[j]);
-            }
-        }
-
+        // Czyszczenie rzędu (lub reconciliation)
+        rowDiv.innerHTML = '';
         cardsInRowNumers.forEach((numer, i) => {
             const card = cards.find(c => c.numer === String(numer));
             if (card) {
-                let wrapper = rowDiv.children[i];
-                if (!wrapper) {
-                    wrapper = document.createElement('div');
-                    wrapper.className = 'board-card-wrapper';
-                    wrapper.style.position = 'absolute';
-                    wrapper.style.height = '100%';
-                    wrapper.style.width = `${cardW}px`;
-                    wrapper.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
-                    
-                    const img = document.createElement('img');
-                    img.style.height = '100%';
-                    img.style.width = 'auto';
-                    img.style.display = 'block';
-                    wrapper.appendChild(img);
-                    rowDiv.appendChild(wrapper);
-                }
-                
-                // Update
+                const wrapper = document.createElement('div');
+                wrapper.className = 'board-card-wrapper';
+                wrapper.style.position = 'absolute';
+                wrapper.style.height = '100%';
                 wrapper.style.width = `${cardW}px`;
-                if (wrapper.querySelector('img').src.indexOf(card.karta) === -1) {
-                    wrapper.querySelector('img').src = card.karta;
-                }
-
-                // Usuń stare punkty/ikony przed odświeżeniem
-                const oldPoints = wrapper.querySelectorAll('.card-points-overlay');
-                oldPoints.forEach(p => p.remove());
-
-                // Modyfikacja koloru punktów na podstawie siły modyfikowanej (zmienność kolorów)
-                const checkWeather = (type) => {
-                    return boardState.weather && boardState.weather.some(wNum => {
-                        const wCard = cards.find(c => String(c.numer) === String(wNum));
-                        return wCard && (wCard.moc === type || wCard.moc === 'sztorm' && (type === 'mgla' || type === 'deszcz'));
-                    });
-                };
-
-                let cardScore = card.punkty;
-                if (!card.bohater && typeof card.punkty === 'number') {
-                    const rowNum = parseInt(rowKey.slice(-1));
-                    let isWeatherActive = false;
-                    if (rowNum === 1 && checkWeather('mroz')) isWeatherActive = true;
-                    if (rowNum === 2 && checkWeather('mgla')) isWeatherActive = true;
-                    if (rowNum === 3 && checkWeather('deszcz')) isWeatherActive = true;
-                    
-                    if (isWeatherActive) cardScore = 1;
-
-                    // Bond/Wiez logic visually (if multiple cards of same name)
-                    // We just count occurrences in this very row to display current effective points.
-                    const cardsInSameRow = boardState[rowKey] || [];
-                    const bondCount = cardsInSameRow.filter(num => num === card.numer).length;
-                    
-                    if (card.moc === 'wiez') cardScore *= bondCount;
-                    
-                    // Morale logic
-                    let moraleCount = 0;
-                    cardsInSameRow.forEach(cNum => {
-                        const cObj = cards.find(c => String(c.numer) === String(cNum));
-                        if (cObj && !cObj.bohater && cObj.moc === 'morale') moraleCount++;
-                    });
-                    
-                    let mBuff = (card.moc === 'morale') ? (moraleCount - 1) : moraleCount;
-                    if (mBuff > 0) cardScore += mBuff;
-
-                    // Horn logic
-                    const specialSlotKey = rowKey.substring(0, 2) + 'S' + rowKey.slice(-1);
-                    const specialSlotVal = boardState[specialSlotKey];
-                    let hornActive = false;
-                    if (specialSlotVal) {
-                        const sCard = cards.find(c => String(c.numer) === String(specialSlotVal));
-                        if (sCard && sCard.moc === 'rog') hornActive = true;
-                    }
-                    if (hornActive) cardScore *= 2;
-                }
-
-                addCardPointsOverlay(wrapper, card, cardW, cardH, cardScore);
-
                 wrapper.style.left = `${startX + i * cardStep}px`;
                 wrapper.style.zIndex = i + 1;
                 wrapper.dataset.numer = card.numer;
-                const rowRealKey = rowKey.startsWith('p1') ? 'p1' : 'p2';
-                wrapper.dataset.side = rowRealKey;
+                wrapper.dataset.side = rowKey.startsWith('p1') ? 'p1' : 'p2';
 
-                // Target for Decoy
-                if (window.proposedCard && window.proposedCard.moc === 'manek') {
-                    const isMyCard = (rowKey.startsWith('p1') === isPlayer1Local);
-                    if (isMyCard && !card.bohater) {
-                        wrapper.style.cursor = 'pointer';
-                        wrapper.classList.add('valid-target');
-                        wrapper.onclick = (e) => {
-                            e.stopPropagation();
-                            confirmPlayProposed({ targetCardNumer: card.numer, targetRow: rowKey });
-                        };
+                const img = document.createElement('img');
+                img.src = card.karta;
+                img.style.height = '100%';
+                img.style.width = '100%';
+                wrapper.appendChild(img);
+
+                // Liczenie rzeczywistej siły karty (podgląd)
+                let cardScore = card.punkty;
+                if (!card.bohater && typeof card.punkty === 'number') {
+                    const checkW = (t) => boardState.weather && boardState.weather.some(w => {
+                        const wc = cards.find(c => c.numer === w.split('-')[1]);
+                        return wc && (wc.moc === t || (wc.moc === 'sztorm' && (t === 'mgla' || t === 'deszcz')));
+                    });
+                    const rowNum = parseInt(rowKey.slice(-1));
+                    if ((rowNum === 1 && checkW('mroz')) || (rowNum === 2 && checkW('mgla')) || (rowNum === 3 && checkW('deszcz'))) {
+                        cardScore = 1;
+                    }
+                    // Więź
+                    const bondCnt = cardsInRowNumers.filter(n => n === card.numer).length;
+                    if (card.moc === 'wiez') cardScore *= bondCnt;
+                    // Morale i Rogi
+                    let moraleCnt = 0;
+                    let rowHorn = false;
+                    cardsInRowNumers.forEach(cn => {
+                        const co = cards.find(c => c.numer === cn);
+                        if (co && !co.bohater) {
+                            if (co.moc === 'morale') moraleCnt++;
+                            if (co.moc === 'rog') rowHorn = true;
+                        }
+                    });
+                    cardScore += (card.moc === 'morale' ? moraleCnt - 1 : moraleCnt);
+                    const sSlot = boardState[rowKey.substring(0, 2) + 'S' + rowKey.slice(-1)];
+                    if (rowHorn || (sSlot && cards.find(c => c.numer === sSlot).moc === 'rog')) {
+                        cardScore *= 2;
                     }
                 }
 
+                addCardPointsOverlay(wrapper, card, cardW, cardH, cardScore);
+                
+                // Obsługa manekina (tylko na swoje karty nie-bohaterów)
+                if (window.proposedCard && window.proposedCard.moc === 'manek' && !card.bohater && rowKey.startsWith(isP1 ? 'p1' : 'p2')) {
+                    wrapper.style.cursor = 'pointer';
+                    wrapper.onclick = (e) => {
+                        e.stopPropagation();
+                        confirmPlayProposed({ targetCardNumer: card.numer, targetRow: rowKey });
+                    };
+                }
+
+                // Hover effect
                 wrapper.onmouseenter = () => {
                     wrapper.style.zIndex = '5000';
                     wrapper.style.transform = 'translateY(-15%)';
@@ -1738,29 +1700,50 @@ function renderRows(overlay) {
                     wrapper.style.transform = 'none';
                     wrapper.style.boxShadow = 'none';
                 };
+
+                rowDiv.appendChild(wrapper);
             }
         });
     };
 
-
     const renderSpecialSlot = (rowIdx, sidePrefix, yCoord) => {
-        const numer = boardState[`${sidePrefix}S${rowIdx}`];
-        if (!numer) return;
-        const card = cards.find(c => c.numer === numer);
-        if (!card) return;
+        let slot = overlay.querySelector(`#special-slot-${sidePrefix}-${rowIdx}`);
+        if (!slot) {
+            slot = document.createElement('div');
+            slot.id = `special-slot-${sidePrefix}-${rowIdx}`;
+            slot.style.position = 'absolute';
+            overlay.appendChild(slot);
+        }
+        slot.style.left = `${1182 * scale + boardLeft}px`;
+        slot.style.top = `${yCoord * scale + boardTop}px`;
+        slot.style.width = `${179 * scale}px`;
+        slot.style.height = `${239 * scale}px`;
 
-        const img = document.createElement('img');
-        img.src = card.karta;
-        img.className = 'board-card-wrapper'; // Specjalny slot też jest kartą na planszy
-        img.dataset.numer = card.numer;
-        img.dataset.side = sidePrefix;
-        img.style.position = 'absolute';
-        // x: 1182 - 1361 (w: 179)
-        img.style.left = `${1182 * scale + boardLeft}px`;
-        img.style.top = `${yCoord * scale + boardTop}px`;
-        img.style.width = `${179 * scale}px`;
-        img.style.height = `${239 * scale}px`;
-        overlay.appendChild(img);
+        if (window.proposedCard && window.proposedCard.typ === 'specjalna' && window.proposedCard.moc === 'rog' && sidePrefix === (isP1 ? 'p1' : 'p2')) {
+            slot.style.backgroundColor = 'rgba(199, 167, 110, 0.4)';
+            slot.style.cursor = 'pointer';
+            slot.onclick = (e) => {
+                e.stopPropagation();
+                confirmPlayProposed({ rowIdx: rowIdx, isSpecial: true });
+            };
+        } else {
+            slot.style.backgroundColor = 'transparent';
+            slot.style.cursor = 'default';
+            slot.onclick = null;
+        }
+
+        slot.innerHTML = '';
+        const num = boardState[`${sidePrefix}S${rowIdx}`];
+        if (num) {
+            const card = cards.find(c => c.numer === num);
+            if (card) {
+                const img = document.createElement('img');
+                img.src = card.karta;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                slot.appendChild(img);
+            }
+        }
     };
 
     if (isP1) {
@@ -1800,39 +1783,32 @@ function renderPiles(overlay) {
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const renderPileGroup = (x, y, count, factionId, isOpponent) => {
-        const fInfo = factionInfo[factionId || '1'] || factionInfo["1"];
-        const reverseSrc = `assets/asety/${fInfo.reverse}`;
-
-        // Render stack (bottom card i=0 at [X, Y])
+        const reverseSrc = `assets/asety/${(factionInfo[factionId || '1'] || factionInfo["1"]).reverse}`;
         for (let i = 0; i < count; i++) {
             const pile = document.createElement('img');
             pile.src = reverseSrc;
             pile.style.position = 'absolute';
-            // Each next card shifts 1px left and top relative to the bottom one
-            const offset = i; 
-            pile.style.left = `${(x - offset) * scale + boardLeft}px`;
-            pile.style.top = `${(y - offset) * scale + boardTop}px`;
+            pile.style.left = `${(x - i) * scale + boardLeft}px`; 
+            pile.style.top = `${(y - i) * scale + boardTop}px`;
             pile.style.width = `${175 * scale}px`;
             pile.style.height = `${300 * scale}px`;
             pile.style.zIndex = 100 + i;
             overlay.appendChild(pile);
 
-            if (i === count - 1) { // Top card interaction
-                if (!isOpponent) {
-                    pile.style.cursor = 'pointer';
-                    pile.oncontextmenu = (e) => {
-                        e.preventDefault();
-                        if (window.showPowiek) window.showPowiek(drawPile, 0, 'game');
-                    };
-                }
+            if (i === count - 1 && !isOpponent) {
+                pile.style.cursor = 'pointer';
+                pile.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    if (window.showPowiek) window.showPowiek(drawPile, 0, 'game');
+                };
             }
         }
 
-        // Count box
+        // Overlay licznika
         const boxX = isOpponent ? 3484 : 3493;
         const boxY = isOpponent ? 358 : 1901;
-        const boxW = isOpponent ? (3583 - 3484) : (3591 - 3493);
-        const boxH = isOpponent ? (432 - 358) : (1974 - 1901);
+        const boxW = isOpponent ? 99 : 98;
+        const boxH = isOpponent ? 74 : 73;
 
         const box = document.createElement('div');
         box.style.position = 'absolute';
@@ -1847,15 +1823,14 @@ function renderPiles(overlay) {
         box.style.zIndex = 200;
 
         const countText = document.createElement('div');
-        countText.style.color = '#c7a76e'; // Deck count color
+        box.appendChild(countText);
+        countText.style.color = '#c7a76e';
         countText.style.fontSize = `${boxH * 0.5 * scale}px`;
         countText.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
         countText.textContent = count;
-        box.appendChild(countText);
         overlay.appendChild(box);
     };
 
-    // Corrected positions for stacking offset base (bottom card)
     renderPileGroup(3459, 1656, drawPile.length, window.playerFaction, false);
     renderPileGroup(3459, 132, opponentDeckCount, window.opponentFaction, true);
 }
@@ -1866,11 +1841,7 @@ function renderLeaders(overlay) {
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const createLeader = (leaderObj, x, y, isOpponent) => {
-        if (!leaderObj) return;
-        // Zabezpieczenie przed pokazywaniem dopóki animacja trwa
-        if (!isOpponent && !window.leaderAnimated) return;
-        if (isOpponent && !window.opponentLeaderAnimated) return;
-
+        if (!leaderObj || (!isOpponent && !window.leaderAnimated) || (isOpponent && !window.opponentLeaderAnimated)) return;
         const img = document.createElement('img');
         img.src = leaderObj.karta;
         img.style.position = 'absolute';
@@ -1879,22 +1850,19 @@ function renderLeaders(overlay) {
         img.style.width = `${180 * scale}px`;
         img.style.height = `${240 * scale}px`;
         img.style.cursor = 'pointer';
-        img.onclick = () => {
-            if (window.showPowiek) window.showPowiek([leaderObj], 0, 'leaders');
-        };
+        img.onclick = () => { if (window.showPowiek) window.showPowiek([leaderObj], 0, 'leaders'); };
         overlay.appendChild(img);
     };
-
     createLeader(playerLeaderObj, 286, 1679, false);
     createLeader(opponentLeaderObj, 286, 174, true);
 
-    // Przycisk PASS obok dowódcy gracza
+    // PASS button
     if (window.gameStarted && !playerPassed) {
         const passBtn = document.createElement('button');
         passBtn.className = 'game-pass-btn';
         passBtn.style.position = 'absolute';
-        passBtn.style.left = `${490 * scale + boardLeft}px`; 
-        passBtn.style.top = `${1779 * scale + boardTop}px`; // Wyrównanie do dolnej połowy karty dowódcy
+        passBtn.style.left = `${490 * scale + boardLeft}px`;
+        passBtn.style.top = `${1779 * scale + boardTop}px`;
         passBtn.style.width = `${120 * scale}px`;
         passBtn.style.height = `${50 * scale}px`;
         passBtn.style.backgroundColor = '#1a1a1a';
@@ -1903,46 +1871,35 @@ function renderLeaders(overlay) {
         passBtn.style.color = '#b28a41';
         passBtn.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
         passBtn.style.fontSize = `${28 * scale}px`;
-        passBtn.style.boxShadow = '0 0 10px rgba(0,0,0,0.8)';
-        passBtn.style.cursor = 'pointer';
         passBtn.textContent = 'PASS';
-        
-        const isMyTurn = currentTurn === window.socket.id;
-        if (!isMyTurn) {
+        passBtn.style.cursor = 'pointer';
+
+        if (currentTurn !== window.socket.id) {
             passBtn.style.opacity = '0.5';
             passBtn.style.cursor = 'not-allowed';
-            passBtn.onmouseenter = () => passBtn.style.backgroundColor = '#2a2a2a';
-            passBtn.onmouseleave = () => passBtn.style.backgroundColor = '#1a1a1a';
         }
 
         passBtn.onclick = () => {
             if (currentTurn === window.socket.id) {
                 window.socket.emit('pass-turn', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
-            } else {
-                console.log("[BOARD] Cannot pass, not your turn.");
             }
         };
-
         overlay.appendChild(passBtn);
     }
 }
 
-function collectCardsOnBoardDOM(isTargetOpponent) {
+function collectCardsOnBoardDOM(isOpponent) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const boardCards = [];
-    const wrappers = document.querySelectorAll('.board-card-wrapper');
-    
-    wrappers.forEach(w => {
-        const side = w.dataset.side; // 'p1' or 'p2'
+    document.querySelectorAll('.board-card-wrapper').forEach(w => {
+        const side = w.dataset.side;
         const isActuallyOpponent = (isPlayer1Local && side === 'p2') || (!isPlayer1Local && side === 'p1');
-        
-        if (isActuallyOpponent === isTargetOpponent) {
+        if (isActuallyOpponent === isOpponent) {
             const rect = w.getBoundingClientRect();
-            const cardNum = w.dataset.numer;
-            const cardObj = cards.find(c => c.numer === cardNum);
+            const cardObj = cards.find(c => c.numer === w.dataset.numer);
             if (cardObj) {
                 boardCards.push({
                     card: cardObj,
@@ -1958,38 +1915,53 @@ function collectCardsOnBoardDOM(isTargetOpponent) {
 }
 
 function handleRoundEnd(data) {
-    const { winner, p1Score, p2Score, p1Lives, p2Lives } = data;
-    
-    // 1. Zidentyfikuj karty na planszy ZANIM je wyczyścisz
+    const { roundResult, p1Score, p2Score, p1Lives, p2Lives } = data;
+    const winner = roundResult;
+
     const myBoardCards = collectCardsOnBoardDOM(false);
     const oppBoardCards = collectCardsOnBoardDOM(true);
 
-    // 2. Wybierz kod banera
-    let bannerCode = 't24'; // Remis
-    if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23'; // Wygrana
-    else if (winner) bannerCode = 't22'; // Przegrana
+    let bannerCode = 't24'; 
+    if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23';
+    else if (winner) bannerCode = 't22';
 
-    // 3. Pokaz baner i RÓWNOLEGLE zacznij animację czyszczenia
-    showPrzejscie(bannerCode);
-    
-    // Lokalne czyszczenie stanu, żeby karta zniknęła z "tła" a została tylko animacja
-    boardState = {
-        p1R1:[], p1R2:[], p1R3:[], p2R1:[], p2R2:[], p2R3:[],
-        p1S1:null, p1S2:null, p1S3:null, p2S1:null, p2S2:null, p2S3:null
-    };
+    showPrzejscie(bannerCode, {
+        onFinish: () => {
+            playerLives = isPlayer1Local ? p1Lives : p2Lives;
+            opponentLives = isPlayer1Local ? p2Lives : p1Lives;
+            renderAll(currentNick);
+        }
+    });
+
+    const myGYPos = { x: 3110, y: 1682 };
+    const oppGYPos = { x: 3110, y: 168 };
+
+    animateBoardToGraveyard(myBoardCards, myGYPos, () => {
+        if (playerGraveyard) playerGraveyard.push(...myBoardCards.map(c => c.card));
+        renderAll(currentNick);
+    });
+    animateBoardToGraveyard(oppBoardCards, oppGYPos, () => {
+        if (opponentGraveyard) opponentGraveyard.push(...oppBoardCards.map(c => c.card));
+        renderAll(currentNick);
+    });
+}
+
+function syncHand(serverHandNums) {
+    const newHand = [];
+    serverHandNums.forEach(num => {
+        const existingCard = playerHand.find(c => c.numer === String(num));
+        if (existingCard) {
+            newHand.push(existingCard);
+            playerHand = playerHand.filter(c => c !== existingCard);
+        } else {
+            const cardData = cards.find(c => c.numer === String(num));
+            if (cardData) {
+                newHand.push({ ...cardData, _id: Math.random() });
+            }
+        }
+    });
+    playerHand = newHand;
+    playerHand.forEach(c => window.arrivedCards.add(c));
+    sortHand();
     renderAll(currentNick);
-
-    // Animacja trupów
-    animateBoardToGraveyard(myBoardCards, false, playerGraveyard.length, () => {
-        myBoardCards.forEach(item => playerGraveyard.push(item.card));
-        renderAll(currentNick);
-    });
-    animateBoardToGraveyard(oppBoardCards, true, opponentGraveyard.length, () => {
-        oppBoardCards.forEach(item => opponentGraveyard.push(item.card));
-        renderAll(currentNick);
-    });
-
-    // Aktualizacja żyć po animacji (lub w jej trakcie)
-    playerLives = isPlayer1Local ? p1Lives : p2Lives;
-    opponentLives = isPlayer1Local ? p2Lives : p1Lives;
 }
