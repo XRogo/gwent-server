@@ -519,6 +519,41 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
     });
 
+    socket.on('medic-revive-prompt', (data) => {
+        console.log("[BOARD] Received medic-revive-prompt", data);
+        if (!data.graveyard || data.graveyard.length === 0) return;
+
+        const graveObjs = data.graveyard.map(num => {
+            const c = cards.find(card => String(card.numer) === String(num));
+            return c ? { ...c, _id: Math.random() } : null;
+        }).filter(Boolean);
+
+        if (graveObjs.length > 0 && typeof window.showPowiek === 'function') {
+            window.showPowiek(graveObjs, 0, 'graveyard', {
+                isMedic: true,
+                onSelect: (selectedCard) => {
+                    console.log(`[BOARD] Medic revived card ${selectedCard.numer}`);
+                    // Dedykowany mechanizm. Karty lądują domyślnie według ich pozycji, agile na froncie
+                    let targetRowStr;
+                    const rType = selectedCard.pozycja;
+                    const side = isPlayer1Local ? 'p1' : 'p2';
+                    if (rType === 1) targetRowStr = `${side}R1`;
+                    else if (rType === 2) targetRowStr = `${side}R2`;
+                    else if (rType === 3) targetRowStr = `${side}R3`;
+                    else if (rType === 4) targetRowStr = `${side}R1`; 
+
+                    window.socket.emit('play-medic-resurrection', {
+                        gameCode: gameCodeLocal,
+                        isPlayer1: isPlayer1Local,
+                        cardNumer: selectedCard.numer,
+                        targetRow: targetRowStr
+                    });
+                    if (window.hidePowiek) window.hidePowiek();
+                }
+            });
+        }
+    });
+
     socket.on('play-error', (data) => {
         console.error("[BOARD] Play error:", data.error);
         isProcessingMove = false; // Unlock if server failed
@@ -836,27 +871,69 @@ function renderStats(overlay) {
 function calculateScores() {
     const scores = { p1: { R1: 0, R2: 0, R3: 0, total: 0 }, p2: { R1: 0, R2: 0, R3: 0, total: 0 } };
     
-    // Helper do zliczania punktów w danym rzędzie
-    const sumRow = (rowArray) => {
+    if (!boardState) return scores;
+
+    const checkWeather = (type) => {
+        return boardState.weather && boardState.weather.some(wNum => {
+            const wCard = cards.find(c => String(c.numer) === String(wNum));
+            return wCard && (wCard.moc === type || wCard.moc === 'sztorm' && (type === 'mgla' || type === 'deszcz'));
+        });
+    };
+
+    const calculateRowScore = (rowCards, specialSlotVal, weatherActive) => {
+        let rowDict = {};
+        let moraleCount = 0;
+        let hornActive = false;
+
+        if (specialSlotVal) {
+            const sCard = cards.find(c => String(c.numer) === String(specialSlotVal));
+            if (sCard && sCard.moc === 'rog') hornActive = true;
+        }
+
+        if (!rowCards || rowCards.length === 0) return 0;
+
+        rowCards.forEach(cardNum => {
+            const card = cards.find(c => String(c.numer) === String(cardNum));
+            if (card && typeof card.punkty === 'number') {
+                if (!rowDict[card.numer]) rowDict[card.numer] = { count: 0, card: card };
+                rowDict[card.numer].count++;
+                if (!card.bohater && card.moc === 'morale') moraleCount++;
+            }
+        });
+
         let sum = 0;
-        if (!rowArray) return sum;
-        rowArray.forEach(cardNum => {
-            const cardObj = cards.find(c => c.numer === cardNum);
-            if (cardObj && typeof cardObj.punkty === 'number') {
-                sum += cardObj.punkty;
+        Object.values(rowDict).forEach(group => {
+            const c = group.card;
+            const count = group.count;
+            
+            if (c.bohater) {
+                sum += c.punkty * count;
+            } else {
+                let pts = weatherActive ? 1 : c.punkty;
+                if (c.moc === 'wiez') pts *= count;
+                
+                let mBuff = (c.moc === 'morale') ? (moraleCount - 1) : moraleCount;
+                if (mBuff > 0) pts += mBuff;
+                
+                if (hornActive) pts *= 2;
+                sum += pts * count;
             }
         });
         return sum;
     };
 
-    scores.p1.R1 = sumRow(boardState.p1R1);
-    scores.p1.R2 = sumRow(boardState.p1R2);
-    scores.p1.R3 = sumRow(boardState.p1R3);
+    const mrozActive = checkWeather('mroz');
+    const mglaActive = checkWeather('mgla');
+    const deszczActive = checkWeather('deszcz');
+
+    scores.p1.R1 = calculateRowScore(boardState.p1R1, boardState.p1S1, mrozActive);
+    scores.p1.R2 = calculateRowScore(boardState.p1R2, boardState.p1S2, mglaActive);
+    scores.p1.R3 = calculateRowScore(boardState.p1R3, boardState.p1S3, deszczActive);
     scores.p1.total = scores.p1.R1 + scores.p1.R2 + scores.p1.R3;
 
-    scores.p2.R1 = sumRow(boardState.p2R1);
-    scores.p2.R2 = sumRow(boardState.p2R2);
-    scores.p2.R3 = sumRow(boardState.p2R3);
+    scores.p2.R1 = calculateRowScore(boardState.p2R1, boardState.p2S1, mrozActive);
+    scores.p2.R2 = calculateRowScore(boardState.p2R2, boardState.p2S2, mglaActive);
+    scores.p2.R3 = calculateRowScore(boardState.p2R3, boardState.p2S3, deszczActive);
     scores.p2.total = scores.p2.R1 + scores.p2.R2 + scores.p2.R3;
 
     return scores;
@@ -937,7 +1014,7 @@ function renderLives(overlay) {
     if (playerLives >= 2) overlay.appendChild(createLive(636, playerYs));
 }
 
-export function addCardPointsOverlay(wrapper, card, cardW, cardH) {
+export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore = null) {
     if (typeof card.punkty !== 'number') return;
     const cardScale = cardW / 180;
 
@@ -950,14 +1027,24 @@ export function addCardPointsOverlay(wrapper, card, cardW, cardH) {
     pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif'; 
     pointsDiv.style.fontSize = `${44 * cardScale}px`;
     pointsDiv.style.fontWeight = 'normal';
-    pointsDiv.style.color = card.bohater ? '#fcfdfc' : '#000000';
+    
+    // User requested coloring based on score deviation from base points
+    const actualScore = effectiveScore !== null ? effectiveScore : card.punkty;
+    let baseColor = card.bohater ? '#fcfdfc' : '#000000';
+    if (!card.bohater && actualScore > card.punkty) {
+        baseColor = '#329420'; // Green buffed
+    } else if (!card.bohater && actualScore < card.punkty) {
+        baseColor = '#942020'; // Red nerfed
+    }
+    
+    pointsDiv.style.color = baseColor;
     pointsDiv.style.textShadow = card.bohater
         ? '0 1px 3px rgba(0,0,0,0.8)'
         : '0 1px 2px rgba(255,255,255,0.3)';
     pointsDiv.style.pointerEvents = 'none';
     pointsDiv.style.zIndex = '3';
     pointsDiv.style.lineHeight = '1';
-    pointsDiv.textContent = card.punkty;
+    pointsDiv.textContent = actualScore;
     wrapper.appendChild(pointsDiv);
     
     if (card.bohater) {
@@ -1368,6 +1455,85 @@ function confirmPlayProposed(targetData = {}) {
     renderAll(currentNick);
 }
 
+function renderWeather(overlay) {
+    if (!boardState || !boardState.weather || boardState.weather.length === 0) return;
+
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const weatherW = 549 * scale;
+    const weatherH = 239 * scale;
+    const cardH = weatherH;
+    const cardW = cardH * (180 / 240);
+    
+    let container = overlay.querySelector('#weather-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'weather-container';
+        container.style.position = 'absolute';
+        overlay.appendChild(container);
+    }
+    
+    container.style.left = `${286 * scale + boardLeft}px`;
+    container.style.top = `${917 * scale + boardTop}px`;
+    container.style.width = `${weatherW}px`;
+    container.style.height = `${weatherH}px`;
+    
+    // Rozkład max 3 kart.
+    const count = Math.min(boardState.weather.length, 3);
+    
+    // Obliczamy krok.
+    let cardStep = cardW + (5 * scale);
+    if (count * cardStep > weatherW) {
+        cardStep = (weatherW - cardW) / Math.max(1, count - 1);
+    }
+    const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
+    const startX = (weatherW - occupiedWidth) / 2;
+
+    // Reconciliation
+    const currentChildren = Array.from(container.children);
+    if (currentChildren.length > count) {
+        for (let j = count; j < currentChildren.length; j++) {
+            container.removeChild(currentChildren[j]);
+        }
+    }
+
+    // Wyświetl tylko 3 ostatnie z zagranych pogód
+    const visibleWeather = boardState.weather.slice(-3);
+
+    visibleWeather.forEach((wStr, i) => {
+        const wNum = wStr.split('-')[1];
+        const card = cards.find(c => String(c.numer) === String(wNum));
+        if (card) {
+            let wrapper = container.children[i];
+            if (!wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'board-card-wrapper pointer-events-none';
+                wrapper.style.position = 'absolute';
+                wrapper.style.height = '100%';
+                wrapper.style.width = `${cardW}px`;
+                wrapper.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
+                
+                const img = document.createElement('img');
+                img.style.height = '100%';
+                img.style.width = 'auto';
+                img.style.display = 'block';
+                wrapper.appendChild(img);
+                container.appendChild(wrapper);
+            }
+            
+            wrapper.style.width = `${cardW}px`;
+            if (wrapper.querySelector('img').src.indexOf(card.karta) === -1) {
+                wrapper.querySelector('img').src = card.karta;
+            }
+
+            wrapper.style.left = `${startX + i * cardStep}px`;
+            wrapper.style.zIndex = i + 1;
+        }
+    });
+}
+
 function renderRows(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
@@ -1494,7 +1660,54 @@ function renderRows(overlay) {
                 // Usuń stare punkty/ikony przed odświeżeniem
                 const oldPoints = wrapper.querySelectorAll('.card-points-overlay');
                 oldPoints.forEach(p => p.remove());
-                addCardPointsOverlay(wrapper, card, cardW, cardH);
+
+                // Modyfikacja koloru punktów na podstawie siły modyfikowanej (zmienność kolorów)
+                const checkWeather = (type) => {
+                    return boardState.weather && boardState.weather.some(wNum => {
+                        const wCard = cards.find(c => String(c.numer) === String(wNum));
+                        return wCard && (wCard.moc === type || wCard.moc === 'sztorm' && (type === 'mgla' || type === 'deszcz'));
+                    });
+                };
+
+                let cardScore = card.punkty;
+                if (!card.bohater && typeof card.punkty === 'number') {
+                    const rowNum = parseInt(rowKey.slice(-1));
+                    let isWeatherActive = false;
+                    if (rowNum === 1 && checkWeather('mroz')) isWeatherActive = true;
+                    if (rowNum === 2 && checkWeather('mgla')) isWeatherActive = true;
+                    if (rowNum === 3 && checkWeather('deszcz')) isWeatherActive = true;
+                    
+                    if (isWeatherActive) cardScore = 1;
+
+                    // Bond/Wiez logic visually (if multiple cards of same name)
+                    // We just count occurrences in this very row to display current effective points.
+                    const cardsInSameRow = boardState[rowKey] || [];
+                    const bondCount = cardsInSameRow.filter(num => num === card.numer).length;
+                    
+                    if (card.moc === 'wiez') cardScore *= bondCount;
+                    
+                    // Morale logic
+                    let moraleCount = 0;
+                    cardsInSameRow.forEach(cNum => {
+                        const cObj = cards.find(c => String(c.numer) === String(cNum));
+                        if (cObj && !cObj.bohater && cObj.moc === 'morale') moraleCount++;
+                    });
+                    
+                    let mBuff = (card.moc === 'morale') ? (moraleCount - 1) : moraleCount;
+                    if (mBuff > 0) cardScore += mBuff;
+
+                    // Horn logic
+                    const specialSlotKey = rowKey.substring(0, 2) + 'S' + rowKey.slice(-1);
+                    const specialSlotVal = boardState[specialSlotKey];
+                    let hornActive = false;
+                    if (specialSlotVal) {
+                        const sCard = cards.find(c => String(c.numer) === String(specialSlotVal));
+                        if (sCard && sCard.moc === 'rog') hornActive = true;
+                    }
+                    if (hornActive) cardScore *= 2;
+                }
+
+                addCardPointsOverlay(wrapper, card, cardW, cardH, cardScore);
 
                 wrapper.style.left = `${startX + i * cardStep}px`;
                 wrapper.style.zIndex = i + 1;

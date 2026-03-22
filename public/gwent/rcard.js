@@ -172,6 +172,12 @@ export function renderPowiek() {
                     e.stopPropagation();
                     if (powiekOptions.onSwap) powiekOptions.onSwap(powiekIndex);
                 };
+            } else if (powiekOptions && powiekOptions.isMedic) {
+                cardDiv.style.cursor = 'pointer';
+                cardDiv.onmousedown = (e) => {
+                    e.stopPropagation();
+                    if (powiekOptions.onSelect) powiekOptions.onSelect(card);
+                };
             }
         } else {
             cardDiv.style.left = pos.left + 'px';
