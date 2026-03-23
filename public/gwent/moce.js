@@ -51,6 +51,8 @@ export const iporz = {
     opis: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej."
     nazwa: "Wsparcie artyleryjskie"
     opis: "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej."
+    nazwa: Wsparcie ogniowe
+    opis:"Zniszcz najsilniejszą jednostkę/i dalekiego zasięgu twojego przeciwnika,\njeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 bądź więcej."
 };
 export const morale = {
     nazwa: "Wysokie Morale",
@@ -70,7 +72,7 @@ export const wezwarniezza = {
 };
 export const berserk = {
     nazwa: "Berserk",
-    opis: "Transformuje się w potężniejszą istotę pod wpływem grzybków (Mardroeme)."
+    opis: "Zmienia się w potężnego niedźwiedzia pod wpływem grzybów Mardroeme."
 };
 export const bohater = {
     nazwa: "Bohater"
