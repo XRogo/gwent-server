@@ -230,7 +230,7 @@ const krole = [
         opis: '"Va faill, luned".',
         frakcja: "4",
         numer: "4001",
-        umiejetnosc: "Wybierz jedną kartę pogody ze swojej talii i natychmiast ją zagraj.",
+        umiejetnosc: "Wybierz dowolną karte pogody ze swojej talii i natychmiast ją zagraj.",
         funkcja: function (gameState) {
             // aktywóje podgląd i pokazuje wszystkie dostępne karty pogodowe (jeśnie ich nie ma któl na effekt urzycia i nie da sie go urzyć)
         }
@@ -241,10 +241,10 @@ const krole = [
         nazwa: "Eredin Bréacc Glas Dowódca Czerwonych Jeźdźców",
         karta: "/gwent/assets/karty/potwory/eredin2.webp",
         dkarta: "/gwent/assets/dkarty/kure/4002.webp",
-        opis: '"Król Goun świeje się, kłapią przegniłe zęby nad zardzewiałym kołnierzem zbroi".',
+        opis: '"Król Goun śmieje się, kłapią przegniłe\nzęby nad zardzewiałym kołnierzem zbroi".',
         frakcja: "4",
         numer: "4002",
-        umiejetnosc: 'Podwaja siłę wszystkich swojich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy).',
+        umiejetnosc: "Podwój siłę wszystkich swoich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy).',
         funkcja: function (gameState) {
             //dodaje róg dowódcy do wojowników (czyli podwaja ich siłę) (dodaje karte a nie zabiera z tali czy kupki)
         }
@@ -255,10 +255,10 @@ const krole = [
         nazwa: "Eredin Bréacc Glas Władca Tir ná Lia",
         karta: "/gwent/assets/karty/potwory/eredin3.webp",
         dkarta: "/gwent/assets/dkarty/kure/4003.webp",
-        opis: '"Im byli bliżej, tym piękno tego miejsca silniej chwytało za serce".',
+        opis: '"Im byli bliżej, tym piękno tego miejsca\nsilniej chwytało za serce".',
         frakcja: "4",
         numer: "4003",
-        umiejetnosc: 'Odrzuć 2 karty, a następnie wybierz jedną dowolną kratę ze swojej talii.',
+        umiejetnosc: 'Odrzuć dwie karty, a następnie wybierz jedną dowolną kratę ze swojej talii.',
         funkcja: function (gameState) {
             //owtiera podgląd wszystkich wylosowanych kart gracz musi odrzucić 2 karty, a następnie wybiera jedną dowolną kartę ze swojej talii 
         }
