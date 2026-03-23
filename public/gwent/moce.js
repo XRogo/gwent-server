@@ -32,37 +32,52 @@ export const sztorm = {
 };
 export const grzybki = {
     nazwa: "Mardroeme",
-    opis: "Aktywuje karty z mocą Berserk (zamienia je w potężniejsze jednostki)."
+    opis: "Wywołuje tranformację wszystkich kart w rzędzie, które posiadają tryb\nberserkera."
 };
 export const wezwanie = {
     nazwa: "Braterstwo",
-    opis: "Po zagraniu przywołuje z talii lub ręki wszystkie karty o tej samej nazwie."
+    opis: "Jeśli w ręku i w talii znajdują się dwie takie same karty, wynajduje je i\nzagrywa nimi",
+    nazwa: "Wezwie Płotkę",
+    opis: "Znajdź w swojej talii kartę Płotka i zagraj ją od razu."
+    nazwa: "Wezwanie tarczowniczek"
+    opis: "Przywołuje wszystkie twórczości z tali i z ręki."
 };
 export const medyk = {
     nazwa: "Medyk",
-    opis: "Pozwala wybrać i natychmiast zagrać jedną kartę (nie-bohatera i nie-specjalną) z cmentarza."
+    opis: Przywraca jedną kartę ze zbioru kart odrzuconych (nie dotyczy kart bohaterów\ni kart specjalnych)."
 };
 export const iporz = {
-    nazwa: "Pożoga (Rząd)",
-    opis: "Niszczy najsilniejszą jednostkę w tym rzędzie, jeśli suma punktów rzędu wynosi 10 lub więcej."
+    nazwa: "Pożoga - jednostka bliskiego starcia",
+    opis: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej."
+    nazwa: "Wsparcie artyleryjskie"
+    opis: "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej."
 };
 export const morale = {
-    nazwa: "Premia Morali",
-    opis: "Dodaje +1 do siły każdej innej jednostki w tym samym rzędzie."
+    nazwa: "Wysokie Morale",
+    opis: Powiększa o 1 siłę wszystkich kart w rzędzie (wylączając siebie)"
 };
 export const wiez = {
     nazwa: "Więź",
-    opis: "Podwaja siłę każdej karty o tej samej nazwie znajdującej się w tym rzędzie."
+    opis: "Umieszczona obok karty o tej samej nazwie podwaja siłę obu kart."
 };
 export const szpieg = {
-    nazwa: "Szpieg",
-    opis: "Zostaje zagrany na stronę przeciwnika, ale pozwala dobrać 2 karty z własnej talii."
+    nazwa: "Szpiegostwo",
+    opis: "Szpieg dostaje się do obozu twojego przeciwnika i zwiększa jego ogólną liczbę\npunktów. W zamian możesz pociągnąć dwie dodatkowe karty"
 };
 export const wezwarniezza = {
-    nazwa: "Zemsta",
-    opis: "Po zakończeniu rundy w miejsce tej karty przyzywana jest inna jednostka."
+    nazwa: "Wezwanie z zaświatów",
+    opis: "Gdy karta zostaje usunięta z pola bitwy, na polu bitwy pojawia się nowa/njednostka"
 };
 export const berserk = {
     nazwa: "Berserk",
     opis: "Transformuje się w potężniejszą istotę pod wpływem grzybków (Mardroeme)."
 };
+export const bohater = {
+    nazwa: "Bohater"
+    opis: "Nie działają na niego żadne specjalne karty ani umiejętności."
+};
+export const zrecznosc = {
+    nazwa: "Zręczność"
+    opis: Karta może zostać umieszczona w rzędzie jednostek bliskiego starcia bądź dalekiego zasięgu. Raz ustawionej karty nie można przesunąć."
+};
+
