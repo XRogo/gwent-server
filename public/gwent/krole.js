@@ -286,7 +286,7 @@ const krole = [
         opis: '"Bo się tobą bawię".',
         frakcja: "4",
         numer: "4005",
-        umiejetnosc: 'Pasywna - podwaja siłę kart szpiegów obu graczy.',
+        umiejetnosc: 'Pasywna - podwaja siłę kart Szpiegów obu graczy.',
         funkcja: function (gameState) {
             //szpiedzy dostają podwojenie punktów siły (czyli jeśli szpieg ma 3 punkty siły to będzie miał 6 punktów siły)
         }
@@ -303,7 +303,7 @@ const krole = [
         opis: '"Nikt nie zastąpi Brana. Moge jedynie próbować."',
         frakcja: "5",
         numer: "5001",
-        umiejetnosc: "Odrzuć 2 karty i dobierz 1.",
+        umiejetnosc: "Pod wpływem złych warunków atmosferycznych, jednostki tracą tylko połowę\nswojej siły bojowej",
         funkcja: function (gameState) {
             // jeśli ten dowódca jest wybrany to nie musi być aktywowany działa całyczas i karty tracą tylko połowe podczs niesprzyjające pogody
         }
@@ -314,10 +314,10 @@ const krole = [
         nazwa: "Crach an Craite",
         karta: "/gwent/assets/karty/Skellige/crach.webp",
         dkarta: "/gwent/assets/dkarty/kure/5002.webp",
-        opis: '"Król musi być madry. Król musi cieszyć się szacunkiem. Król miusi mieć jaja".',
+        opis: '"Król musi być madry. Król musi cieszyć\nsię szacunkiem. Król miusi mieć jaja".',
         frakcja: "5",
         numer: "5002",
-        umiejetnosc: "Wskrześ jedną brązową jednostkę.",
+        umiejetnosc: "Karty odrzucone każdego z graczy zostają przetasowane i przywrócone do talii.",
         funkcja: function (gameState) {
             // karty odrzucone każdego gracza zostają przetasowane i przywrócone do talii
         }
