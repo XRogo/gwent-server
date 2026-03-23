@@ -1,18 +1,18 @@
 export const manek = {
-    nazwa: "Manekin",
-    opis: "Pozwala zabrać do kart w ręce 1 wybraną karte z planszy (tylko z swojej strony, nie dotyczy kart pogodowych i bohaterów)."
+    nazwa: "Atrapa",
+    opis: "Zastępuje jedną kartę na polu bitwy umieszcza ją z powrotem ręce."
 };
 export const rog = {
     nazwa: "Róg Dowódcy",
-    opis: "Podwaja siłę wszystkich jednostek w tym rzędzie (nie dotyczy bohaterów)."
+    opis: "Podwaja siłę jednostek w rzędzie. Zasięg ograniczony do jednego rzędu."
 };
 export const porz = {
     nazwa: "Pożoga",
-    opis: "Niszczy najsilniejszą jednostkę (lub jednostki) na całej planszy."
+    opis: "Niszczy najsilniejszą kartę lub karty na polu bitwy. Odrzuć po zagraniu."
 };
 export const mroz = {
     nazwa: "Trzaskający Mróz",
-    opis: "Zmniejsza siłę wszystkich jednostek w rzędzie piechoty obu graczy do 1."
+    opis: "Siła wszystkich jednostek walczących w zwarciu przyjmuje wartość 1"
 };
 export const mgla = {
     nazwa: "Gęsta Mgła",
