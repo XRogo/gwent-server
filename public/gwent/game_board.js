@@ -399,7 +399,9 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('turn-info', (data) => {
         const { myTurn } = data;
+        currentTurn = myTurn ? window.socket.id : 'opponent_id';
         showPrzejscie(myTurn ? 't07' : 't08');
+        renderAll(nick);
     });
 
     socket.on('opponent-game-update', (data) => {
@@ -1203,6 +1205,9 @@ function renderHand() {
         wrapper.onclick = (e) => {
             e.stopPropagation();
             if (isMulliganActive) return;
+
+            const isMyTurn = (currentTurn === window.socket.id);
+            if (!isMyTurn || playerPassed || isProcessingMove) return;
             
             // Rejestrujemy ostatnie wymiary dla animacji podglądu
             const rect = wrapper.getBoundingClientRect();
@@ -1396,6 +1401,13 @@ function renderGraveyards(overlay) {
 function confirmPlayProposed(targetData = {}) {
     if (!window.proposedCard) return;
 
+    // Turn check - prevent "phantom cards" (client removes but server rejects)
+    const isMyTurn = (currentTurn === window.socket.id);
+    if (!isMyTurn || playerPassed || isProcessingMove) {
+        console.log("[BOARD] Blocked play attempt: Not your turn or already processing.");
+        return;
+    }
+
     const card = window.proposedCard;
     let finalPos = targetData.rowIdx || (card.pozycja === 4 ? 1 : card.pozycja);
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(card.moc);
@@ -1457,7 +1469,8 @@ function confirmPlayProposed(targetData = {}) {
     if (handIdx !== -1) playerHand.splice(handIdx, 1);
 
     window.proposedCard = null;
-    isProcessingMove = true; // Lock ui while server proccesses
+    currentTurn = null; // Lock optimistically
+    isProcessingMove = true; // Lock ui while server processes
     renderAll(currentNick);
 }
 
@@ -1488,7 +1501,8 @@ function renderWeather(overlay) {
     container.style.height = `${weatherH}px`;
 
     // Drop area dla kart pogody
-    if (window.proposedCard && ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(window.proposedCard.moc)) {
+    const isMyTurn = (currentTurn === window.socket.id);
+    if (isMyTurn && window.proposedCard && ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(window.proposedCard.moc)) {
         container.style.backgroundColor = 'rgba(199, 167, 110, 0.2)';
         container.style.pointerEvents = 'auto';
         container.style.cursor = 'pointer';
@@ -1608,7 +1622,8 @@ function renderRows(overlay) {
                 if (pCard.numer === "002" || pCard.moc === "rog") isValidRow = true;
             }
 
-            if (isValidRow) {
+            const isMyTurn = (currentTurn === window.socket.id);
+            if (isMyTurn && isValidRow) {
                 rowDiv.style.backgroundColor = 'rgba(199, 167, 110, 0.2)';
                 rowDiv.style.cursor = 'pointer';
                 rowDiv.onclick = (e) => {
@@ -1719,7 +1734,8 @@ function renderRows(overlay) {
         slot.style.width = `${179 * scale}px`;
         slot.style.height = `${239 * scale}px`;
 
-        if (window.proposedCard && window.proposedCard.typ === 'specjalna' && window.proposedCard.moc === 'rog' && sidePrefix === (isP1 ? 'p1' : 'p2')) {
+        const isMyTurn = (currentTurn === window.socket.id);
+        if (isMyTurn && window.proposedCard && window.proposedCard.typ === 'specjalna' && window.proposedCard.moc === 'rog' && sidePrefix === (isP1 ? 'p1' : 'p2')) {
             slot.style.backgroundColor = 'rgba(199, 167, 110, 0.4)';
             slot.style.cursor = 'pointer';
             slot.onclick = (e) => {

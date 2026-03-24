@@ -38,25 +38,25 @@ export const wezwanie = {
     nazwa: "Braterstwo",
     opis: "Jeśli w ręku i w talii znajdują się dwie takie same karty, wynajduje je i\nzagrywa nimi",
     nazwa: "Wezwie Płotkę",
-    opis: "Znajdź w swojej talii kartę Płotka i zagraj ją od razu."
-    nazwa: "Wezwanie tarczowniczek"
+    opis: "Znajdź w swojej talii kartę Płotka i zagraj ją od razu.",
+    nazwa: "Wezwanie tarczowniczek",
     opis: "Przywołuje wszystkie twórczości z tali i z ręki."
 };
 export const medyk = {
     nazwa: "Medyk",
-    opis: Przywraca jedną kartę ze zbioru kart odrzuconych (nie dotyczy kart bohaterów\ni kart specjalnych)."
+    opis: "Przywraca jedną kartę ze zbioru kart odrzuconych (nie dotyczy kart bohaterów\ni kart specjalnych)."
 };
 export const iporz = {
     nazwa: "Pożoga - jednostka bliskiego starcia",
-    opis: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej."
-    nazwa: "Wsparcie artyleryjskie"
-    opis: "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej."
-    nazwa: Wsparcie ogniowe
-    opis:"Zniszcz najsilniejszą jednostkę/i dalekiego zasięgu twojego przeciwnika,\njeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 bądź więcej."
+    opis: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej.",
+    nazwa: "Wsparcie artyleryjskie",
+    opis: "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej.",
+    nazwa: "Wsparcie ogniowe",
+    opis: "Zniszcz najsilniejszą jednostkę/i dalekiego zasięgu twojego przeciwnika,\njeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 bądź więcej."
 };
 export const morale = {
     nazwa: "Wysokie Morale",
-    opis: Powiększa o 1 siłę wszystkich kart w rzędzie (wylączając siebie)"
+    opis: "Powiększa o 1 siłę wszystkich kart w rzędzie (wylączając siebie)."
 };
 export const wiez = {
     nazwa: "Więź",
@@ -75,11 +75,11 @@ export const berserk = {
     opis: "Zmienia się w potężnego niedźwiedzia pod wpływem grzybów Mardroeme."
 };
 export const bohater = {
-    nazwa: "Bohater"
+    nazwa: "Bohater",
     opis: "Nie działają na niego żadne specjalne karty ani umiejętności."
 };
 export const zrecznosc = {
-    nazwa: "Zręczność"
-    opis: Karta może zostać umieszczona w rzędzie jednostek bliskiego starcia bądź dalekiego zasięgu. Raz ustawionej karty nie można przesunąć."
+    nazwa: "Zręczność",
+    opis: "Karta może zostać umieszczona w rzędzie jednostek bliskiego starcia bądź dalekiego zasięgu. Raz ustawionej karty nie można przesunąć."
 };
 

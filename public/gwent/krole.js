@@ -244,7 +244,7 @@ const krole = [
         opis: '"Król Goun śmieje się, kłapią przegniłe\nzęby nad zardzewiałym kołnierzem zbroi".',
         frakcja: "4",
         numer: "4002",
-        umiejetnosc: "Podwój siłę wszystkich swoich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy).',
+        umiejetnosc: "Podwój siłę wszystkich swoich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy).",
         funkcja: function (gameState) {
             //dodaje róg dowódcy do wojowników (czyli podwaja ich siłę) (dodaje karte a nie zabiera z tali czy kupki)
         }
