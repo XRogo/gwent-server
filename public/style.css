@@ -1,0 +1,344 @@
+@font-face {
+    font-family: 'PFDinTextCondPro-Bold';
+    src: url('fonts/PFDinTextCondPro-Bold.ttf') format('truetype');
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-color: black;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+}
+
+html, body {
+    overflow: hidden !important;
+}
+
+.main-menu {
+    background-image: url('assets/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+}
+
+.side-bar {
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    width: auto;
+    object-fit: contain;
+    z-index: 1;
+}
+
+.left-bar { left: 0; }
+.right-bar { right: 0; }
+
+.menu-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    z-index: 2;
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-wrapper.side-view {
+    left: 25%;
+}
+
+.center-menu {
+    display: block;
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+}
+
+.button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3;
+}
+
+.menu-button, .discord-button {
+    position: absolute;
+    width: 39.72%;
+    height: 5.56%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.play-button {
+    top: 43.61%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.test-menu-button {
+    top: 49.44%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.discord-menu-button {
+    top: 55.27%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.info-menu-button {
+    top: 61.10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hover-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: url('assets/ramka.png') no-repeat center;
+    background-size: contain;
+    display: none;
+}
+
+.menu-button:hover .hover-frame {
+    display: block;
+}
+
+.menu-text-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #c7a76e;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    z-index: 4;
+}
+
+.menu-label-play {
+    position: absolute;
+    top: 43.61%;
+    transform: translateY(-50%);
+}
+
+.menu-label-test {
+    position: absolute;
+    top: 49.44%;
+    transform: translateY(-50%);
+}
+
+.menu-label-discord {
+    position: absolute;
+    top: 55.27%;
+    transform: translateY(-50%);
+}
+
+.menu-label-info {
+    position: absolute;
+    top: 61.10%;
+    transform: translateY(-50%);
+}
+
+/* Side Panel */
+.side-panel {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    transform: translateY(-50%) translateX(120%);
+    width: 45%;
+    height: 85vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    border: 2px solid #c7a76e;
+    z-index: 10;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    overflow-y: auto;
+}
+
+.side-panel.active {
+    transform: translateY(-50%) translateX(0);
+}
+
+.setup-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+.mode-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.mode-item {
+    background: rgba(199, 167, 110, 0.1);
+    border: 1px solid #c7a76e;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.2rem;
+}
+
+.mode-item:hover, .mode-item.active {
+    background: rgba(199, 167, 110, 0.4);
+    box-shadow: 0 0 10px #c7a76e;
+}
+
+.mode-preview {
+    width: 100%;
+    height: 150px;
+    background: rgba(0,0,0,0.3);
+    border: 1px dashed #c7a76e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.mode-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.setup-details {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-top: 1px solid #c7a76e;
+    padding-top: 20px;
+}
+
+.players-status {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.player-box {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border: 1px solid #444;
+    text-align: center;
+}
+
+.player-box.ready {
+    border-color: #00ff00;
+}
+
+.player-box .nick {
+    display: block;
+    font-size: 1.4rem;
+    color: #c7a76e;
+    margin-bottom: 5px;
+}
+
+.player-box .status-indicator {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.player-box.ready .status-indicator {
+    color: #00ff00;
+}
+
+.code-box {
+    background: rgba(0,0,0,0.8);
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: 1.2rem;
+    border: 1px solid #c7a76e;
+}
+
+.code-box button {
+    background: #c7a76e;
+    border: none;
+    color: #000;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+}
+
+.setup-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.setup-actions button {
+    flex: 1;
+    padding: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: transparent;
+    border: 2px solid #c7a76e;
+    color: #c7a76e;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.setup-actions button:hover:not(:disabled) {
+    background: #c7a76e;
+    color: #000;
+}
+
+.setup-actions button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.back-button {
+    cursor: pointer;
+    z-index: 10;
+}
+
+.back-button:hover {
+    filter: brightness(1.2);
+}
+
+.test-game-button:hover .hover-frame {
+    display: block;
+}

@@ -27,7 +27,7 @@
         content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
     <meta name="twitter:image" content="/assets/zdlink.jpg">
     <!-- Istniejące linki do stylów, faviconów itd. -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
     <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
@@ -45,124 +45,87 @@
         <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
         <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
         <div class="menu-wrapper">
-            <img src="assets/srodekmenu.png" class="center-menu" alt="Menu">
+            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
             <div class="button-container">
                 <div class="menu-button play-button" onclick="showHostScreen()">
                     <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
                 </div>
-                <div class="menu-button join-button" onclick="showJoinScreen()">
+                <div class="menu-button test-menu-button" onclick="startTestGame()">
+                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                </div>
+                <div class="menu-button discord-menu-button"
+                    onclick="window.open('https://discord.gg/vs9tnnmNAD', '_blank')">
+                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                </div>
+                <div class="menu-button info-menu-button" onclick="showInfoScreen()">
                     <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
                 </div>
             </div>
-            <!-- Nowy przycisk Test Game w lewym dolnym rogu -->
-            <div class="test-game-button" onclick="startTestGame()"
-                style="position: absolute; left: 32px; bottom: 32px; color: #fff; font-size: 2.2em; font-family: 'Gwent', serif; font-weight: bold; z-index: 1001; cursor: pointer; display: flex; align-items: center; gap: 12px;">
-                <img src="assets/ramka.png" class="hover-frame" alt="Ramka" style="width: 64px; height: 64px;">
-                <span>Test Game</span>
+            <div class="menu-text-overlay">
+                <div class="menu-label-play">Graj</div>
+                <div class="menu-label-test">Test Game</div>
+                <div class="menu-label-discord">Discord</div>
+                <div class="menu-label-info">Info (Przebudowa strony wejsciowej)</div>
             </div>
         </div>
-        <div class="info-button" onclick="showInfoScreen()">INFO Alpha 7.20
+
+        <div id="sidePanel" class="side-panel">
+            <div id="gameSetup" class="setup-container">
+                <h2 style="color: #c7a76e; border-bottom: 1px solid #c7a76e; padding-bottom: 10px; margin-top: 0;">Tryb
+                    Gry</h2>
+
+                <div class="mode-selection-grid">
+                    <div class="mode-item active" data-mode="classic" onclick="selectGameMode('classic')">CLASSIC</div>
+                    <div class="mode-item" data-mode="cyberpunk" onclick="selectGameMode('cyberpunk')">CYBERPUNK</div>
+                    <div class="mode-item" data-mode="1v1v1v1" onclick="selectGameMode('1v1v1v1')">1v1v1v1</div>
+                    <div class="mode-item" data-mode="mix" onclick="selectGameMode('mix')">MIX</div>
+                    <div class="mode-item" data-mode="immersive" onclick="selectGameMode('immersive')">IMERSIV</div>
+                </div>
+
+                <div id="modePreview" class="mode-preview">
+                    <span>Tryb Klasyczny (Geralt vs Monsters)</span>
+                </div>
+
+                <div class="setup-details">
+                    <div class="players-status">
+                        <div class="player-box host">
+                            <span class="nick">Ty (Host)</span>
+                            <span class="status-indicator">Oczekiwanie...</span>
+                        </div>
+                        <div class="player-box opponent">
+                            <span class="nick">Przeciwnik</span>
+                            <span class="status-indicator">Nieobecny</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; margin: 10px 0;">
+                        <input type="text" id="sideCodeInput" placeholder="Wpisz kod aby dołączyć"
+                            style="flex: 1; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #c7a76e; color: #fff; font-family: inherit;">
+                        <button onclick="joinGame()"
+                            style="padding: 10px 20px; background: #c7a76e; border: none; cursor: pointer; font-family: inherit; font-weight: bold;">DOŁĄCZ</button>
+                    </div>
+
+                    <div class="code-box">
+                        <span id="displayCode">KOD: ######</span>
+                        <button onclick="copyCode()">KOPIUJ LINK</button>
+                    </div>
+
+                    <div class="setup-actions">
+                        <button onclick="toggleReady()" id="readyBtn">GOTOWY</button>
+                        <button onclick="requestStartGame()" id="startGameBtn" disabled>START</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="back-button" onclick="goBackToMain()" style="position: absolute; bottom: 20px; left: 20px;">
+                <img src="assets/back.png" alt="Back" style="width: 40px; height: 40px;">
+            </div>
         </div>
         <div id="testGameMsg"
-            style="color:#c7a76e; font-family:'Gwent',serif; font-size:1.2em; text-align:center; margin-top:12px;">
+            style="color:#c7a76e; font-family:'PFDinTextCondPro-Bold',serif; font-size:1.2em; text-align:center; margin-top:12px;">
         </div>
     </div>
 
-    <!-- Strona B: Tworzenie hosta -->
-    <div class="host-screen" id="hostScreen" style="display: none;">
-        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
-        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
-        <div class="menu-wrapper">
-            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
-            <div class="host-content">
-                <div class="mode-options">
-                    <div class="mode-button wszystkie_karty" onclick="selectMode('wszystkie_karty')">
-                        <img src="assets/swszystkiekarty.png" class="mode-text wszystkie_karty-text"
-                            alt="Wszystkie karty">
-                    </div>
-                    <div class="mode-button wybrane_karty" onclick="selectMode('wybrane_karty')">
-                        <img src="assets/swybranekarty.png" class="mode-text wybrane_karty-text" alt="Wybrane karty">
-                    </div>
-                </div>
-                <div class="game-code">
-                    <span class="code-text">123456</span>
-                    <div class="copy-icon code-copy" onclick="copyCode()"></div>
-                    <span class="copy-message">Copy!</span>
-                </div>
-                <div class="game-link">
-                    <span class="link-text">https://gwent...</span>
-                    <div class="copy-icon link-copy" onclick="copyLink()"></div>
-                    <span class="copy-message">Copy!</span>
-                </div>
-                <div class="player-icon">
-                    <img src="assets/ludekn.png" alt="Gracz">
-                </div>
-            </div>
-        </div>
-        <div class="back-button" onclick="goBackFromHostScreen()">
-            <img src="assets/back.png" alt="Back">
-        </div>
-    </div>
-
-    <!-- Strona C: Dołączanie -->
-    <div class="join-screen" id="joinScreen" style="display: none;">
-        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
-        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
-        <div class="menu-wrapper">
-            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
-            <div class="join-content">
-                <img src="assets/kod.png" class="code-label" alt="KOD">
-                <input type="text" class="code-input" placeholder="Wpisz kod" autocomplete="off">
-                <div class="ok-button" onclick="joinGame()">
-                    <img src="assets/ok.png" class="ok-icon" alt="OK">
-                </div>
-                <span class="error-message">Nie poprawny kod</span>
-            </div>
-        </div>
-        <div class="back-button" onclick="goBackFromJoinScreen()">
-            <img src="assets/back.png" alt="Back">
-        </div>
-    </div>
-
-    <!-- Strona D: Wybór nicków -->
-    <div class="nickname-screen" id="nicknameScreen" style="display: none;">
-        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
-        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
-        <div class="menu-wrapper">
-            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
-            <div class="nickname-content">
-                <img src="assets/nick.png" class="nick-label" alt="NICK">
-                <input type="text" class="nickname-input" placeholder="Wybierz nick">
-                <div class="submit-button" onclick="submitNickname()">
-                    <img src="assets/ok.png" class="submit-icon" alt="OK">
-                </div>
-                <!-- Usunięto frame-overlay-left i frame-overlay-right -->
-                <div class="player-icon host-player-icon">
-                    <img src="assets/ludekn.png" alt="Gracz host">
-                </div>
-                <div class="player-icon opponent-player-icon">
-                    <img src="assets/ludekn.png" alt="Gracz przeciwnik">
-                </div>
-            </div>
-        </div>
-        <div class="back-button" onclick="goBackFromNicknameScreen()">
-            <img src="assets/back.png" alt="Back">
-        </div>
-    </div>
-    <!-- Strona C.5: Oczekiwanie na wybór trybu -->
-    <div class="loading-screen" id="loadingScreen" style="display: none;">
-        <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
-        <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
-        <div class="menu-wrapper">
-            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
-            <div class="loading-content">
-                <img src="assets/ladowanie.png" class="loading-icon" alt="Ładowanie">
-            </div>
-        </div>
-        <div class="back-button" onclick="goBackFromLoadingScreen()">
-            <img src="assets/back.png" alt="Back">
-        </div>
-    </div>
     </div>
 
     <!-- Strona I: Informacje -->
@@ -206,7 +169,7 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/script.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
