@@ -26,8 +26,6 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 1;
-    transition: opacity 0.5s ease;
     z-index: 0;
 }
 
@@ -78,7 +76,7 @@ html, body {
     z-index: 3;
 }
 
-.menu-button, .discord-button {
+.menu-button {
     position: absolute;
     width: 39.72%;
     height: 5.56%;
@@ -88,29 +86,10 @@ html, body {
     justify-content: center;
 }
 
-.play-button {
-    top: 43.61%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.test-menu-button {
-    top: 49.44%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.discord-menu-button {
-    top: 55.27%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.info-menu-button {
-    top: 61.10%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+.play-button { top: 43.61%; left: 50%; transform: translate(-50%, -50%); }
+.test-menu-button { top: 49.44%; left: 50%; transform: translate(-50%, -50%); }
+.discord-menu-button { top: 55.27%; left: 50%; transform: translate(-50%, -50%); }
+.info-menu-button { top: 61.10%; left: 50%; transform: translate(-50%, -50%); }
 
 .hover-frame {
     position: absolute;
@@ -145,29 +124,10 @@ html, body {
     z-index: 4;
 }
 
-.menu-label-play {
-    position: absolute;
-    top: 43.61%;
-    transform: translateY(-50%);
-}
-
-.menu-label-test {
-    position: absolute;
-    top: 49.44%;
-    transform: translateY(-50%);
-}
-
-.menu-label-discord {
-    position: absolute;
-    top: 55.27%;
-    transform: translateY(-50%);
-}
-
-.menu-label-info {
-    position: absolute;
-    top: 61.10%;
-    transform: translateY(-50%);
-}
+.menu-label-play { position: absolute; top: 43.61%; transform: translateY(-50%); }
+.menu-label-test { position: absolute; top: 49.44%; transform: translateY(-50%); }
+.menu-label-discord { position: absolute; top: 55.27%; transform: translateY(-50%); }
+.menu-label-info { position: absolute; top: 61.10%; transform: translateY(-50%); }
 
 /* Side Panel */
 .side-panel {
@@ -187,7 +147,6 @@ html, body {
     display: flex;
     flex-direction: column;
     color: #fff;
-    overflow-y: auto;
 }
 
 .side-panel.active {
@@ -199,6 +158,8 @@ html, body {
     flex-direction: column;
     gap: 20px;
     height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .mode-selection-grid {
@@ -224,7 +185,7 @@ html, body {
 
 .mode-preview {
     width: 100%;
-    height: 150px;
+    height: 120px;
     background: rgba(0,0,0,0.3);
     border: 1px dashed #c7a76e;
     display: flex;
@@ -240,56 +201,40 @@ html, body {
 }
 
 .setup-details {
-    margin-top: auto;
     display: flex;
     flex-direction: column;
     gap: 15px;
     border-top: 1px solid #c7a76e;
     padding-top: 20px;
+    margin-top: auto;
 }
 
 .players-status {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 10px;
 }
 
 .player-box {
     flex: 1;
     background: rgba(255,255,255,0.05);
-    padding: 15px;
+    padding: 10px;
     border: 1px solid #444;
     text-align: center;
 }
 
-.player-box.ready {
-    border-color: #00ff00;
-}
-
-.player-box .nick {
-    display: block;
-    font-size: 1.4rem;
-    color: #c7a76e;
-    margin-bottom: 5px;
-}
-
-.player-box .status-indicator {
-    font-size: 0.9rem;
-    color: #888;
-}
-
-.player-box.ready .status-indicator {
-    color: #00ff00;
-}
+.player-box.ready { border-color: #00ff00; }
+.player-box .nick { display: block; font-size: 1.2rem; color: #c7a76e; margin-bottom: 5px; }
+.player-box .status-indicator { font-size: 0.8rem; color: #888; }
+.player-box.ready .status-indicator { color: #00ff00; }
 
 .code-box {
     background: rgba(0,0,0,0.8);
-    padding: 10px;
+    padding: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: monospace;
-    font-size: 1.2rem;
+    font-size: 1rem;
     border: 1px solid #c7a76e;
 }
 
@@ -297,7 +242,7 @@ html, body {
     background: #c7a76e;
     border: none;
     color: #000;
-    padding: 5px 15px;
+    padding: 5px 10px;
     cursor: pointer;
     font-family: inherit;
     font-weight: bold;
@@ -310,8 +255,8 @@ html, body {
 
 .setup-actions button {
     flex: 1;
-    padding: 15px;
-    font-size: 1.5rem;
+    padding: 12px;
+    font-size: 1.3rem;
     cursor: pointer;
     background: transparent;
     border: 2px solid #c7a76e;
@@ -321,24 +266,102 @@ html, body {
 }
 
 .setup-actions button:hover:not(:disabled) {
-    background: #c7a76e;
-    color: #000;
+    background: #c7a76e; color: #000;
 }
 
 .setup-actions button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    opacity: 0.3; cursor: not-allowed;
 }
 
-.back-button {
+.side-back-button {
+    margin-top: 15px;
+    text-align: left;
+    color: #c7a76e;
     cursor: pointer;
-    z-index: 10;
+    font-size: 1.4rem;
+    text-transform: uppercase;
 }
 
-.back-button:hover {
-    filter: brightness(1.2);
+.side-back-button:hover {
+    color: #fff;
 }
 
-.test-game-button:hover .hover-frame {
-    display: block;
+/* Info Screen Styles */
+.info-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('assets/background2.jpg');
+    background-size: cover;
+    background-position: center;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.info-container {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    width: 85%;
+    max-width: 1100px;
+    height: 85vh;
+    border: 2px solid #c7a76e;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-content {
+    color: #eee;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 20px;
+    line-height: 1.6;
+}
+
+.info-content h1 {
+    color: #c7a76e;
+    font-size: 2.2rem;
+    margin-top: 0;
+    border-bottom: 2px solid #c7a76e;
+    padding-bottom: 10px;
+}
+
+.info-section {
+    margin: 25px 0;
+}
+
+.info-section h3 {
+    color: #c7a76e;
+    margin-bottom: 10px;
+}
+
+.legal-section {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border: 1px solid rgba(199, 167, 110, 0.3);
+    border-radius: 4px;
+}
+
+.info-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.info-back-link {
+    display: inline-block;
+    color: #c7a76e;
+    font-size: 2.5rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.info-back-link:hover {
+    color: #fff;
+    text-shadow: 0 0 15px #c7a76e;
 }
