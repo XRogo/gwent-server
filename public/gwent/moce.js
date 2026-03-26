@@ -12,23 +12,23 @@ export const porz = {
 };
 export const mroz = {
     nazwa: "Trzaskający Mróz",
-    opis: "Siła wszystkich jednostek walczących w zwarciu przyjmuje wartość 1"
+    opis: "Siła wszystkich jednostek walczących w zwarciu przyjmuje wartość 1."
 };
 export const mgla = {
     nazwa: "Gęsta Mgła",
-    opis: "Zmniejsza siłę wszystkich jednostek w rzędzie łuczników obu graczy do 1."
+    opis: "Siła wszystkich jednostek strzeleckich przyjmuje wartość 1."
 };
 export const deszcz = {
-    nazwa: "Ulewny Deszcz",
-    opis: "Zmniejsza siłę wszystkich jednostek w rzędzie oblężniczym obu graczy do 1."
+    nazwa: "Deszcz",
+    opis: "Siła wszystkich jednostek oblężniczych przyjmuje wartość 1."
 };
 export const niebo = {
     nazwa: "Czyste Niebo",
-    opis: "Usuwa wszystkie efekty pogodowe z planszy."
+    opis: "Odrzuca wszystkie karty Trzaskającego mrozu, Ulewnego deszczu i Gęstej mgły znajdujące się na polu bitwy"
 };
 export const sztorm = {
-    nazwa: "Skelligijski Sztorm",
-    opis: "Działa jednocześnie jak Gęsta Mgła i Ulewny Deszcz."
+    nazwa: "Skelligijski sztorm",
+    opis: "Redukuje siłę wszystkich jednostek strzeleckich i oblężniczych do 1."
 };
 export const grzybki = {
     nazwa: "Mardroeme",
