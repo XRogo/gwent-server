@@ -457,6 +457,36 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 opponentDeckCount -= data.spyDrawn.length;
             }
 
+            // --- Dźwięki kart granych przez PRZECIWNIKA ---
+            if (window.playSound && data.lastPlayedCard) {
+                const lp = data.lastPlayedCard;
+                const playedByOpponent = data.lastPlayedBy !== (isPlayer1Local ? 'p1' : 'p2');
+                if (playedByOpponent) {
+                    const lpc = cards.find(c => String(c.numer) === String(lp));
+                    if (lpc) {
+                        if (lpc.moc === 'szpieg')          window.playSound('szpiegSound');
+                        else if (lpc.bohater)              window.playSound('zagranieBohateraSound');
+                        else if (lpc.moc === 'manek')      window.playSound('manekinSound');
+                        else if (lpc.moc === 'rog' && (lpc.numer === '002' || typeof lpc.punkty !== 'number')) window.playSound('rogDowodcySound');
+                        else if (lpc.moc === 'mroz')       window.playSound('mrozSound');
+                        else if (lpc.moc === 'mgla')       window.playSound('mglaSound');
+                        else if (lpc.moc === 'deszcz')     window.playSound('deszczSound');
+                        else if (lpc.moc === 'niebo')      window.playSound('czystenieboSound');
+                        else if (lpc.moc === 'sztorm')     window.playSound('sztormSound');
+                        else if (lpc.pozycja === 3)        window.playSound('zagranie3Sound');
+                        else                               window.playSound('zagranie1Sound');
+                        if (lpc.moc === 'wezwanie') {
+                            setTimeout(() => { if (window.playSound) window.playSound('wezwanieSound'); }, 600);
+                        }
+                    }
+                }
+            }
+            // Dźwięk porzogi - gdy serwer zniszczył karty porzogą
+            if (window.playSound && data.porzogaDestroyed && data.porzogaDestroyed.length > 0) {
+                window.playSound('porzogaSound');
+            }
+            // -----------------------------------------------
+
             renderAll(currentNick);
 
             if (currentTurn && window.gameStarted && window.mulliganFinished) {
@@ -467,6 +497,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             }
             isProcessingMove = false;
         };
+
 
         if (data.spyDrawn && data.spyDrawn.length > 0) {
             const isLocalSpy = data.spyPlayer === (isPlayer1Local ? 'p1' : 'p2');
@@ -488,6 +519,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 const drawnNums = data.spyDrawn.map(n => String(n));
                 drawPile = drawPile.filter(c => !drawnNums.includes(c.numer));
 
+                // Sprawdź czy wśród kart ze szpiega jest bohater
+                const hasHero = drawnObjs.some(c => c.bohater);
+                if (hasHero && window.playSound) window.playSound('ohoooooSound');
+
                 renderAll(currentNick); // Show hand with holes
 
                 const wrappers = document.querySelectorAll('.hand-card-img');
@@ -507,6 +542,8 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
                 animateDeckToHand(drawnObjs, targets, () => {
                     drawnObjs.forEach(obj => window.arrivedCards.add(obj));
+                    // Dźwięk dodania kart ze szpiega do ręki
+                    if (window.playSound) window.playSound('addCardSpySound');
                     finishUpdate();
                 });
             } else {
@@ -541,6 +578,9 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 isMedic: true,
                 onSelect: (selectedCard) => {
                     console.log(`[BOARD] Medic revived card ${selectedCard.numer}`);
+                    // Dźwięk wybrania karty przez medyka
+                    if (window.playSound) window.playSound('medykSound');
+
                     // Dedykowany mechanizm. Karty lądują domyślnie według ich pozycji, agile na froncie
                     let targetRowStr;
                     const rType = selectedCard.pozycja;
@@ -713,10 +753,17 @@ function handleScoiaDecision(socket, gameCode, deciderId) {
 }
 
 function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
+    // Dźwięk otwierania mulliganu
+    if (window.playSound) window.playSound('ohoooooSound');
+
     showPowiek(playerHand, selectedIndex, 'hand', {
         isMulligan: true,
         swapsLeft: 2 - swapsCount,
         onSwap: (idx) => {
+            // Dźwięk wymiany (1. lub 2. wymiana)
+            if (window.playSound) {
+                window.playSound(swapsCount === 0 ? 'wymiana1Sound' : 'wymiana2Sound');
+            }
             swapsCount++;
             if (swapsCount >= 2) {
                 if (window.hidePowiek) window.hidePowiek();
@@ -1411,6 +1458,42 @@ function confirmPlayProposed(targetData = {}) {
     const card = window.proposedCard;
     let finalPos = targetData.rowIdx || (card.pozycja === 4 ? 1 : card.pozycja);
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(card.moc);
+
+    // --- Dźwięki zagrania karty ---
+    if (window.playSound) {
+        if (card.moc === 'szpieg') {
+            window.playSound('szpiegSound');
+        } else if (card.bohater) {
+            window.playSound('zagranieBohateraSound');
+        } else if (card.moc === 'manek' || card.numer === '001') {
+            window.playSound('manekinSound');
+        } else if ((card.moc === 'rog') && (card.numer === '002' || typeof card.punkty !== 'number')) {
+            window.playSound('rogDowodcySound');
+        } else if (card.moc === 'mroz' || card.numer === '004') {
+            window.playSound('mrozSound');
+        } else if (card.moc === 'mgla' || card.numer === '005') {
+            window.playSound('mglaSound');
+        } else if (card.moc === 'deszcz' || card.numer === '006') {
+            window.playSound('deszczSound');
+        } else if (card.moc === 'niebo' || card.numer === '007') {
+            window.playSound('czystenieboSound');
+        } else if (card.moc === 'sztorm' || card.numer === '008') {
+            window.playSound('sztormSound');
+        } else if (card.moc === 'porz' || card.moc === 'iporz') {
+            window.playSound('zagranie1Sound');
+            // Efekt porzogi przyjdzie z board-updated (porzogaDestroyed)
+        } else if (finalPos === 3) {
+            window.playSound('zagranie3Sound');
+        } else {
+            window.playSound('zagranie1Sound');
+        }
+        // Wezwanie - grane z opóźnieniem po dźwięku zagrania
+        if (card.moc === 'wezwanie') {
+            setTimeout(() => { if (window.playSound) window.playSound('wezwanieSound'); }, 600);
+        }
+    }
+    // ------------------------------
+
 
     // Animacja przejścia z "dużej" karty na planszę (uproszczona)
     const preview = document.getElementById('proposed-card-preview');

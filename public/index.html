@@ -14,18 +14,17 @@
         content="Gwint, Gwint Online, Gwint 1v1, Wiedźmin 3, Witcher 3, gra karciana, card game, Gwent">
     <!-- Open Graph -->
     <meta property="og:title" content="Gwint Online (Beta) (Fan project)">
-    <meta property="og:description"
-        content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry.">
+    <meta property="og:description" content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://gwent-1vs1.onrender.com/">
     <meta property="og:image" content="/assets/zdlink.jpg">
-    
+
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Tagesschrift:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
     <link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-    
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js" defer></script>
 </head>
@@ -33,85 +32,98 @@
 <body>
     <!-- Strona A: Menu główne -->
     <div class="main-menu" id="mainMenu">
+        <!-- Linia na całą szerokość -->
+        <div class="menu-line"></div>
+
         <img src="assets/boklewy.png" class="side-bar left-bar" alt="Lewy bok">
         <img src="assets/bokprawy.png" class="side-bar right-bar" alt="Prawy bok">
-        
-        <div class="menu-wrapper">
-            <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
-            <div class="button-container">
-                <div class="menu-button play-button" onclick="showHostScreen()">
-                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+
+        <!-- Główny kontener wspólnie wyśrodkowany -->
+        <div class="content-container" id="contentContainer">
+            <div class="menu-wrapper">
+                <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
+                <div class="button-container">
+                    <div class="menu-button play-button" onclick="showHostScreen()">
+                        <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                    </div>
+                    <div class="menu-button test-menu-button" onclick="startTestGame()">
+                        <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                    </div>
+                    <div class="menu-button discord-menu-button"
+                        onclick="window.open('https://discord.gg/vs9tnnmNAD', '_blank')">
+                        <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                    </div>
+                    <div class="menu-button info-menu-button" onclick="showInfoScreen()">
+                        <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                    </div>
                 </div>
-                <div class="menu-button test-menu-button" onclick="startTestGame()">
-                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
-                </div>
-                <div class="menu-button discord-menu-button" onclick="window.open('https://discord.gg/vs9tnnmNAD', '_blank')">
-                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
-                </div>
-                <div class="menu-button info-menu-button" onclick="showInfoScreen()">
-                    <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
+                <div class="menu-text-overlay">
+                    <div class="menu-label-play">Graj</div>
+                    <div class="menu-label-test">Test Game</div>
+                    <div class="menu-label-discord">Discord</div>
+                    <div class="menu-label-info">Info Alpha 7.5 (strona wejściowa w przebudowie)</div>
                 </div>
             </div>
-            <div class="menu-text-overlay">
-                <div class="menu-label-play">Graj</div>
-                <div class="menu-label-test">Test Game</div>
-                <div class="menu-label-discord">Discord</div>
-                <div class="menu-label-info">Info</div>
+
+            <div id="sidePanel" class="side-panel">
+                <div id="gameSetup" class="setup-container">
+                    <h2
+                        style="color: #4b3621; border-bottom: 2px solid #4b3621; padding-bottom: 10px; margin-top: 0; font-size: 2.2rem;">
+                        Tryb Gry</h2>
+
+                    <div class="mode-selection-grid">
+                        <div class="mode-item active" data-mode="classic" onclick="selectGameMode('classic')">CLASSIC
+                        </div>
+                        <div class="mode-item" data-mode="cyberpunk" onclick="selectGameMode('cyberpunk')">CYBERPUNK
+                        </div>
+                        <div class="mode-item" data-mode="1v1v1v1" onclick="selectGameMode('1v1v1v1')">1v1v1v1</div>
+                        <div class="mode-item" data-mode="mix" onclick="selectGameMode('mix')">MIX</div>
+                        <div class="mode-item" data-mode="immersive" onclick="selectGameMode('immersive')">IMERSIV</div>
+                    </div>
+
+                    <div id="modePreview" class="mode-preview">
+                        <span>Tryb Klasyczny (Geralt vs Monsters)</span>
+                    </div>
+
+                    <div class="setup-details">
+                        <div class="players-status">
+                            <div class="player-box host">
+                                <span class="nick">Ty (Host)</span>
+                                <span class="status-indicator">Oczekiwanie...</span>
+                            </div>
+                            <div class="player-box opponent">
+                                <span class="nick">Przeciwnik</span>
+                                <span class="status-indicator">Nieobecny</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; align-items: center; margin: 10px 0;">
+                            <input type="text" id="sideCodeInput" placeholder="Wpisz kod"
+                                style="flex: 1; padding: 10px; background: rgba(0,0,0,0.1); border: 1px solid #4b3621; color: #4b3621; font-family: inherit; font-weight: bold;">
+                            <button onclick="joinGame()"
+                                style="padding: 10px 20px; background: #4b3621; border: none; cursor: pointer; color: #fff; font-family: inherit; font-weight: bold;">DOŁĄCZ</button>
+                        </div>
+
+                        <div class="code-box">
+                            <span id="displayCode" style="color: #4b3621;">KOD: ######</span>
+                            <button onclick="copyCode()">KOPIUJ LINK</button>
+                        </div>
+
+                        <div class="setup-actions">
+                            <button onclick="toggleReady()" id="readyBtn">GOTOWY</button>
+                            <button onclick="requestStartGame()" id="startGameBtn" disabled>START</button>
+                        </div>
+                    </div>
+
+                    <div class="side-back-button" onclick="goBackToMain()">
+                        Powrót
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="sidePanel" class="side-panel">
-            <div id="gameSetup" class="setup-container">
-                <h2 style="color: #c7a76e; border-bottom: 1px solid #c7a76e; padding-bottom: 10px; margin-top: 0;">Tryb Gry</h2>
-                
-                <div class="mode-selection-grid">
-                    <div class="mode-item active" data-mode="classic" onclick="selectGameMode('classic')">CLASSIC</div>
-                    <div class="mode-item" data-mode="cyberpunk" onclick="selectGameMode('cyberpunk')">CYBERPUNK</div>
-                    <div class="mode-item" data-mode="1v1v1v1" onclick="selectGameMode('1v1v1v1')">1v1v1v1</div>
-                    <div class="mode-item" data-mode="mix" onclick="selectGameMode('mix')">MIX</div>
-                    <div class="mode-item" data-mode="immersive" onclick="selectGameMode('immersive')">IMERSIV</div>
-                </div>
-
-                <div id="modePreview" class="mode-preview">
-                    <span>Tryb Klasyczny (Geralt vs Monsters)</span>
-                </div>
-
-                <div class="setup-details">
-                    <div class="players-status">
-                        <div class="player-box host">
-                            <span class="nick">Ty (Host)</span>
-                            <span class="status-indicator">Oczekiwanie...</span>
-                        </div>
-                        <div class="player-box opponent">
-                            <span class="nick">Przeciwnik</span>
-                            <span class="status-indicator">Nieobecny</span>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; align-items: center; margin: 10px 0;">
-                        <input type="text" id="sideCodeInput" placeholder="Wpisz kod" 
-                            style="flex: 1; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #c7a76e; color: #fff; font-family: inherit;">
-                        <button onclick="joinGame()" style="padding: 10px 20px; background: #c7a76e; border: none; cursor: pointer; font-family: inherit; font-weight: bold;">DOŁĄCZ</button>
-                    </div>
-
-                    <div class="code-box">
-                        <span id="displayCode">KOD: ######</span>
-                        <button onclick="copyCode()">KOPIUJ LINK</button>
-                    </div>
-
-                    <div class="setup-actions">
-                        <button onclick="toggleReady()" id="readyBtn">GOTOWY</button>
-                        <button onclick="requestStartGame()" id="startGameBtn" disabled>START</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="side-back-button" onclick="goBackToMain()">
-                Powrót
-            </div>
-        </div>
-
-        <div id="testGameMsg" style="color:#c7a76e; font-family:'PFDinTextCondPro-Bold',serif; font-size:1.2em; text-align:center; position: absolute; bottom: 10px; width: 100%;">
+        <div id="testGameMsg"
+            style="color:#c7a76e; font-family:'PFDinTextCondPro-Bold',serif; font-size:1.2em; text-align:center; position: absolute; bottom: 10px; width: 100%;">
         </div>
     </div>
 
@@ -119,9 +131,10 @@
     <div class="info-screen" id="infoScreen" style="display: none;">
         <div class="info-container">
             <div class="info-content">
-                <h1>Informacje - Strona jest tworzona/work in progres 26.03.2026</h1>
+                <h1>Informacje - Strona jest tworzona/work in progres 29.03.2026</h1>
                 <br>Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem
-                programować. Całą stronę od strony programowania robił Grok Copilot Gemini (GPT nie umie programować), ja
+                programować. Całą stronę od strony programowania robił Grok Copilot Gemini (GPT nie umie programować),
+                ja
                 tylko grafiki.
                 <p>Tu jest rozpiska, skąd co mam:
                     <br>Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3
@@ -148,25 +161,25 @@
                         wyłącznie w celach hobbystycznych.</p>
 
                     <p>Gra wykorzystuje <strong>oryginalne assety</strong> (grafiki, karty, dźwięki itp.) z gry <em>The
-                            Witcher 3: Wild Hunt</em> (Gwint), które są wyłączną własnością <strong>CD PROJEKT RED</strong>.
-                        Część assetów (ikony, tła, elementy interfejsu itp.) została stworzona samodzielnie przez autora
-                        projektu.</p>
+                            Witcher 3: Wild Hunt</em> (Gwint), które są wyłączną własnością <strong>CD PROJEKT
+                            RED</strong>. Część assetów (ikony, tła, elementy interfejsu itp.) została stworzona
+                        samodzielnie przez autora projektu.</p>
 
-                    <p>W klasycznej wersji gra odtwarza mechanikę Gwinta z <em>The Witcher 3</em>. W wariantach dodatkowych
-                        (np. 1v1v1v1, mix kart) jedynie ogólna mechanika karciana jest inspirowana oryginalnym Gwintem –
-                        reszta reguł, balansu i rozgrywki jest autorska.</p>
+                    <p>W klasycznej wersji gra odtwarza mechanikę Gwinta z <em>The Witcher 3</em>. W wariantach
+                        dodatkowych (np. 1v1v1v1, mix kart) jedynie ogólna mechanika karciana jest inspirowana
+                        oryginalnym Gwintem – reszta reguł, balansu i rozgrywki jest autorska.</p>
 
                     <p>Projekt <strong>nie jest zatwierdzony</strong> ani powiązany z CD PROJEKT RED. Nie zastępuje
                         oficjalnego <em>Gwent: The Witcher Card Game</em>.</p>
 
-                    <p>Strona jest w większości <strong>niekomercyjna</strong>. Ewentualne przychody pochodzą wyłącznie z
-                        nieinwazyjnych reklam umieszczonych z boku ekranu i służą jedynie pokryciu kosztów utrzymania
-                        serwera (ok. 30–40 zł miesięcznie). Nie ma żadnych paywalli, mikrotransakcji ani wymogu płatności za
-                        grę.</p>
+                    <p>Strona jest w większości <strong>niekomercyjna</strong>. Ewentualne przychody pochodzą wyłącznie
+                        z nieinwazyjnych reklam umieszczonych z boku ekranu i służą jedynie pokryciu kosztów utrzymania
+                        serwera (ok. 30–40 zł miesięcznie). Nie ma żadnych paywalli, mikrotransakcji ani wymogu
+                        płatności za grę. (obecnie opłacam tylko domene)</p>
 
                     <p>Jeśli CD PROJEKT RED lub inny uprawniony podmiot uzna, że projekt narusza ich prawa własności
-                        intelektualnej, jestem gotów natychmiast usunąć lub odpowiednio zmodyfikować stronę na ich żądanie.
-                    </p>
+                        intelektualnej, jestem gotów natychmiast usunąć lub odpowiednio zmodyfikować stronę na ich
+                        żądanie.</p>
 
                     <p>Korzystanie ze strony odbywa się na własne ryzyko.</p>
 

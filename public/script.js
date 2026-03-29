@@ -32,11 +32,9 @@ const addHoverSound = (elements) => {
     });
 };
 
-addHoverSound(document.querySelectorAll('.menu-button, .discord-button, .mode-item, .back-button, .setup-actions button'));
+addHoverSound(document.querySelectorAll('.menu-button, .mode-item, .side-back-button, .setup-actions button'));
 
 function showSidePanel() {
-    menuWrapper.classList.add('side-view');
-    // centerMenuImg.src = 'assets/srodekmenuw.png'; // Handled by HTML already based on new requirement
     sidePanel.classList.add('active');
 }
 

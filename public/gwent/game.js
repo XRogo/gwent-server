@@ -52,22 +52,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playSound(id) {
         const el = document.getElementById(id);
-        if (el) {
-            el.currentTime = 0;
-            el.play().catch(() => { });
-        }
+        if (!el) return;
+        // Klonujemy element audio - pozwala nakładać wiele dźwięków jednocześnie
+        const clone = el.cloneNode();
+        clone.volume = el.volume;
+        clone.play().catch(() => {});
+        clone.addEventListener('ended', () => clone.remove(), { once: true });
+        document.body.appendChild(clone);
     }
     window.playSound = playSound;
 
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('button') || e.target.closest('.button') || e.target.closest('.page-left') || e.target.closest('.page-right')) {
+    // Hover dźwięk na wszystkich klikalnych elementach (klik na wejście kursora)
+    document.addEventListener('mouseenter', (e) => {
+        const t = e.target;
+        if (
+            t.closest('button') ||
+            t.closest('.button') ||
+            t.closest('.page-left') ||
+            t.closest('.page-right') ||
+            t.closest('.kolekcja-card') ||
+            t.closest('.talia-card') ||
+            t.closest('.hand-card-img') ||
+            t.closest('.board-card-wrapper') ||
+            t.closest('.game-pass-btn') ||
+            t.closest('.scoia-btn')
+        ) {
             playSound('hoverSound');
         }
-    });
+    }, true);
 
     initSelection(socket, gameCode, isP1);
 
     function switchToGame() {
+        playSound('joinSound');
         cardSelectionScreen.style.display = 'none';
         gameScreen.style.display = 'block';
         initGameBoard(socket, gameCode, isP1, nick);

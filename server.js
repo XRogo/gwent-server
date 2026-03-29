@@ -772,6 +772,7 @@ io.on('connection', (socket) => {
                 }
 
                 // Scorch logic (Pożoga ogólna i rzędowa)
+                let scorchDestroyed = [];
                 if (cardObj.moc === 'porz' || cardObj.moc === 'iporz') {
                     let rowsToCheck = [];
                     if (cardObj.moc === 'porz') {
@@ -780,8 +781,6 @@ io.on('connection', (socket) => {
                         // Sprawdź czy rząd przeciwległy ma >= 10
                         const oppRow = `${targetSide === 'p1' ? 'p2' : 'p1'}R${finalPos}`;
                         if (state.board[oppRow]) {
-                            // Szybkie przeliczenie (bez pogody, uproszczone na razie)
-                            // Najlepiej wziąć z calculateRowScore
                             rowsToCheck = [oppRow];
                         }
                     }
@@ -794,9 +793,6 @@ io.on('connection', (socket) => {
                         rArray.forEach((cNum, idx) => {
                             const c = cards.find(x => String(x.numer) === String(cNum));
                             if (c && !c.bohater && typeof c.punkty === 'number') {
-                                // Omijamy dokładnie aktualną logikę pogody/rogów dla uproszczenia (lub wymaga rebuilda)
-                                // W Gwentcie Scorch patrzy na _aktualną_ siłę
-                                // TODO: To wymagałoby użycia calculateRowScore dla każdej karty. Dla MVP bierzemy c.punkty.
                                 if (c.punkty > maxVal) {
                                     maxVal = c.punkty;
                                     targets = [{ row: rKey, index: idx, num: cNum }];
@@ -824,6 +820,7 @@ io.on('connection', (socket) => {
                             state.board[t.row].splice(t.index, 1);
                             if (t.row.startsWith('p1')) state.p1Graveyard.push(t.num);
                             else state.p2Graveyard.push(t.num);
+                            scorchDestroyed.push(t.num);
                         });
                         console.log(`[GAME] Scorch destroyed ${targets.length} cards with power ${maxVal}`);
                     }
@@ -871,7 +868,10 @@ io.on('connection', (socket) => {
                     p2Graveyard: state.p2Graveyard,
                     spyDrawn: spyDrawn, // Send the IDs of cards drawn by the spy
                     spyPlayer: isPlayer1 ? 'p1' : 'p2',
-                    medicPending: state.medicPending
+                    medicPending: state.medicPending,
+                    lastPlayedCard: cardNumer,
+                    lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
+                    porzogaDestroyed: scorchDestroyed
                 });
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)

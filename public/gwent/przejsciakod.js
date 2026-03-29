@@ -42,6 +42,20 @@ export function showPrzejscie(numer, opcje = {}) {
 function displayBanner(item) {
     isShowing = true;
 
+    // --- Dźwięki banerów ---
+    if (window.playSound) {
+        const bannerSounds = {
+            't01': 'monetkaSound',
+            't02': 'monetkaSound',
+            't07': 'twojRochSound',
+            't08': 'rochPrzeciwnikaSound',
+            't22': 'przeciwnikWygralSound',
+        };
+        const snd = bannerSounds[item.numer];
+        if (snd) window.playSound(snd);
+    }
+    // -----------------------
+
     const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
     const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
     const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
