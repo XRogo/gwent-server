@@ -192,7 +192,7 @@ export function renderPowiek() {
 
         if (i === 0) {
             const podsw = document.createElement('img');
-            podsw.src = '/gwent/assets/dkarty/podsw.webp';
+            podsw.src = 'assets/dkarty/podsw.webp';
             podsw.className = 'poswiata powiek-podsw';
             podsw.style.position = 'absolute';
             podsw.style.left = '0.2%';
@@ -203,7 +203,7 @@ export function renderPowiek() {
             cardDiv.appendChild(podsw);
 
             const podsw2 = document.createElement('img');
-            podsw2.src = '/gwent/assets/dkarty/podsw2.webp';
+            podsw2.src = 'assets/dkarty/podsw2.webp';
             podsw2.className = 'poswiata powiek-podsw2';
             podsw2.style.position = 'absolute';
             podsw2.style.left = '0.2%';

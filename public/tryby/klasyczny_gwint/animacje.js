@@ -48,7 +48,7 @@ function calcDuration(fromX, fromY, toX, toY) {
 
 // Pre-load common assets
 const heroIconImg = new Image();
-heroIconImg.src = '/gwent/assets/karty/bohater.webp';
+heroIconImg.src = 'assets/karty/bohater.webp';
 
 /**
  * Animuje element (kratę) z pozycji A do B.

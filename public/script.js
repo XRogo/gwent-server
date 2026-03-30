@@ -17,6 +17,44 @@ let isP1Ready = false;
 let isP2Ready = false;
 let player2Id = null;
 
+function showToast(message, duration = 3000) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    // Force reflow
+    toast.offsetHeight;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+window.copyCodeToClipboard = function() {
+    if (!currentGameCode) return;
+    navigator.clipboard.writeText(currentGameCode).then(() => {
+        showToast("SKOPIOWANO KOD: " + currentGameCode);
+    });
+}
+
+window.pasteCodeFromClipboard = function() {
+    navigator.clipboard.readText().then(text => {
+        const clean = text.trim();
+        if (clean.length === 6 && /^\d+$/.test(clean)) {
+            document.getElementById('sideCodeInput').value = clean;
+            showToast("WKLEJONO KOD");
+        } else {
+            showToast("BRAK DANYCH DO WKLEJENIA");
+        }
+    }).catch(() => {
+        showToast("BRAK DOSTĘPU DO SCHOWKA");
+    });
+}
+
 const nicknames = [
     "Geralt", "Yennefer", "Ciri", "Triss", "Jaskier", "Zoltan", "Vesemir", "Lambert", "Eskel", "Foltest",
     "Emhyr", "Fringilla", "Meve", "Eredin", "Regis", "Yarpen", "Keira", "Letho", "Roche", "Ves", "Iorveth",
@@ -136,8 +174,8 @@ function selectGameMode(index) {
     document.getElementById('modePreviewText').textContent = mode.opis;
     
     const imgElement = document.getElementById('modePreviewImg');
-    if (mode.nazwa === 'Klasyczny') {
-        imgElement.src = 'assets/wybory.webp'; // Fallback / current
+    if (mode.obraz) {
+        imgElement.src = `assets/${mode.obraz}`; 
     } else {
         imgElement.src = 'assets/work in prognres.png'; // Fallback
     }
@@ -154,7 +192,73 @@ document.addEventListener('DOMContentLoaded', () => {
     addHoverSound('.menu-button, .carousel-kafelek, .side-back-button, .game-btn');
     document.getElementById('nicknameInput').value = localStorage.getItem('nickname') || nicknames[Math.floor(Math.random() * nicknames.length)];
     setTimeout(fitMenuToScreen, 100);
+    checkMobileOrientation();
 });
+
+function checkMobileOrientation() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+        document.getElementById('mobileWarning').style.display = 'flex';
+    }
+}
+
+window.closeWarning = function() {
+    document.getElementById('mobileWarning').style.display = 'none';
+}
+
+window.setupMobileGame = function() {
+    // 1. Wejdz w fullscreen (wymagane dla Screen Orientation API)
+    const docEl = document.documentElement;
+    const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+    
+    if (requestFullScreen) {
+        requestFullScreen.call(docEl).then(() => {
+            // 2. Proba wymuszenia orientacji poziomej
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => {
+                    console.log("Nie udało się zablokować orientacji: ", err);
+                    showToast("OBRÓĆ EKRAN RĘCZNIE");
+                });
+            }
+            updateFsIcon();
+            closeWarning();
+        }).catch(() => {
+            showToast("BŁĄD PEŁNEGO EKRANU");
+        });
+    }
+}
+
+window.toggleFullScreen = function() {
+    const doc = window.document;
+    const docEl = doc.documentElement;
+    const fsIcon = document.getElementById('fsIcon');
+
+    const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+    const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+    if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        requestFullScreen.call(docEl);
+        fsIcon.src = 'assets/pomiek.webp';
+    } else {
+        cancelFullScreen.call(doc);
+        fsIcon.src = 'assets/powiek.webp';
+    }
+}
+
+// Track FS changes to update icon if Esc pressed
+document.addEventListener('fullscreenchange', updateFsIcon);
+document.addEventListener('webkitfullscreenchange', updateFsIcon);
+document.addEventListener('mozfullscreenchange', updateFsIcon);
+document.addEventListener('MSFullscreenChange', updateFsIcon);
+
+function updateFsIcon() {
+    const fsIcon = document.getElementById('fsIcon');
+    if (!document.fullscreenElement) {
+        fsIcon.src = 'assets/powiek.webp';
+    } else {
+        fsIcon.src = 'assets/pomiek.webp';
+    }
+}
 
 /* ========================================================
    LOBBY LOGIC
@@ -229,6 +333,11 @@ function requestStartGame() {
 function startRealGame() {
     const nick = document.getElementById('nicknameInput').value || nicknames[Math.floor(Math.random() * nicknames.length)];
     localStorage.setItem('nickname', nick);
+
+    // Zapamiętaj czy użytkownik jest w trybie pełnoekranowym
+    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    localStorage.setItem('gwent_fullscreen_pref', isFS ? 'true' : 'false');
+
     const mode = tryby[selectedModeIndex];
     const gamePath = mode ? mode.gra : 'tryby/klasyczny_gwint';
     
@@ -295,19 +404,39 @@ socket.on('message-from-p2', (data) => {
 
 
 
+let isResetting = false;
 // Reset Lobby
 window.resetLobby = function () {
+    if (isResetting) return;
+    
     if (isPlayer1) {
+        isResetting = true;
+        const reloadBtn = document.querySelector('.reload-btn');
+        if (reloadBtn) reloadBtn.style.opacity = '0.5';
+
         socket.emit('p1Left');
+        isJoined = false;
+        player2Id = null;
+        isP1Ready = false;
+        isP2Ready = false;
+        currentGameCode = null;
+        updateSetupUI();
+
         setTimeout(() => {
-            isJoined = false;
-            player2Id = null;
-            player2Nickname = null;
-            isP1Ready = false;
-            isP2Ready = false;
-            currentGameCode = null;
             socket.emit('create-game');
         }, 150);
+
+        let secondsLeft = 30;
+        const interval = setInterval(() => {
+            secondsLeft--;
+            if (secondsLeft <= 0) {
+                clearInterval(interval);
+                isResetting = false;
+                if (reloadBtn) reloadBtn.style.opacity = '1';
+            }
+        }, 1000);
+        
+        showToast("RESTART LOBBY... POCZEKAJ 30S");
     }
 };
 

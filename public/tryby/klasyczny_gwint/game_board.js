@@ -1121,7 +1121,7 @@ export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore
     // Jeśli bohater, dodajemy ikonkę tarczy po lewo od punktów (lub na pod punkty)
     if (card.bohater) {
         const heroIcon = document.createElement('img');
-        heroIcon.src = '/gwent/assets/karty/bohater.webp';
+        heroIcon.src = 'assets/karty/bohater.webp';
         heroIcon.className = 'card-points-overlay';
         heroIcon.style.position = 'absolute';
         heroIcon.style.left = `${-8 * cardScale}px`;

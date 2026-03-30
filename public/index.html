@@ -31,6 +31,7 @@
 </head>
 
 <body>
+    <div id="toast-container"></div>
     <!-- Strona A: Menu główne -->
     <div class="main-menu" id="mainMenu">
         <!-- Linia na całą szerokość -->
@@ -62,7 +63,7 @@
                     <div class="menu-label-play">Graj</div>
                     <div class="menu-label-test">Test Game</div>
                     <div class="menu-label-discord">Discord</div>
-                    <div class="menu-label-info">Info Alpha 7.60</div>
+                    <div class="menu-label-info">Info Alpha 8.0</div>
                 </div>
             </div>
 
@@ -95,12 +96,20 @@
                                 <img src="assets/reload.webp" class="reload-btn" onclick="resetLobby()"
                                     title="Resetuje lobby i kod" alt="Reset">
                                 <span id="displayCode" class="lobby-code">TWÓJ KOD ######</span>
+                                <img src="assets/coppy.webp" class="icon-btn copy-btn" onclick="copyCodeToClipboard()"
+                                    title="Kopiuj kod" alt="Copy">
                             </div>
 
                             <!-- 751, 348 x 1204, 407 -->
                             <div class="join-area">
                                 <span>DOŁĄCZ: </span>
-                                <input type="text" id="sideCodeInput" placeholder="KOD">
+                                <div class="input-wrapper">
+                                    <input type="text" id="sideCodeInput" placeholder="KOD">
+                                    <img src="assets/paset.webp" class="inner-paste-btn"
+                                        onclick="pasteCodeFromClipboard()" title="Wklej kod" alt="Paste">
+                                </div>
+                                <img src="assets/accept.webp" class="icon-btn accept-btn" onclick="joinOrStartGame()"
+                                    title="Dołącz" alt="Accept">
                             </div>
 
                             <div class="player-entry-area">
@@ -133,6 +142,22 @@
             <h2>Stan gry</h2>
             <p>Host: <span id="hostNickname">...</span></p>
             <p>Przeciwnik: <span id="opponentNickname">...</span></p>
+        </div>
+    </div>
+
+    <!-- Przycisk Pełnego Ekranu -->
+    <div id="fullScreenBtn" class="fullscreen-btn" onclick="toggleFullScreen()" title="Tryb pełnoekranowy">
+        <img src="assets/powiek.webp" id="fsIcon" alt="Fullscreen">
+    </div>
+
+    <!-- Informacja dla telefonów -->
+    <div id="mobileWarning" class="mobile-warning">
+        <div class="warning-box">
+            <p>Dla najlepszego doświadczenia używaj Gwinta w trybie pełnoekranowym i poziomie (bokiem).</p>
+            <div class="warning-buttons">
+                <button onclick="setupMobileGame()" class="gold-btn">USTAW</button>
+                <button onclick="closeWarning()">ROZUMIEM</button>
+            </div>
         </div>
     </div>
 </body>

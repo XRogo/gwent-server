@@ -9,8 +9,8 @@ const krole = [
     {
         ////////////////////////////////////////////////////////////////////
         nazwa: "Foltest Król Temerii",
-        karta: "/gwent/assets/karty/polnoc/foltest1.webp",
-        dkarta: "/gwent/assets/dkarty/kure/1001.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1001.webp",
         opis: "Przecież to naturalne, że brat darzy miłością swoją siostrę.",
         frakcja: "1",
         numer: "1001",
@@ -23,8 +23,8 @@ const krole = [
     {
         /////////////////////////////////////////////////////////////////////
         nazwa: "Foltest Dowódca Północyi",
-        karta: "/gwent/assets/karty/polnoc/foltest2.webp",
-        dkarta: "/gwent/assets/dkarty/kure/1002.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1002.webp",
         opis: '"Pieprzeni doradcy i ich polityczne układanki. Na polu bitwy ufam sobie i swoim zbrojnym".',
         frakcja: "1",
         numer: "1002",
@@ -37,8 +37,8 @@ const krole = [
     {
         /////////////////////////////////////////////////////////////////////
         nazwa: "Foltest Zdobywca",
-        karta: "/gwent/assets/karty/polnoc/foltest3.webp",
-        dkarta: "/gwent/assets/dkarty/kure/1003.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1003.webp",
         opis: '"Dobrze wymierzony strzał z balisty druzgocze nie tylko umocnienia, ale też morale wroga".',
         frakcja: "1",
         numer: "1003",
@@ -51,8 +51,8 @@ const krole = [
     {
         /////////////////////////////////////////////////////////////
         nazwa: "Foltest Żelazny Władca",
-        karta: "/gwent/assets/karty/polnoc/foltest4.webp",
-        dkarta: "/gwent/assets/dkarty/kure/1004.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1004.webp",
         opis: '"Cóż za piękny dzień na bitwę!"',
         frakcja: "1",
         numer: "1004",
@@ -65,8 +65,8 @@ const krole = [
     {
         ////////////////////////////////////////////////////////////////
         nazwa: "Foltest Syn Medella",
-        karta: "/gwent/assets/karty/polnoc/foltest5.webp",
-        dkarta: "/gwent/assets/dkarty/kure/1005.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1005.webp",
         opis: '"Ja tu rządę i nie będę się krył po kątach".',
         frakcja: "1",
         numer: "1005",
@@ -81,8 +81,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Jeż z Erlenwaldu",
-        karta: "/gwent/assets/karty/nilftgard/emhyr1.webp",
-        dkarta: "/gwent/assets/dkarty/kure/2001.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2001.webp",
         opis: '"Niebo nie płakało, gdy zabrali mi Pawette".',
         frakcja: "2",
         numer: "2001",
@@ -95,8 +95,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Cesarz Nilfgaardu",
-        karta: "/gwent/assets/karty/nilftgard/emhyr2.webp",
-        dkarta: "/gwent/assets/dkarty/kure/2002.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2002.webp",
         opis: '"Nie interesują mnie twoje przesłaniki. Oczekikję wyników".',
         frakcja: "2",
         numer: "2002",
@@ -109,8 +109,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Biały Płomień Tańczący na Kurhanach Wrogów",
-        karta: "/gwent/assets/karty/nilftgard/emhyr3.webp",
-        dkarta: "/gwent/assets/dkarty/kure/2003.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2003.webp",
         opis: '"Miecz jest raptem jednym z narzędzi w dyspozycji cesarza".',
         frakcja: "2",
         numer: "2003",
@@ -123,8 +123,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Pan Południa",
-        karta: "/gwent/assets/karty/nilftgard/emhyr4.webp",
-        dkarta: "/gwent/assets/dkarty/kure/2004.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2004.webp",
         opis: '"Nie jestem znany ze swojej cierpliwości. Poczyń, prosze, kroki , abym nie być znanym z braku głowy na karku".',
         frakcja: "2",
         numer: "2004",
@@ -137,8 +137,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////////////
         nazwa: "Emhyr var Emreis Najeźca Północy",
-        karta: "/gwent/assets/karty/nilftgard/emhyr5.webp",
-        dkarta: "/gwent/assets/dkarty/kure/2005.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2005.webp",
         opis: '"Cesarze władają imperium, ale dwiem rzeczami rządzić nie mogą swojim sercem i swojim czasem".',
         frakcja: "2",
         numer: "2005",
@@ -153,8 +153,8 @@ const krole = [
     {
         //////////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Elfka czystej krwi",
-        karta: "/gwent/assets/karty/scio'tel/francesca_findabair1.webp",
-        dkarta: "/gwent/assets/dkarty/kure/3001.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3001.webp",
         opis: '"Znowu jesteśmy Ludem, aie wygnańcami. A popiół użyźnia".',
         frakcja: "3",
         numer: "3001",
@@ -167,8 +167,8 @@ const krole = [
     {
         /////////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Stokrotka z Dolin",
-        karta: "/gwent/assets/karty/scio'tel/francesca_findabair2.webp",
-        dkarta: "/gwent/assets/dkarty/kure/3002.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3002.webp",
         opis: '"Powszechnei uważa się ją za najpiękniejszą kobietę świata".',
         frakcja: "3",
         numer: "3002",
@@ -181,8 +181,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Najpiękniejsza kobieta na świecie",
-        karta: "/gwent/assets/karty/scio'tel/francesca_findabair3.webp",
-        dkarta: "/gwent/assets/dkarty/kure/3003.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3003.webp",
         opis: '"Komanda muszą nadal prowadzić walkę".',
         frakcja: "3",
         numer: "3003",
@@ -195,8 +195,8 @@ const krole = [
     {
         /////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Królowa Dol Blathanna",
-        karta: "/gwent/assets/karty/scio'tel/francesca_findabair4.webp",
-        dkarta: "/gwent/assets/dkarty/kure/3004.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3004.webp",
         opis: '"Wszystko ma swoją cenę. Wojna wymaga ofiar. Pokój, jak się okazuje, również".',
         frakcja: "3",
         numer: "3004",
@@ -209,8 +209,8 @@ const krole = [
     {
         ////////////////////////////////////////////////////
         nazwa: "Francesca Findabair Nadzieja Dol Blathanna",
-        karta: "/gwent/assets/karty/scio'tel/francesca_findabair5.webp",
-        dkarta: "/gwent/assets/dkarty/kure/3005.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3005.webp",
         opis: '"Daede sian caente, Aen Seidhe en\'allane ael coeden...".',
         frakcja: "3",
         numer: "3005",
@@ -225,8 +225,8 @@ const krole = [
     {
         ////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Król Dzikiego Gonu",
-        karta: "/gwent/assets/karty/potwory/eredin1.webp",
-        dkarta: "/gwent/assets/dkarty/kure/4001.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4001.webp",
         opis: '"Va faill, luned".',
         frakcja: "4",
         numer: "4001",
@@ -239,8 +239,8 @@ const krole = [
     {
         ////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Dowódca Czerwonych Jeźdźców",
-        karta: "/gwent/assets/karty/potwory/eredin2.webp",
-        dkarta: "/gwent/assets/dkarty/kure/4002.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4002.webp",
         opis: '"Król Goun śmieje się, kłapią przegniłe\nzęby nad zardzewiałym kołnierzem zbroi".',
         frakcja: "4",
         numer: "4002",
@@ -253,8 +253,8 @@ const krole = [
     {
         //////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Władca Tir ná Lia",
-        karta: "/gwent/assets/karty/potwory/eredin3.webp",
-        dkarta: "/gwent/assets/dkarty/kure/4003.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4003.webp",
         opis: '"Im byli bliżej, tym piękno tego miejsca\nsilniej chwytało za serce".',
         frakcja: "4",
         numer: "4003",
@@ -267,8 +267,8 @@ const krole = [
     {
         ////////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Zabujca Auberona",
-        karta: "/gwent/assets/karty/potwory/eredin4.webp",
-        dkarta: "/gwent/assets/dkarty/kure/4004.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4004.webp",
         opis: '"Czerwpni Jeźdżcy zdołają doścignąć cię nawet w odchłani czasów i  miejsc".',
         frakcja: "4",
         numer: "4004",
@@ -281,8 +281,8 @@ const krole = [
     {
         //////////////////////////////////////////////////////
         nazwa: "Eredin Bréacc Glas Zdradziecki",
-        karta: "/gwent/assets/karty/potwory/eredin5.webp",
-        dkarta: "/gwent/assets/dkarty/kure/4005.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4005.webp",
         opis: '"Bo się tobą bawię".',
         frakcja: "4",
         numer: "4005",
@@ -298,8 +298,8 @@ const krole = [
     {
         //////////////////////////////////////////////////////////
         nazwa: "Król Bran",
-        karta: "/gwent/assets/karty/Skellige/bran.webp",
-        dkarta: "/gwent/assets/dkarty/kure/5001.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/bran.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/5001.webp",
         opis: '"Nikt nie zastąpi Brana. Moge jedynie próbować."',
         frakcja: "5",
         numer: "5001",
@@ -312,8 +312,8 @@ const krole = [
     {
         ///////////////////////////////////////////////////////////////////
         nazwa: "Crach an Craite",
-        karta: "/gwent/assets/karty/Skellige/crach.webp",
-        dkarta: "/gwent/assets/dkarty/kure/5002.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/crach.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/5002.webp",
         opis: '"Król musi być madry. Król musi cieszyć\nsię szacunkiem. Król miusi mieć jaja".',
         frakcja: "5",
         numer: "5002",
