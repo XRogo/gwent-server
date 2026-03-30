@@ -26,6 +26,7 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="tryby.js"></script>
     <script src="script.js" defer></script>
 </head>
 
@@ -53,7 +54,7 @@
                         onclick="window.open('https://discord.gg/vs9tnnmNAD', '_blank')">
                         <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
                     </div>
-                    <div class="menu-button info-menu-button" onclick="showInfoScreen()">
+                    <div class="menu-button info-menu-button" onclick="window.location.href='info.html'">
                         <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
                     </div>
                 </div>
@@ -61,62 +62,59 @@
                     <div class="menu-label-play">Graj</div>
                     <div class="menu-label-test">Test Game</div>
                     <div class="menu-label-discord">Discord</div>
-                    <div class="menu-label-info">Info Alpha 7.5 (strona wejściowa w przebudowie)</div>
+                    <div class="menu-label-info">Info Alpha 7.60</div>
                 </div>
             </div>
 
             <div id="sidePanel" class="side-panel">
-                <div id="gameSetup" class="setup-container">
-                    <h2
-                        style="color: #4b3621; border-bottom: 2px solid #4b3621; padding-bottom: 10px; margin-top: 0; font-size: 2.2rem;">
-                        Tryb Gry</h2>
-
-                    <div class="mode-selection-grid">
-                        <div class="mode-item active" data-mode="classic" onclick="selectGameMode('classic')">CLASSIC
+                <div id="gameSetup" class="setup-container wybor-mode-container">
+                    <!-- Ukryty obrazek do załadowania dla naturalnych rozmiarów -->
+                    <img src="assets/wybor.webp" id="wyborBgImg" class="wybor-bg" alt="Tryby">
+                    <div id="wyborPixelCanvas" class="wybor-pixel-canvas">
+                        <!-- Top Bar kafelki (<141) -->
+                        <div id="modeCarousel" class="mode-carousel">
+                            <!-- mode items injected via JS -->
                         </div>
-                        <div class="mode-item" data-mode="cyberpunk" onclick="selectGameMode('cyberpunk')">CYBERPUNK
+
+                        <!-- Środek-Lewo (Opis) 281, 146 x 738, 326 -->
+                        <div id="modeDescriptionArea" class="mode-desc">
+                            <span id="modePreviewText">Opis trybu</span>
                         </div>
-                        <div class="mode-item" data-mode="1v1v1v1" onclick="selectGameMode('1v1v1v1')">1v1v1v1</div>
-                        <div class="mode-item" data-mode="mix" onclick="selectGameMode('mix')">MIX</div>
-                        <div class="mode-item" data-mode="immersive" onclick="selectGameMode('immersive')">IMERSIV</div>
-                    </div>
 
-                    <div id="modePreview" class="mode-preview">
-                        <span>Tryb Klasyczny (Geralt vs Monsters)</span>
-                    </div>
+                        <!-- Środek-Prawo (Obraz trybu) 845, 153 x 1141, 322 -->
+                        <div id="modeImageArea" class="mode-image">
+                            <img id="modePreviewImg" src="assets/wybory.webp" alt="Podgląd">
+                        </div>
 
-                    <div class="setup-details">
-                        <div class="players-status">
-                            <div class="player-box host">
-                                <span class="nick">Ty (Host)</span>
-                                <span class="status-indicator">Oczekiwanie...</span>
+                        <!-- Pasek na dole, Y=346 -->
+                        <div id="modeBottomBar" class="mode-bottom">
+                            <img src="assets/kod pasek.webp" class="pasek-bg" alt="Pasek">
+
+                            <!-- 274, 348 x 733, 407 (pozycja bezwg na canvas) -->
+                            <div class="code-generator">
+                                <img src="assets/reload.webp" class="reload-btn" onclick="resetLobby()"
+                                    title="Resetuje lobby i kod" alt="Reset">
+                                <span id="displayCode" class="lobby-code">TWÓJ KOD ######</span>
                             </div>
-                            <div class="player-box opponent">
-                                <span class="nick">Przeciwnik</span>
-                                <span class="status-indicator">Nieobecny</span>
+
+                            <!-- 751, 348 x 1204, 407 -->
+                            <div class="join-area">
+                                <span>DOŁĄCZ: </span>
+                                <input type="text" id="sideCodeInput" placeholder="KOD">
+                            </div>
+
+                            <div class="player-entry-area">
+                                <input type="text" id="nicknameInput" placeholder="NICK">
+                                <button onclick="requestStartGame()" id="startGameBtn" class="game-btn">START /
+                                    DOŁĄCZ</button>
+                                <button onclick="toggleReady()" id="readyBtn" class="game-btn">GOTOWY</button>
+                                <div class="status-indicator" id="p2Status">Status...</div>
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 10px; align-items: center; margin: 10px 0;">
-                            <input type="text" id="sideCodeInput" placeholder="Wpisz kod"
-                                style="flex: 1; padding: 10px; background: rgba(0,0,0,0.1); border: 1px solid #4b3621; color: #4b3621; font-family: inherit; font-weight: bold;">
-                            <button onclick="joinGame()"
-                                style="padding: 10px 20px; background: #4b3621; border: none; cursor: pointer; color: #fff; font-family: inherit; font-weight: bold;">DOŁĄCZ</button>
+                        <div class="side-back-button" onclick="goBackToMain()">
+                            Powrót
                         </div>
-
-                        <div class="code-box">
-                            <span id="displayCode" style="color: #4b3621;">KOD: ######</span>
-                            <button onclick="copyCode()">KOPIUJ LINK</button>
-                        </div>
-
-                        <div class="setup-actions">
-                            <button onclick="toggleReady()" id="readyBtn">GOTOWY</button>
-                            <button onclick="requestStartGame()" id="startGameBtn" disabled>START</button>
-                        </div>
-                    </div>
-
-                    <div class="side-back-button" onclick="goBackToMain()">
-                        Powrót
                     </div>
                 </div>
             </div>
@@ -127,75 +125,7 @@
         </div>
     </div>
 
-    <!-- Strona I: Informacje -->
-    <div class="info-screen" id="infoScreen" style="display: none;">
-        <div class="info-container">
-            <div class="info-content">
-                <h1>Informacje - Strona jest tworzona/work in progres 29.03.2026</h1>
-                <br>Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem
-                programować. Całą stronę od strony programowania robił Grok Copilot Gemini (GPT nie umie programować),
-                ja
-                tylko grafiki.
-                <p>Tu jest rozpiska, skąd co mam:
-                    <br>Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3
-                    <br>Ramki: bezpośrednio z gry i częściowo poprzerabiane
-                    <br>Napis "Gwint": z Google Grafika
-                    <br> Pasek ten czarny: z filmu <a href="https://www.youtube.com/watch?v=xx8kQ4s5hCY"
-                        target="_blank">https://www.youtube.com/watch?v=xx8kQ4s5hCY</a>
-                    <br> Gradient: sam robiłem.
-                    <br>Dźwięk przycisków: podjebane bezpośrednio z gry.
-                    <br>Napisy: zrobione na stronie <a href="https://www.fontspace.com/category/the-witcher"
-                        target="_blank">https://www.fontspace.com/category/the-witcher</a>
-                    <br>ładowanie sam robiłem wzór Yrden
-                    <br>ikonki aktwynośći sam robiłem
-                    <br>ikony strony rewers kart z wieśka 3
-                    <br>tczcionka <a href="https://font.download/font/pf-din-text-cond-pro-2"
-                        target="_blank">https://font.download/font/pf-din-text-cond-pro-2</a>
-                    <br>karty i wszystkie asety jakie sa już w grze są wzięte z gry wiedmzin 3 3 najlepszy
-                </p>
 
-                <div class="legal-section">
-                    <h2>Informacja prawna / Disclaimer</h2>
-
-                    <p>Ta strona i dostępna na niej gra to <strong>nieoficjalny, fanowski projekt</strong> stworzony
-                        wyłącznie w celach hobbystycznych.</p>
-
-                    <p>Gra wykorzystuje <strong>oryginalne assety</strong> (grafiki, karty, dźwięki itp.) z gry <em>The
-                            Witcher 3: Wild Hunt</em> (Gwint), które są wyłączną własnością <strong>CD PROJEKT
-                            RED</strong>. Część assetów (ikony, tła, elementy interfejsu itp.) została stworzona
-                        samodzielnie przez autora projektu.</p>
-
-                    <p>W klasycznej wersji gra odtwarza mechanikę Gwinta z <em>The Witcher 3</em>. W wariantach
-                        dodatkowych (np. 1v1v1v1, mix kart) jedynie ogólna mechanika karciana jest inspirowana
-                        oryginalnym Gwintem – reszta reguł, balansu i rozgrywki jest autorska.</p>
-
-                    <p>Projekt <strong>nie jest zatwierdzony</strong> ani powiązany z CD PROJEKT RED. Nie zastępuje
-                        oficjalnego <em>Gwent: The Witcher Card Game</em>.</p>
-
-                    <p>Strona jest w większości <strong>niekomercyjna</strong>. Ewentualne przychody pochodzą wyłącznie
-                        z nieinwazyjnych reklam umieszczonych z boku ekranu i służą jedynie pokryciu kosztów utrzymania
-                        serwera (ok. 30–40 zł miesięcznie). Nie ma żadnych paywalli, mikrotransakcji ani wymogu
-                        płatności za grę. (obecnie opłacam tylko domene)</p>
-
-                    <p>Jeśli CD PROJEKT RED lub inny uprawniony podmiot uzna, że projekt narusza ich prawa własności
-                        intelektualnej, jestem gotów natychmiast usunąć lub odpowiednio zmodyfikować stronę na ich
-                        żądanie.</p>
-
-                    <p>Korzystanie ze strony odbywa się na własne ryzyko.</p>
-
-                    <hr>
-
-                    <p style="font-size: 0.9em; color: #888;">
-                        © CD PROJEKT RED. The Witcher®, Gwint i wszystkie powiązane znaki towarowe oraz materiały są
-                        własnością CD PROJEKT RED. Wszelkie prawa zastrzeżone.
-                    </p>
-                </div>
-            </div>
-            <div class="info-footer">
-                <div class="info-back-link" onclick="showMainMenu()">Powrót</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Ekran gry -->
     <div id="gameScreen" class="screen">

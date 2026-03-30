@@ -1,0 +1,42 @@
+const tryby = [
+    {
+        nazwa: "Klasyczny",
+        ikona: "tryby/gwent_classic.webp",
+        obraz: "tymczasem.webp",
+        players: 2,
+        opis: "Klasyczna wersja Gwinta\n identyczna jak w Wiedźminie 3.",
+        gra: "tryby/klasyczny_gwint",
+    },
+    {
+        nazwa: "Mix",
+        ikona: "tryby/mix_cart.webp",
+        obraz: "tymczasem.webp",
+        players: 2,
+        opis: "koncept",
+        gra: "tryby/klasyczny_gwint",
+    },
+    {
+        nazwa: "1v1v1v1",
+        ikona: "tryby/1v1v1v1.webp",
+        obraz: "tymczasem.webp",
+        players: 4,
+        opis: "koncept",
+        gra: "tryby/gwint_1v1v1v1",
+    },
+    {
+        nazwa: "Czasowy",
+        ikona: "tryby/czasowka.webp",
+        obraz: "tymczasem.webp",
+        players: 2,
+        opis: "koncept",
+        gra: "tryby/gwint_czasowy",
+    },
+    {
+        nazwa: "Cyberpunkowy",
+        ikona: "tryby/cp_tryb.webp",
+        obraz: "tymczasem.webp",
+        players: 2,
+        opis: "koncept",
+        gra: "tryby/cyberpunkowy_gwint",
+    },
+];

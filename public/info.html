@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwent Menu - Informacje</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <style>
+        /* Nadpisanie by Info Screen działał jako samodzielna strona */
+        body {
+            overflow: auto !important;
+            background-image: url('assets/background2.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .info-screen {
+            display: flex; /* Override display: none from CSS class */
+            position: relative;
+            background: none; /* Already on body */
+            z-index: 10;
+        }
+        .info-container {
+            max-height: 90vh; /* Zapobiega przycinaniu na malych ekranach */
+        }
+    </style>
+</head>
+<body>
+    <div class="info-screen" id="infoScreen">
+        <div class="info-container">
+            <div class="info-content">
+                <h1>Informacje - Strona jest tworzona/work in progres 29.03.2026</h1>
+                <br>Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem
+                programować. Całą stronę od strony programowania robił Grok Copilot Gemini (GPT nie umie programować),
+                ja tylko grafiki.
+                <p>Tu jest rozpiska, skąd co mam:
+                    <br>Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3
+                    <br>Ramki: bezpośrednio z gry i częściowo poprzerabiane
+                    <br>Napis "Gwint": z Google Grafika
+                    <br> Pasek ten czarny: z filmu <a href="https://www.youtube.com/watch?v=xx8kQ4s5hCY"
+                        target="_blank">https://www.youtube.com/watch?v=xx8kQ4s5hCY</a>
+                    <br> Gradient: sam robiłem.
+                    <br>Dźwięk przycisków: podjebane bezpośrednio z gry.
+                    <br>Napisy: zrobione na stronie <a href="https://www.fontspace.com/category/the-witcher"
+                        target="_blank">https://www.fontspace.com/category/the-witcher</a>
+                    <br>ładowanie sam robiłem wzór Yrden
+                    <br>ikonki aktwynośći sam robiłem
+                    <br>ikony strony rewers kart z wieśka 3
+                    <br>tczcionka <a href="https://font.download/font/pf-din-text-cond-pro-2"
+                        target="_blank">https://font.download/font/pf-din-text-cond-pro-2</a>
+                    <br>karty i wszystkie asety jakie sa już w grze są wzięte z gry wiedmzin 3 3 najlepszy
+                </p>
+
+                <div class="legal-section">
+                    <h2>Informacja prawna / Disclaimer</h2>
+
+                    <p>Ta strona i dostępna na niej gra to <strong>nieoficjalny, fanowski projekt</strong> stworzony
+                        wyłącznie w celach hobbystycznych.</p>
+
+                    <p>Gra wykorzystuje <strong>oryginalne assety</strong> (grafiki, karty, dźwięki itp.) z gry <em>The
+                            Witcher 3: Wild Hunt</em> (Gwint), które są wyłączną własnością <strong>CD PROJEKT
+                            RED</strong>. Część assetów (ikony, tła, elementy interfejsu itp.) została stworzona
+                        samodzielnie przez autora projektu.</p>
+
+                    <p>W klasycznej wersji gra odtwarza mechanikę Gwinta z <em>The Witcher 3</em>. W wariantach
+                        dodatkowych (np. 1v1v1v1, mix kart) jedynie ogólna mechanika karciana jest inspirowana
+                        oryginalnym Gwintem – reszta reguł, balansu i rozgrywki jest autorska.</p>
+
+                    <p>Projekt <strong>nie jest zatwierdzony</strong> ani powiązany z CD PROJEKT RED. Nie zastępuje
+                        oficjalnego <em>Gwent: The Witcher Card Game</em>.</p>
+
+                    <p>Strona jest w większości <strong>niekomercyjna</strong>. Ewentualne przychody pochodzą wyłącznie
+                        z nieinwazyjnych reklam umieszczonych z boku ekranu i służą jedynie pokryciu kosztów utrzymania
+                        serwera (ok. 30–40 zł miesięcznie). Nie ma żadnych paywalli, mikrotransakcji ani wymogu
+                        płatności za grę. (obecnie opłacam tylko domene)</p>
+
+                    <p>Jeśli CD PROJEKT RED lub inny uprawniony podmiot uzna, że projekt narusza ich prawa własności
+                        intelektualnej, jestem gotów natychmiast usunąć lub odpowiednio zmodyfikować stronę na ich
+                        żądanie.</p>
+
+                    <p>Korzystanie ze strony odbywa się na własne ryzyko.</p>
+
+                    <hr>
+
+                    <p style="font-size: 0.9em; color: #888;">
+                        © CD PROJEKT RED. The Witcher®, Gwint i wszystkie powiązane znaki towarowe oraz materiały są
+                        własnością CD PROJEKT RED. Wszelkie prawa zastrzeżone.
+                    </p>
+                </div>
+            </div>
+            <div class="info-footer">
+                <a href="index.html" class="info-back-link" style="text-decoration: none;">Powrót</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -7,7 +7,7 @@ const menuWrapper = document.querySelector('.menu-wrapper');
 const infoScreen = document.getElementById('infoScreen');
 const gameScreen = document.getElementById('gameScreen');
 
-let selectedMode = 'classic';
+let selectedModeIndex = 0; // Default to first mode in tryby.js
 let isPlayer1 = false;
 let isJoined = false;
 let currentGameCode = null;
@@ -24,18 +24,18 @@ const nicknames = [
 ];
 
 // Hover sounds
-const addHoverSound = (elements) => {
-    elements.forEach(el => {
+const addHoverSound = (selector) => {
+    document.querySelectorAll(selector).forEach(el => {
         el.addEventListener('mouseenter', () => {
             new Audio('assets/hover-sound.mp3').play().catch(() => {});
         });
     });
 };
 
-addHoverSound(document.querySelectorAll('.menu-button, .mode-item, .side-back-button, .setup-actions button'));
-
 function showSidePanel() {
     sidePanel.classList.add('active');
+    triggerCanvasResize();
+    setTimeout(fitMenuToScreen, 100); // Pozwala animacji CSS zaktualizować szerokość
 }
 
 function showHostScreen() {
@@ -45,52 +45,154 @@ function showHostScreen() {
     updateSetupUI();
 }
 
-function selectGameMode(mode) {
-    selectedMode = mode;
+/* ========================================================
+   DYNAMIC MODE SYSTEM & PIXEL SCALING (wybor.webp)
+======================================================== */
+const canvas = document.getElementById('wyborPixelCanvas');
+const bgImg = document.getElementById('wyborBgImg');
+
+bgImg.onload = () => {
+    triggerCanvasResize();
+    fitMenuToScreen();
+};
+window.addEventListener('resize', () => {
+    triggerCanvasResize();
+    fitMenuToScreen();
+});
+
+function fitMenuToScreen() {
+    const container = document.querySelector('.content-container');
+    if (!container) return;
     
-    // Update active class
-    document.querySelectorAll('.mode-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.mode === mode) item.classList.add('active');
+    // Resetuj skale do 1 przed pomiarem, zeby uniknac nieskończonych wyjatkow
+    container.style.transform = `translateX(-50%) scale(1)`;
+    container.offsetHeight; // force reflow
+    
+    const w = container.scrollWidth;
+    if (w > window.innerWidth) {
+        const scale = window.innerWidth / w;
+        container.style.transform = `translateX(-50%) scale(${scale})`;
+    }
+}
+
+function triggerCanvasResize() {
+    if (!bgImg.complete || bgImg.naturalWidth === 0) return;
+    
+    const natW = bgImg.naturalWidth;
+    const natH = bgImg.naturalHeight;
+    const curW = bgImg.clientWidth;
+    
+    // Pixel canvas matches natural dimensions of the image
+    canvas.style.width = natW + 'px';
+    canvas.style.height = natH + 'px';
+    
+    // Scale it down to match the rendered width
+    const scale = curW / natW;
+    canvas.style.transform = `scale(${scale})`;
+}
+
+function initModeCarousel() {
+    const carousel = document.getElementById('modeCarousel');
+    carousel.innerHTML = '';
+    
+    tryby.forEach((mode, index) => {
+        const item = document.createElement('div');
+        item.className = 'carousel-kafelek';
+        item.style.backgroundImage = `url('assets/${mode.ikona}')`;
+        item.onclick = () => selectGameMode(index);
+        
+        const text = document.createElement('div');
+        text.className = 'carousel-kafelek-hover-text';
+        text.textContent = mode.nazwa;
+        
+        item.appendChild(text);
+        carousel.appendChild(item);
+        
+        // Add separator if not last
+        if (index < tryby.length - 1) {
+            const separator = document.createElement('img');
+            separator.src = 'assets/dzielnik.webp';
+            separator.className = 'dzielnik-img';
+            separator.alt = 'dzielnik';
+            carousel.appendChild(separator);
+        }
     });
 
-    // Update preview image
-    const preview = document.getElementById('modePreview');
-    if (mode === 'classic') {
-        preview.innerHTML = '<span>Tryb Klasyczny</span>';
-    } else if (mode === 'mix') {
-        preview.innerHTML = '<img src="assets/work in prognres.png" alt="Work in progress">';
+    selectGameMode(0); // Select first mode
+}
+
+function selectGameMode(index) {
+    selectedModeIndex = index;
+    const mode = tryby[index];
+    
+    // Update active class
+    const items = document.querySelectorAll('.carousel-kafelek');
+    items.forEach((item, i) => {
+        item.classList.remove('active');
+        if (i === index) item.classList.add('active');
+    });
+
+    // Update texts and images
+    document.getElementById('modePreviewText').textContent = mode.opis;
+    
+    const imgElement = document.getElementById('modePreviewImg');
+    if (mode.nazwa === 'Klasyczny') {
+        imgElement.src = 'assets/wybory.webp'; // Fallback / current
     } else {
-        preview.innerHTML = '<img src="assets/inconcept.png" alt="In concept">';
+        imgElement.src = 'assets/work in prognres.png'; // Fallback
     }
 
     if (isPlayer1 && player2Id) {
-        socket.emit('send-to-p2', { player2Id, message: { type: 'mode-changed', mode } });
+        // Send index to P2
+        socket.emit('send-to-p2', { player2Id, message: { type: 'mode-changed', index } });
     }
 }
 
+// Initialize when DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+    initModeCarousel();
+    addHoverSound('.menu-button, .carousel-kafelek, .side-back-button, .game-btn');
+    document.getElementById('nicknameInput').value = localStorage.getItem('nickname') || nicknames[Math.floor(Math.random() * nicknames.length)];
+    setTimeout(fitMenuToScreen, 100);
+});
+
+/* ========================================================
+   LOBBY LOGIC
+======================================================== */
+
 function updateSetupUI() {
-    const p1Box = document.querySelector('.player-box.host');
-    const p2Box = document.querySelector('.player-box.opponent');
     const codeDisplay = document.getElementById('displayCode');
+    const p2Status = document.getElementById('p2Status');
+    const startBtn = document.getElementById('startGameBtn');
     
-    p1Box.querySelector('.nick').textContent = player1Nickname || 'Ty (Host)';
-    p1Box.classList.toggle('ready', isP1Ready);
-    p1Box.querySelector('.status-indicator').textContent = isP1Ready ? 'GOTOWY' : 'Czekanie...';
-
-    p2Box.querySelector('.nick').textContent = player2Nickname || (isPlayer1 ? 'Czekanie na gracza...' : 'Łączenie...');
-    p2Box.classList.toggle('ready', isP2Ready);
-    p2Box.querySelector('.status-indicator').textContent = isP2Ready ? 'GOTOWY' : 'Niegotowy';
-
     if (currentGameCode) {
-        codeDisplay.textContent = `KOD: ${currentGameCode}`;
+        codeDisplay.textContent = `TWÓJ KOD ${currentGameCode}`;
     }
 
-    const startBtn = document.getElementById('startGameBtn');
-    startBtn.disabled = !(isP1Ready && isP2Ready);
+    if (isPlayer1) {
+        startBtn.textContent = 'START';
+        p2Status.textContent = isP2Ready ? 'Przeciwnik: GOTOWY' : (player2Id ? 'Przeciwnik: Czeka' : 'Brak przeciwnika');
+        startBtn.disabled = !(isP1Ready && isP2Ready);
+    } else {
+        startBtn.textContent = 'GOTOWY / CZEKAJ'; 
+        // If joined, startbtn becomes just a visual indicator or used for something else.
+        // Actually toggleReady handles the readiness. So startBtn can be hidden for P2 or disabled.
+        startBtn.style.display = 'none'; 
+        p2Status.textContent = isP2Ready ? 'Ty: GOTOWY' : 'Ty: Niegotowy';
+    }
+    
+    const readyBtn = document.getElementById('readyBtn');
+    if (isPlayer1) {
+        readyBtn.textContent = isP1Ready ? 'ANULUJ GOT.' : 'GOTOWY';
+    } else {
+        readyBtn.textContent = isP2Ready ? 'ANULUJ GOT.' : 'GOTOWY';
+    }
 }
 
 function toggleReady() {
+    const nick = document.getElementById('nicknameInput').value || nicknames[0];
+    localStorage.setItem('nickname', nick);
+
     if (isPlayer1) {
         isP1Ready = !isP1Ready;
         if (player2Id) {
@@ -100,35 +202,47 @@ function toggleReady() {
         isP2Ready = !isP2Ready;
         socket.emit('send-to-p1', { gameCode: currentGameCode, message: { type: 'readiness-changed', ready: isP2Ready } });
     }
+    
+    socket.emit('set-nickname', { gameCode: currentGameCode, isPlayer1, nickname: nick });
     updateSetupUI();
 }
 
-function joinGame() {
-    const codeInput = document.getElementById('sideCodeInput');
-    const code = codeInput.value.trim();
-    if (!code) return;
-    
-    currentGameCode = code;
-    socket.emit('join-game', { gameCode: code });
+function joinOrStartGame() {
+    const codeInput = document.getElementById('sideCodeInput').value.trim();
+    if (codeInput) {
+        // Player wants to join
+        currentGameCode = codeInput;
+        socket.emit('join-game', { gameCode: codeInput });
+    } else {
+        // Player 1 wants to start
+        requestStartGame();
+    }
 }
 
-function copyCode() {
-    if (!currentGameCode) return;
-    navigator.clipboard.writeText(currentGameCode);
-    const btn = document.querySelector('.code-box button');
-    const oldText = btn.textContent;
-    btn.textContent = 'OK!';
-    setTimeout(() => btn.textContent = oldText, 2000);
+function requestStartGame() {
+    if (isPlayer1 && isP1Ready && isP2Ready) {
+        socket.emit('send-to-p2', { player2Id, message: { type: 'start-game' } });
+        startRealGame();
+    }
+}
+
+function startRealGame() {
+    const nick = document.getElementById('nicknameInput').value || nicknames[Math.floor(Math.random() * nicknames.length)];
+    localStorage.setItem('nickname', nick);
+    const mode = tryby[selectedModeIndex];
+    const gamePath = mode ? mode.gra : 'tryby/klasyczny_gwint';
+    
+    window.location.href = `/${gamePath}/game.html?code=${currentGameCode}&host=${isPlayer1}&nick=${encodeURIComponent(nick)}`;
 }
 
 function goBackToMain() {
     menuWrapper.classList.remove('side-view');
     sidePanel.classList.remove('active');
-    // centerMenuImg.src = 'assets/srodekmenu.png'; // If we want to revert, but user said start with srodekmenuw.png
+    setTimeout(fitMenuToScreen, 100);
     if (isPlayer1) socket.emit('p1Left');
     else socket.emit('p2Left');
     socket.disconnect();
-    location.reload(); // Simple reset
+    location.reload(); 
 }
 
 // Socket events
@@ -150,15 +264,15 @@ socket.on('join-success', (data) => {
 
 socket.on('opponent-joined', (data) => {
     player2Id = data.opponentId;
-    player2Nickname = "Przeciwnik"; // For now
+    player2Nickname = "Przeciwnik"; 
     updateSetupUI();
     // Notify P2 of current status
-    socket.emit('send-to-p2', { player2Id, message: { type: 'sync-setup', mode: selectedMode, ready: isP1Ready } });
+    socket.emit('send-to-p2', { player2Id, message: { type: 'sync-setup', modeIndex: selectedModeIndex, ready: isP1Ready } });
 });
 
 socket.on('message-from-p1', (msg) => {
     if (msg.type === 'sync-setup' || msg.type === 'mode-changed') {
-        selectGameMode(msg.mode);
+        if (msg.modeIndex !== undefined) selectGameMode(msg.modeIndex);
         if (msg.ready !== undefined) {
             isP1Ready = msg.ready;
             updateSetupUI();
@@ -179,35 +293,34 @@ socket.on('message-from-p2', (data) => {
     }
 });
 
-function requestStartGame() {
-    if (isPlayer1 && isP1Ready && isP2Ready) {
-        socket.emit('send-to-p2', { player2Id, message: { type: 'start-game' } });
-        startRealGame();
+
+
+// Reset Lobby
+window.resetLobby = function () {
+    if (isPlayer1) {
+        socket.emit('p1Left');
+        setTimeout(() => {
+            isJoined = false;
+            player2Id = null;
+            player2Nickname = null;
+            isP1Ready = false;
+            isP2Ready = false;
+            currentGameCode = null;
+            socket.emit('create-game');
+        }, 150);
     }
-}
-
-function startRealGame() {
-    const nick = localStorage.getItem('nickname') || nicknames[Math.floor(Math.random() * nicknames.length)];
-    window.location.href = `/gwent/game.html?code=${currentGameCode}&host=${isPlayer1}&nick=${encodeURIComponent(nick)}`;
-}
-
-// Info Screen
-function showInfoScreen() {
-    mainMenu.style.display = 'none';
-    infoScreen.style.display = 'flex';
-}
-
-function showMainMenu() {
-    infoScreen.style.display = 'none';
-    mainMenu.style.display = 'flex';
-}
+};
 
 // Test Game
 window.startTestGame = function () {
     socket.emit('find-test-game');
 };
+
 socket.on('test-game-joined', (data) => {
     currentGameCode = data.gameCode;
     isPlayer1 = data.isHost;
+    
+    // In test game, we immediately assume the first mode
+    selectedModeIndex = 0;
     startRealGame();
 });

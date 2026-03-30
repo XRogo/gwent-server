@@ -186,3 +186,59 @@ Po przejściu na gra.html
 SERWER POWINIEN ZAPISYWAĆ WSZYSTKIE ZMIANY NA PLANSZY GRY informacje o ruchach pozycjach ilości kart w tali... (Żeby gracz nie był w stanie dodać sobie kart do ręki czy oszukiwać w jakis sposób za pomocą konsoli)
  Jesli gracz zechce może wymienić 1 wybrana karte, klikając na  niechciane kartę  wysyła informacje do serwera o tym, serwer usuwa tą kartę z ręki i losuje 1 losową z kupku poczym wysyla informacje o tym do gracza, a u gracza zamienai sie ta karta (Może to zrobić max 2 razy) poczym 2 odrzucone karty wracają do talli gry
  
+
+
+
+
+
+ dobra poprawmy ten pasek jeszcze to znaczy 
+
+
+
+
+
+poprawiłem obraz wybor.webp obecnie ma 2 dzielniki  (zrob z tego kontener w którum będą kolejne assety)
+górna część czyli ta nad wysokością 141 mają wyświetlać się grafiki z odpowiednimi grafikami zapisanymi w tryby.js (ogólnie jeśli w przyszłosci dodam jakiś tyrb to w tamtym miejcu dodam jego opisy itd) (pzrealalizuj go i popraw wrazie co jak coś źle zrobiłem) urzyj z tego pliku ikona i powklejaj je w kolejności w jakiej są zapisane w rzędzie obok siebie (ich wymiary to 140x100) wybrany tryb / najechany myszką ma pokazwyać obok ikony nazwe (też z pliku tryby.js) a pomiędzy ikonami dodawaj  dzielnik.webp (ten ma sie przesówać w zależności od potrzeby i ma mieć stałą wysokość 29px )
+
+po wybraniu trybu (domyślny jest classic gwent) w obszarze 281, 146 x 738, 326 na środku wycentrowane ma wyświetlać się opis trybu  a po przeciwniej stornie o się wyświetlać obraz trybu (w przyszłości będzie to gif) 845, 153 x 1141, 322 (to jedyna grafika która ma sie skalowac do tej wielkości) 
+
+poniżej w punkcie 282, 346 ma się wyświetlić grafika  kod pasek.webp a na tym, na pozycji 
+274, 348 x 733, 407 ma sie wyświetlac pokoleji najpierw reload.webp (przycisk po naciśnięciu którego wygeneruje nowy kod) "TWÓJ KOD" {i następnie kod} 
+
+ 751, 348 x  1204, 407 ma się wyświetlać w kolejności "DOŁĄCZ: {miejsce na wpisanie kodu}"
+
+i poniżej miejce na nick i dołącz
+
+na potrzebe tego przebudbuduj 
+
+Jeśli się da to rozdziel plik serwer od mechanik gry gwint a łączenia graczy
+Tzn. Gracze maja się łączyć i po daniu gotowość serwer ma przenieść ich od innego pliku serwera z daną grą
+Bo obecnie cala strona działa na 1 pliku 
+dlaczego jest to problem,
+Bo w momencie dodania nowych trybów gry będą sie mieszały funkcje 
+
+Obecnie cala mechanika gry (assety mechaniki itp) są zapisane w folderze gwint 
+W przyszłości będą kolejne tryby np gwent_mix i w tym folderze będa wszystkie funkcje i assety
+
+przenieś cały folder 
+
+gwent
+ do 
+
+klasyczny_gwint
+ 
+
+i popraw wyświetlanie strony wejściowej 
+podnieś 
+
+line.webp
+ żeby wyświetlała się ~3% od góry 
+zmień wielkość napisów "Graj" / Test game ... o jakies 10% 
+przesuń wyswietlanie się napisów graj test game ... o 2 wysokości przycisku
+spraw aby pasek ten co teraz dodasz wyświetlał się poprawnie czyli z tymi samymi atrybutami co 
+
+srodekmenuw.png
+ czyli stała wielkość nie sciskanie / rozciąganie
+zadbaj o dynamiczne skalowanie strony wejściowej 
+
+najpierw zaplanuj, zadaj brakujące pytania a potem tworz
