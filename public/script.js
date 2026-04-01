@@ -61,6 +61,75 @@ const nicknames = [
     "Radovid", "Dettlaff", "Barnabo", "Baron", "Milva"
 ];
 
+// Cookie Helpers
+function setCookie(name, value, days = 30) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+}
+
+// Transient session nickname confirmation
+window.confirmNickname = function() {
+    const nick = document.getElementById('nicknameInput').value.trim();
+    if (!nick) {
+        showToast("WPISZ NICK");
+        return;
+    }
+    
+    // Notify server/opponent
+    if (currentGameCode) {
+        socket.emit('set-nickname', { gameCode: currentGameCode, isPlayer1, nickname: nick });
+        showToast("POTWIERDZONO NICK: " + nick);
+    } else {
+        showToast("NICK USTAWIONY LOKALNIE");
+    }
+    updateNicknameFading();
+};
+
+// Persistent cookie save
+window.saveNicknamePersistent = function() {
+    const nick = document.getElementById('nicknameInput').value.trim();
+    if (!nick) {
+        showToast("WPISZ NICK");
+        return;
+    }
+    setCookie('gwent_nickname', nick);
+    showToast("ZAPISANO NICK NA STAŁE: " + nick);
+    
+    // Also confirm session change
+    confirmNickname();
+};
+
+// Cookie Consent Handlers
+window.acceptCookies = function() {
+    localStorage.setItem('gwent_cookies_accepted', 'true');
+    document.getElementById('cookieBanner').style.display = 'none';
+    showToast("ZAAKCEPTOWANO COOKIES");
+};
+
+window.rejectCookies = function() {
+    document.getElementById('cookieBanner').style.display = 'none';
+    showToast("COOKIES ODRZUCONE (BRAK ZAPISU)");
+};
+
+function checkCookieConsent() {
+    if (!localStorage.getItem('gwent_cookies_accepted')) {
+        document.getElementById('cookieBanner').style.display = 'block';
+    }
+}
+
 // Hover sounds
 const addHoverSound = (selector) => {
     document.querySelectorAll(selector).forEach(el => {
@@ -78,7 +147,7 @@ function showSidePanel() {
 
 function showHostScreen() {
     isPlayer1 = true;
-    socket.emit('create-game');
+    // Nie tworzymy gry od razu - czekamy na kliknięcie Generuj w UI
     showSidePanel();
     updateSetupUI();
 }
@@ -134,9 +203,13 @@ function initModeCarousel() {
     carousel.innerHTML = '';
     
     tryby.forEach((mode, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'kafelek-wrapper';
+        
         const item = document.createElement('div');
         item.className = 'carousel-kafelek';
         item.style.backgroundImage = `url('assets/${mode.ikona}')`;
+        item.style.zIndex = index + 1;
         item.onclick = () => selectGameMode(index);
         
         const text = document.createElement('div');
@@ -144,7 +217,8 @@ function initModeCarousel() {
         text.textContent = mode.nazwa;
         
         item.appendChild(text);
-        carousel.appendChild(item);
+        wrapper.appendChild(item);
+        carousel.appendChild(wrapper);
         
         // Add separator if not last
         if (index < tryby.length - 1) {
@@ -180,9 +254,34 @@ function selectGameMode(index) {
         imgElement.src = 'assets/work in prognres.png'; // Fallback
     }
 
+    // Status logic (Stan 1, 2, 3)
+    const conceptOverlay = document.getElementById('conceptOverlay');
+    const betaStatusLabel = document.getElementById('betaStatusLabel');
+    
+    if (mode.stan === 3) {
+        conceptOverlay.style.display = 'flex';
+        betaStatusLabel.style.display = 'none';
+    } else if (mode.stan === 2) {
+        conceptOverlay.style.display = 'none';
+        betaStatusLabel.style.display = 'block';
+    } else {
+        conceptOverlay.style.display = 'none';
+        betaStatusLabel.style.display = 'none';
+    }
+
     if (isPlayer1 && player2Id) {
         // Send index to P2
         socket.emit('send-to-p2', { player2Id, message: { type: 'mode-changed', index } });
+    }
+}
+
+function updateNicknameFading() {
+    const input = document.getElementById('nicknameInput');
+    const val = input.value.trim();
+    if (nicknames.includes(val)) {
+        input.classList.add('nickname-faded');
+    } else {
+        input.classList.remove('nickname-faded');
     }
 }
 
@@ -190,7 +289,39 @@ function selectGameMode(index) {
 document.addEventListener('DOMContentLoaded', () => {
     initModeCarousel();
     addHoverSound('.menu-button, .carousel-kafelek, .side-back-button, .game-btn');
-    document.getElementById('nicknameInput').value = localStorage.getItem('nickname') || nicknames[Math.floor(Math.random() * nicknames.length)];
+    
+    const nickInput = document.getElementById('nicknameInput');
+
+    // Load from cookie or random (filter "test")
+    let savedNick = getCookie('gwent_nickname');
+    if (!savedNick) {
+        const filtered = nicknames.filter(n => !n.toLowerCase().includes('test'));
+        savedNick = filtered[Math.floor(Math.random() * filtered.length)];
+    }
+    nickInput.value = savedNick;
+    updateNicknameFading();
+
+    nickInput.onfocus = () => {
+        if (nicknames.includes(nickInput.value.trim())) {
+            nickInput.value = '';
+            updateNicknameFading();
+        }
+    };
+    nickInput.onblur = () => {
+        if (!nickInput.value.trim()) {
+            const filtered = nicknames.filter(n => !n.toLowerCase().includes('test'));
+            nickInput.value = filtered[Math.floor(Math.random() * filtered.length)];
+        }
+        updateNicknameFading();
+    };
+    nickInput.oninput = updateNicknameFading;
+    nickInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            confirmNickname();
+        }
+    };
+
+    checkCookieConsent();
     setTimeout(fitMenuToScreen, 100);
     checkMobileOrientation();
 });
@@ -260,6 +391,39 @@ function updateFsIcon() {
     }
 }
 
+let countdownInterval = null;
+function handleCountdown() {
+    const display = document.getElementById('countdownDisplay');
+    if (isP1Ready && isP2Ready) {
+        if (!countdownInterval) {
+            let seconds = 5;
+            display.textContent = `START ZA: ${seconds}s`;
+            countdownInterval = setInterval(() => {
+                seconds--;
+                if (seconds > 0) {
+                    display.textContent = `START ZA: ${seconds}s`;
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    startRealGame();
+                }
+            }, 1000);
+        }
+    } else {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        display.textContent = '';
+    }
+}
+
+function leaveRoom() {
+    if (isPlayer1) socket.emit('p1Left');
+    else socket.emit('p2Left');
+    setTimeout(() => location.reload(), 100);
+}
+
 /* ========================================================
    LOBBY LOGIC
 ======================================================== */
@@ -267,36 +431,77 @@ function updateFsIcon() {
 function updateSetupUI() {
     const codeDisplay = document.getElementById('displayCode');
     const p2Status = document.getElementById('p2Status');
-    const startBtn = document.getElementById('startGameBtn');
+    const joinArea = document.getElementById('joinArea');
+    const acceptBtn = document.getElementById('acceptBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
     
     if (currentGameCode) {
         codeDisplay.textContent = `TWÓJ KOD ${currentGameCode}`;
+    } else if (isPlayer1) {
+        codeDisplay.textContent = `KLIKNIJ GENERUJ KOD`;
+    }
+
+    // Host Action Button Logic
+    if (isPlayer1) {
+        if (!currentGameCode) {
+            reloadBtn.src = 'assets/reload.webp';
+            reloadBtn.title = 'Generuj kod';
+            reloadBtn.onclick = () => socket.emit('create-game');
+            reloadBtn.classList.remove('disabled');
+        } else {
+            // Jeśli jest kod, to reloadBtn resetuje lobby
+            reloadBtn.src = 'assets/reload.webp';
+            reloadBtn.title = 'Zmień kod / Reset';
+            reloadBtn.onclick = resetLobby;
+
+            // BLOKADA: Jeśli przeciwnik dołączył, nie można generować/resetować
+            if (player2Id) {
+                reloadBtn.classList.add('disabled');
+                reloadBtn.title = 'Lobby zablokowane (obecność gracza)';
+            } else {
+                reloadBtn.classList.remove('disabled');
+            }
+        }
+    }
+
+    // Lock join area logic
+    if (player2Id || (!isPlayer1 && isJoined)) {
+        joinArea.classList.add('locked');
+    } else {
+        joinArea.classList.remove('locked');
     }
 
     if (isPlayer1) {
-        startBtn.textContent = 'START';
-        p2Status.textContent = isP2Ready ? 'Przeciwnik: GOTOWY' : (player2Id ? 'Przeciwnik: Czeka' : 'Brak przeciwnika');
-        startBtn.disabled = !(isP1Ready && isP2Ready);
+        p2Status.textContent = isP2Ready ? 'PRZECIWNIK GOTOWY' : (player2Id ? 'PRZECIWNIK CZEKA' : 'OCZEKIWANIE...');
+        document.getElementById('opponentNameDisplay').textContent = player2Nickname || 'CZEKAM NA PRZECIWNIKA...';
     } else {
-        startBtn.textContent = 'GOTOWY / CZEKAJ'; 
-        // If joined, startbtn becomes just a visual indicator or used for something else.
-        // Actually toggleReady handles the readiness. So startBtn can be hidden for P2 or disabled.
-        startBtn.style.display = 'none'; 
         p2Status.textContent = isP2Ready ? 'Ty: GOTOWY' : 'Ty: Niegotowy';
+        document.getElementById('opponentNameDisplay').textContent = player1Nickname || 'POŁĄCZONO Z HOSTEM';
     }
     
     const readyBtn = document.getElementById('readyBtn');
-    if (isPlayer1) {
-        readyBtn.textContent = isP1Ready ? 'ANULUJ GOT.' : 'GOTOWY';
+    readyBtn.textContent = (isPlayer1 ? isP1Ready : isP2Ready) ? 'ANULUJ GOT.' : 'GOTOWY';
+
+    // BLOKADA: Nie można dać gotowości bez przeciwnika
+    if (isPlayer1 && !player2Id) {
+        readyBtn.classList.add('disabled');
+        readyBtn.title = 'Czekaj na przeciwnika...';
     } else {
-        readyBtn.textContent = isP2Ready ? 'ANULUJ GOT.' : 'GOTOWY';
+        readyBtn.classList.remove('disabled');
+        readyBtn.title = '';
     }
+
+    handleCountdown();
 }
 
 function toggleReady() {
-    const nick = document.getElementById('nicknameInput').value || nicknames[0];
-    localStorage.setItem('nickname', nick);
-
+    if (isPlayer1 && !player2Id) {
+        showToast("CZEKAJ NA PRZECIWNIKA!");
+        return;
+    }
+    const nick = document.getElementById('nicknameInput').value.trim() || 'Gracz';
+    // NIE zapisujemy automatycznie do ciasteczek, jedynie rozsyłamy stan
+    
     if (isPlayer1) {
         isP1Ready = !isP1Ready;
         if (player2Id) {
@@ -314,6 +519,10 @@ function toggleReady() {
 function joinOrStartGame() {
     const codeInput = document.getElementById('sideCodeInput').value.trim();
     if (codeInput) {
+        if (codeInput === currentGameCode) {
+            showToast("NIE MOŻNA DOŁĄCZYĆ DO WŁASNEGO LOBBY");
+            return;
+        }
         // Player wants to join
         currentGameCode = codeInput;
         socket.emit('join-game', { gameCode: codeInput });
@@ -369,6 +578,12 @@ socket.on('join-success', (data) => {
         showSidePanel();
     }
     updateSetupUI();
+
+    // Wyślij nick jeśli już jest ustawiony
+    const myNick = document.getElementById('nicknameInput').value.trim();
+    if (myNick) {
+        socket.emit('set-nickname', { gameCode: currentGameCode, isPlayer1, nickname: myNick });
+    }
 });
 
 socket.on('opponent-joined', (data) => {
@@ -377,6 +592,12 @@ socket.on('opponent-joined', (data) => {
     updateSetupUI();
     // Notify P2 of current status
     socket.emit('send-to-p2', { player2Id, message: { type: 'sync-setup', modeIndex: selectedModeIndex, ready: isP1Ready } });
+    
+    // Send nickname if already set
+    const myNick = document.getElementById('nicknameInput').value.trim();
+    if (myNick) {
+        socket.emit('set-nickname', { gameCode: currentGameCode, isPlayer1, nickname: myNick });
+    }
 });
 
 socket.on('message-from-p1', (msg) => {
@@ -400,6 +621,19 @@ socket.on('message-from-p2', (data) => {
         isP2Ready = msg.ready;
         updateSetupUI();
     }
+});
+
+// Update nicknames and status from server
+socket.on('opponent-status', (data) => {
+    if (data.player1Nickname) player1Nickname = data.player1Nickname;
+    if (data.player2Nickname) player2Nickname = data.player2Nickname;
+    
+    // Also update player2Id if it's missing (for P1)
+    if (isPlayer1 && data.player2Id) {
+        player2Id = data.player2Id;
+    }
+    
+    updateSetupUI();
 });
 
 
