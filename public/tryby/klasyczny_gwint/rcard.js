@@ -129,6 +129,11 @@ export function renderPowiek() {
             e.stopPropagation();
             return;
         }
+        if (powiekOptions && powiekOptions.isMedic) {
+            // Medyk: klik poza kartą NIE zamyka — tylko ESC
+            e.stopPropagation();
+            return;
+        }
         hidePowiek();
     };
     document.body.appendChild(overlay);

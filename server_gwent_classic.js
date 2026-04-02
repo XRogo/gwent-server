@@ -462,17 +462,19 @@ function registerClassicGwentEvents(socket, io, games) {
                     state.board[targetRow] = cardNumer;
                     hand.splice(cardIdx, 1);
                     
-                    // Grzybki transform logic
-                    if (cardObj.moc === 'grzybki') {
-                        const affectedRow = `${targetSide}R${finalPos}`;
-                        if (state.board[affectedRow]) {
-                            state.board[affectedRow] = state.board[affectedRow].map(num => {
-                                const c = cards.find(x => String(x.numer) === String(num));
-                                if (c && c.moc === 'berserk' && c.summon) {
-                                    return c.summon; // Zamień na misia
-                                }
-                                return num;
-                            });
+                    // Manekin (Decoy) logic - Swapping card from board back to hand
+                    if (cardObj.moc === 'manek' && data.targetCardNumer && data.targetRow) {
+                        const tRow = data.targetRow;
+                        const tNum = data.targetCardNumer;
+                        const rowArray = state.board[tRow];
+                        if (rowArray) {
+                            const idx = rowArray.indexOf(tNum);
+                            if (idx !== -1) {
+                                // Usuń z planszy i dodaj do ręki
+                                rowArray.splice(idx, 1);
+                                hand.push(tNum);
+                                console.log(`[GAME CLASSIC] Decoy swapped ${tNum} from ${tRow} back to ${isPlayer1 ? 'P1' : 'P2'} hand.`);
+                            }
                         }
                     }
                 } else {
@@ -484,7 +486,8 @@ function registerClassicGwentEvents(socket, io, games) {
                         state.board[`${targetSide}R1`].push(cardNumer);
                     }
                     hand.splice(cardIdx, 1);
-
+                    
+                    let musteredCount = 0;
                     // Wezwanie (Muster) logic
                     if (cardObj.moc === 'wezwanie' && cardObj.summon) {
                         const summonIds = cardObj.summon.split(',').map(s => s.trim());
@@ -496,6 +499,7 @@ function registerClassicGwentEvents(socket, io, games) {
                             if (summonIds.includes(String(cNum))) {
                                 state.board[targetRow].push(cNum);
                                 hand.splice(i, 1);
+                                musteredCount++;
                             }
                         }
                         // Z talii
@@ -504,6 +508,7 @@ function registerClassicGwentEvents(socket, io, games) {
                             if (summonIds.includes(String(cNum))) {
                                 state.board[targetRow].push(cNum);
                                 deck.splice(i, 1);
+                                musteredCount++;
                             }
                         }
                     }
@@ -612,18 +617,22 @@ function registerClassicGwentEvents(socket, io, games) {
                     currentTurn: state.currentTurn,
                     p1HandCount: state.p1Hand.length,
                     p2HandCount: state.p2Hand.length,
+                    // Zawsze wysyłaj pełną rękę dla synchronizacji
+                    p1Hand: state.p1Hand,
+                    p2Hand: state.p2Hand,
                     p1Lives: state.p1Lives,
                     p2Lives: state.p2Lives,
                     p1Passed: state.p1Passed,
                     p2Passed: state.p2Passed,
                     p1Graveyard: state.p1Graveyard,
                     p2Graveyard: state.p2Graveyard,
-                    spyDrawn: spyDrawn, // Send the IDs of cards drawn by the spy
+                    spyDrawn: spyDrawn,
                     spyPlayer: isPlayer1 ? 'p1' : 'p2',
+                    musteredCount: musteredCount || 0,
                     medicPending: state.medicPending,
                     lastPlayedCard: cardNumer,
                     lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
-                    porzogaDestroyed: scorchDestroyed
+                    porzogaDestroyed: scorchDestroyed || []
                 });
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
@@ -716,9 +725,9 @@ function registerClassicGwentEvents(socket, io, games) {
         const game = games[gameCode];
         if (game && game.gameState) {
             const state = game.gameState;
-            if (state.currentTurn !== socket.id) return;
-
             const mySide = isPlayer1 ? 'p1' : 'p2';
+            if (state[mySide + 'Passed']) return; // Debounce server-side
+            
             state[mySide + 'Passed'] = true;
 
             if (state.p1Passed && state.p2Passed) {
@@ -733,6 +742,8 @@ function registerClassicGwentEvents(socket, io, games) {
                     currentTurn: state.currentTurn,
                     p1HandCount: state.p1Hand.length,
                     p2HandCount: state.p2Hand.length,
+                    p1Hand: state.p1Hand, // Sync hand even on pass
+                    p2Hand: state.p2Hand,
                     p1Lives: state.p1Lives,
                     p2Lives: state.p2Lives,
                     p1Passed: state.p1Passed,

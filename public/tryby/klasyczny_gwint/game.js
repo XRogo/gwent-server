@@ -50,35 +50,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function playSound(id) {
+    // Śledzi czas zakończenia ostatniego dźwięku (do opóźnienia banera)
+    window._lastSoundEndTime = 0;
+
+    function playSound(id, onEnded) {
         const el = document.getElementById(id);
-        if (!el) return;
-        // Klonujemy element audio - pozwala nakładać wiele dźwięków jednocześnie
+        if (!el) { if (onEnded) onEnded(); return null; }
         const clone = el.cloneNode();
         clone.volume = el.volume;
-        clone.play().catch(() => {});
-        clone.addEventListener('ended', () => clone.remove(), { once: true });
+        clone.play().catch(() => { if (onEnded) onEnded(); });
+        clone.addEventListener('ended', () => {
+            clone.remove();
+            if (onEnded) onEnded();
+        }, { once: true });
         document.body.appendChild(clone);
+        // Śledź kiedy dźwięk się skończy (dla opóźnienia banera)
+        if (el.duration && isFinite(el.duration)) {
+            window._lastSoundEndTime = Math.max(window._lastSoundEndTime, Date.now() + el.duration * 1000);
+        } else {
+            // Fallback jeśli duration nieznany (plik nie załadowany jeszcze) – zakładamy 2s
+            window._lastSoundEndTime = Math.max(window._lastSoundEndTime, Date.now() + 2000);
+        }
+        return clone;
     }
     window.playSound = playSound;
 
-    // Hover dźwięk na wszystkich klikalnych elementach (klik na wejście kursora)
+    // Hover dźwięk — tylko na SAMYM elemencie karty/przycisku, nie na jego dzieciach
+    // + debounce 150ms per element żeby szybkie przejazdy nie spamowały
+    const _hoverCooldowns = new WeakMap();
+    const HOVER_SELECTORS = ['button', '.button', '.page-left', '.page-right',
+        '.kolekcja-card', '.talia-card', '.hand-card-img',
+        '.board-card-wrapper', '.game-pass-btn', '.scoia-btn'];
+
     document.addEventListener('mouseenter', (e) => {
         const t = e.target;
-        if (
-            t.closest('button') ||
-            t.closest('.button') ||
-            t.closest('.page-left') ||
-            t.closest('.page-right') ||
-            t.closest('.kolekcja-card') ||
-            t.closest('.talia-card') ||
-            t.closest('.hand-card-img') ||
-            t.closest('.board-card-wrapper') ||
-            t.closest('.game-pass-btn') ||
-            t.closest('.scoia-btn')
-        ) {
-            playSound('hoverSound');
-        }
+        // Sprawdź czy TEN element (nie rodzic) pasuje do któregoś selektora
+        const matches = HOVER_SELECTORS.some(sel => t.matches && t.matches(sel));
+        if (!matches) return;
+
+        // Debounce per element
+        const now = Date.now();
+        const last = _hoverCooldowns.get(t) || 0;
+        if (now - last < 150) return;
+        _hoverCooldowns.set(t, now);
+
+        playSound('hoverSound');
     }, true);
 
     initSelection(socket, gameCode, isP1);
