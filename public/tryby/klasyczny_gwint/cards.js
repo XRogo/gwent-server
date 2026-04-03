@@ -2259,7 +2259,7 @@ const cards = [
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/cerys.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/6/503.webp",
         opis: "Chodź, już ja ci pokaże Przepióreczkę...",
-        bohater: false,
+        bohater: true,
         moc: "wezwanie",
         frakcja: "5",
         punkty: 10,

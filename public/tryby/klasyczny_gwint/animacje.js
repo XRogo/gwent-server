@@ -59,7 +59,7 @@ heroIconImg.src = 'assets/karty/bohater.webp';
  * @param {number} h4K - wysokość karty w skali 4K
  * @param {function} [onDone] - callback po zakończeniu
  */
-export function animateElement(el, from4K, to4K, w4K, h4K, onDone) {
+export function animateElement(el, from4K, to4K, w4K, h4K, onDone, targetW4K = w4K, targetH4K = h4K) {
     const scale = getScale();
     const fromScreen = toScreenPos(from4K.x, from4K.y);
     const toScreen = toScreenPos(to4K.x, to4K.y);
@@ -72,10 +72,11 @@ export function animateElement(el, from4K, to4K, w4K, h4K, onDone) {
     el.style.height = `${h4K * scale}px`;
     el.style.zIndex = '5000'; // Pod UI (które ma ~100k)
     el.style.pointerEvents = 'none';
-    el.style.transition = `left ${duration}s ease-in-out, top ${duration}s ease-in-out`;
+    el.style.transition = `left ${duration}s ease-in-out, top ${duration}s ease-in-out, width ${duration}s ease-in-out, height ${duration}s ease-in-out`;
     document.body.appendChild(el);
 
     el._targetPos = toScreen;
+    el._targetSize = { w: targetW4K * scale, h: targetH4K * scale };
     el._onDone = onDone;
     el._duration = duration;
 
@@ -189,6 +190,10 @@ export function animateDeckToHand(handCards, targets4K, onAllDone, onCardDone, i
             elements.forEach(el => {
                 el.style.left = `${el._targetPos.x}px`;
                 el.style.top = `${el._targetPos.y}px`;
+                if (el._targetSize) {
+                    el.style.width = `${el._targetSize.w}px`;
+                    el.style.height = `${el._targetSize.h}px`;
+                }
             });
         });
     });
@@ -234,6 +239,10 @@ export function animateBoardToGraveyard(cardsOnBoard, isOpponent, currentGraveya
             elements.forEach(el => {
                 el.style.left = `${el._targetPos.x}px`;
                 el.style.top = `${el._targetPos.y}px`;
+                if (el._targetSize) {
+                    el.style.width = `${el._targetSize.w}px`;
+                    el.style.height = `${el._targetSize.h}px`;
+                }
             });
         });
     });
@@ -253,6 +262,10 @@ export function animateCardToDeck(card, from4K, onDone) {
         requestAnimationFrame(() => {
             el.style.left = `${el._targetPos.x}px`;
             el.style.top = `${el._targetPos.y}px`;
+            if (el._targetSize) {
+                el.style.width = `${el._targetSize.w}px`;
+                el.style.height = `${el._targetSize.h}px`;
+            }
         });
     });
 }

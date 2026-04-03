@@ -442,6 +442,14 @@ window.addEventListener('keydown', (event) => {
     }
 
     if (event.key === 'Escape') {
+        if (powiekOptions && powiekOptions.isMedic) {
+            if (window.socket && window.gameCodeLocal) {
+                window.socket.emit('medic-cancel', {
+                    gameCode: window.gameCodeLocal,
+                    isPlayer1: window.isPlayer1Local
+                });
+            }
+        }
         hidePowiek();
     } else if (event.key === 'ArrowRight') {
         if (powiekIndex < powiekDeck.length - 1) {

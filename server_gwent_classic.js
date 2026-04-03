@@ -380,8 +380,18 @@ function registerClassicGwentEvents(socket, io, games) {
         const game = games[gameCode];
         if (game && game.gameState) {
             const state = game.gameState;
+            let musteredCount = 0;
+            let scorchDestroyed = [];
+            let spyDrawn = [];
+            let grzybkiApplied = null; // null = nie dotyczy, true = aktywowany, false = pusty
+            let musteredDetails = []; // [{numer, source}]
+
             if (state.currentTurn !== socket.id) {
                 console.log(`[GAME CLASSIC] Blocked play: Not ${socket.id}'s turn.`);
+                return;
+            }
+            if (state.medicPending) {
+                console.log(`[GAME CLASSIC] Blocked play: Medic resurrection pending.`);
                 return;
             }
 
@@ -408,19 +418,7 @@ function registerClassicGwentEvents(socket, io, games) {
                 const targetSide = isSpy ? (isPlayer1 ? 'p2' : 'p1') : side;
                 const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(cardObj.moc);
 
-                if (cardObj.moc === 'manek') {
-                    // Decoy logic
-                    if (!data.targetRow || !data.targetCardNumer) return;
-                    const rArray = state.board[data.targetRow];
-                    if (!rArray) return;
-                    
-                    const tIndex = rArray.indexOf(data.targetCardNumer);
-                    if (tIndex !== -1) {
-                        rArray.splice(tIndex, 1, cardNumer); // Zastąp celem
-                        hand.push(data.targetCardNumer); // Dodaj cel do ręki
-                    }
-                    hand.splice(cardIdx, 1); // Usuń manekina z ręki
-                } else if (isWeather) {
+                if (isWeather) {
                     if (!state.board.weather) state.board.weather = [];
                     // Trzymamy z side, aby wiedzieć czyj cmentarz
                     state.board.weather.push(`${side}-${cardNumer}`);
@@ -459,8 +457,6 @@ function registerClassicGwentEvents(socket, io, games) {
                     }
                 } else if (isSpecial) {
                     targetRow = `${targetSide}S${finalPos}`;
-                    state.board[targetRow] = cardNumer;
-                    hand.splice(cardIdx, 1);
                     
                     // Manekin (Decoy) logic - Swapping card from board back to hand
                     if (cardObj.moc === 'manek' && data.targetCardNumer && data.targetRow) {
@@ -470,13 +466,39 @@ function registerClassicGwentEvents(socket, io, games) {
                         if (rowArray) {
                             const idx = rowArray.indexOf(tNum);
                             if (idx !== -1) {
-                                // Usuń z planszy i dodaj do ręki
-                                rowArray.splice(idx, 1);
+                                // Podmień kartę na planszy na 001 (Manekin)
+                                rowArray.splice(idx, 1, "001");
+                                // Dodaj zabraną jednostkę do ręki
                                 hand.push(tNum);
-                                console.log(`[GAME CLASSIC] Decoy swapped ${tNum} from ${tRow} back to ${isPlayer1 ? 'P1' : 'P2'} hand.`);
+                                console.log(`[GAME CLASSIC] Decoy swapped ${tNum} from ${tRow} for 001. ${tNum} back to hand.`);
                             }
                         }
+                    } else {
+                        // Inne karty specjalne (pogoda, róg) zostają w slocie S, 
+                        // ale Porzoga (003) nie powinna tam zostawać na stałe.
+                        state.board[targetRow] = cardNumer;
+                        
+                        if (cardObj.moc === 'porz') {
+                            // Porzoga idzie do cmentarza po zagraniu (nie zostaje w slocie S)
+                            setTimeout(() => {
+                                state.board[targetRow] = null;
+                                if (isPlayer1) state.p1Graveyard.push(cardNumer);
+                                else state.p2Graveyard.push(cardNumer);
+                            }, 1000);
+                        }
+
+                        // Grzybki (Mardroeme) logic
+                        if (cardObj.moc === 'grzybki') {
+                            const rowToCheck = `${targetSide}R${finalPos}`;
+                            const rArray = state.board[rowToCheck] || [];
+                            const hasBerserk = rArray.some(cNum => {
+                                const c = cards.find(x => String(x.numer) === String(cNum));
+                                return c && c.moc === 'berserk';
+                            });
+                            grzybkiApplied = hasBerserk;
+                        }
                     }
+                    hand.splice(cardIdx, 1);
                 } else {
                     targetRow = `${targetSide}R${finalPos}`;
                     if (state.board[targetRow]) {
@@ -487,7 +509,6 @@ function registerClassicGwentEvents(socket, io, games) {
                     }
                     hand.splice(cardIdx, 1);
                     
-                    let musteredCount = 0;
                     // Wezwanie (Muster) logic
                     if (cardObj.moc === 'wezwanie' && cardObj.summon) {
                         const summonIds = cardObj.summon.split(',').map(s => s.trim());
@@ -500,6 +521,7 @@ function registerClassicGwentEvents(socket, io, games) {
                                 state.board[targetRow].push(cNum);
                                 hand.splice(i, 1);
                                 musteredCount++;
+                                musteredDetails.push({ numer: String(cNum), source: 'hand' });
                             }
                         }
                         // Z talii
@@ -509,7 +531,17 @@ function registerClassicGwentEvents(socket, io, games) {
                                 state.board[targetRow].push(cNum);
                                 deck.splice(i, 1);
                                 musteredCount++;
+                                musteredDetails.push({ numer: String(cNum), source: 'deck' });
                             }
+                        }
+                    }
+                    // Berserk played into Grzybki check
+                    if (cardObj.moc === 'berserk') {
+                        const sSlot = `${targetSide}S${finalPos}`;
+                        const sCardNum = state.board[sSlot];
+                        const sCard = sCardNum ? cards.find(x => String(x.numer) === String(sCardNum)) : null;
+                        if (sCard && sCard.moc === 'grzybki') {
+                            grzybkiApplied = true;
                         }
                     }
                     // Medic logic (Medyk)
@@ -529,7 +561,6 @@ function registerClassicGwentEvents(socket, io, games) {
                 }
 
                 // Scorch logic (Pożoga ogólna i rzędowa)
-                let scorchDestroyed = [];
                 if (cardObj.moc === 'porz' || cardObj.moc === 'iporz') {
                     let rowsToCheck = [];
                     if (cardObj.moc === 'porz') {
@@ -584,7 +615,6 @@ function registerClassicGwentEvents(socket, io, games) {
                 }
 
                 
-                let spyDrawn = [];
                 if (isSpy) {
                     const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
                     for (let i = 0; i < 2 && deck.length > 0; i++) {
@@ -622,14 +652,16 @@ function registerClassicGwentEvents(socket, io, games) {
                     p2Hand: state.p2Hand,
                     p1Lives: state.p1Lives,
                     p2Lives: state.p2Lives,
-                    p1Passed: state.p1Passed,
                     p2Passed: state.p2Passed,
                     p1Graveyard: state.p1Graveyard,
                     p2Graveyard: state.p2Graveyard,
+                    musteredCount: musteredCount || 0,
+                    musteredDetails: musteredDetails,
                     spyDrawn: spyDrawn,
                     spyPlayer: isPlayer1 ? 'p1' : 'p2',
                     musteredCount: musteredCount || 0,
-                    medicPending: state.medicPending,
+                    grzybkiApplied: grzybkiApplied,
+                    scorchDestroyed: scorchDestroyed || [],
                     lastPlayedCard: cardNumer,
                     lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
                     porzogaDestroyed: scorchDestroyed || []
@@ -720,6 +752,40 @@ function registerClassicGwentEvents(socket, io, games) {
         }
     });
 
+    socket.on('medic-cancel', (data) => {
+        const { gameCode, isPlayer1 } = data;
+        const game = games[gameCode];
+        if (game && game.gameState && game.gameState.medicPending) {
+            const state = game.gameState;
+            if (state.currentTurn !== socket.id) return;
+
+            state.medicPending = false;
+            console.log(`[GAME CLASSIC] Medic cancelled by ${socket.id}. Switching turn.`);
+
+            // Zmień turę jeśli przeciwnik nie spasował
+            const oppSide = isPlayer1 ? 'p2' : 'p1';
+            if (!state[oppSide + 'Passed']) {
+                const nextPlayer = isPlayer1 ? game.player2 : game.player1;
+                state.currentTurn = nextPlayer;
+            }
+
+            io.to(gameCode).emit('board-updated', {
+                board: state.board,
+                currentTurn: state.currentTurn,
+                p1HandCount: state.p1Hand.length,
+                p2HandCount: state.p2Hand.length,
+                p1Lives: state.p1Lives,
+                p2Lives: state.p2Lives,
+                p1Passed: state.p1Passed,
+                p2Passed: state.p2Passed,
+                p1Graveyard: state.p1Graveyard,
+                p2Graveyard: state.p2Graveyard,
+                p1Hand: state.p1Hand,
+                p2Hand: state.p2Hand
+            });
+        }
+    });
+
     socket.on('pass-turn', (data) => {
         const { gameCode, isPlayer1 } = data;
         const game = games[gameCode];
@@ -747,7 +813,8 @@ function registerClassicGwentEvents(socket, io, games) {
                     p1Lives: state.p1Lives,
                     p2Lives: state.p2Lives,
                     p1Passed: state.p1Passed,
-                    p2Passed: state.p2Passed
+                    p2Passed: state.p2Passed,
+                    grzybkiApplied: null // Reset for turn
                 });
             }
         }
@@ -834,6 +901,11 @@ function registerClassicGwentEvents(socket, io, games) {
             p1Score, p2Score, roundResult, p1Lives: state.p1Lives, p2Lives: state.p2Lives,
             p1Hand: state.p1Hand, p2Hand: state.p2Hand
         });
+
+        // Let client know cards are about to be cleared (for klikZabranieSound)
+        setTimeout(() => {
+            io.to(gameCode).emit('board-clearing', { klikZabranie: true });
+        }, 3000);
         
         // Timeout to start next round assuming game is not over
         setTimeout(() => {
@@ -844,6 +916,7 @@ function registerClassicGwentEvents(socket, io, games) {
                 io.to(gameCode).emit('game-over', { gameResult });
             } else {
                 // Before clearing, scan for wezwarniezza effects (Cow/Kambi)
+                let cowTransformed = false;
                 const pendingSummons = []; 
                 if (state.board) {
                     Object.keys(state.board).forEach(rKey => {
@@ -853,6 +926,7 @@ function registerClassicGwentEvents(socket, io, games) {
                                 const c = cards.find(x => String(x.numer) === String(cNum));
                                 if (c && c.moc === 'wezwarniezza' && c.summon) {
                                     pendingSummons.push({ side: rKey.startsWith('p1') ? 'p1' : 'p2', num: c.summon, row: rKey });
+                                    if (c.numer === '023') cowTransformed = true;
                                 }
                             });
                         }
@@ -916,10 +990,66 @@ function registerClassicGwentEvents(socket, io, games) {
                     p2HandCount: state.p2Hand.length,
                     p1Hand: state.p1Hand,
                     p2Hand: state.p2Hand,
-                    northernRealmsDraw: { p1: p1NrDraw, p2: p2NrDraw }
+                    northernRealmsDraw: { p1: p1NrDraw, p2: p2NrDraw },
+                    cowTransformed: cowTransformed
                 });
             }
         }, 5000);
+    }
+
+    // --- Konsolowe narzędzia deweloperskie (Inicjalizacja raz na serwer) ---
+    if (!global.classicTerminalSetup) {
+        global.classicTerminalSetup = true;
+        process.stdin.on('data', (data) => {
+            const input = data.toString().trim();
+            const match = input.match(/^addcard\s+\{?(\d+)\}?\s+(\d+)\s+(P1|P2|p1|p2)$/i);
+            
+            if (match) {
+                const cardNum = match[1];
+                const count = parseInt(match[2]);
+                const playerStr = match[3].toUpperCase();
+                
+                const cardExists = cards.find(c => String(c.numer) === String(cardNum));
+                if (!cardExists) {
+                    console.log(`[CLASSIC ADMIN] Error: Card ${cardNum} not found in cards.js`);
+                    return;
+                }
+
+                // Szukamy wszystkich trwających gier
+                let gamesAffected = 0;
+                Object.keys(games).forEach(gameCode => {
+                    const game = games[gameCode];
+                    if (game && game.gameState) {
+                        const state = game.gameState;
+                        const targetHand = (playerStr === 'P1') ? state.p1Hand : state.p2Hand;
+                        
+                        if (targetHand) {
+                            for(let i=0; i<count; i++) {
+                                targetHand.push(cardNum);
+                            }
+                            sortHandForPlayer(targetHand);
+                            gamesAffected++;
+
+                            // Emitujemy aktualizację do graczy w tej grze
+                            io.to(gameCode).emit('board-updated', {
+                                board: state.board,
+                                currentTurn: state.currentTurn,
+                                p1HandCount: state.p1Hand.length,
+                                p2HandCount: state.p2Hand.length,
+                                p1Hand: state.p1Hand,
+                                p2Hand: state.p2Hand,
+                                p1Lives: state.p1Lives,
+                                p2Lives: state.p2Lives,
+                                p1Passed: state.p1Passed,
+                                p2Passed: state.p2Passed
+                            });
+                        }
+                    }
+                });
+                console.log(`[CLASSIC ADMIN] Added ${count}x card ${cardNum} to ${playerStr} in ${gamesAffected} game(s).`);
+            }
+        });
+        console.log("[CLASSIC ADMIN] Console command 'addcard {numer} ilosc P1/P2' is ready.");
     }
 }
 
