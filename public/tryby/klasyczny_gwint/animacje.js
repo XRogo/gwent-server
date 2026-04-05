@@ -37,6 +37,17 @@ function toScreenPos(guiX, guiY) {
     };
 }
 
+export function getElement4KPos(el) {
+    if (!el) return { x: 0, y: 0 };
+    const rect = el.getBoundingClientRect();
+    const scale = getScale();
+    const offset = getBoardOffset();
+    return {
+        x: (rect.left - offset.left) / scale,
+        y: (rect.top - offset.top) / scale
+    };
+}
+
 function calcDuration(fromX, fromY, toX, toY) {
     const scale = getScale();
     const dx = (toX - fromX) * scale;

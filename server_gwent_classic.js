@@ -659,7 +659,6 @@ function registerClassicGwentEvents(socket, io, games) {
                     musteredDetails: musteredDetails,
                     spyDrawn: spyDrawn,
                     spyPlayer: isPlayer1 ? 'p1' : 'p2',
-                    musteredCount: musteredCount || 0,
                     grzybkiApplied: grzybkiApplied,
                     scorchDestroyed: scorchDestroyed || [],
                     lastPlayedCard: cardNumer,
