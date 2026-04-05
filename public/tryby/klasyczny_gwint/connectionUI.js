@@ -175,6 +175,18 @@ const ConnectionUI = {
             const oppNick = this.isPlayer1 ? data.player2Nickname : data.player1Nickname;
             const opponentConnected = this.isPlayer1 ? data.player2Connected : data.player1Connected;
 
+            window.opponentConnected = opponentConnected;
+            const btn = document.getElementById('goToGameButton');
+            if (btn) {
+                if (opponentConnected) {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                } else {
+                    btn.style.opacity = '0.5';
+                    btn.style.pointerEvents = 'none';
+                }
+            }
+
             if (oppNick) {
                 this.opponentNickname = oppNick;
                 if (this.oppLabel) this.oppLabel.textContent = oppNick;

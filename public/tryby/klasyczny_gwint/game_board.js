@@ -15,16 +15,7 @@ function preloadCardImages() {
         }
     });
 
-    // Also preload card backs for animations
-    const backs = [
-        'polnoc_rewers.webp', 'nilftgard_rewers.webp', 
-        "scoia'tel_rewers.webp", 'potwory_rewers.webp', 
-        'skelige_rewers.webp'
-    ];
-    backs.forEach(b => {
-        const img = new Image();
-        img.src = `/gwent/assets/asety/${b}`;
-    });
+    // Usunięto preload rewersów powodujący błędy 404 u przeciwnika (np. polnoc_rewers.webp)
 }
 preloadCardImages();
 
@@ -139,29 +130,51 @@ const handleCardAnimationSequence = async (data) => {
         } else if (!isMe) {
             // Animacja przeciwnika: Start (Środek góry) -> Podgląd (Prawa strona) -> Cel (Slot)
             allAnimations.push(new Promise(resolve => {
+                const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                const bL = (window.innerWidth - 3840 * scale) / 2;
+                const bT = (window.innerHeight - 2160 * scale) / 2;
+
                 const start4K = { x: 1920, y: -300 }; // Środek góry
-                const preview4K = { x: 3120, y: 1080 }; // Miejsce podglądu docelowe (x lewej)
-                const zipStart4K = { x: 3315, y: 875 }; // Prawidłowy środek dla zip 
                 
-                // 1. Dolot do podglądu
+                // Miejsca docelowe podglądu HD (środek dla zip oraz lewy róg dla ustawienia el)
+                const previewCenter4K = { x: 3120 + 523/2, y: 1080 }; 
+                const previewLeft4K = { x: 3120, y: 1080 }; 
+                
+                const zipStart4K = { x: 3315, y: 875 }; 
+                
+                // Mała karta dolatuje do środka preview
+                // Aby doliczyła centrycznie jako mała, docelowe 4K to środek - połowa rozmiaru małej
+                const targetSmall4K = { x: previewCenter4K.x - 180/2, y: previewCenter4K.y - 240/2 };
+                
+                // 1. Dolot do podglądu jako MAŁA karta
                 const el = createAnimationCardElement(lpc, 180, 240);
-                animateElement(el, start4K, preview4K, 180, 240, () => {
-                    // Zamieniamy na "dużą" kartę po dolocie do podglądu
+                
+                animateElement(el, start4K, targetSmall4K, 180, 240, () => {
+                    // Po osiągnięciu miejsca -> nagła podmiana zawartości na wielki rozmiar z HD designem
+                    el.style.transition = 'none'; // wyłączamy animacje dla natychmiastowego powiększenia
                     el.innerHTML = '';
-                    const bigEl = createAnimationCardElement(lpc, 523, 992, true);
+                    const bigEl = createAnimationCardElement(lpc, 523, 992, true, true); // (karta, w, h, isLarge, isOpponent)
                     while(bigEl.firstChild) el.appendChild(bigEl.firstChild);
-                    el.className = bigEl.className;
-                    
+                    el.className = bigEl.className; // Nadanie odpowiednich klas od large wizualizacji
+
+                    el.style.width = `${523 * scale}px`;
+                    el.style.height = `${992 * scale}px`;
+                    el.style.left = `${previewLeft4K.x * scale + bL}px`;
+                    el.style.top = `${previewLeft4K.y * scale + bT - (992 * scale / 2)}px`;
+
                     const baseSound = getBaseSound(lpc, data);
                     if (window.playSound) window.playSound(baseSound);
                     
-                    // 2. Pauza na podglądzie (2s), potem ZIP do planszy
+                    // 2. Pauza na podglądzie (2s), potem ZIP do planszy jako mała karta
                     setTimeout(() => {
-                        // Przywracamy mały rozmiar wnętrza przed animacją
+                        // Przywracamy mały rozmiar przed animacją zip w locie
                         el.innerHTML = '';
                         const smallEl = createAnimationCardElement(lpc, 180, 239);
                         while(smallEl.firstChild) el.appendChild(smallEl.firstChild);
                         el.className = smallEl.className;
+                        
+                        // Zwracamy płynne transition jeśli animateElement tego wymaga, 
+                        // ale animateElement nadpisze style transition w locie, więc okej.
 
                         animateElement(el, zipStart4K, to4K, 180, 239, () => {
                             if (window.playSound) window.playSound(lpc.pozycja === 3 ? 'zagranie3Sound' : 'zagranie1Sound'); 
@@ -170,25 +183,17 @@ const handleCardAnimationSequence = async (data) => {
                         }, 180, 239);
                         
                         requestAnimationFrame(() => requestAnimationFrame(() => {
-                            const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
-                            const bL = (window.innerWidth - 3840 * scale) / 2;
-                            const bT = (window.innerHeight - 2160 * scale) / 2;
                             el.style.left = `${to4K.x * scale + bL}px`;
                             el.style.top = `${to4K.y * scale + bT}px`;
                             el.style.width = `${180 * scale}px`;
                             el.style.height = `${239 * scale}px`;
                         }));
                     }, 2000);
-                }, 523, 992);
+                }); // Koniec callbacku lotu na podgląd
                 
                 requestAnimationFrame(() => requestAnimationFrame(() => {
-                    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
-                    const bL = (window.innerWidth - 3840 * scale) / 2;
-                    const bT = (window.innerHeight - 2160 * scale) / 2;
-                    el.style.left = `${preview4K.x * scale + bL}px`;
-                    el.style.top = `${(preview4K.y) * scale + bT - (992 * scale / 2)}px`;
-                    el.style.width = `${523 * scale}px`;
-                    el.style.height = `${992 * scale}px`;
+                    el.style.left = `${targetSmall4K.x * scale + bL}px`;
+                    el.style.top = `${targetSmall4K.y * scale + bT}px`;
                 }));
             }));
         } else {
@@ -1395,10 +1400,10 @@ function renderScores(overlay) {
     overlay.appendChild(createScoreValue(oppScores.R1, 1071, 686, false));
     overlay.appendChild(createScoreValue(oppScores.total, 907, 663, true));
 
-    // Player rows
-    overlay.appendChild(createScoreValue(myScores.R3, 1071, 982, false));
+    // Player rows (Zamienione 1 z 3)
+    overlay.appendChild(createScoreValue(myScores.R1, 1071, 982, false));
     overlay.appendChild(createScoreValue(myScores.R2, 1071, 1247, false));
-    overlay.appendChild(createScoreValue(myScores.R1, 1071, 1524, false));
+    overlay.appendChild(createScoreValue(myScores.R3, 1071, 1524, false));
     overlay.appendChild(createScoreValue(myScores.total, 907, 1467, true));
 }
 
@@ -1980,14 +1985,20 @@ function renderRows(overlay) {
                 isValidRow = isMySide && (parseInt(rowKey.slice(-1)) === pCard.pozycja);
             }
             // Karty jednostek, szpiedzy, medyk itd.
-            else if (isMySide && !isWeather && !isHornSpecial) {
-                if (pCard.pozycja === 1 && isMelee) isValidRow = true;
-                if (pCard.pozycja === 2 && isRanged) isValidRow = true;
-                if (pCard.pozycja === 3 && isSiege) isValidRow = true;
-                if (pCard.pozycja === 4 && (isMelee || isRanged)) isValidRow = true;
+            else if (!isWeather && !isHornSpecial) {
+                const isSpy = (pCard.moc === 'szpieg');
+                // Szpieg trafia na stronę przeciwnika, reszta na swoją
+                const isTargetSide = isSpy ? !isMySide : isMySide;
 
-                // Dowódca jako róg w rzędzie (specyficzne karty)
-                if (pCard.numer === "002" || pCard.moc === "rog") isValidRow = true;
+                if (isTargetSide) {
+                    if (pCard.pozycja === 1 && isMelee) isValidRow = true;
+                    if (pCard.pozycja === 2 && isRanged) isValidRow = true;
+                    if (pCard.pozycja === 3 && isSiege) isValidRow = true;
+                    if (pCard.pozycja === 4 && (isMelee || isRanged)) isValidRow = true;
+
+                    // Dowódca jako róg w rzędzie (specyficzne karty)
+                    if (pCard.numer === "002" || pCard.moc === "rog") isValidRow = true;
+                }
             }
 
             const isMyTurn = (currentTurn === window.socket.id);
@@ -2396,7 +2407,7 @@ function syncHand(serverHandNums) {
 /**
  * Tworzy element karty do animacji (identyczny jak w animacje.js ale bez zliczania).
  */
-function createAnimationCardElement(card, w4K, h4K, isLarge = false) {
+function createAnimationCardElement(card, w4K, h4K, isLarge = false, isOpponent = false) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const wrapper = document.createElement('div');
     wrapper.className = 'moving-card-muster';
@@ -2405,7 +2416,7 @@ function createAnimationCardElement(card, w4K, h4K, isLarge = false) {
     wrapper.style.position = 'relative';
 
     if (isLarge) {
-        const factionId = window.playerFaction || '1';
+        const factionId = (isOpponent ? window.opponentFaction : window.playerFaction) || '1';
         wrapper.innerHTML = renderCardHTML(card, { playerFaction: factionId, isLargeView: true });
         // Dopasowanie czcionek
         const content = wrapper.querySelector('.card-content');
