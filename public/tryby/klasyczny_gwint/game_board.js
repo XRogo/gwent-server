@@ -128,74 +128,135 @@ const handleCardAnimationSequence = async (data) => {
                 }));
             }));
         } else if (!isMe) {
-            // Animacja przeciwnika: Start (Środek góry) -> Podgląd (Prawa strona) -> Cel (Slot)
+            // Animacja przeciwnika: Start (Środek góry) -> Podgląd (Prawa strona HD) -> Cel (Slot)
             allAnimations.push(new Promise(resolve => {
                 const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                 const bL = (window.innerWidth - 3840 * scale) / 2;
                 const bT = (window.innerHeight - 2160 * scale) / 2;
 
-                const start4K = { x: 1920, y: -300 }; // Środek góry
-                
-                // Miejsca docelowe podglądu HD (środek dla zip oraz lewy róg dla ustawienia el)
-                const previewCenter4K = { x: 3120 + 523/2, y: 1080 }; 
-                const previewLeft4K = { x: 3120, y: 1080 }; 
-                
-                const zipStart4K = { x: 3315, y: 875 }; 
-                
-                // Mała karta dolatuje do środka preview
-                // Aby doliczyła centrycznie jako mała, docelowe 4K to środek - połowa rozmiaru małej
-                const targetSmall4K = { x: previewCenter4K.x - 180/2, y: previewCenter4K.y - 240/2 };
-                
-                // 1. Dolot do podglądu jako MAŁA karta
-                const el = createAnimationCardElement(lpc, 180, 240);
-                
-                animateElement(el, start4K, targetSmall4K, 180, 240, () => {
-                    // Po osiągnięciu miejsca -> nagła podmiana zawartości na wielki rozmiar z HD designem
-                    el.style.transition = 'none'; // wyłączamy animacje dla natychmiastowego powiększenia
-                    el.innerHTML = '';
-                    const bigEl = createAnimationCardElement(lpc, 523, 992, true, true); // (karta, w, h, isLarge, isOpponent)
-                    while(bigEl.firstChild) el.appendChild(bigEl.firstChild);
-                    el.className = bigEl.className; // Nadanie odpowiednich klas od large wizualizacji
+                // Pozycje startowe i docelowe
+                const startScreen = { 
+                    x: 1920 * scale + bL - (180 * scale / 2), 
+                    y: -300 * scale + bT 
+                };
+                // Docelowe podglądu: lewy-górny róg dużej karty wycentrowanej w x=3120, y_center=1080
+                const previewW = 523 * scale;
+                const previewH = 992 * scale;
+                const previewScreen = {
+                    x: 3120 * scale + bL,
+                    y: 1080 * scale + bT - previewH / 2
+                };
 
-                    el.style.width = `${523 * scale}px`;
-                    el.style.height = `${992 * scale}px`;
-                    el.style.left = `${previewLeft4K.x * scale + bL}px`;
-                    el.style.top = `${previewLeft4K.y * scale + bT - (992 * scale / 2)}px`;
+                // Czas lotu proporcjonalny do odległości (3480px/s w 4K)
+                const SPEED = 3480;
+                const dx = (previewScreen.x + previewW/2) - (startScreen.x + 180*scale/2);
+                const dy = (previewScreen.y + previewH/2) - (startScreen.y + 240*scale/2);
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const flightDurationMs = Math.max(300, (dist / (SPEED * scale)) * 1000);
 
+                // --- FAZA 1: DOLOT MAŁEJ KARTY DO MIEJSCA PODGLĄDU ---
+                // Tworzymy małą kartę (obrazek), dokładamy do body ręcznie (bez animateElement)
+                const flyEl = createAnimationCardElement(lpc, 180, 240);
+                flyEl.style.position = 'fixed';
+                flyEl.style.zIndex = '5000';
+                flyEl.style.pointerEvents = 'none';
+                flyEl.style.width = `${180 * scale}px`;
+                flyEl.style.height = `${240 * scale}px`;
+                flyEl.style.left = `${startScreen.x}px`;
+                flyEl.style.top = `${startScreen.y}px`;
+                flyEl.style.transition = 'none';
+                document.body.appendChild(flyEl);
+
+                // Jeden rAF aby przeglądarka "wyrenderowała" pozycję startową, potem uruchamiamy transition
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        flyEl.style.transition = `left ${flightDurationMs}ms ease-in-out, top ${flightDurationMs}ms ease-in-out`;
+                        // Lecimy do ŚRODKA podglądu centrycznie (lewy = previewScreen.x - bo to lewy rog duzej)
+                        // Ale małą kartą centrujemy do środka dużego kontenera
+                        const centerX = previewScreen.x + previewW/2 - (180 * scale / 2);
+                        const centerY = previewScreen.y + previewH/2 - (240 * scale / 2);
+                        flyEl.style.left = `${centerX}px`;
+                        flyEl.style.top = `${centerY}px`;
+                    });
+                });
+
+                // Po zakończeniu lotu: podmień na dużą kartę HD
+                setTimeout(() => {
+                    if (!flyEl.parentNode) return; // zabezpieczenie
+
+                    // Podmiana na dużą kartę HD - stop transition, zmiana rozmiar i zawartości
+                    flyEl.style.transition = 'none';
+                    flyEl.innerHTML = '';
+                    
+                    // Stwórz zawartość dużej karty HD
+                    const bigContent = createAnimationCardElement(lpc, 523, 992, true, true);
+                    while(bigContent.firstChild) flyEl.appendChild(bigContent.firstChild);
+                    flyEl.className = bigContent.className;
+                    
+                    // Ustaw wymiary i pozycję dużej karty (lewy-górny róg)
+                    flyEl.style.position = 'fixed';
+                    flyEl.style.width = `${previewW}px`;
+                    flyEl.style.height = `${previewH}px`;
+                    flyEl.style.left = `${previewScreen.x}px`;
+                    flyEl.style.top = `${previewScreen.y}px`;
+                    flyEl.style.zIndex = '5000';
+
+                    // Dźwięk zagrania
                     const baseSound = getBaseSound(lpc, data);
                     if (window.playSound) window.playSound(baseSound);
-                    
-                    // 2. Pauza na podglądzie (2s), potem ZIP do planszy jako mała karta
-                    setTimeout(() => {
-                        // Przywracamy mały rozmiar przed animacją zip w locie
-                        el.innerHTML = '';
-                        const smallEl = createAnimationCardElement(lpc, 180, 239);
-                        while(smallEl.firstChild) el.appendChild(smallEl.firstChild);
-                        el.className = smallEl.className;
-                        
-                        // Zwracamy płynne transition jeśli animateElement tego wymaga, 
-                        // ale animateElement nadpisze style transition w locie, więc okej.
 
-                        animateElement(el, zipStart4K, to4K, 180, 239, () => {
-                            if (window.playSound) window.playSound(lpc.pozycja === 3 ? 'zagranie3Sound' : 'zagranie1Sound'); 
+                    // --- FAZA 2: PO 2s ZIP do slota planszy ---
+                    setTimeout(() => {
+                        if (!flyEl.parentNode) return;
+
+                        // Podmieniamy na małą kartę przed lotem zip
+                        flyEl.innerHTML = '';
+                        const smallContent = createAnimationCardElement(lpc, 180, 239);
+                        while(smallContent.firstChild) flyEl.appendChild(smallContent.firstChild);
+                        flyEl.className = smallContent.className;
+
+                        // Pobieramy pozycje docelową slotu w pikselach ekranu
+                        const toScreen = {
+                            x: to4K.x * scale + bL,
+                            y: to4K.y * scale + bT
+                        };
+
+                        // Zip ze startPoint4K (3315, 875) do docelowego slotu
+                        const zipStartScreen = {
+                            x: 3315 * scale + bL,
+                            y: 875 * scale + bT
+                        };
+
+                        const zdx = toScreen.x - zipStartScreen.x;
+                        const zdy = toScreen.y - zipStartScreen.y;
+                        const zdist = Math.sqrt(zdx*zdx + zdy*zdy);
+                        const zipDurationMs = Math.max(200, (zdist / (SPEED * scale)) * 1000);
+
+                        flyEl.style.transition = 'none';
+                        flyEl.style.width = `${180 * scale}px`;
+                        flyEl.style.height = `${239 * scale}px`;
+                        flyEl.style.left = `${zipStartScreen.x}px`;
+                        flyEl.style.top = `${zipStartScreen.y}px`;
+
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                flyEl.style.transition = `left ${zipDurationMs}ms ease-in-out, top ${zipDurationMs}ms ease-in-out`;
+                                flyEl.style.left = `${toScreen.x}px`;
+                                flyEl.style.top = `${toScreen.y}px`;
+                            });
+                        });
+
+                        setTimeout(() => {
+                            if (flyEl.parentNode) flyEl.parentNode.removeChild(flyEl);
+                            if (window.playSound) window.playSound(lpc.pozycja === 3 ? 'zagranie3Sound' : 'zagranie1Sound');
                             markArrivedInState(lp, data.lastPlayedBy, data.board);
                             resolve();
-                        }, 180, 239);
-                        
-                        requestAnimationFrame(() => requestAnimationFrame(() => {
-                            el.style.left = `${to4K.x * scale + bL}px`;
-                            el.style.top = `${to4K.y * scale + bT}px`;
-                            el.style.width = `${180 * scale}px`;
-                            el.style.height = `${239 * scale}px`;
-                        }));
+                        }, zipDurationMs + 50);
+
                     }, 2000);
-                }); // Koniec callbacku lotu na podgląd
-                
-                requestAnimationFrame(() => requestAnimationFrame(() => {
-                    el.style.left = `${targetSmall4K.x * scale + bL}px`;
-                    el.style.top = `${targetSmall4K.y * scale + bT}px`;
-                }));
-            }));
+
+                }, flightDurationMs + 50);
+            })); // koniec allAnimations.push(new Promise dla animacji przeciwnika
         } else {
             // Animacja gracza: Podgląd -> Cel
             // Karta gracza była już w podglądzie dzięki renderProposedCard, po confirmPlayProposed musi lecieć.
@@ -1971,17 +2032,20 @@ function renderRows(overlay) {
             // Logika walidacji rzędu
             const isWeather = ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(pCard.moc);
             const isHornSpecial = (pCard.typ === 'specjalna' && pCard.moc === 'rog');
-            const isScorch = (pCard.moc === 'porz' || pCard.moc === 'iporz');
+            const isPorz = (pCard.moc === 'porz');      // Porzoga ogólna
+            const isIporz = (pCard.moc === 'iporz');     // Porzoga rzędowa
 
             let isValidRow = false;
 
-            if (isScorch) {
-                // Porzoga: aktywuje się na jakimkolwiek polu planszy (nie wymaga konkretnego rzędu)
-                // Klikamy dowolny rząd — to wystarcza
-                isValidRow = true;
-            }
+            if (isPorz) {
+                // Porzoga ogólna: aktywuje się na DOWOLNYM własnym rzędzie (jako trigger)
+                isValidRow = isMySide;
+            } else if (isIporz) {
+                // Porzoga rzędowa (iporz): karta jednostki trafia na WŁASNY rząd o tej samej pozycji co karta
+                // pozycja karty iporz determinuje dostępny rząd
+                isValidRow = isMySide && (parseInt(rowKey.slice(-1)) === pCard.pozycja);
             // WYJĄTEK JASKIER/INNI Z ROGIEM JEDNOSTKI
-            else if (pCard.moc === 'rog_jednostki' || pCard.numer === '021' || pCard.numer === '522') {
+            } else if (pCard.moc === 'rog_jednostki' || pCard.numer === '021' || pCard.numer === '522') {
                 isValidRow = isMySide && (parseInt(rowKey.slice(-1)) === pCard.pozycja);
             }
             // Karty jednostek, szpiedzy, medyk itd.
@@ -2003,18 +2067,14 @@ function renderRows(overlay) {
 
             const isMyTurn = (currentTurn === window.socket.id);
             if (isMyTurn && isValidRow) {
-                rowDiv.style.backgroundColor = isScorch
+                rowDiv.style.backgroundColor = (isPorz || isIporz)
                     ? 'rgba(180, 60, 30, 0.25)'
                     : 'rgba(199, 167, 110, 0.2)';
                 rowDiv.style.cursor = 'pointer';
                 rowDiv.onclick = (e) => {
                     e.stopPropagation();
-                    if (isScorch) {
-                        // Porzoga nie potrzebuje konkretnego rzędu
-                        confirmPlayProposed({ rowIdx: isMelee ? 1 : (isRanged ? 2 : 3) });
-                    } else {
-                        confirmPlayProposed({ rowIdx: isMelee ? 1 : (isRanged ? 2 : 3) });
-                    }
+                    const rowIdx = isMelee ? 1 : (isRanged ? 2 : 3);
+                    confirmPlayProposed({ rowIdx });
                 };
             } else {
                 rowDiv.style.backgroundColor = 'transparent';

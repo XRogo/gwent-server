@@ -40,6 +40,68 @@ function sortHandForPlayer(hand) {
     });
 }
 
+/**
+ * Oblicza efektywną siłę karty uwzględniając buffy (róg, więź, morale, pogoda).
+ * @param {string} cardNum - numer karty
+ * @param {string} rowKey - klucz rzędu np. 'p1R1'
+ * @param {object} board - stan planszy
+ * @param {object} state - pełny stan gry
+ * @returns {number} efektywna siła lub -1 jeśli bohater/specjalna
+ */
+function calculateEffectivePower(cardNum, rowKey, board, state) {
+    const card = cards.find(c => String(c.numer) === String(cardNum));
+    if (!card || typeof card.punkty !== 'number') return -1;
+    if (card.bohater) return -1; // Bohaterów nie można niszczyć
+
+    const rowCards = board[rowKey] || [];
+    const rowNum = parseInt(rowKey.slice(-1)); // 1, 2 lub 3
+    const rowSide = rowKey.startsWith('p1') ? 'p1' : 'p2';
+    const specialSlot = `${rowSide}S${rowNum}`;
+    const specialCardNum = board[specialSlot];
+
+    // Pogoda
+    const weatherMap = { 1: 'mroz', 2: 'mgla', 3: 'deszcz' };
+    const weatherType = weatherMap[rowNum];
+    const weatherActive = (state.board.weather || []).some(wStr => {
+        const wNum = wStr.split('-')[1];
+        const wCard = cards.find(c => String(c.numer) === String(wNum));
+        return wCard && (wCard.moc === weatherType || (wCard.moc === 'sztorm' && (weatherType === 'mgla' || weatherType === 'deszcz')));
+    });
+
+    // Róg aktywny?
+    let hornActive = false;
+    if (specialCardNum) {
+        const sCard = cards.find(c => String(c.numer) === String(specialCardNum));
+        if (sCard && sCard.moc === 'rog') hornActive = true;
+    }
+    if (rowCards.some(n => { const c = cards.find(x => String(x.numer) === String(n)); return c && !c.bohater && c.moc === 'rog'; })) {
+        hornActive = true;
+    }
+
+    // Morale Count
+    const moraleCount = rowCards.reduce((acc, n) => {
+        const c = cards.find(x => String(x.numer) === String(n));
+        return (c && !c.bohater && c.moc === 'morale') ? acc + 1 : acc;
+    }, 0);
+
+    // Więź Count (ile kart o tym samym numerze)
+    const wiezCount = rowCards.filter(n => String(n) === String(cardNum)).length;
+
+    let pts = weatherActive ? 1 : card.punkty;
+
+    // Więź: mnożnik bazowy razy ilość
+    if (card.moc === 'wiez') pts *= wiezCount;
+
+    // Morale
+    const mBuff = (card.moc === 'morale') ? (moraleCount - 1) : moraleCount;
+    if (mBuff > 0) pts += mBuff;
+
+    // Róg
+    if (hornActive) pts *= 2;
+
+    return pts;
+}
+
 function registerClassicGwentEvents(socket, io, games) {
     socket.on('save-full-deck', (data) => {
         const { gameCode, isPlayer1, deck, factionId, leader } = data;
@@ -455,6 +517,14 @@ function registerClassicGwentEvents(socket, io, games) {
                             }
                         }, 1500);
                     }
+                } else if (cardObj.moc === 'porz') {
+                    // Porzoga ogólna: specjalna karta która NIE zostaje na planszy
+                    // Trafia od razu do cmentarza po zagraniu (animacja z player preview -> cmentarz)
+                    targetRow = 'graveyard_direct'; // nie trafia do żadnego rzędu planszy
+                    if (isPlayer1) state.p1Graveyard.push(cardNumer);
+                    else state.p2Graveyard.push(cardNumer);
+                    hand.splice(cardIdx, 1);
+                    console.log(`[GAME CLASSIC] Porzoga (${cardNumer}) played and sent directly to graveyard.`);
                 } else if (isSpecial) {
                     targetRow = `${targetSide}S${finalPos}`;
                     
@@ -474,18 +544,8 @@ function registerClassicGwentEvents(socket, io, games) {
                             }
                         }
                     } else {
-                        // Inne karty specjalne (pogoda, róg) zostają w slocie S, 
-                        // ale Porzoga (003) nie powinna tam zostawać na stałe.
+                        // Inne karty specjalne (róg, iporz) zostają w slocie S
                         state.board[targetRow] = cardNumer;
-                        
-                        if (cardObj.moc === 'porz') {
-                            // Porzoga idzie do cmentarza po zagraniu (nie zostaje w slocie S)
-                            setTimeout(() => {
-                                state.board[targetRow] = null;
-                                if (isPlayer1) state.p1Graveyard.push(cardNumer);
-                                else state.p2Graveyard.push(cardNumer);
-                            }, 1000);
-                        }
 
                         // Grzybki (Mardroeme) logic
                         if (cardObj.moc === 'grzybki') {
@@ -560,46 +620,55 @@ function registerClassicGwentEvents(socket, io, games) {
                     }
                 }
 
-                // Scorch logic (Pożoga ogólna i rzędowa)
+                // Scorch logic (Pożoga ogólna i rzędowa) - Oblicza EFEKTYWNE punkty (z bufami)
                 if (cardObj.moc === 'porz' || cardObj.moc === 'iporz') {
                     let rowsToCheck = [];
                     if (cardObj.moc === 'porz') {
+                        // Porzoga ogólna: wszystkie rzędy obu graczy
                         rowsToCheck = ['p1R1', 'p1R2', 'p1R3', 'p2R1', 'p2R2', 'p2R3'];
                     } else if (cardObj.moc === 'iporz') {
-                        // Sprawdź czy rząd przeciwległy ma >= 10
-                        const oppRow = `${targetSide === 'p1' ? 'p2' : 'p1'}R${finalPos}`;
+                        // iporz: rząd przeciwnika na tej samej pozycji co zagrana karta
+                        // targetSide to własna strona gracza, więc opp to odwrotność
+                        const mySide = isPlayer1 ? 'p1' : 'p2';
+                        const oppSideKey = isPlayer1 ? 'p2' : 'p1';
+                        const oppRow = `${oppSideKey}R${finalPos}`;
                         if (state.board[oppRow]) {
                             rowsToCheck = [oppRow];
                         }
                     }
 
+                    // Oblicz efektywną siłę dla każdej karty (uwzględniając buffy)
                     let maxVal = -1;
-                    let targets = []; // Array of { row, index, num }
+                    let targets = []; // Array of { row, index, num, effectivePts }
 
                     rowsToCheck.forEach(rKey => {
                         const rArray = state.board[rKey] || [];
                         rArray.forEach((cNum, idx) => {
                             const c = cards.find(x => String(x.numer) === String(cNum));
-                            if (c && !c.bohater && typeof c.punkty === 'number') {
-                                if (c.punkty > maxVal) {
-                                    maxVal = c.punkty;
-                                    targets = [{ row: rKey, index: idx, num: cNum }];
-                                } else if (c.punkty === maxVal) {
-                                    targets.push({ row: rKey, index: idx, num: cNum });
-                                }
+                            if (!c || c.bohater || typeof c.punkty !== 'number') return; // Pomijamy bohaterów
+                            const effPts = calculateEffectivePower(cNum, rKey, state.board, state);
+                            if (effPts < 0) return; // bohater lub specjalna -> skip
+                            if (effPts > maxVal) {
+                                maxVal = effPts;
+                                targets = [{ row: rKey, index: idx, num: cNum, effectivePts: effPts }];
+                            } else if (effPts === maxVal) {
+                                targets.push({ row: rKey, index: idx, num: cNum, effectivePts: effPts });
                             }
                         });
                     });
 
-                    // Jeśli iporz, łączna siła rzędu musi być >= 10
+                    // Jeśli iporz: sumę rzdędu efektywną musi lić >= 10
                     let proceedScorch = true;
                     if (cardObj.moc === 'iporz' && rowsToCheck.length === 1) {
                         let rowSum = 0;
                         (state.board[rowsToCheck[0]] || []).forEach(n => {
-                            const tmp = cards.find(x => String(x.numer) === String(n));
-                            if (tmp && typeof tmp.punkty === 'number') rowSum += tmp.punkty;
+                            const effPts = calculateEffectivePower(n, rowsToCheck[0], state.board, state);
+                            if (effPts >= 0) rowSum += effPts;
                         });
-                        if (rowSum < 10) proceedScorch = false;
+                        if (rowSum < 10) {
+                            proceedScorch = false;
+                            console.log(`[GAME CLASSIC] iporz: opp row sum ${rowSum} < 10, no scorch.`);
+                        }
                     }
 
                     if (proceedScorch && maxVal >= 0) {
@@ -610,7 +679,7 @@ function registerClassicGwentEvents(socket, io, games) {
                             else state.p2Graveyard.push(t.num);
                             scorchDestroyed.push(t.num);
                         });
-                        console.log(`[GAME CLASSIC] Scorch destroyed ${targets.length} cards with power ${maxVal}`);
+                        console.log(`[GAME CLASSIC] Scorch destroyed ${targets.length} cards with effective power ${maxVal}`);
                     }
                 }
 
