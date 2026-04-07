@@ -1065,6 +1065,73 @@ function registerClassicGwentEvents(socket, io, games) {
         }, 5000);
     }
 
+    // --- REWANŻ ---
+    socket.on('request-rematch', (data) => {
+        const { gameCode, isPlayer1 } = data;
+        const game = games[gameCode];
+        if (!game) return;
+
+        // Oznacz gracza jako chcącego rewanżu
+        if (isPlayer1) game.p1WantsRematch = true;
+        else game.p2WantsRematch = true;
+
+        // Powiadom przeciwnika, że ktoś chce rewanżu
+        const oppId = isPlayer1 ? game.player2 : game.player1;
+        if (oppId) {
+            io.to(oppId).emit('opponent-wants-rematch');
+        }
+
+        // Jeśli obaj chcą rewanżu — restartuj grę
+        if (game.p1WantsRematch && game.p2WantsRematch) {
+            game.p1WantsRematch = false;
+            game.p2WantsRematch = false;
+
+            // Reset stanu
+            game.p1Swaps = 0;
+            game.p2Swaps = 0;
+            game.p1MulliganDone = false;
+            game.p2MulliganDone = false;
+            if (game.mulliganTimer) { clearInterval(game.mulliganTimer); game.mulliganTimer = null; }
+
+            game.gameState = {
+                p1Hand: [], p1Deck: game.player1FullDeck ? [...game.player1FullDeck] : [],
+                p1Graveyard: [], p1MulliganRejects: [],
+                p1Faction: game.player1Faction,
+                p2Hand: [], p2Deck: game.player2FullDeck ? [...game.player2FullDeck] : [],
+                p2Graveyard: [], p2MulliganRejects: [],
+                p2Faction: game.player2Faction,
+                p1Lives: 2, p2Lives: 2,
+                p1Passed: false, p2Passed: false,
+                currentTurn: null, scoiaDecider: null, startReason: null,
+                board: {
+                    p1R1: [], p1R2: [], p1R3: [],
+                    p2R1: [], p2R2: [], p2R3: [],
+                    p1S1: null, p1S2: null, p1S3: null,
+                    p2S1: null, p2S2: null, p2S3: null,
+                    weather: []
+                }
+            };
+
+            // Losowanie kto zaczyna
+            const p1Scoia = game.player1Faction === "3";
+            const p2Scoia = game.player2Faction === "3";
+            if (p1Scoia && !p2Scoia) {
+                game.status = 'scoia-decision';
+                game.gameState.scoiaDecider = game.player1;
+            } else if (!p1Scoia && p2Scoia) {
+                game.status = 'scoia-decision';
+                game.gameState.scoiaDecider = game.player2;
+            } else {
+                game.status = 'playing';
+                game.gameState.startReason = 'random';
+                game.gameState.currentTurn = Math.random() < 0.5 ? game.player1 : game.player2;
+            }
+
+            console.log(`[GAME CLASSIC] Rematch started for ${gameCode}`);
+            io.to(gameCode).emit('rematch-starting');
+        }
+    });
+
     // --- Konsolowe narzędzia deweloperskie (Inicjalizacja raz na serwer) ---
     if (!global.classicTerminalSetup) {
         global.classicTerminalSetup = true;

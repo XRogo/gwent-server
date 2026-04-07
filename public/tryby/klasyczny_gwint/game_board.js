@@ -400,6 +400,8 @@ let opponentGraveyard = []; // Now full array
 let opponentHandCount = 10;
 let opponentDeckCount = 12;
 let isMulliganActive = false;
+// Tablica wyników rund: [{myScore, oppScore, result}] (max 3 rundy)
+let roundScoresHistory = [];
 let isProcessingMove = false; // Flag to prevent rapid clicks / double playing
 let swapsCount = 0;
 let playerLives = 2;
@@ -1028,6 +1030,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     });
 
     socket.on('round-ended', (data) => {
+        // Zapisz wyniki rundy do historii
+        const myScore = isPlayer1Local ? data.p1Score : data.p2Score;
+        const oppScore = isPlayer1Local ? data.p2Score : data.p1Score;
+        roundScoresHistory.push({ myScore, oppScore, result: data.roundResult });
         handleRoundEnd(data);
     });
 
@@ -1080,9 +1086,42 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     });
 
     socket.on('game-over', (data) => {
-        if (data.gameResult === 'draw' && window.playSound) {
-            window.playSound('remisGraSound');
-        }
+        // Poczekaj na zakończenie komunikatu spasowania/banera przed pokazaniem ekranu końcowego
+        setTimeout(() => {
+            showEndGameScreen(data.gameResult, currentNick, window.opponentNickname || 'PRZECIWNIK');
+        }, 3500);
+    });
+
+    socket.on('rematch-starting', () => {
+        // Usuń ekran końcowy i zresetuj stan gry
+        const endScreen = document.getElementById('end-game-screen');
+        if (endScreen) endScreen.remove();
+        
+        // Reset lokalnego stanu
+        roundScoresHistory = [];
+        playerHand = [];
+        drawPile = [];
+        playerGraveyard = [];
+        opponentGraveyard = [];
+        boardState = { p1R1: [], p1R2: [], p1R3: [], p2R1: [], p2R2: [], p2R3: [],
+            p1S1: null, p1S2: null, p1S3: null, p2S1: null, p2S2: null, p2S3: null };
+        playerLives = 2;
+        opponentLives = 2;
+        playerPassed = false;
+        opponentPassed = false;
+        currentTurn = null;
+        window.gameStarted = false;
+        window._gameBoardInitialized = false;
+        window.leaderAnimated = false;
+        window.opponentLeaderAnimated = false;
+        window.cardsAnimated = false;
+        window.arrivedCards = new Set();
+        window.arrivedBoardCards = new Set();
+        window.proposedCard = null;
+        window.mulliganFinished = false;
+        
+        // Poproś o nowy stan gry
+        socket.emit('get-game-state', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
     });
 
     window.addEventListener('resize', () => {
@@ -2500,4 +2539,248 @@ function createAnimationCardElement(card, w4K, h4K, isLarge = false, isOpponent 
         addCardPointsOverlay(wrapper, card, w4K * scale, h4K * scale);
     }
     return wrapper;
+}
+
+// ========================================
+// EKRAN KOŃCOWY GRY
+// ========================================
+function showEndGameScreen(gameResult, myNick, oppNick) {
+    if (document.getElementById('end-game-screen')) return;
+
+    let localResult;
+    if (gameResult === 'draw') {
+        localResult = 'draw';
+    } else if (gameResult === (isPlayer1Local ? 'p1' : 'p2')) {
+        localResult = 'win';
+    } else {
+        localResult = 'loss';
+    }
+
+    const soundMap = { win: 'winGraSound', loss: 'lossGraSound', draw: 'remisGraSound' };
+    if (window.playSound) window.playSound(soundMap[localResult]);
+
+    const screen = document.createElement('div');
+    screen.id = 'end-game-screen';
+    screen.style.cssText = `
+        position: fixed; inset: 0; z-index: 99000;
+        pointer-events: auto; overflow: hidden;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: grayscale(0.5);
+        -webkit-backdrop-filter: grayscale(0.5);
+        animation: endScreenFadeIn 0.8s ease forwards;
+    `;
+
+    // Ustawienie na body, by omijać inne kontenery
+    document.body.appendChild(screen);
+
+    const inner = document.createElement('div');
+    inner.id = 'end-game-inner';
+    inner.style.cssText = `
+        position: absolute;
+        width: 3840px; height: 2160px;
+        transform-origin: left top;
+    `;
+    screen.appendChild(inner);
+
+    const updateScale = () => {
+        const innerEl = document.getElementById('end-game-inner');
+        if (!innerEl) {
+            window.removeEventListener('resize', updateScale);
+            return;
+        }
+        const GUI_WIDTH = 3840;
+        const GUI_HEIGHT = 2160;
+        const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
+        const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
+        const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
+        
+        innerEl.style.left = boardLeft + 'px';
+        innerEl.style.top = boardTop + 'px';
+        innerEl.style.transform = `scale(${scale})`;
+    };
+    window.addEventListener('resize', updateScale);
+    updateScale();
+
+    const resultImgSrc = localResult === 'win' ? 'assets/asety/win.webp'
+        : localResult === 'loss' ? 'assets/asety/lost.webp'
+        : 'assets/asety/remis.webp';
+
+    const resultImg = document.createElement('img');
+    resultImg.src = resultImgSrc;
+    resultImg.style.cssText = `
+        position: absolute;
+        left: 924px; top: 292px;
+        animation: endImgPop 0.5s 0.3s ease backwards;
+    `;
+    inner.appendChild(resultImg);
+
+    const resultTextMap = {
+        win:  { text: 'ZWYCIĘSTWO!', color: '#d19c59' },
+        loss: { text: 'Porażka',     color: '#9b2424' },
+        draw: { text: 'Remis',       color: '#7b7b7b' }
+    };
+    const rtInfo = resultTextMap[localResult];
+    const resultText = document.createElement('div');
+    resultText.style.cssText = `
+        position: absolute;
+        left: 0; width: 3840px; text-align: center;
+        top: 835px;
+        font-family: 'PFDinTextCondPro-Bold', sans-serif;
+        font-size: 96px;
+        color: ${rtInfo.color};
+        text-shadow: 0 0 40px ${rtInfo.color}88, 0 4px 12px #000;
+        letter-spacing: 6px;
+        animation: endTextSlide 0.6s 0.5s ease backwards;
+    `;
+    resultText.textContent = rtInfo.text;
+    inner.appendChild(resultText);
+
+    const tableDiv = document.createElement('div');
+    tableDiv.style.cssText = `
+        position: absolute;
+        left: 0; top: 0; width: 3840px; height: 2160px;
+        font-family: 'PFDinTextCondPro', sans-serif;
+        animation: endTableFade 0.7s 0.7s ease backwards;
+    `;
+    inner.appendChild(tableDiv);
+
+    const fontNormal = "'PFDinTextCondPro', sans-serif";
+    const fontBold = "'PFDinTextCondPro-Bold', sans-serif";
+    
+    const renderTableText = (text, xCent, yCent, color, size, align='center', customFontFam=fontNormal) => {
+        const d = document.createElement('div');
+        d.style.cssText = `
+            position: absolute;
+            left: 0; top: ${yCent}px;
+            width: 3840px; text-align: left;
+            font-family: ${customFontFam};
+            font-size: ${size}px;
+            color: ${color};
+        `;
+        
+        const innerSpan = document.createElement('span');
+        innerSpan.textContent = text;
+        innerSpan.style.position = 'absolute';
+        
+        if (align === 'center') {
+            innerSpan.style.left = `${xCent}px`;
+            innerSpan.style.transform = 'translate(-50%, -50%)';
+        } else if (align === 'right') {
+            innerSpan.style.right = `${3840 - xCent}px`;
+            innerSpan.style.transform = 'translate(0, -50%)';
+        }
+        
+        d.appendChild(innerSpan);
+        tableDiv.appendChild(d);
+    };
+
+    const headerY = 1262;
+    renderTableText('Runda 1', 1477, headerY, '#736f6f', 38, 'center');
+    renderTableText('Runda 2', 1949, headerY, '#736f6f', 38, 'center');
+    renderTableText('Runda 3', 2422, headerY, '#736f6f', 38, 'center');
+
+    const myY = 1417; 
+    renderTableText(myNick, 1100, myY, '#c29f5a', 45, 'right', fontBold);
+    
+    const oppY = 1574;
+    renderTableText(oppNick, 1100, oppY, '#c29f5a', 45, 'right', fontBold);
+
+    const getScoreColor = (myScore, oppScore, isMe) => {
+        const myR = myScore ?? 0;
+        const oppR = oppScore ?? 0;
+        if (myR > oppR) return isMe ? '#e6b552' : '#cdcccc';
+        if (myR < oppR) return isMe ? '#cdcccc' : '#e6b552';
+        return '#cdcccc';
+    };
+
+    [1477, 1949, 2422].forEach((xVal, index) => {
+        const rd = roundScoresHistory[index];
+        let myVal = '—', oppVal = '—';
+        let myColor = '#736f6f', oppColor = '#736f6f';
+
+        if (rd !== undefined) {
+            myVal = String(rd.myScore);
+            oppVal = String(rd.oppScore);
+            myColor = getScoreColor(rd.myScore, rd.oppScore, true);
+            oppColor = getScoreColor(rd.myScore, rd.oppScore, false);
+        }
+
+        renderTableText(myVal, xVal, myY, myColor, 50, 'center');
+        renderTableText(oppVal, xVal, oppY, oppColor, 50, 'center');
+    });
+
+    const btnContainer = document.createElement('div');
+    btnContainer.style.cssText = `
+        position: absolute;
+        top: 1750px;
+        left: 0; width: 3840px;
+        display: flex; gap: 60px;
+        justify-content: center; align-items: center;
+    `;
+    inner.appendChild(btnContainer);
+
+    const makeBtn = (label, onClick, isPrimary = false) => {
+        const btn = document.createElement('button');
+        btn.style.cssText = `
+            font-family: 'PFDinTextCondPro-Bold', sans-serif;
+            font-size: 40px;
+            color: ${isPrimary ? '#1a1108' : '#c7a76e'};
+            background: ${isPrimary ? 'linear-gradient(135deg, #d4a74a, #a0782a)' : 'rgba(10, 8, 4, 0.85)'};
+            border: 2px solid ${isPrimary ? '#e8c060' : '#7d6a45'};
+            border-radius: 8px;
+            padding: 20px 60px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.6), ${isPrimary ? 'inset 0 1px 0 rgba(255,220,120,0.3)' : ''};
+            transition: transform 0.15s ease, filter 0.15s ease;
+        `;
+        btn.textContent = label;
+        btn.onmouseenter = () => { btn.style.transform = 'scale(1.05)'; btn.style.filter = 'brightness(1.2)'; };
+        btn.onmouseleave = () => { btn.style.transform = 'scale(1)'; btn.style.filter = 'brightness(1)'; };
+        btn.onclick = onClick;
+        return btn;
+    };
+
+    const rematchBtn = makeBtn('Rewanż', () => {
+        rematchBtn.disabled = true;
+        rematchBtn.style.opacity = '0.6';
+        rematchBtn.textContent = 'Oczekiwanie...';
+        window.socket.emit('request-rematch', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+    }, true);
+
+    const lobbyBtn = makeBtn('Powrót do lobby', () => {
+        window.location.href = 'https://gwent-1vs1.uk';
+    }, false);
+
+    btnContainer.appendChild(lobbyBtn);
+    btnContainer.appendChild(rematchBtn);
+
+    if (window.socket) {
+        window.socket.once('opponent-wants-rematch', () => {
+            const notice = document.createElement('div');
+            notice.style.cssText = `
+                position: absolute; top: 1880px;
+                left: 0; width: 3840px; text-align: center;
+                color: #c29f5a; font-family: 'PFDinTextCondPro-Bold', sans-serif;
+                font-size: 36px; letter-spacing: 2px;
+                text-shadow: 0 2px 4px #000;
+                animation: endTextSlide 0.4s ease backwards;
+            `;
+            notice.textContent = 'Przeciwnik chce rewanżu!';
+            inner.appendChild(notice);
+        });
+    }
+
+    if (!document.getElementById('end-screen-keyframes')) {
+        const style = document.createElement('style');
+        style.id = 'end-screen-keyframes';
+        style.textContent = `
+            @keyframes endScreenFadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes endImgPop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+            @keyframes endTextSlide { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+            @keyframes endTableFade { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
+        `;
+        document.head.appendChild(style);
+    }
 }

@@ -48,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             socket.emit('force-start-game', { gameCode });
         });
+
+        socket.on('rematch-starting', () => {
+            const endScreen = document.getElementById('end-game-screen');
+            if (endScreen) endScreen.remove();
+            initGameBoard(socket, gameCode, isP1, nick);
+        });
     }
 
     // Śledzi czas zakończenia ostatniego dźwięku (do opóźnienia banera)
