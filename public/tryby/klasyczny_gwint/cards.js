@@ -529,7 +529,7 @@ const cards = [
         bohater: false,
         moc: "szpieg",
         frakcja: "1",
-        punkty: 4,
+        punkty: 5,
         pozycja: 1,
         ilosc: 1,
         numer: "116"

@@ -540,6 +540,11 @@ function registerClassicGwentEvents(socket, io, games) {
                                 rowArray.splice(idx, 1, "001");
                                 // Dodaj zabraną jednostkę do ręki
                                 hand.push(tNum);
+                                state.decoyDetails = {
+                                    replacedNumer: tNum,
+                                    row: tRow,
+                                    index: idx
+                                };
                                 console.log(`[GAME CLASSIC] Decoy swapped ${tNum} from ${tRow} for 001. ${tNum} back to hand.`);
                             }
                         }
@@ -581,7 +586,12 @@ function registerClassicGwentEvents(socket, io, games) {
                                 state.board[targetRow].push(cNum);
                                 hand.splice(i, 1);
                                 musteredCount++;
-                                musteredDetails.push({ numer: String(cNum), source: 'hand' });
+                                musteredDetails.push({ 
+                                    numer: String(cNum), 
+                                    source: 'hand',
+                                    row: targetRow,
+                                    index: state.board[targetRow].length - 1
+                                });
                             }
                         }
                         // Z talii
@@ -591,7 +601,12 @@ function registerClassicGwentEvents(socket, io, games) {
                                 state.board[targetRow].push(cNum);
                                 deck.splice(i, 1);
                                 musteredCount++;
-                                musteredDetails.push({ numer: String(cNum), source: 'deck' });
+                                musteredDetails.push({ 
+                                    numer: String(cNum), 
+                                    source: 'deck',
+                                    row: targetRow,
+                                    index: state.board[targetRow].length - 1
+                                });
                             }
                         }
                     }
@@ -607,9 +622,10 @@ function registerClassicGwentEvents(socket, io, games) {
                     // Medic logic (Medyk)
                     if (cardObj.moc === 'medyk') {
                         const grave = isPlayer1 ? state.p1Graveyard : state.p2Graveyard;
+                        const EXCLUDED_NUMERS = ['000','001','002','003','004','005','006','007','008'];
                         const reviveable = grave.filter(gNum => {
                             const c = cards.find(x => String(x.numer) === String(gNum));
-                            return c && !c.bohater && !['mroz','mgla','deszcz','sztorm','niebo'].includes(c.moc) && c.typ !== 'specjalna' && c.moc !== 'rog';
+                            return c && !c.bohater && !EXCLUDED_NUMERS.includes(String(gNum)) && !['mroz','mgla','deszcz','sztorm','niebo'].includes(c.moc) && c.typ !== 'specjalna' && c.moc !== 'rog';
                         });
                         
                         if (reviveable.length > 0) {
@@ -732,8 +748,16 @@ function registerClassicGwentEvents(socket, io, games) {
                     scorchDestroyed: scorchDestroyed || [],
                     lastPlayedCard: cardNumer,
                     lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
-                    porzogaDestroyed: scorchDestroyed || []
+                    porzogaDestroyed: scorchDestroyed || [],
+                    decoyDetails: state.decoyDetails || null,
+                    targetSlot: (targetRow && state.board[targetRow]) ? {
+                        row: targetRow,
+                        index: Array.isArray(state.board[targetRow]) ? state.board[targetRow].lastIndexOf(cardNumer) : -1
+                    } : null
                 });
+
+                // Reset decoyDetails after sync
+                state.decoyDetails = null;
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
                 const targetId = isPlayer1 ? game.player2 : game.player1;
@@ -791,31 +815,86 @@ function registerClassicGwentEvents(socket, io, games) {
                     state.board[finalRow].push(cardNumer);
                 }
 
-                state.medicPending = false;
+                // Sprawdź czy wskrzeszona karta to medyk - jeśli tak, łańcuchuj
+                let chainMedic = false;
+                if (revivedCardObj && revivedCardObj.moc === 'medyk') {
+                    const EXCLUDED_NUMERS = ['000','001','002','003','004','005','006','007','008'];
+                    const reviveable = grave.filter(gNum => {
+                        const c = cards.find(x => String(x.numer) === String(gNum));
+                        return c && !c.bohater && !EXCLUDED_NUMERS.includes(String(gNum)) && !['mroz','mgla','deszcz','sztorm','niebo'].includes(c.moc) && c.typ !== 'specjalna' && c.moc !== 'rog';
+                    });
+                    if (reviveable.length > 0) {
+                        chainMedic = true;
+                        // medicPending pozostaje true
+                        console.log(`[GAME CLASSIC] Chained Medic! Revived medyk ${cardNumer}, prompting for next pick from ${reviveable.length} cards.`);
+                        
+                        // Wyślij board-updated z animacją wskrzeszonego medyka
+                        io.to(gameCode).emit('board-updated', {
+                            board: state.board,
+                            currentTurn: state.currentTurn,
+                            p1HandCount: state.p1Hand.length,
+                            p2HandCount: state.p2Hand.length,
+                            p1Lives: state.p1Lives,
+                            p2Lives: state.p2Lives,
+                            p1Passed: state.p1Passed,
+                            p2Passed: state.p2Passed,
+                            p1Graveyard: state.p1Graveyard,
+                            p2Graveyard: state.p2Graveyard,
+                            spyDrawn: spyDrawn,
+                            spyPlayer: spyPlayer,
+                            p1Hand: state.p1Hand,
+                            p2Hand: state.p2Hand,
+                            lastPlayedCard: cardNumer,
+                            lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
+                            isFromGraveyard: true,
+                            isMedicChain: true,
+                            targetSlot: {
+                                row: finalRow,
+                                index: state.board[finalRow].length - 1
+                            }
+                        });
 
-                // Sprawdź spasowanie przeciwnika i zmień turę
-                const oppSide = isPlayer1 ? 'p2' : 'p1';
-                if (!state[oppSide + 'Passed']) {
-                    const nextPlayer = isPlayer1 ? game.player2 : game.player1;
-                    state.currentTurn = nextPlayer;
+                        // Po krótkim opóźnieniu wyślij prompt na kolejną kartę
+                        setTimeout(() => {
+                            socket.emit('medic-revive-prompt', { graveyard: reviveable });
+                        }, 500);
+                    }
                 }
 
-                io.to(gameCode).emit('board-updated', {
-                    board: state.board,
-                    currentTurn: state.currentTurn,
-                    p1HandCount: state.p1Hand.length,
-                    p2HandCount: state.p2Hand.length,
-                    p1Lives: state.p1Lives,
-                    p2Lives: state.p2Lives,
-                    p1Passed: state.p1Passed,
-                    p2Passed: state.p2Passed,
-                    p1Graveyard: state.p1Graveyard,
-                    p2Graveyard: state.p2Graveyard,
-                    spyDrawn: spyDrawn,
-                    spyPlayer: spyPlayer,
-                    p1Hand: state.p1Hand,
-                    p2Hand: state.p2Hand
-                });
+                if (!chainMedic) {
+                    state.medicPending = false;
+
+                    // Sprawdź spasowanie przeciwnika i zmień turę
+                    const oppSide = isPlayer1 ? 'p2' : 'p1';
+                    if (!state[oppSide + 'Passed']) {
+                        const nextPlayer = isPlayer1 ? game.player2 : game.player1;
+                        state.currentTurn = nextPlayer;
+                    }
+
+                    io.to(gameCode).emit('board-updated', {
+                        board: state.board,
+                        currentTurn: state.currentTurn,
+                        p1HandCount: state.p1Hand.length,
+                        p2HandCount: state.p2Hand.length,
+                        p1Lives: state.p1Lives,
+                        p2Lives: state.p2Lives,
+                        p1Passed: state.p1Passed,
+                        p2Passed: state.p2Passed,
+                        p1Graveyard: state.p1Graveyard,
+                        p2Graveyard: state.p2Graveyard,
+                        spyDrawn: spyDrawn,
+                        spyPlayer: spyPlayer,
+                        p1Hand: state.p1Hand,
+                        p2Hand: state.p2Hand,
+                        lastPlayedCard: cardNumer,
+                        lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
+                        isFromGraveyard: true,
+                        targetSlot: {
+                            row: finalRow,
+                            index: state.board[finalRow].length - 1
+                        }
+                    });
+                }
             }
         }
     });
