@@ -63,15 +63,42 @@ const runDecoyFlyBack = async (decoyDetails, from4K) => {
     const replacedCard = cards.find(c => String(c.numer) === String(decoyDetails.replacedNumer));
     if (!replacedCard) return;
 
+    // Obliczamy docelowe miejsce w ręce (dla gracza)
+    const isMyDecoy = decoyDetails.row.startsWith(isPlayer1Local ? 'p1' : 'p2');
+    let to4K = isMyDecoy ? { x: 2090, y: 1811 } : { x: 2090, y: -300 };
+
+    if (isMyDecoy) {
+        // Znajdujemy indeks karty w ręce (powinna być już dodana przez syncHand przed animacją)
+        const handIdx = playerHand.findIndex(c => String(c.numer) === String(replacedCard.numer));
+        if (handIdx !== -1) {
+            const areaLeft = 1163;
+            const areaRight = 3018;
+            const count = playerHand.length;
+            const totalAreaWidth = areaRight - areaLeft;
+            const cardW = 180;
+            let cardStep = cardW + 5;
+            if (count * cardStep > totalAreaWidth) {
+                cardStep = (totalAreaWidth - cardW) / (count - 1);
+            }
+            const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
+            const startX = (totalAreaWidth - occupiedWidth) / 2;
+            
+            to4K = {
+                x: areaLeft + startX + handIdx * cardStep,
+                y: 1691
+            };
+        }
+    }
+
     await new Promise(resolve => {
         const el = createAnimationCardElement(replacedCard, 180, 239);
-        const isMyDecoy = decoyDetails.row.startsWith(isPlayer1Local ? 'p1' : 'p2');
-        const to4K = isMyDecoy ? { x: 2090, y: 1811 } : { x: 2090, y: -300 };
-        
+        const targetW = isMyDecoy ? 180 : 50;
+        const targetH = isMyDecoy ? 239 : 66;
+
         animateElement(el, from4K, to4K, 180, 239, () => {
              if (window.playSound) window.playSound('addCardSpySound');
              resolve();
-        }, 50, 66);
+        }, targetW, targetH);
 
         // Trigger manual move and shrink
         requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -80,8 +107,8 @@ const runDecoyFlyBack = async (decoyDetails, from4K) => {
             const bT = (window.innerHeight - 2160 * scale) / 2;
             el.style.left = `${to4K.x * scale + bL}px`;
             el.style.top = `${to4K.y * scale + bT}px`;
-            el.style.width = `${50 * scale}px`;
-            el.style.height = `${66 * scale}px`;
+            el.style.width = `${targetW * scale}px`;
+            el.style.height = `${targetH * scale}px`;
         }));
     });
 };
@@ -141,6 +168,11 @@ const handleCardAnimationSequence = async (data) => {
     const lpc = cards.find(c => String(c.numer) === String(lp));
     
     if (lpc) {
+        // Dźwięk manekina puszczamy na samym początku sekwencji (user request: 1s wcześniej)
+        if (lpc.moc === 'manek' && window.playSound) {
+            window.playSound('manekinSound');
+        }
+
         let rowKey = "";
         let cardIdx = -1;
         if (data.targetSlot) {
@@ -192,11 +224,17 @@ const handleCardAnimationSequence = async (data) => {
                     markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
                     
                     if (data.decoyDetails) {
+                        if (window.playSound) window.playSound('manekinSound');
                         await runDecoyFlyBack(data.decoyDetails, to4K);
                     }
 
-                    if (window.playSound) window.playSound(baseSound, resolve);
-                    else resolve();
+                    // Jeśli to manekin, dźwięk już puściliśmy wcześniej
+                    if (baseSound !== 'manekinSound') {
+                        if (window.playSound) window.playSound(baseSound, resolve);
+                        else resolve();
+                    } else {
+                        resolve();
+                    }
                 }, 180, 239);
 
                 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -249,12 +287,18 @@ const handleCardAnimationSequence = async (data) => {
                             markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
 
                             if (data.decoyDetails) {
+                                if (window.playSound) window.playSound('manekinSound');
                                 await runDecoyFlyBack(data.decoyDetails, to4K);
                             }
 
                             const finalSound = getBaseSound(lpc, data);
-                            if (window.playSound) window.playSound(finalSound, resolve);
-                            else resolve();
+                            // Jeśli to manekin, dźwięk już puściliśmy wcześniej
+                            if (finalSound !== 'manekinSound') {
+                                if (window.playSound) window.playSound(finalSound, resolve);
+                                else resolve();
+                            } else {
+                                resolve();
+                            }
                         }, 180, 239);
 
                         // TRIGGER ZIP
@@ -299,11 +343,17 @@ const handleCardAnimationSequence = async (data) => {
                     markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
 
                     if (data.decoyDetails) {
+                        if (window.playSound) window.playSound('manekinSound');
                         await runDecoyFlyBack(data.decoyDetails, to4K);
                     }
 
-                    if (window.playSound) window.playSound(baseSound, resolve);
-                    else resolve();
+                    // Jeśli to manekin, dźwięk już puściliśmy wcześniej
+                    if (baseSound !== 'manekinSound') {
+                        if (window.playSound) window.playSound(baseSound, resolve);
+                        else resolve();
+                    } else {
+                        resolve();
+                    }
                 }, 180, 239);
 
                 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2298,8 +2348,9 @@ function renderRows(overlay) {
                     };
                 }
 
-                // Hover effect
+                // Hover effect (blokowany podczas animacji manekina)
                 wrapper.onmouseenter = () => {
+                    if (window.activeDecoySequences.has(cardKey)) return;
                     wrapper.style.zIndex = '5000';
                     wrapper.style.transform = 'translateY(-15%)';
                     wrapper.style.boxShadow = `0 0 ${15 * scale}px #c7a76e`;
