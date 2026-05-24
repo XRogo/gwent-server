@@ -20,18 +20,42 @@ function preloadCardImages() {
 preloadCardImages();
 
 // --- GLOBALNE FUNKCJE POMOCNICZE (DOSTĘPNE DLA WSZYSTKICH) ---
+const isSpecialSlotCard = (card) => {
+    if (!card) return false;
+    return (card.moc === 'rog' || card.moc === 'grzybki' || card.numer === '002' || card.numer === '000') && typeof card.punkty !== 'number';
+};
+
 const getBaseSound = (card, data) => {
-    if (card.moc === 'szpieg')      return 'szpiegSound';
-    if (card.bohater)          return 'zagranieBohateraSound';
-    if (card.moc === 'manek' || card.numer === '001')  return 'manekinSound';
+    if (card.moc === 'szpieg') return 'szpiegSound';
+    if (card.bohater) return 'zagranieBohateraSound';
+    if (card.moc === 'manek' || card.numer === '001') return 'manekinSound';
     if (card.moc === 'rog' && (card.numer === '002' || typeof card.punkty !== 'number')) return 'rogDowodcySound';
     if (card.moc === 'rog') return 'rogDowodcySound';
-    if (card.moc === 'mroz')   return 'mrozSound';
-    if (card.moc === 'mgla')   return 'mglaSound';
+    if (card.moc === 'porz') return 'porzogaSound';
+    if (card.moc === 'mroz') return 'mrozSound';
+    if (card.moc === 'mgla') return 'mglaSound';
     if (card.moc === 'deszcz') return 'deszczSound';
-    if (card.moc === 'niebo')  return 'czystenieboSound';
+    if (card.moc === 'niebo') return 'czystenieboSound';
     if (card.moc === 'sztorm') return 'sztormSound';
-    if (card.pozycja === 3)    return 'zagranie3Sound';
+    if (card.pozycja === 3) return 'zagranie3Sound';
+    if (card.numer === '000') {
+        let activated = false;
+        let foundSide = null, foundRow = null;
+        ['p1', 'p2'].forEach(side => {
+            [1, 2, 3].forEach(r => {
+                if (data && data.board && String(data.board[`${side}S${r}`]) === '000') {
+                    foundSide = side; foundRow = r;
+                }
+            });
+        });
+        if (foundSide && foundRow) {
+            const rowCards = data.board[`${foundSide}R${foundRow}`] || [];
+            if (rowCards.includes(26) || rowCards.includes('026') || rowCards.includes(27) || rowCards.includes('027')) {
+                activated = true;
+            }
+        }
+        return activated ? 'grzybkiSound' : 'pusteGrzybkiSound';
+    }
     if (card.pozycja === 2 && !card.bohater && card.moc !== 'manek') return 'zagranie2Sound';
     return 'zagranie1Sound';
 };
@@ -82,7 +106,7 @@ const runDecoyFlyBack = async (decoyDetails, from4K) => {
             }
             const occupiedWidth = (count > 0 ? (count - 1) * cardStep + cardW : 0);
             const startX = (totalAreaWidth - occupiedWidth) / 2;
-            
+
             to4K = {
                 x: areaLeft + startX + handIdx * cardStep,
                 y: 1691
@@ -96,8 +120,8 @@ const runDecoyFlyBack = async (decoyDetails, from4K) => {
         const targetH = isMyDecoy ? 239 : 66;
 
         animateElement(el, from4K, to4K, 180, 239, () => {
-             if (window.playSound) window.playSound('addCardSpySound');
-             resolve();
+            if (window.playSound) window.playSound('addCardSpySound');
+            resolve();
         }, targetW, targetH);
 
         // Trigger manual move and shrink
@@ -133,7 +157,7 @@ function reconcileArrivedCards(board, excludeNumerStrings = []) {
 const handleCardAnimationSequence = async (data) => {
     const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
     const usedSlotsInSequence = new Set();
-    
+
     // Zapamiętujemy stan więzi sprzed tej sekwencji (do utrzymania płynności punktów)
     window.bondPreviousCounts = {};
     Object.keys(data.board).forEach(rk => {
@@ -166,13 +190,8 @@ const handleCardAnimationSequence = async (data) => {
     // 1. ZAGRANA KARTA (lastPlayedCard)
     const lp = data.lastPlayedCard;
     const lpc = cards.find(c => String(c.numer) === String(lp));
-    
-    if (lpc) {
-        // Dźwięk manekina puszczamy na samym początku sekwencji (user request: 1s wcześniej)
-        if (lpc.moc === 'manek' && window.playSound) {
-            window.playSound('manekinSound');
-        }
 
+    if (lpc) {
         let rowKey = "";
         let cardIdx = -1;
         if (data.targetSlot) {
@@ -202,9 +221,30 @@ const handleCardAnimationSequence = async (data) => {
 
         // Wyszukaj placeholder
         const placeholder = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
-        let to4K = { x: 1412 + 1609/2, y: 1000 }; // Fallback
-        if (placeholder) {
+        let to4K = { x: 1412 + 1609 / 2, y: 1000 }; // Fallback
+        if (lpc.moc === 'porz') {
+            to4K = isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
+        } else if (isSpecialSlotCard(lpc)) {
+            let foundSide = null, foundRow = null;
+            ['p1', 'p2'].forEach(side => {
+                [1, 2, 3].forEach(r => {
+                    if (String(data.board[`${side}S${r}`]) === String(lp)) {
+                        foundSide = side; foundRow = r;
+                    }
+                });
+            });
+            if (foundSide && foundRow) {
+                const sSlotEl = document.getElementById(`special-slot-${foundSide}-${foundRow}`);
+                if (sSlotEl) to4K = getElement4KPos(sSlotEl);
+            }
+        } else if (placeholder) {
             to4K = getElement4KPos(placeholder);
+        } else if (lpc.typ === 'pogoda' || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(lpc.moc)) {
+            const weatherEl = document.getElementById('weather-container');
+            if (weatherEl) {
+                to4K = getElement4KPos(weatherEl);
+                to4K.x += 100;
+            }
         }
 
         if (data.isFromGraveyard) {
@@ -215,14 +255,14 @@ const handleCardAnimationSequence = async (data) => {
                 const el = createAnimationCardElement(lpc, 180, 239);
                 animateElement(el, from4K, to4K, 180, 239, async () => {
                     const baseSound = getBaseSound(lpc, data);
-                    
+
                     if (data.decoyDetails) {
                         const d = data.decoyDetails;
                         window.activeDecoySequences.delete(`${d.row}_${d.index}`);
                     }
-                    
+
                     markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
-                    
+
                     if (data.decoyDetails) {
                         if (window.playSound) window.playSound('manekinSound');
                         await runDecoyFlyBack(data.decoyDetails, to4K);
@@ -250,12 +290,12 @@ const handleCardAnimationSequence = async (data) => {
         } else if (!isMe) {
             // Animacja przeciwnika: Start (Środek góry) -> Podgląd (Prawa strona HD) -> Cel (Slot)
             await new Promise(resolve => {
-                const preview4K = { x: 3120, y: 1080 - 992/2 };
+                const preview4K = { x: 3120, y: 1080 - 992 / 2 };
                 const start4K = { x: 1920, y: -300 }; // Środek góry (ręka przeciwnika)
-                
+
                 // FAZA 1: Dolot i płynny wzrost do podglądu (używamy animateElement)
-                const flyEl = createAnimationCardElement(lpc, 180, 240);
-                animateElement(flyEl, start4K, preview4K, 180, 240, () => {
+                const flyEl = createAnimationCardElement(lpc, 523, 992, true, true);
+                animateElement(flyEl, start4K, preview4K, 523, 992, () => {
                     // FAZA 2: Podmiana na statyczny podgląd HD (dla ostrości) na 2s
                     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                     const bL = (window.innerWidth - 3840 * scale) / 2;
@@ -267,50 +307,44 @@ const handleCardAnimationSequence = async (data) => {
                     hdEl.style.width = `${523 * scale}px`;
                     hdEl.style.height = `${992 * scale}px`;
                     hdEl.style.left = `${3120 * scale + bL}px`;
-                    hdEl.style.top = `${(1080 - 992/2) * scale + bT}px`;
+                    hdEl.style.top = `${(1080 - 992 / 2) * scale + bT}px`;
                     document.body.appendChild(hdEl);
 
                     setTimeout(() => {
                         // FAZA 3: Zip do slotu (zmaleje z powrotem do rozmiaru rzędu)
                         if (hdEl.parentNode) hdEl.parentNode.removeChild(hdEl);
 
-                        const zipEl = createAnimationCardElement(lpc, 180, 239);
-                        const zipStart4K = { x: 3315, y: 875 };
-
-                        animateElement(zipEl, zipStart4K, to4K, 180, 239, async () => {
-                            // Trafienie w slot
-                            if (data.decoyDetails) {
-                                const d = data.decoyDetails;
-                                window.activeDecoySequences.delete(`${d.row}_${d.index}`);
-                            }
-
-                            markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
-
-                            if (data.decoyDetails) {
-                                if (window.playSound) window.playSound('manekinSound');
-                                await runDecoyFlyBack(data.decoyDetails, to4K);
-                            }
-
+                        if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
                             const finalSound = getBaseSound(lpc, data);
-                            // Jeśli to manekin, dźwięk już puściliśmy wcześniej
-                            if (finalSound !== 'manekinSound') {
-                                if (window.playSound) window.playSound(finalSound, resolve);
-                                else resolve();
-                            } else {
-                                resolve();
-                            }
-                        }, 180, 239);
+                            if (window.playSound) window.playSound(finalSound);
 
-                        // TRIGGER ZIP
-                        requestAnimationFrame(() => requestAnimationFrame(() => {
-                            zipEl.style.left = `${to4K.x * scale + bL}px`;
-                            zipEl.style.top = `${to4K.y * scale + bT}px`;
-                            zipEl.style.width = `${180 * scale}px`;
-                            zipEl.style.height = `${239 * scale}px`;
-                        }));
+                            if (window.lastDestroyedCardsDOM && window.lastDestroyedCardsDOM.length > 0) {
+                                window.lastDestroyedCardsDOM.forEach(item => {
+                                    const graveyard4K = item.side === 'p1' ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
+                                    const del = createAnimationCardElement(item.card, 180, 239);
+                                    animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => {});
+                                    requestAnimationFrame(() => requestAnimationFrame(() => {
+                                        const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                                        const bL = (window.innerWidth - 3840 * scale) / 2;
+                                        const bT = (window.innerHeight - 2160 * scale) / 2;
+                                        del.style.left = `${item.currentPos4K.x * scale + bL}px`;
+                                        del.style.top = `${item.currentPos4K.y * scale + bT}px`;
+                                    }));
+                                });
+                            }
+                            setTimeout(() => {
+                                executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
+                            }, 800);
+                        } else {
+                            executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
+                        }
 
                     }, 2000);
                 }, 523, 992); // Docelowa wielkość fazy 1
+
+                flyEl.style.transformOrigin = 'top left';
+                flyEl.style.transform = `scale(${180 / 523}, ${240 / 992})`;
+                flyEl.style.transition += `, transform ${flyEl._duration}s ease-in-out`;
 
                 // TRIGGER DOLOT I WZROST
                 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -319,52 +353,39 @@ const handleCardAnimationSequence = async (data) => {
                     const bT = (window.innerHeight - 2160 * scale) / 2;
                     flyEl.style.left = `${preview4K.x * scale + bL}px`;
                     flyEl.style.top = `${preview4K.y * scale + bT}px`;
-                    flyEl.style.width = `${523 * scale}px`;
-                    flyEl.style.height = `${992 * scale}px`;
+                    flyEl.style.transform = `scale(1, 1)`;
                 }));
             });
         } else {
             // Animacja gracza: Podgląd -> Cel
             await new Promise(resolve => {
-                const zipStart4K = { x: 3315, y: 875 };
-                const el = createAnimationCardElement(lpc, 180, 239);
-                
                 const proposedPreview = document.getElementById('proposed-card-preview');
-                if (proposedPreview) proposedPreview.style.display = 'none';
+                if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
+                    const finalSound = getBaseSound(lpc, data);
+                    if (window.playSound) window.playSound(finalSound);
 
-                animateElement(el, zipStart4K, to4K, 180, 239, async () => {
-                    const baseSound = getBaseSound(lpc, data);
-
-                    if (data.decoyDetails) {
-                        const d = data.decoyDetails;
-                        window.activeDecoySequences.delete(`${d.row}_${d.index}`);
+                    if (window.lastDestroyedCardsDOM && window.lastDestroyedCardsDOM.length > 0) {
+                        window.lastDestroyedCardsDOM.forEach(item => {
+                            const graveyard4K = item.side === 'p1' ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
+                            const del = createAnimationCardElement(item.card, 180, 239);
+                            animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => {});
+                            requestAnimationFrame(() => requestAnimationFrame(() => {
+                                const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                                const bL = (window.innerWidth - 3840 * scale) / 2;
+                                const bT = (window.innerHeight - 2160 * scale) / 2;
+                                del.style.left = `${item.currentPos4K.x * scale + bL}px`;
+                                del.style.top = `${item.currentPos4K.y * scale + bT}px`;
+                            }));
+                        });
                     }
-
-                    markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
-
-                    if (data.decoyDetails) {
-                        if (window.playSound) window.playSound('manekinSound');
-                        await runDecoyFlyBack(data.decoyDetails, to4K);
-                    }
-
-                    // Jeśli to manekin, dźwięk już puściliśmy wcześniej
-                    if (baseSound !== 'manekinSound') {
-                        if (window.playSound) window.playSound(baseSound, resolve);
-                        else resolve();
-                    } else {
-                        resolve();
-                    }
-                }, 180, 239);
-
-                requestAnimationFrame(() => requestAnimationFrame(() => {
-                    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
-                    const bL = (window.innerWidth - 3840 * scale) / 2;
-                    const bT = (window.innerHeight - 2160 * scale) / 2;
-                    el.style.left = `${to4K.x * scale + bL}px`;
-                    el.style.top = `${to4K.y * scale + bT}px`;
-                    el.style.width = `${180 * scale}px`;
-                    el.style.height = `${239 * scale}px`;
-                }));
+                    setTimeout(() => {
+                        if (proposedPreview) proposedPreview.style.display = 'none';
+                        executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
+                    }, 800);
+                } else {
+                    if (proposedPreview) proposedPreview.style.display = 'none';
+                    executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
+                }
             });
         }
     }
@@ -383,7 +404,7 @@ const handleCardAnimationSequence = async (data) => {
             return new Promise(resolveMuster => {
                 const cardObj = cards.find(c => String(c.numer) === String(m.numer));
                 if (!cardObj) return resolveMuster();
-                
+
                 let rowKey = m.row || "";
                 let cardIdx = (m.index !== undefined) ? m.index : -1;
 
@@ -408,7 +429,7 @@ const handleCardAnimationSequence = async (data) => {
                 }
 
                 const placeholder = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
-                let to4K = { x: 1412 + 1609/2, y: 1000 };
+                let to4K = { x: 1412 + 1609 / 2, y: 1000 };
                 if (placeholder) {
                     to4K = getElement4KPos(placeholder);
                 }
@@ -434,7 +455,7 @@ const handleCardAnimationSequence = async (data) => {
                     if (window.playSound) window.playSound(surfaceSound, resolveMuster);
                     else resolveMuster();
                 });
-                
+
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                     const bL = (window.innerWidth - 3840 * scale) / 2;
@@ -480,10 +501,10 @@ const handleCardAnimationSequence = async (data) => {
     if (bondCards.length > 0 && window.playSound) {
         // Czekamy na zakończenie dźwięku wejścia ostatniej karty (szacunkowo 1s po dolocie)
         await new Promise(r => setTimeout(r, 800));
-        
+
         // Odtwarzamy dźwięk więzi
         window.playSound('wiezSound');
-        
+
         // W TYM SAMYM MOMENCIE (gdy zaczyna się dźwięk) aktywujemy mnożnik i aktualizujemy punkty na planszy
         window.bondMultiplierActive = true;
         renderAll(currentNick);
@@ -491,6 +512,43 @@ const handleCardAnimationSequence = async (data) => {
         // Czekamy szacunkowo na koniec dźwięku przed zakończeniem całej sekwencji
         await new Promise(r => setTimeout(r, 1500));
     }
+};
+
+const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
+    const zipEl = createAnimationCardElement(lpc, 180, 239);
+    const zipStart4K = { x: 3315, y: 875 };
+
+    animateElement(zipEl, zipStart4K, to4K, 180, 239, async () => {
+        if (data.decoyDetails) {
+            const d = data.decoyDetails;
+            window.activeDecoySequences.delete(`${d.row}_${d.index}`);
+        }
+
+        markArrivedInState(data.lastPlayedCard, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
+
+        if (data.decoyDetails) {
+            if (window.playSound) window.playSound('manekinSound');
+            await runDecoyFlyBack(data.decoyDetails, to4K);
+        }
+
+        const finalSound = getBaseSound(lpc, data);
+        if (finalSound !== 'manekinSound' && lpc.moc !== 'porz' && lpc.moc !== 'iporz') {
+            if (window.playSound) window.playSound(finalSound, resolve);
+            else resolve();
+        } else {
+            resolve();
+        }
+    }, 180, 239);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+        const bL = (window.innerWidth - 3840 * scale) / 2;
+        const bT = (window.innerHeight - 2160 * scale) / 2;
+        zipEl.style.left = `${to4K.x * scale + bL}px`;
+        zipEl.style.top = `${to4K.y * scale + bT}px`;
+        zipEl.style.width = `${180 * scale}px`;
+        zipEl.style.height = `${239 * scale}px`;
+    }));
 };
 
 let playerHand = [];
@@ -530,10 +588,10 @@ const factionInfo = {
 };
 // Konfiguracja fizycznych współrzędnych rzędów na planszy 4K (3840x2160)
 const rowCoords = {
-    opp3:  { x: 1412, y: 29,   w: 1609, h: 239 },
-    opp2:  { x: 1412, y: 294,  w: 1609, h: 239 },
-    opp1:  { x: 1412, y: 565,  w: 1609, h: 239 },
-    self1: { x: 1412, y: 863,  w: 1609, h: 239 },
+    opp3: { x: 1412, y: 29, w: 1609, h: 239 },
+    opp2: { x: 1412, y: 294, w: 1609, h: 239 },
+    opp1: { x: 1412, y: 565, w: 1609, h: 239 },
+    self1: { x: 1412, y: 863, w: 1609, h: 239 },
     self2: { x: 1412, y: 1129, w: 1609, h: 239 },
     self3: { x: 1412, y: 1407, w: 1609, h: 239 }
 };
@@ -544,7 +602,7 @@ window.cardsAnimated = false;
 window.arrivedCards = new Set();
 window.arrivedBoardCards = new Set(); // Klucze w formacie: "p1R1_0", "p1R1_1" etc.
 window.proposedCard = null; // Karta wybrana do potwierdzenia propozycji zagrania
-window.proposedTargetRow = null; 
+window.proposedTargetRow = null;
 window.bondMultiplierActive = false;
 window.activeDecoySequences = new Map(); // Klucz: "rowKey_index", Wartość: numer_zabieranej_karty
 
@@ -637,11 +695,11 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                     // Mamy ostateczny 'playing' i nie wystartowaliśmy jeszcze gry.
                     hideScoiaUI();
                     renderAll(nick); // Zawsze wyrenderuj stan (pusta plansza)
-                    
+
                     // Decydujemy jaki baner użyć na wejście
                     let startBanner = null;
                     const isMyTurn = data.currentTurn === window.socket.id;
-                    
+
                     if (data.startReason === 'random') {
                         startBanner = isMyTurn ? 't01' : 't02';
                     } else if (data.startReason === 'scoia') {
@@ -651,7 +709,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                     if (startBanner) {
                         window.gameStarted = true;
                         hidePrzejscie(true); // Natychmiast ukryj ewentualne komunikaty t13
-                        
+
                         // Animacja dowódcy gracza
                         if (playerLeaderObj) {
                             animateLeaderFromDeck(playerLeaderObj, () => {
@@ -667,7 +725,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                                 renderAll(currentNick);
                             });
                         }
-                        
+
                         showPrzejscie(startBanner, {
                             customCzas: 2000,
                             onFinish: () => {
@@ -711,13 +769,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
     });
 
-        socket.on('initial-cards-dealt', (data) => {
+    socket.on('initial-cards-dealt', (data) => {
         const { hand } = data;
         const handObjects = hand.map(num => {
             const c = cards.find(card => card.numer === String(num));
             return c ? { ...c, _id: Math.random() } : null;
         }).filter(Boolean);
-        
+
         // Aktualizacja lokalnej talii (drawPile) - usuń tylko te wystąpienia które doleciały do ręki
         if (drawPile.length > 0) {
             handObjects.forEach(hCard => {
@@ -728,12 +786,12 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
         // Natychmiast otwórz mulligan (animacje lecą "pod" nim)
         playerHand = handObjects;
-        sortHand(); 
+        sortHand();
 
         const areaLeft = 1163, areaRight = 3018, areaTop = 1691, cardW = 180;
         const count = playerHand.length;
         const totalAreaWidth = (areaRight - areaLeft);
-        
+
         let cardStep = cardW + 5;
         if (count * cardStep > totalAreaWidth) {
             cardStep = (totalAreaWidth - cardW) / (count - 1);
@@ -774,7 +832,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         if (cardObj) {
             playerHand[cardIndex] = cardObj;
             console.log(`[BOARD] Swap successful: Index ${cardIndex} -> ${cardObj.nazwa}`);
-            
+
             // Sync local drawPile - remove the card that just arrived in hand
             const dIdx = drawPile.findIndex(c => String(c.numer) === String(newCard));
             if (dIdx !== -1) drawPile.splice(dIdx, 1);
@@ -797,16 +855,16 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             // 1. Zakończenie wymiany (zamknięcie okna)
             window.mulliganFinished = true; // Set early to avoid onClose redundancy
             if (window.hidePowiek) window.hidePowiek();
-            
+
             // 2. Posortowanie kart (zmienia indeksy w playerHand)
             sortHand();
-            
+
             // Znajdź nowy indeks podmienionej karty po posortowaniu
             const newIndex = playerHand.findIndex(c => c === cardObj);
-            
+
             // Ukryj tylko tę nową kartę dopóki nie doleci (arrivedCards już ma inne)
             window.arrivedCards.delete(cardObj);
-            
+
             // Renderujemy rąkę z "dziurą" na nową kartę
             renderAll(currentNick);
 
@@ -814,12 +872,12 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             // Używamy getBoundingClientRect na ukrytym elemencie (który renderAll właśnie wstawił)
             const wrappers = document.querySelectorAll('.hand-card-img');
             const targetEl = Array.from(wrappers).find(el => parseInt(el.dataset.index) === newIndex);
-            
+
             const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
             const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
             const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
             const boardTop = (window.innerHeight - 2160 * scale) / 2;
-            
+
             let finalTarget = { x: startXInHand, y: areaTop }; // Fallback
             if (targetEl) {
                 const rect = targetEl.getBoundingClientRect();
@@ -841,7 +899,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             // Animacja dla pojedynczej wymiany
             window.arrivedCards.delete(cardObj);
             renderAll(currentNick);
-            animateDeckToHand([cardObj], [{x: startXInHand, y: areaTop}], () => {
+            animateDeckToHand([cardObj], [{ x: startXInHand, y: areaTop }], () => {
                 window.arrivedCards.add(cardObj);
                 renderAll(currentNick);
             });
@@ -872,10 +930,12 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('mulligan-finished-all', () => {
         hidePrzejscie(true); // Close t06 instantly
-        showPrzejscie('t05', { onFinish: () => {
-            const isMyTurn = currentTurn === window.socket.id;
-            showPrzejscie(isMyTurn ? 't07' : 't08');
-        }});
+        showPrzejscie('t05', {
+            onFinish: () => {
+                const isMyTurn = currentTurn === window.socket.id;
+                showPrzejscie(isMyTurn ? 't07' : 't08');
+            }
+        });
     });
 
     socket.on('turn-info', (data) => {
@@ -906,9 +966,32 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('board-updated', (data) => {
         console.log("[BOARD] Received board-updated:", data);
+        
+        // Zbierz karty do animacji zniszczenia przed nadpisaniem stanu
+        const oldCards = collectCardsOnBoardDOM(false).map(i => ({...i, side: isPlayer1Local ? 'p1' : 'p2'}))
+                        .concat(collectCardsOnBoardDOM(true).map(i => ({...i, side: isPlayer1Local ? 'p2' : 'p1'})));
+
         const prevTurn = currentTurn;
         boardState = data.board;
         currentTurn = data.currentTurn;
+
+        // Znajdź usunięte karty (np. przez pożogę)
+        const newBoardCounts = {};
+        ['p1R1','p1R2','p1R3','p2R1','p2R2','p2R3'].forEach(r => {
+             (data.board[r] || []).forEach(n => {
+                 newBoardCounts[n] = (newBoardCounts[n] || 0) + 1;
+             });
+        });
+        window.lastDestroyedCardsDOM = [];
+        oldCards.forEach(item => {
+             if (newBoardCounts[item.card.numer] > 0) {
+                 newBoardCounts[item.card.numer]--;
+             } else {
+                 if (!data.decoyDetails || String(data.decoyDetails.replacedNumer) !== String(item.card.numer)) {
+                     window.lastDestroyedCardsDOM.push(item);
+                 }
+             }
+        });
 
         // --- SYNCHRONIZACJA WIDOCZNOŚCI ---
         // Wyłączamy z natychmiastowej widoczności tylko te karty, które właśnie "lądują" (animacja).
@@ -921,13 +1004,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         // ---------------------------------
 
         const newOppHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
-        
+
         // Sync local hand if provided by server
         const serverHand = isPlayer1Local ? data.p1Hand : data.p2Hand;
         if (serverHand) {
             syncHand(serverHand);
         }
-        
+
         if (data.lastPlayedCard) {
             if (data.isFromGraveyard) {
                 // Serwer jawnie mówi że karta wskrzeszona z cmentarza (medyk)
@@ -960,16 +1043,96 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
         }
 
-        const finishUpdate = async () => {
+        const performUpdateSequence = async () => {
             try {
                 opponentHandCount = newOppHandCount;
                 if (data.spyDrawn && data.spyDrawn.length > 0 && data.spyPlayer !== (isPlayer1Local ? 'p1' : 'p2')) {
                     opponentDeckCount -= data.spyDrawn.length;
                 }
 
-                // NOWA UNIFIKOWANA SEKWENCJA ANIMACJI
+                // Przygotuj (preload) obrazki dobieranych kart w trakcie poprzedzającej animacji
+                if (data.spyDrawn && data.spyDrawn.length > 0) {
+                    const mappedDrawn = data.spyDrawn.map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
+                    mappedDrawn.forEach(c => {
+                        if (c && c.karta) {
+                            const img = new Image();
+                            img.src = c.karta;
+                        }
+                    });
+                }
+
+                // NOWA UNIFIKOWANA SEKWENCJA ANIMACJI ZAGRANIA KARTY
                 if (data.lastPlayedCard) {
                     await handleCardAnimationSequence(data);
+                }
+
+                if (data.spyDrawn && data.spyDrawn.length > 0) {
+                    const isLocalSpy = data.spyPlayer === (isPlayer1Local ? 'p1' : 'p2');
+
+                    if (isLocalSpy) {
+                        // Jeśli serwer przesłał pełną rękę — użyj jej jako źródła prawdy...
+                        const serverHandForSync = isPlayer1Local ? data.p1Hand : data.p2Hand;
+                        const mapToObjects = (arr) => (arr || []).map(num => {
+                            const c = cards.find(card => card.numer === String(num));
+                            return c ? { ...c, _id: Math.random() } : null;
+                        }).filter(Boolean);
+
+                        const drawnObjs = mapToObjects(data.spyDrawn);
+                        if (serverHandForSync) syncHand(serverHandForSync);
+                        else {
+                            playerHand.push(...drawnObjs);
+                            sortHand();
+                        }
+
+                        // Usuń karty szpiega z lokalnej talii
+                        const drawnNums = data.spyDrawn.map(n => String(n));
+                        drawPile = drawPile.filter(c => !drawnNums.includes(c.numer));
+
+                        // Odtwórz dźwięk przed animacją dla załadowania kart
+                        const hasHero = drawnObjs.some(c => c.bohater);
+                        if (hasHero && window.playSound) window.playSound('ohoooooSound');
+
+                        renderAll(currentNick);
+
+                        const wrappers = document.querySelectorAll('.hand-card-img');
+                        const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                        const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+                        const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+                        const spyNumsLeft = [...data.spyDrawn.map(n => String(n))];
+                        const drawnInHand = [];
+                        playerHand.forEach(c => {
+                            const idx = spyNumsLeft.indexOf(c.numer);
+                            if (idx !== -1) {
+                                drawnInHand.push(c);
+                                spyNumsLeft.splice(idx, 1);
+                            }
+                        });
+
+                        drawnInHand.forEach(obj => window.arrivedCards.delete(obj));
+                        renderAll(currentNick);
+
+                        const targets = drawnInHand.map(obj => {
+                            const idx = playerHand.findIndex(c => c === obj);
+                            const el = Array.from(wrappers).find(w => parseInt(w.dataset.index) === idx);
+                            if (el) {
+                                const rect = el.getBoundingClientRect();
+                                return { x: (rect.left - boardLeft) / scale, y: (rect.top - boardTop) / scale };
+                            }
+                            return { x: 2090, y: 1811 };
+                        });
+
+                        await new Promise(resolve => {
+                            animateDeckToHand(drawnInHand, targets, () => {
+                                drawnInHand.forEach(obj => window.arrivedCards.add(obj));
+                                if (window.playSound) window.playSound('addCardSpySound');
+                                resolve();
+                            });
+                        });
+                    } else {
+                        // Dla przeciwnika: brak animacji lotu dobieranych kart do dłoni. 
+                        // Zagrał kartę i usłyszał opcjonalnie dźwięk (w handleCardAnimationSequence).
+                    }
                 }
 
                 renderAll(currentNick);
@@ -984,87 +1147,14 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                     }
                 }
             } catch (err) {
-                console.error("[BOARD] Error in finishUpdate:", err);
+                console.error("[BOARD] Error in performUpdateSequence:", err);
             } finally {
                 // ZAWSZE odblokuj ruch po zakończeniu całej sekwencji
                 isProcessingMove = false;
             }
         };
 
-        if (data.spyDrawn && data.spyDrawn.length > 0) {
-            const isLocalSpy = data.spyPlayer === (isPlayer1Local ? 'p1' : 'p2');
-            
-            if (isLocalSpy) {
-                // Jeśli serwer przesłał pełną rękę — użyj jej jako źródła prawdy...
-                const serverHandForSync = isPlayer1Local ? data.p1Hand : data.p2Hand;
-                const mapToObjects = (arr) => (arr || []).map(num => {
-                    const c = cards.find(card => card.numer === String(num));
-                    return c ? { ...c, _id: Math.random() } : null;
-                }).filter(Boolean);
-
-                const drawnObjs = mapToObjects(data.spyDrawn);
-                if (serverHandForSync) syncHand(serverHandForSync);
-                else {
-                    playerHand.push(...drawnObjs);
-                    sortHand();
-                }
-
-                // Usuń karty szpiega z lokalnej talii
-                const drawnNums = data.spyDrawn.map(n => String(n));
-                drawPile = drawPile.filter(c => !drawnNums.includes(c.numer));
-
-                // Dźwięk jeśli wśród dobranych kart jest bohater
-                const hasHero = drawnObjs.some(c => c.bohater);
-                if (hasHero && window.playSound) window.playSound('ohoooooSound');
-
-                renderAll(currentNick);
-
-                const wrappers = document.querySelectorAll('.hand-card-img');
-                const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
-                const boardLeft = (window.innerWidth - 3840 * scale) / 2;
-                const boardTop = (window.innerHeight - 2160 * scale) / 2;
-
-                const spyNumsLeft = [...data.spyDrawn.map(n => String(n))];
-                const drawnInHand = [];
-                playerHand.forEach(c => {
-                    const idx = spyNumsLeft.indexOf(c.numer);
-                    if (idx !== -1) {
-                        drawnInHand.push(c);
-                        spyNumsLeft.splice(idx, 1);
-                    }
-                });
-
-                drawnInHand.forEach(obj => window.arrivedCards.delete(obj));
-                renderAll(currentNick);
-
-                const targets = drawnInHand.map(obj => {
-                    const idx = playerHand.findIndex(c => c === obj);
-                    const el = Array.from(wrappers).find(w => parseInt(w.dataset.index) === idx);
-                    if (el) {
-                        const rect = el.getBoundingClientRect();
-                        return { x: (rect.left - boardLeft) / scale, y: (rect.top - boardTop) / scale };
-                    }
-                    return { x: 2090, y: 1811 };
-                });
-
-                animateDeckToHand(drawnInHand, targets, () => {
-                    drawnInHand.forEach(obj => window.arrivedCards.add(obj));
-                    if (window.playSound) window.playSound('addCardSpySound');
-                    finishUpdate();
-                });
-            } else {
-                const oppFaction = window.opponentFaction || '1';
-                const fMap = { "1": "polnoc_rewers.webp", "2": "nilftgard_rewers.webp", "3": "scoia'tel_rewers.webp", "4": "potwory_rewers.webp", "5": "skelige_rewers.webp" };
-                const reverseImg = `/gwent/assets/asety/${fMap[oppFaction] || "polnoc_rewers.webp"}`;
-                const fakeCards = data.spyDrawn.map(() => ({ karta: reverseImg, nazwa: 'Rewers', punkty: null }));
-                const oppTarget = { x: 2090, y: 350 }; 
-                animateDeckToHand(fakeCards, fakeCards.map(() => oppTarget), () => {
-                    finishUpdate();
-                }, null, true);
-            }
-        } else {
-            finishUpdate();
-        }
+        performUpdateSequence();
     });
 
 
@@ -1094,7 +1184,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                     if (rType === 1) targetRowStr = `${side}R1`;
                     else if (rType === 2) targetRowStr = `${side}R2`;
                     else if (rType === 3) targetRowStr = `${side}R3`;
-                    else if (rType === 4) targetRowStr = `${side}R1`; 
+                    else if (rType === 4) targetRowStr = `${side}R1`;
 
                     window.socket.emit('play-medic-resurrection', {
                         gameCode: gameCodeLocal,
@@ -1123,17 +1213,21 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             playerPassed = true;
             // Only show pass banner if opponent hasn't passed yet
             if (!opponentPassed) {
-                showPrzejscie('t21', { onFinish: () => {
-                    showPrzejscie('t08');
-                }});
+                showPrzejscie('t21', {
+                    onFinish: () => {
+                        showPrzejscie('t08');
+                    }
+                });
             }
         } else {
             opponentPassed = true;
             // Only show pass banner if player hasn't passed yet
             if (!playerPassed) {
-                showPrzejscie('t20', { onFinish: () => {
-                    showPrzejscie('t07');
-                }});
+                showPrzejscie('t20', {
+                    onFinish: () => {
+                        showPrzejscie('t07');
+                    }
+                });
             }
         }
         renderAll(currentNick);
@@ -1170,23 +1264,27 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
 
         renderAll(currentNick);
-        
+
         // Faza startowa rundy - t05, potem t07/08
-        showPrzejscie('t05', { onFinish: () => {
-            if (data.cowTransformed && window.playSound) {
-                window.playSound('krowaSound');
-            }
-            const myNrDraw = data.northernRealmsDraw && (isPlayer1Local ? data.northernRealmsDraw.p1 : data.northernRealmsDraw.p2);
-            if (myNrDraw) {
-                showPrzejscie('t11', { onFinish: () => {
+        showPrzejscie('t05', {
+            onFinish: () => {
+                if (data.cowTransformed && window.playSound) {
+                    window.playSound('krowaSound');
+                }
+                const myNrDraw = data.northernRealmsDraw && (isPlayer1Local ? data.northernRealmsDraw.p1 : data.northernRealmsDraw.p2);
+                if (myNrDraw) {
+                    showPrzejscie('t11', {
+                        onFinish: () => {
+                            const isMyTurn = currentTurn === window.socket.id;
+                            showPrzejscie(isMyTurn ? 't07' : 't08');
+                        }
+                    });
+                } else {
                     const isMyTurn = currentTurn === window.socket.id;
                     showPrzejscie(isMyTurn ? 't07' : 't08');
-                }});
-            } else {
-                const isMyTurn = currentTurn === window.socket.id;
-                showPrzejscie(isMyTurn ? 't07' : 't08');
+                }
             }
-        }});
+        });
     });
 
     socket.on('board-clearing', (data) => {
@@ -1206,15 +1304,17 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         // Usuń ekran końcowy i zresetuj stan gry
         const endScreen = document.getElementById('end-game-screen');
         if (endScreen) endScreen.remove();
-        
+
         // Reset lokalnego stanu
         roundScoresHistory = [];
         playerHand = [];
         drawPile = [];
         playerGraveyard = [];
         opponentGraveyard = [];
-        boardState = { p1R1: [], p1R2: [], p1R3: [], p2R1: [], p2R2: [], p2R3: [],
-            p1S1: null, p1S2: null, p1S3: null, p2S1: null, p2S2: null, p2S3: null };
+        boardState = {
+            p1R1: [], p1R2: [], p1R3: [], p2R1: [], p2R2: [], p2R3: [],
+            p1S1: null, p1S2: null, p1S3: null, p2S1: null, p2S2: null, p2S3: null
+        };
         playerLives = 2;
         opponentLives = 2;
         playerPassed = false;
@@ -1229,7 +1329,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         window.arrivedBoardCards = new Set();
         window.proposedCard = null;
         window.mulliganFinished = false;
-        
+
         // Poproś o nowy stan gry
         socket.emit('get-game-state', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
     });
@@ -1265,18 +1365,18 @@ function handleScoiaDecision(socket, gameCode, deciderId) {
         title.textContent = 'Kto rozpoczyna grę?';
 
         const btnsBox = document.createElement('div');
-        
+
         const btnFirst = document.createElement('button');
         btnFirst.className = 'scoia-btn';
         btnFirst.textContent = 'Będę zaczynać ja';
-        
+
         const btnSecond = document.createElement('button');
         btnSecond.className = 'scoia-btn';
         btnSecond.textContent = 'Przeciwnik zaczyna';
 
         let timerText = document.createElement('div');
         timerText.id = 'scoia-decision-timer';
-        
+
         box.appendChild(title);
         btnsBox.appendChild(btnFirst);
         btnsBox.appendChild(btnSecond);
@@ -1287,7 +1387,7 @@ function handleScoiaDecision(socket, gameCode, deciderId) {
 
         let timeLeft = 10;
         timerText.textContent = `Pozostały czas: ${timeLeft}s`;
-        
+
         const makeDecision = (startFirst) => {
             if (scoiaTimerInterval) clearInterval(scoiaTimerInterval);
             socket.emit('scoia-decision-made', { gameCode, startFirst });
@@ -1342,7 +1442,7 @@ export function renderAll(nick) {
     if (nick) currentNick = nick;
     const overlay = document.querySelector('#gameScreen .overlay');
     if (!overlay) return;
-    
+
     // Nie usuwamy wszystkiego (overlay.innerHTML = ''), 
     // aby zachować kontenery i umożliwić animacje CSS.
     // Zamiast tego usuwamy tylko nie-persystentne elementy
@@ -1390,11 +1490,11 @@ function renderProposedCard(overlay) {
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const card = window.proposedCard;
-    const dkartaW = 523 * scale; 
+    const dkartaW = 523 * scale;
     const dkartaH = 992 * scale;
 
     const isNew = (!wrapper || window._activeProposedId !== card._id);
-    
+
     if (!wrapper) {
         wrapper = document.createElement('div');
         wrapper.id = 'proposed-card-preview';
@@ -1420,9 +1520,9 @@ function renderProposedCard(overlay) {
         wrapper.style.height = `${window.lastProposedStartRect.height}px`;
         wrapper.style.transform = 'none';
         wrapper.style.opacity = '0.5';
-        
+
         wrapper.offsetHeight; // force reflow
-        
+
         wrapper.style.transition = 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
         wrapper.style.left = `${targetLeft}px`;
         wrapper.style.top = `${targetTop}px`;
@@ -1439,7 +1539,7 @@ function renderProposedCard(overlay) {
     }
 
     wrapper.style.boxShadow = `0 0 ${40 * scale}px rgba(199, 167, 110, 0.8)`;
-    
+
     const factionId = window.playerFaction || '1';
     wrapper.innerHTML = renderCardHTML(card, { playerFaction: factionId, isLargeView: true });
 
@@ -1529,7 +1629,7 @@ function calculateScores() {
                     rowDict[card.numer] = { count: 0, card: card };
                 }
                 rowDict[card.numer].count++;
-                
+
                 // Morale buff (liczymy wszystkie jednostki z morale w rzędzie prócz bohaterów)
                 if (!card.bohater && card.moc === 'morale') moraleCount++;
                 // Róg jednostki w rzędzie
@@ -1551,13 +1651,13 @@ function calculateScores() {
                 if (c.moc === 'wiez') {
                     const bKey = `${rowKey}_${c.numer}`;
                     const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
-                    
+
                     // Jeśli mnożnik nie jest jeszcze aktywny (trwa animacja), 
                     // używamy poprzedniej liczby kart (aby utrzymać stary stan punktowy)
-                    const effectiveCount = (window.bondMultiplierActive || prevCount >= count) 
-                        ? count 
+                    const effectiveCount = (window.bondMultiplierActive || prevCount >= count)
+                        ? count
                         : Math.max(1, prevCount);
-                        
+
                     if (effectiveCount > 1) pts *= effectiveCount;
                 }
 
@@ -1660,18 +1760,18 @@ function renderLives(overlay) {
  */
 export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore = null) {
     if (typeof card.punkty !== 'number') return;
-    
+
     const cardScale = cardW / 180;
-    
+
     const pointsDiv = document.createElement('div');
     pointsDiv.className = 'card-points-overlay';
     pointsDiv.style.position = 'absolute';
     pointsDiv.style.left = `${30 * cardScale}px`;
     pointsDiv.style.top = `${30 * cardScale}px`;
     pointsDiv.style.transform = 'translate(-50%, -50%)';
-    pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif'; 
+    pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
     pointsDiv.style.fontSize = `${44 * cardScale}px`;
-    
+
     // Logika kolorowania punktów (proponowana przez GURU)
     const actualScore = effectiveScore !== null ? effectiveScore : card.punkty;
     let baseColor = card.bohater ? '#fcfdfc' : '#000000';
@@ -1683,14 +1783,14 @@ export function addCardPointsOverlay(wrapper, card, cardW, cardH, effectiveScore
             baseColor = '#942020'; // czerwony - osłabienie
         }
     }
-    
+
     pointsDiv.style.color = baseColor;
     pointsDiv.style.textShadow = card.bohater ? '0 1px 3px rgba(0,0,0,0.8)' : '0 1px 2px rgba(255,255,255,0.3)';
     pointsDiv.style.pointerEvents = 'none';
     pointsDiv.style.zIndex = '3';
     pointsDiv.style.lineHeight = '1';
     pointsDiv.textContent = actualScore;
-    
+
     wrapper.appendChild(pointsDiv);
 
     // Jeśli bohater, dodajemy ikonkę tarczy po lewo od punktów (lub na pod punkty)
@@ -1769,7 +1869,7 @@ function renderHand() {
     playerHand.forEach((card, i) => {
         const isProposed = window.proposedCard === card;
         let wrapper = container.querySelector(`.hand-card-img[data-id="${card._id}"]`);
-        
+
         if (!wrapper) {
             wrapper = document.createElement('div');
             wrapper.className = 'hand-card-img';
@@ -1778,7 +1878,7 @@ function renderHand() {
             wrapper.style.position = 'absolute';
             wrapper.style.cursor = 'pointer';
             wrapper.style.transition = 'transform 0.2s ease-out, top 0.2s ease-out';
-            
+
             const img = document.createElement('img');
             img.src = card.karta;
             img.style.width = '100%';
@@ -1887,8 +1987,8 @@ function playCardAtIndex(index) {
     // Proste zagranie bez potwierdzenia (np. z klawiatury)
     isProcessingMove = true;
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo", "manek", "porz"].includes(card.moc);
-    let posToPlay = card.pozycja || 1; 
-    
+    let posToPlay = card.pozycja || 1;
+
     // Fallback dla agile (4) -> na przód (1)
     if (!isSpecial && posToPlay === 4) posToPlay = 1;
 
@@ -1997,7 +2097,7 @@ function renderGraveyards(overlay) {
             const cardObj = cardList[i];
             const cardW = 179 * scale;
             const cardH = 239 * scale;
-            
+
             const wrapper = document.createElement('div');
             wrapper.style.position = 'absolute';
             wrapper.style.left = `${(x - i) * scale + boardLeft}px`;
@@ -2056,7 +2156,7 @@ function confirmPlayProposed(targetData = {}) {
     // --- NOWA LOGIKA ANIMACJI ZIP Z SERWERA ---
     // Natychmiast emitujemy zagranie do serwera. Serwer odpowie board-updated,
     // który uruchomi handleCardAnimationSequence i właściwy dolot karty do zarezerwowanego slota.
-    
+
     // Zostawiamy element podglądu nietknięty (zostanie ukryty w handleCardAnimationSequence),
     // żeby animacja gracza miała punkt startowy.
     window.socket.emit('play-card', {
@@ -2071,7 +2171,7 @@ function confirmPlayProposed(targetData = {}) {
 
     const handIdx = playerHand.findIndex(c => c._id === card._id);
     if (handIdx !== -1) playerHand.splice(handIdx, 1);
-    
+
     window.proposedCard = null;
     renderAll(currentNick);
 }
@@ -2156,7 +2256,7 @@ function renderRows(overlay) {
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const isP1 = isPlayer1Local;
-    
+
     const renderRowCards = (rowKey, coords) => {
         const cardsInRowNumers = boardState[rowKey] || [];
         const count = cardsInRowNumers.length;
@@ -2195,7 +2295,7 @@ function renderRows(overlay) {
 
             // Logika walidacji rzędu
             const isWeather = ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(pCard.moc);
-            const isHornSpecial = (pCard.typ === 'specjalna' && pCard.moc === 'rog');
+            const isHornSpecial = (pCard.typ === 'specjalna' && pCard.moc === 'rog') || isSpecialSlotCard(pCard);
             const isPorz = (pCard.moc === 'porz');      // Porzoga ogólna
             const isIporz = (pCard.moc === 'iporz');     // Porzoga rzędowa
 
@@ -2208,7 +2308,7 @@ function renderRows(overlay) {
                 // Porzoga rzędowa (iporz): karta jednostki trafia na WŁASNY rząd o tej samej pozycji co karta
                 // pozycja karty iporz determinuje dostępny rząd
                 isValidRow = isMySide && (parseInt(rowKey.slice(-1)) === pCard.pozycja);
-            // WYJĄTEK JASKIER/INNI Z ROGIEM JEDNOSTKI
+                // WYJĄTEK JASKIER/INNI Z ROGIEM JEDNOSTKI
             } else if (pCard.moc === 'rog_jednostki' || pCard.numer === '021' || pCard.numer === '522') {
                 isValidRow = isMySide && (parseInt(rowKey.slice(-1)) === pCard.pozycja);
             }
@@ -2305,10 +2405,10 @@ function renderRows(overlay) {
                     if (card.moc === 'wiez') {
                         const bKey = `${rowKey}_${card.numer}`;
                         const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
-                        const effectiveCount = (window.bondMultiplierActive || prevCount >= bondCnt) 
-                            ? bondCnt 
+                        const effectiveCount = (window.bondMultiplierActive || prevCount >= bondCnt)
+                            ? bondCnt
                             : Math.max(1, prevCount);
-                            
+
                         if (effectiveCount > 1) cardScore *= effectiveCount;
                     }
                     // Morale i Rogi
@@ -2329,14 +2429,14 @@ function renderRows(overlay) {
                 }
 
                 addCardPointsOverlay(wrapper, card, cardW, cardH, cardScore);
-                
+
                 // Obsługa manekina (tylko na swoje karty nie-bohaterów, wyłączając specjalne 000-008)
-                const EXCLUDED_DECOY = ['000','001','002','003','004','005','006','007','008'];
-                const isManekinTargetValid = window.proposedCard && 
-                                            window.proposedCard.moc === 'manek' && 
-                                            !card.bohater && 
-                                            !EXCLUDED_DECOY.includes(String(card.numer)) &&
-                                            rowKey.startsWith(isP1 ? 'p1' : 'p2');
+                const EXCLUDED_DECOY = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
+                const isManekinTargetValid = window.proposedCard &&
+                    window.proposedCard.moc === 'manek' &&
+                    !card.bohater &&
+                    !EXCLUDED_DECOY.includes(String(card.numer)) &&
+                    rowKey.startsWith(isP1 ? 'p1' : 'p2');
 
                 if (isManekinTargetValid) {
                     wrapper.style.cursor = 'pointer';
@@ -2379,8 +2479,11 @@ function renderRows(overlay) {
         slot.style.width = `${179 * scale}px`;
         slot.style.height = `${239 * scale}px`;
 
+        const num = boardState[`${sidePrefix}S${rowIdx}`];
+        const isSlotEmpty = !num;
+
         const isMyTurn = (currentTurn === window.socket.id);
-        if (isMyTurn && window.proposedCard && window.proposedCard.typ === 'specjalna' && window.proposedCard.moc === 'rog' && sidePrefix === (isP1 ? 'p1' : 'p2')) {
+        if (isMyTurn && window.proposedCard && isSpecialSlotCard(window.proposedCard) && sidePrefix === (isP1 ? 'p1' : 'p2') && isSlotEmpty) {
             slot.style.backgroundColor = 'rgba(199, 167, 110, 0.4)';
             slot.style.cursor = 'pointer';
             slot.onclick = (e) => {
@@ -2394,7 +2497,6 @@ function renderRows(overlay) {
         }
 
         slot.innerHTML = '';
-        const num = boardState[`${sidePrefix}S${rowIdx}`];
         if (num) {
             const card = cards.find(c => c.numer === num);
             if (card) {
@@ -2449,7 +2551,7 @@ function renderPiles(overlay) {
             const pile = document.createElement('img');
             pile.src = reverseSrc;
             pile.style.position = 'absolute';
-            pile.style.left = `${(x - i) * scale + boardLeft}px`; 
+            pile.style.left = `${(x - i) * scale + boardLeft}px`;
             pile.style.top = `${(y - i) * scale + boardTop}px`;
             pile.style.width = `${175 * scale}px`;
             pile.style.height = `${300 * scale}px`;
@@ -2580,7 +2682,7 @@ function collectCardsOnBoardDOM(isOpponent) {
 
 function handleRoundEnd(data) {
     const { roundResult, p1Lives, p2Lives } = data;
-    
+
     // Play win/draw sounds
     if (window.playSound) {
         if (roundResult === 'draw') {
@@ -2596,7 +2698,7 @@ function handleRoundEnd(data) {
     const myBoardCards = collectCardsOnBoardDOM(false);
     const oppBoardCards = collectCardsOnBoardDOM(true);
 
-    let bannerCode = 't24'; 
+    let bannerCode = 't24';
     if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23';
     else if (winner) bannerCode = 't22';
 
@@ -2732,7 +2834,7 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
         const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
         const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
         const boardTop = (window.innerHeight - GUI_HEIGHT * scale) / 2;
-        
+
         innerEl.style.left = boardLeft + 'px';
         innerEl.style.top = boardTop + 'px';
         innerEl.style.transform = `scale(${scale})`;
@@ -2742,7 +2844,7 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
 
     const resultImgSrc = localResult === 'win' ? 'assets/asety/win.webp'
         : localResult === 'loss' ? 'assets/asety/lost.webp'
-        : 'assets/asety/remis.webp';
+            : 'assets/asety/remis.webp';
 
     const resultImg = document.createElement('img');
     resultImg.src = resultImgSrc;
@@ -2754,9 +2856,9 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
     inner.appendChild(resultImg);
 
     const resultTextMap = {
-        win:  { text: 'ZWYCIĘSTWO!', color: '#d19c59' },
-        loss: { text: 'Porażka',     color: '#9b2424' },
-        draw: { text: 'Remis',       color: '#7b7b7b' }
+        win: { text: 'ZWYCIĘSTWO!', color: '#d19c59' },
+        loss: { text: 'Porażka', color: '#9b2424' },
+        draw: { text: 'Remis', color: '#7b7b7b' }
     };
     const rtInfo = resultTextMap[localResult];
     const resultText = document.createElement('div');
@@ -2785,8 +2887,8 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
 
     const fontNormal = "'PFDinTextCondPro', sans-serif";
     const fontBold = "'PFDinTextCondPro-Bold', sans-serif";
-    
-    const renderTableText = (text, xCent, yCent, color, size, align='center', customFontFam=fontNormal) => {
+
+    const renderTableText = (text, xCent, yCent, color, size, align = 'center', customFontFam = fontNormal) => {
         const d = document.createElement('div');
         d.style.cssText = `
             position: absolute;
@@ -2796,11 +2898,11 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
             font-size: ${size}px;
             color: ${color};
         `;
-        
+
         const innerSpan = document.createElement('span');
         innerSpan.textContent = text;
         innerSpan.style.position = 'absolute';
-        
+
         if (align === 'center') {
             innerSpan.style.left = `${xCent}px`;
             innerSpan.style.transform = 'translate(-50%, -50%)';
@@ -2808,7 +2910,7 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
             innerSpan.style.right = `${3840 - xCent}px`;
             innerSpan.style.transform = 'translate(0, -50%)';
         }
-        
+
         d.appendChild(innerSpan);
         tableDiv.appendChild(d);
     };
@@ -2818,9 +2920,9 @@ function showEndGameScreen(gameResult, myNick, oppNick) {
     renderTableText('Runda 2', 1949, headerY, '#736f6f', 38, 'center');
     renderTableText('Runda 3', 2422, headerY, '#736f6f', 38, 'center');
 
-    const myY = 1417; 
+    const myY = 1417;
     renderTableText(myNick, 1100, myY, '#c29f5a', 45, 'right', fontBold);
-    
+
     const oppY = 1574;
     renderTableText(oppNick, 1100, oppY, '#c29f5a', 45, 'right', fontBold);
 

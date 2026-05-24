@@ -482,9 +482,44 @@ function registerClassicGwentEvents(socket, io, games) {
 
                 if (isWeather) {
                     if (!state.board.weather) state.board.weather = [];
+                    
+                    let weatherReplaced = [];
+                    const newMoc = cardObj.moc;
+
+                    if (newMoc === 'sztorm') {
+                        // Sztorm zastępuje deszcz i mgłę (i samego siebie jeśli był)
+                        for (let i = state.board.weather.length - 1; i >= 0; i--) {
+                            const wStr = state.board.weather[i];
+                            const wNum = wStr.split('-')[1];
+                            const wCard = cards.find(c => String(c.numer) === String(wNum));
+                            if (wCard && (wCard.moc === 'deszcz' || wCard.moc === 'mgla' || wCard.moc === 'sztorm')) {
+                                weatherReplaced.push(wStr);
+                                state.board.weather.splice(i, 1);
+                                const parts = wStr.split('-');
+                                if (parts[0] === 'p1') state.p1Graveyard.push(parts[1]);
+                                else state.p2Graveyard.push(parts[1]);
+                            }
+                        }
+                    } else if (newMoc !== 'niebo') {
+                        // Inne (mroz, deszcz, mgla) zastępują same siebie
+                        for (let i = state.board.weather.length - 1; i >= 0; i--) {
+                            const wStr = state.board.weather[i];
+                            const wNum = wStr.split('-')[1];
+                            const wCard = cards.find(c => String(c.numer) === String(wNum));
+                            if (wCard && wCard.moc === newMoc) {
+                                weatherReplaced.push(wStr);
+                                state.board.weather.splice(i, 1);
+                                const parts = wStr.split('-');
+                                if (parts[0] === 'p1') state.p1Graveyard.push(parts[1]);
+                                else state.p2Graveyard.push(parts[1]);
+                            }
+                        }
+                    }
+
                     // Trzymamy z side, aby wiedzieć czyj cmentarz
                     state.board.weather.push(`${side}-${cardNumer}`);
                     hand.splice(cardIdx, 1);
+                    state.weatherReplaced = weatherReplaced; // Przekazujemy do animacji
 
                     targetRow = 'weather';
 
@@ -493,6 +528,7 @@ function registerClassicGwentEvents(socket, io, games) {
                             const gInfo = games[gameCode];
                             if (gInfo && gInfo.gameState && gInfo.gameState.board.weather) {
                                 const gs = gInfo.gameState;
+                                let weatherCleared = [...gs.board.weather];
                                 gs.board.weather.forEach(wStr => {
                                     const parts = wStr.split('-');
                                     const wOwner = parts[0];
@@ -502,7 +538,7 @@ function registerClassicGwentEvents(socket, io, games) {
                                 });
                                 gs.board.weather = [];
                                 
-                                io.to(gameCode).emit('board-updated', { // Re-sync po wyczyszczeniu
+                                io.to(gameCode).emit('board-updated', {
                                     board: gs.board,
                                     currentTurn: gs.currentTurn,
                                     p1HandCount: gs.p1Hand.length,
@@ -513,9 +549,10 @@ function registerClassicGwentEvents(socket, io, games) {
                                     p2Passed: gs.p2Passed,
                                     p1Graveyard: gs.p1Graveyard,
                                     p2Graveyard: gs.p2Graveyard,
+                                    weatherCleared: weatherCleared, // Informacja dla klienta co zniknęło
                                 });
                             }
-                        }, 1500);
+                        }, 2000); // 2 sekundy na wybrzmienie dźwięku nieba
                     }
                 } else if (cardObj.moc === 'porz') {
                     // Porzoga ogólna: specjalna karta która NIE zostaje na planszy
@@ -750,14 +787,16 @@ function registerClassicGwentEvents(socket, io, games) {
                     lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
                     porzogaDestroyed: scorchDestroyed || [],
                     decoyDetails: state.decoyDetails || null,
+                    weatherReplaced: state.weatherReplaced || [],
                     targetSlot: (targetRow && state.board[targetRow]) ? {
                         row: targetRow,
                         index: Array.isArray(state.board[targetRow]) ? state.board[targetRow].lastIndexOf(cardNumer) : -1
                     } : null
                 });
 
-                // Reset decoyDetails after sync
+                // Reset temporary states
                 state.decoyDetails = null;
+                state.weatherReplaced = null;
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
                 const targetId = isPlayer1 ? game.player2 : game.player1;
