@@ -1,0 +1,27 @@
+{
+  "title.web": "Gwent Menu - Información",
+
+  "title.me": "Información - El sitio está en desarrollo, última actualización",
+  "sub.title.me1": "En general hago esta página por diversión, y si hay errores o algo, perdón xD, no sé programar. Toda la parte de programación la hicieron Grok, Copilot y Gemini (GPT no sabe programar), yo solo hago los gráficos y programación simple (estoy aprendiendo).",
+  "sub.title.me2": "Aquí tienes de dónde sale cada cosa:",
+  "sub.title.me3": "Fondos del menú: sacados del art book que está en la carpeta de The Witcher 3",
+  "sub.title.me4": "Esa barra negra: de un vídeo",
+  "sub.title.me5": "Sonidos sacados directamente del juego.",
+  "sub.title.me6": "Fuente",
+  "sub.title.me7": "Las cartas y todos los assets que ya están en el juego están tomados de The Witcher 3",
+  "sub.title.me8": "Todo lo que no está tomado de The Witcher lo he hecho yo",
+
+  "title.dis": "Aviso legal / Disclaimer",
+  "sub.title.dis1": "Este sitio web y el juego disponible en él son un <strong>proyecto no oficial de fans</strong> creado únicamente con fines de afición.",
+  "sub.title.dis2": "El juego utiliza <strong>assets originales</strong> (gráficos, cartas, sonidos, etc.) de <em>The Witcher 3: Wild Hunt</em> (Gwent), que son propiedad exclusiva de <strong>CD PROJEKT RED</strong>. Algunos assets (iconos, fondos, elementos de la interfaz, etc.) fueron creados por el autor de este proyecto.",
+  "sub.title.dis3": "En la versión clásica el juego reproduce la mecánica de Gwent de <em>The Witcher 3</em>. En las variantes adicionales (p. ej. 1v1v1v1, mix de cartas) solo la mecánica general de cartas está inspirada en el Gwent original; el resto de reglas, equilibrio y jugabilidad es original.",
+  "sub.title.dis4": "Este proyecto <strong>no está aprobado</strong> ni afiliado con CD PROJEKT RED. No sustituye el oficial <em>Gwent: The Witcher Card Game</em>.",
+  "sub.title.dis5": "El sitio es en su mayor parte <strong>no comercial</strong>. Cualquier ingreso proviene únicamente de anuncios no invasivos colocados a un lado de la pantalla y sirve solo para cubrir los costes del servidor (aprox. 30–40 PLN al mes). No hay muros de pago, microtransacciones ni ningún requisito de pagar para jugar. (actualmente solo pago el dominio)",
+  "sub.title.dis6": "Si CD PROJEKT RED u otro titular legítimo considera que este proyecto infringe sus derechos de propiedad intelectual, estoy dispuesto a eliminar o modificar adecuadamente el sitio de inmediato a su solicitud.",
+  "sub.title.dis7": "El uso del sitio es bajo tu propia responsabilidad.",
+
+  "Last": "© CD PROJEKT RED. The Witcher®, Gwent y todas las marcas comerciales y materiales relacionados son propiedad de CD PROJEKT RED. Todos los derechos reservados.",
+
+  "Back": "Volver",
+  "link": "ENLACE"
+}

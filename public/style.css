@@ -852,3 +852,26 @@ body {
         text-align: center;
     }
 }
+
+/* ===== Przełącznik języków ===== */
+.lang-switcher {
+    position: fixed;   /* zawsze w tym samym miejscu */
+    bottom: 20px;   /* 20px od dołu */
+    left: 20px;   /* 20px od lewej */
+    display: flex;
+    gap: 10px;   /* odstęp między flagami */
+    z-index: 9999;    /* nad wszystkimi innymi elementami */
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px 12px;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+}
+
+.lang-flag {
+    width: 50px;   /* połowa oryginalnego rozmiaru (było 100x61) */
+    height: auto;  /* zachowuje proporcje */
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}

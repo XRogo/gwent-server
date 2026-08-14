@@ -1,3 +1,70 @@
+// ========== SYSTEM JĘZYKÓW (i18n) ==========
+
+let currentLang = localStorage.getItem('lang') || 'pl';
+let translations = {};
+
+async function loadLanguage(lang) {
+    try {
+        const response = await fetch(`/locales/${lang}.json`);
+        if (!response.ok) throw new Error('Nie znaleziono pliku języka');
+
+        translations = await response.json();
+        currentLang = lang;
+        localStorage.setItem('lang', lang);
+        document.documentElement.lang = lang;
+
+        refreshAllTranslations();   // ← zamiast samego applyTranslations()
+
+    } catch (error) {
+        console.error('Błąd ładowania języka:', error);
+        if (lang !== 'pl') loadLanguage('pl');
+    }
+}
+
+function t(key) {
+    return translations[key] || key;
+}
+
+function applyTranslations() {
+
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        element.textContent = t(key);
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        element.placeholder = t(key);
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        el.title = t(el.getAttribute('data-i18n-title'));
+    });
+
+    document.querySelectorAll('[data-i18n-img]').forEach(el => {
+        const template = el.getAttribute('data-i18n-img');
+        el.src = template.replace('{lang}', currentLang);
+    });
+}
+
+function refreshAllTranslations() {
+    applyTranslations();          // data-i18n, data-i18n-title, placeholder itd.
+
+    // Odśwież dynamiczne teksty trybów
+    if (typeof initModeCarousel === 'function') {
+        initModeCarousel();
+    }
+
+    // Odśwież aktualny opis trybu
+    if (typeof selectedModeIndex !== 'undefined' && tryby[selectedModeIndex]) {
+        const mode = tryby[selectedModeIndex];
+        const descEl = document.getElementById('modePreviewText');
+        if (descEl) descEl.textContent = t(mode.opis);
+    }
+}
+
+// ========== KONIEC SYSTEMU JĘZYKÓW ==========
+
 const socket = io();
 
 const mainMenu = document.getElementById('mainMenu');
@@ -23,35 +90,35 @@ function showToast(message, duration = 3000) {
     toast.className = 'toast';
     toast.textContent = message;
     container.appendChild(toast);
-    
+
     // Force reflow
     toast.offsetHeight;
     toast.classList.add('show');
-    
+
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
     }, duration);
 }
 
-window.copyCodeToClipboard = function() {
+window.copyCodeToClipboard = function () {
     if (!currentGameCode) return;
     navigator.clipboard.writeText(currentGameCode).then(() => {
         showToast("SKOPIOWANO KOD: " + currentGameCode);
     });
 }
 
-window.pasteCodeFromClipboard = function() {
+window.pasteCodeFromClipboard = function () {
     navigator.clipboard.readText().then(text => {
         const clean = text.trim();
         if (clean.length === 6 && /^\d+$/.test(clean)) {
             document.getElementById('sideCodeInput').value = clean;
-            showToast("WKLEJONO KOD");
+            showToast(t("toast.pasted"));
         } else {
-            showToast("BRAK DANYCH DO WKLEJENIA");
+            showToast(t("toast.null.data"));
         }
     }).catch(() => {
-        showToast("BRAK DOSTĘPU DO SCHOWKA");
+        showToast(t("toast.no_clipboard"));
     });
 }
 
@@ -81,47 +148,47 @@ function getCookie(name) {
 }
 
 // Transient session nickname confirmation
-window.confirmNickname = function() {
+window.confirmNickname = function () {
     const nick = document.getElementById('nicknameInput').value.trim();
     if (!nick) {
-        showToast("WPISZ NICK");
+        showToast(t("toast.enter_nick"));
         return;
     }
-    
+
     // Notify server/opponent
     if (currentGameCode) {
         socket.emit('set-nickname', { gameCode: currentGameCode, isPlayer1, nickname: nick });
-        showToast("POTWIERDZONO NICK: " + nick);
+        showToast(t("toast.nick_confirmed") + nick);
     } else {
-        showToast("NICK USTAWIONY LOKALNIE");
+        showToast(t("toast.nick_confirmed") + nick);
     }
     updateNicknameFading();
 };
 
 // Persistent cookie save
-window.saveNicknamePersistent = function() {
+window.saveNicknamePersistent = function () {
     const nick = document.getElementById('nicknameInput').value.trim();
     if (!nick) {
-        showToast("WPISZ NICK");
+        showToast(t("toast.enter_nick"));
         return;
     }
     setCookie('gwent_nickname', nick);
-    showToast("ZAPISANO NICK NA STAŁE: " + nick);
-    
+    showToast(t("toast.nick_saved"));
+
     // Also confirm session change
     confirmNickname();
 };
 
 // Cookie Consent Handlers
-window.acceptCookies = function() {
+window.acceptCookies = function () {
     localStorage.setItem('gwent_cookies_accepted', 'true');
     document.getElementById('cookieBanner').style.display = 'none';
-    showToast("ZAAKCEPTOWANO COOKIES");
+    showToast(t("toast.cookies_accepted"));
 };
 
-window.rejectCookies = function() {
+window.rejectCookies = function () {
     document.getElementById('cookieBanner').style.display = 'none';
-    showToast("COOKIES ODRZUCONE (BRAK ZAPISU)");
+    showToast(t("toast.cookies_rejected"));
 };
 
 function checkCookieConsent() {
@@ -134,7 +201,7 @@ function checkCookieConsent() {
 const addHoverSound = (selector) => {
     document.querySelectorAll(selector).forEach(el => {
         el.addEventListener('mouseenter', () => {
-            new Audio('assets/hover-sound.mp3').play().catch(() => {});
+            new Audio('assets/hover-sound.mp3').play().catch(() => { });
         });
     });
 };
@@ -142,7 +209,10 @@ const addHoverSound = (selector) => {
 function showSidePanel() {
     sidePanel.classList.add('active');
     triggerCanvasResize();
-    setTimeout(fitMenuToScreen, 100); // Pozwala animacji CSS zaktualizować szerokość
+    setTimeout(fitMenuToScreen, 100); // Pozwala animacji CSS zaktualizować szerokość  
+    setTimeout(() => {
+    refreshAllTranslations();
+    }, 50); 
 }
 
 function showHostScreen() {
@@ -150,6 +220,10 @@ function showHostScreen() {
     // Nie tworzymy gry od razu - czekamy na kliknięcie Generuj w UI
     showSidePanel();
     updateSetupUI();
+    initModeCarousel();
+    setTimeout(() => {
+    refreshAllTranslations();
+    }, 50); 
 }
 
 /* ========================================================
@@ -170,11 +244,11 @@ window.addEventListener('resize', () => {
 function fitMenuToScreen() {
     const container = document.querySelector('.content-container');
     if (!container) return;
-    
+
     // Resetuj skale do 1 przed pomiarem, zeby uniknac nieskończonych wyjatkow
     container.style.transform = `translateX(-50%) scale(1)`;
     container.offsetHeight; // force reflow
-    
+
     const w = container.scrollWidth;
     if (w > window.innerWidth) {
         const scale = window.innerWidth / w;
@@ -184,15 +258,15 @@ function fitMenuToScreen() {
 
 function triggerCanvasResize() {
     if (!bgImg.complete || bgImg.naturalWidth === 0) return;
-    
+
     const natW = bgImg.naturalWidth;
     const natH = bgImg.naturalHeight;
     const curW = bgImg.clientWidth;
-    
+
     // Pixel canvas matches natural dimensions of the image
     canvas.style.width = natW + 'px';
     canvas.style.height = natH + 'px';
-    
+
     // Scale it down to match the rendered width
     const scale = curW / natW;
     canvas.style.transform = `scale(${scale})`;
@@ -201,25 +275,25 @@ function triggerCanvasResize() {
 function initModeCarousel() {
     const carousel = document.getElementById('modeCarousel');
     carousel.innerHTML = '';
-    
+
     tryby.forEach((mode, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'kafelek-wrapper';
-        
+
         const item = document.createElement('div');
         item.className = 'carousel-kafelek';
         item.style.backgroundImage = `url('assets/${mode.ikona}')`;
         item.style.zIndex = index + 1;
         item.onclick = () => selectGameMode(index);
-        
+
         const text = document.createElement('div');
         text.className = 'carousel-kafelek-hover-text';
-        text.textContent = mode.nazwa;
-        
+        text.textContent = t(mode.nazwa);
+
         item.appendChild(text);
         wrapper.appendChild(item);
         carousel.appendChild(wrapper);
-        
+
         // Add separator if not last
         if (index < tryby.length - 1) {
             const separator = document.createElement('img');
@@ -236,7 +310,7 @@ function initModeCarousel() {
 function selectGameMode(index) {
     selectedModeIndex = index;
     const mode = tryby[index];
-    
+
     // Update active class
     const items = document.querySelectorAll('.carousel-kafelek');
     items.forEach((item, i) => {
@@ -245,11 +319,11 @@ function selectGameMode(index) {
     });
 
     // Update texts and images
-    document.getElementById('modePreviewText').textContent = mode.opis;
-    
+    document.getElementById('modePreviewText').textContent = t(mode.opis);
+
     const imgElement = document.getElementById('modePreviewImg');
     if (mode.obraz) {
-        imgElement.src = `assets/${mode.obraz}`; 
+        imgElement.src = `assets/${mode.obraz}`;
     } else {
         imgElement.src = 'assets/work in prognres.png'; // Fallback
     }
@@ -257,7 +331,7 @@ function selectGameMode(index) {
     // Status logic (Stan 1, 2, 3)
     const conceptOverlay = document.getElementById('conceptOverlay');
     const betaStatusLabel = document.getElementById('betaStatusLabel');
-    
+
     if (mode.stan === 3) {
         conceptOverlay.style.display = 'flex';
         betaStatusLabel.style.display = 'none';
@@ -287,9 +361,8 @@ function updateNicknameFading() {
 
 // Initialize when DOM loads
 document.addEventListener('DOMContentLoaded', () => {
-    initModeCarousel();
     addHoverSound('.menu-button, .carousel-kafelek, .side-back-button, .game-btn');
-    
+
     const nickInput = document.getElementById('nicknameInput');
 
     // Load from cookie or random (filter "test")
@@ -324,6 +397,18 @@ document.addEventListener('DOMContentLoaded', () => {
     checkCookieConsent();
     setTimeout(fitMenuToScreen, 100);
     checkMobileOrientation();
+    loadLanguage(currentLang);
+
+    // ===== PRZEŁĄCZNIK JĘZYKÓW =====
+    // Nasłuchiwanie kliknięć w flagi
+    document.querySelectorAll('.lang-flag').forEach(flag => {
+        flag.addEventListener('click', () => {
+            const selectedLang = flag.dataset.lang;
+            if (selectedLang !== currentLang) {
+                loadLanguage(selectedLang);
+        }
+    });
+});
 });
 
 function checkMobileOrientation() {
@@ -333,33 +418,33 @@ function checkMobileOrientation() {
     }
 }
 
-window.closeWarning = function() {
+window.closeWarning = function () {
     document.getElementById('mobileWarning').style.display = 'none';
 }
 
-window.setupMobileGame = function() {
+window.setupMobileGame = function () {
     // 1. Wejdz w fullscreen (wymagane dla Screen Orientation API)
     const docEl = document.documentElement;
     const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-    
+
     if (requestFullScreen) {
         requestFullScreen.call(docEl).then(() => {
             // 2. Proba wymuszenia orientacji poziomej
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(err => {
-                    console.log("Nie udało się zablokować orientacji: ", err);
-                    showToast("OBRÓĆ EKRAN RĘCZNIE");
+                    console.log(t("toast.orjent"), err);
+                    showToast(t("toast.obr_ren"));
                 });
             }
             updateFsIcon();
             closeWarning();
         }).catch(() => {
-            showToast("BŁĄD PEŁNEGO EKRANU");
+            showToast(t("toast.error.fullscreen"));
         });
     }
 }
 
-window.toggleFullScreen = function() {
+window.toggleFullScreen = function () {
     const doc = window.document;
     const docEl = doc.documentElement;
     const fsIcon = document.getElementById('fsIcon');
@@ -397,11 +482,11 @@ function handleCountdown() {
     if (isP1Ready && isP2Ready) {
         if (!countdownInterval) {
             let seconds = 5;
-            display.textContent = `START ZA: ${seconds}s`;
+            display.textContent = (t("toast.start").replace("{seconds}", seconds));
             countdownInterval = setInterval(() => {
                 seconds--;
                 if (seconds > 0) {
-                    display.textContent = `START ZA: ${seconds}s`;
+                    display.textContent = (t("toast.start").replace("{seconds}", seconds));
                 } else {
                     clearInterval(countdownInterval);
                     countdownInterval = null;
@@ -434,11 +519,11 @@ function updateSetupUI() {
     const joinArea = document.getElementById('joinArea');
     const acceptBtn = document.getElementById('acceptBtn');
     const reloadBtn = document.getElementById('reloadBtn');
-    
+
     if (currentGameCode) {
-        codeDisplay.textContent = `TWÓJ KOD ${currentGameCode}`;
+        codeDisplay.textContent = (t("toast.your_code").replace("{code}", currentGameCode));
     } else if (isPlayer1) {
-        codeDisplay.textContent = `KLIKNIJ GENERUJ KOD`;
+        codeDisplay.textContent = (t("lobby.generate"));
     }
 
     // Host Action Button Logic
@@ -457,7 +542,7 @@ function updateSetupUI() {
             // BLOKADA: Jeśli przeciwnik dołączył, nie można generować/resetować
             if (player2Id) {
                 reloadBtn.classList.add('disabled');
-                reloadBtn.title = 'Lobby zablokowane (obecność gracza)';
+                reloadBtn.title = (t("toast.lobby.full"));
             } else {
                 reloadBtn.classList.remove('disabled');
             }
@@ -472,20 +557,20 @@ function updateSetupUI() {
     }
 
     if (isPlayer1) {
-        p2Status.textContent = isP2Ready ? 'PRZECIWNIK GOTOWY' : (player2Id ? 'PRZECIWNIK CZEKA' : 'OCZEKIWANIE...');
-        document.getElementById('opponentNameDisplay').textContent = player2Nickname || 'CZEKAM NA PRZECIWNIKA...';
+        p2Status.textContent = isP2Ready ? (t("enemy.redy")) : (player2Id ? (t("enemy.waiting")) : (t("lobby.waiting")));
+        document.getElementById('opponentNameDisplay').textContent = player2Nickname || (t("waiting.on.enemy"));
     } else {
-        p2Status.textContent = isP2Ready ? 'Ty: GOTOWY' : 'Ty: Niegotowy';
-        document.getElementById('opponentNameDisplay').textContent = player1Nickname || 'POŁĄCZONO Z HOSTEM';
+        p2Status.textContent = isP2Ready ? (t("status.ready")) : (t("status.not.ready"));
+        document.getElementById('opponentNameDisplay').textContent = player1Nickname || (t("connected.host"));
     }
-    
+
     const readyBtn = document.getElementById('readyBtn');
-    readyBtn.textContent = (isPlayer1 ? isP1Ready : isP2Ready) ? 'ANULUJ GOT.' : 'GOTOWY';
+    readyBtn.textContent = (isPlayer1 ? isP1Ready : isP2Ready) ? (t("cancel.redy")) : (t("lobby.ready"));
 
     // BLOKADA: Nie można dać gotowości bez przeciwnika
     if (isPlayer1 && !player2Id) {
         readyBtn.classList.add('disabled');
-        readyBtn.title = 'Czekaj na przeciwnika...';
+        readyBtn.title = (t("dy.waiting.on.enemy"));
     } else {
         readyBtn.classList.remove('disabled');
         readyBtn.title = '';
@@ -496,12 +581,12 @@ function updateSetupUI() {
 
 function toggleReady() {
     if (isPlayer1 && !player2Id) {
-        showToast("CZEKAJ NA PRZECIWNIKA!");
+        showToast(t("dy.waiting.on.enemy2"));
         return;
     }
-    const nick = document.getElementById('nicknameInput').value.trim() || 'Gracz';
+    const nick = document.getElementById('nicknameInput').value.trim() || (t("Player"));
     // NIE zapisujemy automatycznie do ciasteczek, jedynie rozsyłamy stan
-    
+
     if (isPlayer1) {
         isP1Ready = !isP1Ready;
         if (player2Id) {
@@ -511,7 +596,7 @@ function toggleReady() {
         isP2Ready = !isP2Ready;
         socket.emit('send-to-p1', { gameCode: currentGameCode, message: { type: 'readiness-changed', ready: isP2Ready } });
     }
-    
+
     socket.emit('set-nickname', { gameCode: currentGameCode, isPlayer1, nickname: nick });
     updateSetupUI();
 }
@@ -520,7 +605,7 @@ function joinOrStartGame() {
     const codeInput = document.getElementById('sideCodeInput').value.trim();
     if (codeInput) {
         if (codeInput === currentGameCode) {
-            showToast("NIE MOŻNA DOŁĄCZYĆ DO WŁASNEGO LOBBY");
+            showToast(t("dy.your.lobby"));
             return;
         }
         // Player wants to join
@@ -549,7 +634,7 @@ function startRealGame() {
 
     const mode = tryby[selectedModeIndex];
     const gamePath = mode ? mode.gra : 'tryby/klasyczny_gwint';
-    
+
     window.location.href = `/${gamePath}/game.html?code=${currentGameCode}&host=${isPlayer1}&nick=${encodeURIComponent(nick)}`;
 }
 
@@ -560,7 +645,7 @@ function goBackToMain() {
     if (isPlayer1) socket.emit('p1Left');
     else socket.emit('p2Left');
     socket.disconnect();
-    location.reload(); 
+    location.reload();
 }
 
 // Socket events
@@ -588,11 +673,11 @@ socket.on('join-success', (data) => {
 
 socket.on('opponent-joined', (data) => {
     player2Id = data.opponentId;
-    player2Nickname = "Przeciwnik"; 
+    player2Nickname = "Przeciwnik";
     updateSetupUI();
     // Notify P2 of current status
     socket.emit('send-to-p2', { player2Id, message: { type: 'sync-setup', modeIndex: selectedModeIndex, ready: isP1Ready } });
-    
+
     // Send nickname if already set
     const myNick = document.getElementById('nicknameInput').value.trim();
     if (myNick) {
@@ -627,12 +712,12 @@ socket.on('message-from-p2', (data) => {
 socket.on('opponent-status', (data) => {
     if (data.player1Nickname) player1Nickname = data.player1Nickname;
     if (data.player2Nickname) player2Nickname = data.player2Nickname;
-    
+
     // Also update player2Id if it's missing (for P1)
     if (isPlayer1 && data.player2Id) {
         player2Id = data.player2Id;
     }
-    
+
     updateSetupUI();
 });
 
@@ -642,7 +727,7 @@ let isResetting = false;
 // Reset Lobby
 window.resetLobby = function () {
     if (isResetting) return;
-    
+
     if (isPlayer1) {
         isResetting = true;
         const reloadBtn = document.querySelector('.reload-btn');
@@ -669,8 +754,8 @@ window.resetLobby = function () {
                 if (reloadBtn) reloadBtn.style.opacity = '1';
             }
         }, 1000);
-        
-        showToast("RESTART LOBBY... POCZEKAJ 30S");
+
+        showToast(t("reload.lobby"));
     }
 };
 
@@ -682,7 +767,7 @@ window.startTestGame = function () {
 socket.on('test-game-joined', (data) => {
     currentGameCode = data.gameCode;
     isPlayer1 = data.isHost;
-    
+
     // In test game, we immediately assume the first mode
     selectedModeIndex = 0;
     startRealGame();

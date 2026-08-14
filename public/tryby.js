@@ -1,56 +1,65 @@
 const tryby = [
     {
-        nazwa: "Klasyczny",
+        nazwa: "tryb.klasyczny",
         ikona: "tryby/gwent_classic.webp",
         obraz: "tymczasem.webp",
         players: 2,
-        opis: "Klasyczna wersja Gwinta\nidentyczna jak w Wiedźminie 3.",
+        opis: "opis.klasyczny",
         gra: "tryby/klasyczny_gwint",
         stan: 2
     },
     {
-        nazwa: "Mix",
+        nazwa: "tryb.mix",
         ikona: "tryby/mix_cart.webp",
         obraz: "tymczasem.webp",
         players: 2,
-        opis: "koncept",
+        opis: "opis.mix",
         gra: "tryby/klasyczny_gwint",
         stan: 3
     },
     {
-        nazwa: "1v1v1v1",
+        nazwa: "tryb.1v1v1v1",
         ikona: "tryby/1v1v1v1.webp",
         obraz: "tymczasem.webp",
         players: 4,
-        opis: "koncept",
+        opis: "opis.1v1v1v1",
         gra: "tryby/gwint_1v1v1v1",
         stan: 3
     },
     {
-        nazwa: "Czasowy",
+        nazwa: "tryb.czasowy",
         ikona: "tryby/czasowka.webp",
         obraz: "tymczasem.webp",
         players: 2,
-        opis: "koncept",
+        opis: "opis.czasowy",
         gra: "tryby/gwint_czasowy",
         stan: 3
     },
     {
-        nazwa: "Cyberpunkowy",
+        nazwa: "tryb.cyberpunkowy",
         ikona: "tryby/cp_tryb.webp",
         obraz: "tymczasem.webp",
         players: 2,
-        opis: "koncept",
+        opis: "opis.cyberpunkowy",
         gra: "tryby/cyberpunkowy_gwint",
         stan: 3
     },
     {
-        nazwa: "Pełna talia",
+        nazwa: "tryb.pelna_talia",
         ikona: "tryby/cp_tryb.webp",
         obraz: "tymczasem.webp",
         players: 2,
-        opis: "koncept",
+        opis: "opis.pelna_talia",
         gra: "tryby/pelna_talia",
         stan: 3
     },
+    {
+        nazwa: "tryb.imersywny",
+        ikona: "tryby/imersywny.webp",
+        obraz: "tymczasem.webp",
+        players: 2,
+        opis: "opis.imersywny",
+        gra: "tryby/imersywny_gwint",
+        stan: 3
+    }
 ];

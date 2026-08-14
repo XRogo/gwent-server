@@ -1,2 +1,12 @@
 node_modules/
 package-lock.json
+public/tryby/klasyczny_gwint/locales/map.txt
+public/tryby/klasyczny_gwint/locales/pl.json
+public/tryby/klasyczny_gwint/locales/es.json
+public/tryby/klasyczny_gwint/locales/en.json
+public/tryby/klasyczny_gwint/assets/asety/korona.webp
+public/tryby/klasyczny_gwint/krole.js
+public/tryby/klasyczny_gwint/krol_code.js
+public/tryby/klasyczny_gwint/game_board.js
+public/tryby/klasyczny_gwint/cards.js
+

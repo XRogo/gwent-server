@@ -10,6 +10,8 @@
         content="Zagraj w Gwint Online 1v1 z przyjaciółmi! Stwórz lub dołącz do gry, całość działa bardzo podobnie co w Wiedzmine 3">
     <!-- Tag weryfikacyjny Google -->
     <meta name="google-site-verification" content="hLf1PX-1fD-PLj-3HAYo-pzLykQeqSmrrMrvrvE-lM8" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6454405372396036"
+     crossorigin="anonymous"></script>
     <meta name="keywords"
         content="Gwint, Gwint Online, Gwint 1v1, Wiedźmin 3, Witcher 3, gra karciana, card game, Gwent">
     <!-- Open Graph -->
@@ -43,7 +45,7 @@
         <!-- Główny kontener wspólnie wyśrodkowany -->
         <div class="content-container" id="contentContainer">
             <div class="menu-wrapper">
-                <img src="assets/srodekmenuw.png" class="center-menu" alt="Menu">
+                <img src="assets/menu_pl.png" class="center-menu" alt="Menu" data-i18n-img="assets/menu_{lang}.png">
                 <div class="button-container">
                     <div class="menu-button play-button" onclick="showHostScreen()">
                         <img src="assets/ramka.png" class="hover-frame" alt="Ramka">
@@ -60,10 +62,10 @@
                     </div>
                 </div>
                 <div class="menu-text-overlay">
-                    <div class="menu-label-play">Graj</div>
+                    <div class="menu-label-play" data-i18n="menu.play">Graj</div>
                     <div class="menu-label-test">Test Game (DEV)</div>
                     <div class="menu-label-discord">Discord</div>
-                    <div class="menu-label-info">Info Alpha 8.8</div>
+                    <div class="menu-label-info">Info Alpha 9.0</div>
                     <!-- WWWWWWWWWWWEEEEEEEEEERRRRRRRRRRRRSSSSSSSSSSJJJJJJJJJJJAAAAAAAAAAAAAAA -->
                 </div>
             </div>
@@ -80,7 +82,7 @@
 
                         <!-- Środek-Lewo (Opis) 281, 146 x 738, 326 -->
                         <div id="modeDescriptionArea" class="mode-desc">
-                            <span id="modePreviewText">Opis trybu</span>
+                            <span id="modePreviewText" data-i18n="mode.description">Opis trybu</span>
                         </div>
 
                         <!-- Środek-Prawo (Obraz trybu) 845, 153 x 1141, 322 -->
@@ -92,7 +94,7 @@
                         <!-- Paski na dole -->
                         <div id="sideSetupFooter" class="side-setup-footer">
                             <div id="conceptOverlay" class="concept-overlay">
-                                <div class="concept-text">Koncept, w przyszłości może dodam</div>
+                                <div class="concept-text" data-i18n="concept">Koncept, w przyszłości może dodam</div>
                             </div>
                             <div class="mode-bottom-container">
                                 <div id="modeBottomBar" class="mode-bottom">
@@ -100,21 +102,21 @@
 
                                     <div class="code-generator">
                                         <img src="assets/reload.webp" id="reloadBtn" class="reload-btn"
-                                            onclick="resetLobby()" title="Generuj / Resetuje" alt="Reload">
-                                        <span id="displayCode" class="lobby-code">KLIKNIJ GENERUJ KOD</span>
+                                            onclick="resetLobby()" data-i18n-title="dy.generuj" title="Generuj / Resetuje" alt="Reload">
+                                        <span id="displayCode" class="lobby-code" data-i18n="lobby.generate">KLIKNIJ GENERUJ KOD</span>
                                         <img src="assets/coppy.webp" class="icon-btn copy-btn"
-                                            onclick="copyCodeToClipboard()" title="Kopiuj kod" alt="Copy">
+                                            onclick="copyCodeToClipboard()" data-i18n-title="dy.kopiuj" title="Kopiuj kod" alt="Copy">
                                     </div>
 
                                     <div class="join-area" id="joinArea">
-                                        <span>DOŁĄCZ: </span>
+                                        <span data-i18n="lobby.join">DOŁĄCZ:</span>
                                         <div class="input-wrapper">
-                                            <input type="text" id="sideCodeInput" placeholder="KOD">
+                                            <input type="text" id="sideCodeInput" data-i18n-placeholder="dy.code" placeholder="KOD">
                                             <img src="assets/paset.webp" class="inner-paste-btn"
-                                                onclick="pasteCodeFromClipboard()" title="Wklej kod" alt="Paste">
+                                                onclick="pasteCodeFromClipboard()" data-i18n-title="dy.paste.code" title="Wklej kod" alt="Paste">
                                         </div>
                                         <img src="assets/accept.webp" id="acceptBtn" class="icon-btn accept-btn"
-                                            onclick="joinOrStartGame()" title="Dołącz" alt="Accept">
+                                            onclick="joinOrStartGame()" data-i18n-title="dy.join" title="Dołącz" alt="Accept">
                                     </div>
                                 </div>
 
@@ -122,29 +124,28 @@
                                     <img src="assets/kod pasek.webp" class="pasek-bg" alt="Pasek">
 
                                     <div class="nickname-setup-area">
-                                        <input type="text" id="nicknameInput" placeholder="TWÓJ NICK">
+                                        <input type="text" id="nicknameInput" data-i18n-placeholder="nickname.placeholder" placeholder="TWÓJ NICK">
                                         <img src="assets/accept.webp" id="nickConfirmBtn" class="icon-btn"
-                                            onclick="confirmNickname()" title="Zatwierdź" alt="Confirm">
+                                            onclick="confirmNickname()" data-i18n-title="dy.zatwierdz" title="Zatwierdź" alt="Confirm">
                                         <img src="assets/save.webp" id="nickSaveBtn" class="icon-btn"
-                                            onclick="saveNicknamePersistent()" title="Zapisz na stałe" alt="Save">
+                                            onclick="saveNicknamePersistent()" data-i18n-title="dy.save.zawsze" title="Zapisz na stałe" alt="Save">
                                     </div>
 
                                     <div class="opponent-nickname-area">
-                                        <span id="opponentNameDisplay" class="lobby-code">OCZEKIWANIE...</span>
+                                        <span id="opponentNameDisplay" class="lobby-code" data-i18n="lobby.waiting">OCZEKIWANIE...</span>
                                     </div>
                                 </div>
 
                                 <div class="player-entry-area">
                                     <div id="countdownDisplay" class="countdown-text"></div>
                                     <div class="entry-buttons-row">
-                                        <button onclick="toggleReady()" id="readyBtn" class="game-btn">GOTOWY</button>
+                                        <button onclick="toggleReady()" id="readyBtn" class="game-btn" data-i18n="lobby.ready">GOTOWY</button>
                                         <button onclick="leaveRoom()" id="leaveBtn"
-                                            class="game-btn exit-lobby-btn">WYJDŹ Z
-                                            LOBBY</button>
+                                            class="game-btn exit-lobby-btn" data-i18n="lobby.leave">WYJDŹ Z LOBBY</button>
                                     </div>
                                     <div class="status-indicator-container">
                                         <div class="status-indicator" id="p2Status">Status...</div>
-                                        <div id="betaStatusLabel" class="beta-status">Beta (mogą występować błędy)</div>
+                                        <div id="betaStatusLabel" class="beta-status" data-i18n="beta">Beta (mogą występować błędy)</div>
                                     </div>
                                 </div>
                             </div>
@@ -164,6 +165,14 @@
         <div id="gameScreen" class="screen">
         </div>
 
+        <!-- Przyciski Języka-->
+        <!-- PRZYCISKI JĘZYKÓW - lewy dolny róg -->
+        <div id="langSwitcher" class="lang-switcher">
+            <img src="assets/flag/pl.webp" class="lang-flag" data-lang="pl" alt="Polski" title="Polski">
+            <img src="assets/flag/en.webp" class="lang-flag" data-lang="en" alt="English" title="English">
+            <img src="assets/flag/es.webp" class="lang-flag" data-lang="es" alt="Español" title="Español">
+        </div>
+
         <!-- Przycisk Pełnego Ekranu -->
         <div id="fullScreenBtn" class="fullscreen-btn" onclick="toggleFullScreen()" title="Tryb pełnoekranowy">
             <img src="assets/powiek.webp" id="fsIcon" alt="Fullscreen">
@@ -172,20 +181,20 @@
         <!-- Informacja dla telefonów -->
         <div id="mobileWarning" class="mobile-warning">
             <div class="warning-box">
-                <p>Dla najlepszego doświadczenia używaj Gwinta w trybie pełnoekranowym i poziomie (bokiem).</p>
+                <p data-i18n="mobile.warning">Dla najlepszego doświadczenia używaj Gwinta w trybie pełnoekranowym i poziomie (bokiem).</p>
                 <div class="warning-buttons">
-                    <button onclick="setupMobileGame()" class="gold-btn">USTAW</button>
-                    <button onclick="closeWarning()">ROZUMIEM</button>
+                    <button onclick="setupMobileGame()" class="gold-btn" data-i18n="mobile.setup">USTAW</button>
+                    <button onclick="closeWarning()" data-i18n="mobile.understand">ROZUMIEM</button>
                 </div>
             </div>
         </div>
         <!-- Baner Cookies -->
         <div id="cookieBanner" class="cookie-banner">
             <div class="cookie-content">
-                <p>Ta strona używa plików Cookies wyłącznie w celu zapisania Twoich talii kart oraz nicku gracza.</p>
+                <p data-i18n="cookies.text">Ta strona używa plików Cookies wyłącznie w celu zapisania Twoich talii kart oraz nicku gracza.</p>
                 <div class="cookie-buttons">
-                    <button onclick="acceptCookies()" class="gold-btn">AKCEPTUJ</button>
-                    <button onclick="rejectCookies()" class="simple-btn">ODRZUĆ</button>
+                    <button onclick="acceptCookies()" class="gold-btn" data-i18n="cookies.accept">AKCEPTUJ</button>
+                    <button onclick="rejectCookies()" class="simple-btn" data-i18n="cookies.reject">ODRZUĆ</button>
                 </div>
             </div>
         </div>

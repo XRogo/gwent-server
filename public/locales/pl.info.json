@@ -1,0 +1,27 @@
+{
+"title.web": "Gwent Menu - Informacje",
+
+"title.me": "Informacje - Strona jest tworzona, ostatnia aktualizacja",
+"sub.title.me1": "Ogólnie to robię sobie tę stronę 4fun i jak będą jakieś błędy czy coś, to sorry xD, nie umiem programować. Całą stronę od strony programowania robił Grok Copilot Gemini (GPT nie umie programować), ja tylko grafiki i proste programowanie (ucze się).",
+"sub.title.me2": "Tu jest rozpiska, skąd co mam:",
+"sub.title.me3": "Tła w menu: podjebane z art booka, co jest w folderze Wiedźmina 3",
+"sub.title.me4": "Pasek ten czarny: z filmu",
+"sub.title.me5": "Dźwięki podjebane bezpośrednio z gry.",
+"sub.title.me6": "czcionka",
+"sub.title.me7": "karty i wszystkie asety jakie sa już w grze są wzięte z gry wiedmzin 3 3 najlepszy",
+"sub.title.me8": "Wszystko co nie jest podwlone z wiedzmina jest zrobione przezemnie",
+
+"title.dis": "Informacja prawna",
+"sub.title.dis1": "Ta strona i dostępna na niej gra to <strong>nieoficjalny, fanowski projekt</strong> stworzony wyłącznie w celach hobbystycznych.",
+"sub.title.dis2": "Gra wykorzystuje <strong>oryginalne assety</strong> (grafiki, karty, dźwięki itp.) z gry <em>The Witcher 3: Wild Hunt</em> (Gwint), które są wyłączną własnością <strong>CD PROJEKT RED</strong>. Część assetów (ikony, tła, elementy interfejsu itp.) została stworzona samodzielnie przez autora projektu.",
+"sub.title.dis3": "W klasycznej wersji gra odtwarza mechanikę Gwinta z <em>The Witcher 3</em>. W wariantach dodatkowych (np. 1v1v1v1, mix kart) jedynie ogólna mechanika karciana jest inspirowana oryginalnym Gwintem – reszta reguł, balansu i rozgrywki jest autorska.",
+"sub.title.dis4": "Projekt <strong>nie jest zatwierdzony</strong> ani powiązany z CD PROJEKT RED. Nie zastępuje oficjalnego <em>Gwent: The Witcher Card Game</em>.",
+"sub.title.dis5": "Strona jest w większości <strong>niekomercyjna</strong>. Ewentualne przychody pochodzą wyłącznie z nieinwazyjnych reklam umieszczonych z boku ekranu i służą jedynie pokryciu kosztów utrzymania serwera (ok. 30–40 zł miesięcznie). Nie ma żadnych paywalli, mikrotransakcji ani wymogu płatności za grę. (obecnie opłacam tylko domene)",
+"sub.title.dis6": "Jeśli CD PROJEKT RED lub inny uprawniony podmiot uzna, że projekt narusza ich prawa własności intelektualnej, jestem gotów natychmiast usunąć lub odpowiednio zmodyfikować stronę na ich żądanie.",
+"sub.title.dis7": "Korzystanie ze strony odbywa się na własne ryzyko.",
+
+"Last": "© CD PROJEKT RED. The Witcher®, Gwint i wszystkie powiązane znaki towarowe oraz materiały są własnością CD PROJEKT RED. Wszelkie prawa zastrzeżone.",
+
+"Back": "Powrót",
+"link": "LINK"
+}
