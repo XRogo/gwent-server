@@ -53,6 +53,8 @@
 
   "tryb.klasyczny": "Classic",
   "opis.klasyczny": "Classic version of Gwent\nidentical to The Witcher 3.",
+  "tryb.test": "Test",
+  "opis.test": "Test",
   "tryb.mix": "Mix",
   "opis.mix": "No card selection – you play\nwith all available cards in the deck",
   "tryb.1v1v1v1": "1v1v1v1",

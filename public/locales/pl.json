@@ -53,6 +53,8 @@
   
   "tryb.klasyczny": "Klasyczny",
   "opis.klasyczny": "Klasyczna wersja Gwinta\nidentyczna jak w Wiedźminie 3.",
+  "tryb.test": "Test",
+  "opis.test": "Test",
   "tryb.mix": "Mix",
   "opis.mix": "Nie ma wybierania kart grasz\nwszystkimi dostępny kartami w tali",
   "tryb.1v1v1v1": "1v1v1v1",

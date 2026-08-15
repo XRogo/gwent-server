@@ -1,0 +1,53 @@
+.powiek-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+}
+
+.powiek-card {
+    box-shadow: 0 0 32px #000;
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(.77, 0, .18, 1);
+}
+
+.powiek-card.powiek-central {
+    box-shadow: none !important;
+}
+
+.powiek-card .inner-card-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+.powiek-podsw {
+    pointer-events: none;
+}
+
+.powiek-podsw2 {
+    pointer-events: none;
+    animation: powiek-pulse 1.5s infinite;
+}
+
+@keyframes powiek-pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.1;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.poswiata,
+.powiek-podsw,
+.powiek-podsw2 {
+    box-shadow: none !important;
+    filter: none !important;
+    background: none !important;
+    outline: none !important;
+}

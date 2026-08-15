@@ -1,0 +1,266 @@
+///połnoc
+
+// Lista dowódców Gwent
+
+const krole = [
+
+    // Północ ██████████████████████████████████████████████████████████████████████████████████████████████████
+
+    {
+        ////////////////////////////////////////////////////////////////////
+        nazwa: "Foltest Król Temerii",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1001.webp",
+        opis: "Przecież to naturalne, że brat darzy miłością swoją siostrę.",
+        frakcja: "1",
+        numer: "1001",
+        umiejetnosc: "Znajdź kartę Gęsta mgła w swojej talii i natychmiast ją zagraj."
+    },
+
+    {
+        /////////////////////////////////////////////////////////////////////
+        nazwa: "Foltest Dowódca Północyi",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1002.webp",
+        opis: '"Pieprzeni doradcy i ich polityczne układanki. Na polu bitwy ufam sobie i swoim zbrojnym".',
+        frakcja: "1",
+        numer: "1002",
+        umiejetnosc: '"Usuń aktywne efekty pogodowe wynikające z kart Trzaskający Mróz, Ulewny deszcz i Gęsta mgła".'
+    },
+
+    {
+        /////////////////////////////////////////////////////////////////////
+        nazwa: "Foltest Zdobywca",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1003.webp",
+        opis: '"Dobrze wymierzony strzał z balisty druzgocze nie tylko umocnienia, ale też morale wroga".',
+        frakcja: "1",
+        numer: "1003",
+        umiejetnosc: "Podwaja siłę wszystkich twoich jednostek oblężniczych (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
+    },
+
+    {
+        /////////////////////////////////////////////////////////////
+        nazwa: "Foltest Żelazny Władca",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1004.webp",
+        opis: '"Cóż za piękny dzień na bitwę!"',
+        frakcja: "1",
+        numer: "1004",
+        umiejetnosc: "Zniszcz najsilniejszą jednostke/ jednostki oblężniczą/e twojego przeciwnika, jeśli suma siły wszystkich jego kart oblężniczych wynosi 10 bądź więcej."
+    },
+
+    {
+        ////////////////////////////////////////////////////////////////
+        nazwa: "Foltest Syn Medella",
+        karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1005.webp",
+        opis: '"Ja tu rządę i nie będę się krył po kątach".',
+        frakcja: "1",
+        numer: "1005",
+        umiejetnosc: "Niszczy najsilniejszą jednostke/i dalekiego zasięgu twojego przeciwnika, jeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 lub więcej."
+    },
+
+    // Nilfgaard ██████████████████████████████████████████████████████████████████████████████████████████████████
+
+    {
+        ///////////////////////////////////////////////////////////////
+        nazwa: "Emhyr var Emreis Jeż z Erlenwaldu",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2001.webp",
+        opis: '"Niebo nie płakało, gdy zabrali mi Pawette".',
+        frakcja: "2",
+        numer: "2001",
+        umiejetnosc: "Znajdź w swojej talii kartę Deszcz i natychmiast ją zagraj."
+    },
+
+    {
+        ///////////////////////////////////////////////////////////////
+        nazwa: "Emhyr var Emreis Cesarz Nilfgaardu",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2002.webp",
+        opis: '"Nie interesują mnie twoje przesłaniki. Oczekikję wyników".',
+        frakcja: "2",
+        numer: "2002",
+        umiejetnosc: "Obejrzyj trzy losowe karty z ręki przeciwnika"
+    },
+
+    {
+        ///////////////////////////////////////////////////////////////
+        nazwa: "Emhyr var Emreis Biały Płomień Tańczący na Kurhanach Wrogów",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2003.webp",
+        opis: '"Miecz jest raptem jednym z narzędzi w dyspozycji cesarza".',
+        frakcja: "2",
+        numer: "2003",
+        umiejetnosc: "Blokuję umiejętności dowódcy twojego przeciwnika."
+    },
+
+    {
+        ///////////////////////////////////////////////////////////////
+        nazwa: "Emhyr var Emreis Pan Południa",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2004.webp",
+        opis: '"Nie jestem znany ze swojej cierpliwości. Poczyń, prosze, kroki , abym nie być znanym z braku głowy na karku".',
+        frakcja: "2",
+        numer: "2004",
+        umiejetnosc: "Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika."
+    },
+
+    {
+        ///////////////////////////////////////////////////////////////
+        nazwa: "Emhyr var Emreis Najeźca Północy",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2005.webp",
+        opis: '"Cesarze władają imperium, ale dwiem rzeczami rządzić nie mogą swojim sercem i swojim czasie".',
+        frakcja: "2",
+        numer: "2005",
+        umiejetnosc: "Gdy gracz przywraca jednostkę na pole bitwy, przywrócona zostaje losowa jednostka. Dotyczy obu graczy."
+    },
+
+    // Scoia'tael ██████████████████████████████████████████████████████████████████████████████████████████████████
+
+    {
+        //////////////////////////////////////////////////////////
+        nazwa: "Francesca Findabair Elfka czystej krwi",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3001.webp",
+        opis: '"Znowu jesteśmy Ludem, aie wygnańcami. A popiół użyźnia".',
+        frakcja: "3",
+        numer: "3001",
+        umiejetnosc: "Znajdź w swojej talii kartę Trzaskający Mróz i natychmiast ją zagraj."
+    },
+
+    {
+        /////////////////////////////////////////////////////////
+        nazwa: "Francesca Findabair Stokrotka z Dolin",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3002.webp",
+        opis: '"Powszechnei uważa się ją za najpiękniejszą kobietę świata".',
+        frakcja: "3",
+        numer: "3002",
+        umiejetnosc: "Weź o jedną kartę więcej na początku bitwy."
+    },
+
+    {
+        ///////////////////////////////////////////////////////
+        nazwa: "Francesca Findabair Najpiękniejsza kobieta na świecie",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3003.webp",
+        opis: '"Komanda muszą nadal prowadzić walkę".',
+        frakcja: "3",
+        numer: "3003",
+        umiejetnosc: "Podwaja siłę twoich jednostek dalekiego zasięgu (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
+    },
+
+    {
+        /////////////////////////////////////////////////////
+        nazwa: "Francesca Findabair Królowa Dol Blathanna",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3004.webp",
+        opis: '"Wszystko ma swoją cenę. Wojna wymaga ofiar. Pokój, jak się okazuje, również".',
+        frakcja: "3",
+        numer: "3004",
+        umiejetnosc: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 lub więcej."
+    },
+
+    {
+        ////////////////////////////////////////////////////
+        nazwa: "Francesca Findabair Nadzieja Dol Blathanna",
+        karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3005.webp",
+        opis: '"Daede sian caente, Aen Seidhe en\'allane ael coeden...".',
+        frakcja: "3",
+        numer: "3005",
+        umiejetnosc: "Przesuwa jednostki ze zdolnością Zręczności do rzędóow, które maksymalizują ich siłę. (jednostki w optymalnych miejscach nie zostaną przesunięte)."
+    },
+
+    // Potwory ██████████████████████████████████████████████████████████████████████████████████████████████████
+
+    {
+        ////////////////////////////////////////////////
+        nazwa: "Eredin Bréacc Glas Król Dzikiego Gonu",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin1.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4001.webp",
+        opis: '"Va faill, luned".',
+        frakcja: "4",
+        numer: "4001",
+        umiejetnosc: "Wybierz dowolną karte pogody ze swojej talii i natychmiast ją zagraj."
+    },
+
+    {
+        ////////////////////////////////////////////////
+        nazwa: "Eredin Bréacc Glas Dowódca Czerwonych Jeźdźców",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin2.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4002.webp",
+        opis: '"Król Goun śmieje się, kłapią przegniłe\nzęby nad zardzewiałym kołnierzem zbroi".',
+        frakcja: "4",
+        numer: "4002",
+        umiejetnosc: "Podwój siłę wszystkich swoich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
+    },
+
+    {
+        //////////////////////////////////////////////
+        nazwa: "Eredin Bréacc Glas Władca Tir ná Lia",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin3.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4003.webp",
+        opis: '"Im byli bliżej, tym piękno tego miejsca\nsilniej chwytało za serce".',
+        frakcja: "4",
+        numer: "4003",
+        umiejetnosc: 'Odrzuć dwie karty, a następnie wybierz jedną dowolną kratę ze swojej talii.'
+    },
+
+    {
+        ////////////////////////////////////////////////////
+        nazwa: "Eredin Bréacc Glas Zabujca Auberona",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin4.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4004.webp",
+        opis: '"Czerwpni Jeźdżcy zdołają doścignąć cię nawet w odchłani czasów i  miejsc".',
+        frakcja: "4",
+        numer: "4004",
+        umiejetnosc: 'Weź karte ze stosu kart odrzuconych.'
+    },
+
+    {
+        //////////////////////////////////////////////////////
+        nazwa: "Eredin Bréacc Glas Zdradziecki",
+        karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin5.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4005.webp",
+        opis: '"Bo się tobą bawię".',
+        frakcja: "4",
+        numer: "4005",
+        umiejetnosc: 'Pasywna - podwaja siłę kart Szpiegów obu graczy.'
+    },
+
+
+    // Skellige ██████████████████████████████████████████████████████████████████████████████████████████████████
+
+    {
+        //////////////////////////////////////////////////////////
+        nazwa: "Król Bran",
+        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/bran.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/5001.webp",
+        opis: '"Nikt nie zastąpi Brana. Moge jedynie próbować."',
+        frakcja: "5",
+        numer: "5001",
+        umiejetnosc: "Pod wpływem złych warunków atmosferycznych, jednostki tracą tylko połowę\nswojej siły bojowej"
+    },
+
+    {
+        ///////////////////////////////////////////////////////////////////
+        nazwa: "Crach an Craite",
+        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/crach.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/5002.webp",
+        opis: '"Król musi być madry. Król musi cieszyć\nsię szacunkiem. Król miusi mieć jaja".',
+        frakcja: "5",
+        numer: "5002",
+        umiejetnosc: "Karty odrzucone każdego z graczy zostają przetasowane i przywrócone do talii."
+    }
+];
+
+// Przykładowa funkcja pomocnicza
+function getKrolByNumer(numer) {
+    return krole.find(krol => krol.numer === numer);
+}
+
+export { krole, getKrolByNumer };

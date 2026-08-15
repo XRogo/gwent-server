@@ -1,0 +1,19 @@
+Wybor Kart
+ >>>>>
+
+Gra
+ >>>
+ 
+Przejścia
+ opisy
+
+Moce kart
+ opis poszczególnych mocy i nazwy
+
+Karty (dowódcy > opisy dowódców)(nazwa kary > opis karty) 
+ neutral
+ północ 
+ nilftgard
+ scoiatael
+ potwory
+ skelige

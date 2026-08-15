@@ -1,0 +1,774 @@
+{
+"1■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■":"Wybor kart ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+"2■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■": "Gra ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+"3■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Przejsica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+        "t.t01": "Zaczynasz jako pierwszy.",
+        "t.t02": "Przeciwnik zaczyna jako pierwszy.",
+        "t.t03": "Zaczynasz jako pierwszy.",
+        "t.t04": "Przeciwnik zaczyna jako pierwszy.",
+        "t.t05": "Początek rundy",
+        "t.t06": "Przeciwnik wymienia karty {czas 60s}",
+        "t.t07": "Twój ruch!",
+        "t.t08": "Ruch przeciwnika",
+        
+        "t.t11": "Dzięki zdolności talii Królestw Północy po wygranej\nrundzie dobiera się dodatkową kartę.",
+        "t.t12": "Dzięki zdolności talii .",
+        "t.t13": "Przeciwnik użył zdolności specjalnej talii Scoia'tael, by\nrozpocząć jako pierwszy.",
+        "t.t14": "umiem potwory",
+        "t.t15": "Zdolność talii Skellige została aktywowana!",
+
+        "t.t20": "Przeciwnik spasował",
+        "t.t21": "Spasowałeś",
+        "t.t22": "Przeciwnik wygrał tę rundę.",
+        "t.t23": "Wygrałeś tę rundę!",
+        "t.t24": "Remis",
+        
+"4■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Moce kart ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+        "n.manek": "Atrapa",
+        "o.manek": "Zastępuje jedną kartę na polu bitwy umieszcza ją z powrotem ręce.",
+
+        "n.rog": "Róg Dowódcy",
+        "o.rog": "Podwaja siłę jednostek w rzędzie. Zasięg ograniczony do jednego rzędu.",
+
+        "n.porz": "Pożoga",
+        "o.porz": "Niszczy najsilniejszą kartę lub karty na polu bitwy. Odrzuć po zagraniu.",
+
+        "n.mroz": "Trzaskający Mróz",
+        "o.mroz": "Siła wszystkich jednostek walczących w zwarciu przyjmuje wartość 1.",
+
+        "n.mgla": "Gęsta mgła",
+        "o.mgla": "Siła wszystkich jednostek łuczniczych przyjmuje wartość 1.",
+
+        "n.deszcz": "Ulewny deszcz",
+        "o.deszcz": "Siła wszystkich jednostek oblężniczych przyjmuje wartość 1.",
+
+        "n.niebo": "Czyste Niebo",
+        "o.niebo": "Odrzuca wszystkie karty Trzaskającego mrozu, Ulewnego deszczu i Gęstej mgły znajdujące się na polu bitwy",
+
+        "n.sztorm": "Skelligijski sztorm",
+        "o.sztorm": "Redukuje siłę wszystkich jednostek strzeleckich i oblężniczych do 1.",
+
+        "n.grzybki": "Mardroeme",
+        "o.grzybki": "Wywołuje tranformację wszystkich kart w rzędzie, które posiadają tryb\nberserkera.",
+
+        "n.wezwanie": "Braterstwo",
+        "o.wezwanie": "Jeśli w ręku i w talii znajdują się dwie takie same karty, wynajduje je i\nzagrywa nimi",
+        "n.020.wezwanie": "Wezwie Płotkę",
+        "o.020.wezwanie": "Znajdź w swojej talii kartę Płotka i zagraj ją od razu.",
+        "n.520.wezwanie": "Wezwanie tarczowniczek",
+        "o.520.wezwanie": "Przywołuje wszystkie twórczości z tali i z ręki.",
+
+        "n.medyk": "Medyk",
+        "o.medyk": "Przywraca jedną kartę ze zbioru kart odrzuconych (nie dotyczy kart bohaterów\ni kart specjalnych).",
+
+        "n.1.iporz": "Pożoga - jednostka bliskiego starcia",
+        "o.1.iporz": "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej.",
+        "n.2.iporz": "Wsparcie ogniowe",
+        "o.2.iporz": "Zniszcz najsilniejszą jednostkę/i dalekiego zasięgu twojego przeciwnika,\njeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 bądź więcej.",
+        "n.3.iporz": "Wsparcie artyleryjskie",
+        "o.3.iporz": "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej.",
+        
+        "n.morele": "Wysokie Morale",
+        "o.morale": "Powiększa o 1 siłę wszystkich kart w rzędzie (wylączając siebie).",
+
+        "n.wiez": "Więź",
+        "o.wiez": "Umieszczona obok karty o tej samej nazwie podwaja siłę obu kart.",
+
+        "n.szpieg": "Szpiegostwo",
+        "o.szpieg": "Szpieg dostaje się do obozu twojego przeciwnika i zwiększa jego ogólną liczbę\npunktów. W zamian możesz pociągnąć dwie dodatkowe karty",
+
+        "n.wezwarniezza": "Wezwanie z zaświatów",
+        "o.wezwarniezza": "Gdy karta zostaje usunięta z pola bitwy, na polu bitwy pojawia się nowa/njednostka",
+
+        "n.berserk": "Berserk",
+        "o.berserk": "Zmienia się w potężnego niedźwiedzia pod wpływem grzybów Mardroeme.",
+
+        "n.bohater": "Bohater",
+        "o.bohater": "Nie działają na niego żadne specjalne karty ani umiejętności.",
+
+        "n.zrecznosc": "Zręczność",
+        "o.zrecznosc": "Karta może zostać umieszczona w rzędzie jednostek bliskiego starcia bądź dalekiego zasięgu. Raz ustawionej karty nie można przesunąć.",
+
+
+
+
+"5■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Karty ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+"6■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Karty ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+    
+        "n001": "Manekin do ćwiczeń",
+        "o001": "\"Niespodzianka skurwysyny!\"",
+
+        "n002": "Róg dowódcy",
+        "o002": "\"Do atakuuuuu!!!\"",
+
+        "n003": "Pożoga",
+        "o003": "\"Że też zawsze musi jebnąć, tma gdzie\nnajbardziej boli\".",
+
+        "n004": "Trzaskający mróz",
+        "o004": "\"Tak mi palce zgrabiały, że lewie miecz\ntrzymam... A tujeszcze machać trzeba\".",
+
+        "n005": "Gęsta mgła",
+        "o005": "\"Mgła, że oko wykol... Cokolwiek to\nznaczy\".",
+
+        "n006": "Ulewny deszcz",
+        "o006": "\"Wieża oblężnicz utkneła w błocie!\"\n\"Widzę, idioto. Trąb na odwrót\".",
+
+        "n007": "Czyste niebo",
+        "o007": "\"Piękny dzień, żeby umrzeć\".",
+
+        "n008": "Skelligijski sztorm",
+        "o008": "\"To nie jest zwykła burza. To gniew\nbogów.\"",
+
+        "n000": "Mardroeme",
+        "o000": "\"To nie jest zwykła burza. To gniew\nbogów.\"",
+
+        "n009": "Geralt z Rivi",
+        "o009": "\"Jeżeli mam wybierać pomiędzy jednym\nzłem a drugim, to wole nie wybierać\nwcale.\"",
+
+        "n010": "Ciri",
+        "o010": "\"Wiesz, kiedy bajki przestają być\nbajkami? Kiedy ludzie zaczynają w nie\nwierzyć.\"",
+
+        "n011": "Yennefer z Vengerbergu",
+        "o011": "\"Odziana w kompozycje czerni i bieli,\nprzywodziła na myśl grudniowy poranek\".",
+
+        "n012": "Triss Merigold",
+        "o012": "\"Potrafię o siebie zadbać. Wierz mi\"",
+
+        "n013": "Villentretenmerth",
+        "o013": "\"Było w tym stworzeniu coś pełnego\nniewysławionej gracji\".",
+
+        "n014": "Vesemir",
+        "o014": "\"Gdy cie mają wieszać, poproś o wode.\nNie wiadomo co może sie zdarzyć zanim\nprzyniosą\".",
+
+        "n015": "Olgierd von Everec",
+        "o015": "\"Teraz przynajmniej wiesz, że łatwo nie\ntrace głowy\"",
+
+        "n016": "Zoltan Chivay",
+        "o016": "\"Lubie czynić dobro. Zwłaszcza dla siebie\ni mego bezpośredniego otocznia\"",
+
+        "n017": "Emiel Regis Rohellec Terzieff",
+        "o017": "\"Uchodzę, delikatnie mówiąc, za potwora.\nZa krwiożercze monstrum\".",
+
+        "n018": "Guanter O'Dim: Cień",
+        "o018": "\"Bój sie nie ciemnosci, a światła\"",
+
+        "n019": "Guanter O'Dim",
+        "o019": "Życzenia twe zawsze spełni z ochotą, da\nci brylant i srebro, i złoto",
+
+        "n020": "Płotka",
+        "o020": "Płotka! Potrzebuję cie!",
+
+        "n021": "Jaskier",
+        "o021": "\"Julian Alfred Pankratz wicehrabia de\nLettenhove. Dla przyjaciół - Jaskier\".",
+
+        "n022": "Tajemniczy elf",
+        "o022": "\"Nie zwykłem żartować\".",
+
+        "n023": "Krowa",
+        "o023": "\"Muuu!\"",
+
+    "8■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Północ ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+ 
+        "n1001": "",
+        "o1001": "",
+        "u1001": "",
+
+        "n1002": "",
+        "o1002": "",
+        "u1002": "",
+
+        "n1003": "",
+        "o1003": "",
+        "u1003": "",
+
+        "n1004": "",
+        "o1004": "",
+        "u1004": "",
+
+        "n1005": "",
+        "o1005": "",
+        "u1005": "",
+
+        "n101": "",
+        "o101": "",
+
+        "n102": "",
+        "o102": "",
+
+        "n103": "",
+        "o103": "",
+
+        "n104": "",
+        "o104": "",
+
+        "n105": "",
+        "o105": "",
+
+        "n106": "",
+        "o106": "",
+
+        "n107": "",
+        "o107": "",
+
+        "n108": "",
+        "o108": "",
+
+        "n109": "",
+        "o109": "",
+
+        "n110": "",
+        "o110": "",
+
+        "n111": "",
+        "o111": "",
+
+        "n112": "",
+        "o112": "",
+
+        "n113": "",
+        "o113": "",
+
+        "n114": "",
+        "o114": "",
+
+        "n115": "",
+        "o115": "",
+
+        "n116": "",
+        "o116": "",
+
+        "n117": "",
+        "o117": "",
+
+        "n118": "",
+        "o118": "",
+
+        "n119": "",
+        "o119": "",
+
+        "n120": "",
+        "o120": "",
+
+        "n121": "",
+        "o121": "",
+
+        "n122": "",
+        "o122": "",
+
+        "n123": "",
+        "o123": "",
+
+        "n124": "",
+        "o124": "",
+
+        "n125": "",
+        "o125": "",
+
+        "n126": "",
+        "o126": "",
+
+        "n127": "",
+        "o127": "",
+
+        "n128": "",
+        "o128": "",
+
+    "9■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Nilftgard ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+ 
+        "n2001": "",
+        "o2001": "",
+        "u2001": "",
+
+        "n2002": "",
+        "o2002": "",
+        "u2002": "",
+
+        "n2003": "",
+        "o2003": "",
+        "u2003": "",
+
+        "n2004": "",
+        "o2004": "",
+        "u2004": "",
+
+        "n2005": "",
+        "o2005": "",
+        "u2005": "",
+
+        "n201": "",
+        "o201": "",
+
+        "n202": "",
+        "o202": "",
+
+        "n203": "",
+        "o203": "",
+
+        "n204": "",
+        "o204": "",
+
+        "n205": "",
+        "o205": "",
+
+        "n206": "",
+        "o206": "",
+
+        "n207": "",
+        "o207": "",
+
+        "n208": "",
+        "o208": "",
+
+        "n209": "",
+        "o209": "",
+
+        "n210": "",
+        "o210": "",
+
+        "n211": "",
+        "o211": "",
+
+        "n212": "",
+        "o212": "",
+
+        "n213": "",
+        "o213": "",
+
+        "n214": "",
+        "o214": "",
+
+        "n215": "",
+        "o215": "",
+
+        "n216": "",
+        "o216": "",
+
+        "n217": "",
+        "o217": "",
+
+        "n218": "",
+        "o218": "",
+
+        "n219": "",
+        "o219": "",
+
+        "n220": "",
+        "o220": "",
+
+        "n221": "",
+        "o221": "",
+
+        "n222": "",
+        "o222": "",
+
+        "n223": "",
+        "o223": "",
+
+        "n224": "",
+        "o224": "",
+
+        "n225": "",
+        "o225": "",
+
+        "n226": "",
+        "o226": "",
+
+        "n227": "",
+        "o227": "",
+
+        "n228": "",
+        "o228": "",
+
+        "n229": "",
+        "o229": "",
+
+        "n230": "",
+        "o230": "",
+
+        "n231": "",
+        "o231": "",
+
+        "n232": "",
+        "o232": "",
+
+    "10■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Scoiltael ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+ 
+        "n3001": "",
+        "o3001": "",
+        "u3001": "",
+
+        "n3002": "",
+        "o3002": "",
+        "u3002": "",
+
+        "n3003": "",
+        "o3003": "",
+        "u3003": "",
+
+        "n3004": "",
+        "o3004": "",
+        "u3004": "",
+
+        "n3005": "",
+        "o3005": "",
+        "u3005": "",
+
+        "n301": "",
+        "o301": "",
+
+        "n302": "",
+        "o302": "",
+
+        "n303": "",
+        "o303": "",
+
+        "n304": "",
+        "o304": "",
+
+        "n305": "",
+        "o305": "",
+
+        "n306": "",
+        "o306": "",
+
+        "n307": "",
+        "o307": "",
+
+        "n308": "",
+        "o308": "",
+
+        "n309": "",
+        "o309": "",
+
+        "n310": "",
+        "o310": "",
+
+        "n311": "",
+        "o311": "",
+
+        "n312": "",
+        "o312": "",
+
+        "n313": "",
+        "o313": "",
+
+        "n314": "",
+        "o314": "",
+
+        "n315": "",
+        "o315": "",
+
+        "n316": "",
+        "o316": "",
+
+        "n317": "",
+        "o317": "",
+
+        "n318": "",
+        "o318": "",
+
+        "n319": "",
+        "o319": "",
+
+        "n320": "",
+        "o320": "",
+
+        "n321": "",
+        "o321": "",
+
+        "n322": "",
+        "o322": "",
+
+        "n323": "",
+        "o323": "",
+
+        "n324": "",
+        "o324": "",
+
+        "n325": "",
+        "o325": "",
+
+        "n326": "",
+        "o326": "",
+
+        "n327": "",
+        "o327": "",
+
+        "n328": "",
+        "o328": "",
+
+        "n329": "",
+        "o329": "",
+
+        "n330": "",
+        "o330": "",
+
+        "n331": "",
+        "o331": "",
+
+        "n332": "",
+        "o332": "",
+
+        "n333": "",
+        "o333": "",
+
+        "n334": "",
+        "o334": "",
+
+        "n335": "",
+        "o335": "",
+
+        "n336": "",
+        "o336": "",
+
+        "n337": "",
+        "o337": "",
+
+        "n338": "",
+        "o338": "",
+
+    "12■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "Potwory ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+     
+        "n4001": "",
+        "o4001": "",
+        "u4001": "",
+
+        "n4002": "",
+        "o4002": "",
+        "u4002": "",
+
+        "n4003": "",
+        "o4003": "",
+        "u4003": "",
+
+        "n4004": "",
+        "o4004": "",
+        "u4004": "",
+
+        "n4005": "",
+        "o4005": "",
+        "u4005": "",
+        
+        "n401": "",
+        "o401": "",
+
+        "n402": "",
+        "o402": "",
+
+        "n403": "",
+        "o403": "",
+
+        "n404": "",
+        "o404": "",
+
+        "n405": "",
+        "o405": "",
+
+        "n406": "",
+        "o406": "",
+
+        "n407": "",
+        "o407": "",
+
+        "n408": "",
+        "o408": "",
+
+        "n409": "",
+        "o409": "",
+
+        "n410": "",
+        "o410": "",
+
+        "n411": "",
+        "o411": "",
+
+        "n412": "",
+        "o412": "",
+
+        "n413": "",
+        "o413": "",
+
+        "n414": "",
+        "o414": "",
+
+        "n415": "",
+        "o415": "",
+
+        "n416": "",
+        "o416": "",
+
+        "n417": "",
+        "o417": "",
+
+        "n418": "",
+        "o418": "",
+
+        "n419": "",
+        "o419": "",
+
+        "n420": "",
+        "o420": "",
+
+        "n421": "",
+        "o421": "",
+
+        "n422": "",
+        "o422": "",
+
+        "n423": "",
+        "o423": "",
+
+        "n424": "",
+        "o424": "",
+
+        "n425": "",
+        "o425": "",
+
+        "n426": "",
+        "o426": "",
+
+        "n427": "",
+        "o427": "",
+
+        "n428": "",
+        "o428": "",
+
+        "n429": "",
+        "o429": "",
+
+        "n430": "",
+        "o430": "",
+
+        "n431": "",
+        "o431": "",
+
+        "n432": "",
+        "o432": "",
+
+        "n433": "",
+        "o433": "",
+
+        "n434": "",
+        "o434": "",
+
+        "n435": "",
+        "o435": "",
+
+        "n436": "",
+        "o436": "",
+
+        "n437": "",
+        "o437": "",
+
+        "n438": "",
+        "o438": "",
+
+        "n439": "",
+        "o439": "",
+
+        "n440": "",
+        "o440": "",
+
+        "n441": "",
+        "o441": "",
+
+        "13■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" : "skellige ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+         
+        "n5001": "",
+        "o5001": "",
+        "u5001": "",
+
+        "n5002": "",
+        "o5002": "",
+        "u5002": "",
+
+        "n501": "",
+        "o501": "",
+
+        "n502": "",
+        "o502": "",
+
+        "n503": "",
+        "o503": "",
+
+        "n504": "",
+        "o504": "",
+
+        "n505": "",
+        "o505": "",
+
+        "n506": "",
+        "o506": "",
+
+        "n507": "",
+        "o507": "",
+
+        "n508": "",
+        "o508": "",
+
+        "n509": "",
+        "o509": "",
+
+        "n510": "",
+        "o510": "",
+
+        "n511": "",
+        "o511": "",
+
+        "n512": "",
+        "o512": "",
+
+        "n513": "",
+        "o513": "",
+
+        "n514": "",
+        "o514": "",
+
+        "n515": "",
+        "o515": "",
+
+        "n516": "",
+        "o516": "",
+
+        "n517": "",
+        "o517": "",
+
+        "n518": "",
+        "o518": "",
+
+        "n519": "",
+        "o519": "",
+
+        "n520": "",
+        "o520": "",
+
+        "n521": "",
+        "o521": "",
+
+        "n522": "",
+        "o522": "",
+
+        "n523": "",
+        "o523": "",
+
+        "n524": "",
+        "o524": "",
+
+        "n525": "",
+        "o525": "",
+
+        "n526": "",
+        "o526": "",
+
+        "n527": "",
+        "o527": "",
+
+        "n528": "",
+        "o528": ""
+
+}

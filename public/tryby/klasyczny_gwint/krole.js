@@ -14,7 +14,10 @@ const krole = [
         opis: "Przecież to naturalne, że brat darzy miłością swoją siostrę.",
         frakcja: "1",
         numer: "1001",
-        umiejetnosc: "Znajdź kartę Gęsta mgła w swojej talii i natychmiast ją zagraj."
+        umiejetnosc: "Znajdź kartę Gęsta mgła w swojej talii i natychmiast ją zagraj.",
+        funkcja: function (gameState) {
+            //sprzawdza czy w kupce i w talli gry znajduje sie karta gęsta magła i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)
+        }
     },
 
     {
@@ -25,7 +28,10 @@ const krole = [
         opis: '"Pieprzeni doradcy i ich polityczne układanki. Na polu bitwy ufam sobie i swoim zbrojnym".',
         frakcja: "1",
         numer: "1002",
-        umiejetnosc: '"Usuń aktywne efekty pogodowe wynikające z kart Trzaskający Mróz, Ulewny deszcz i Gęsta mgła".'
+        umiejetnosc: '"Usuń aktywne efekty pogodowe wynikające z kart Trzaskający Mróz, Ulewny deszcz i Gęsta mgła".',
+        funkcja: function (gameState) {
+            // urzywa czyste niebo (dodaje karte a nie zabiera z tali czy kupki)
+        }
     },
 
     {
@@ -36,7 +42,10 @@ const krole = [
         opis: '"Dobrze wymierzony strzał z balisty druzgocze nie tylko umocnienia, ale też morale wroga".',
         frakcja: "1",
         numer: "1003",
-        umiejetnosc: "Podwaja siłę wszystkich twoich jednostek oblężniczych (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
+        umiejetnosc: "Podwaja siłę wszystkich twoich jednostek oblężniczych (o ile w ich rzędzie nie ma już Rogu Dowódcy).",
+        funkcja: function (gameState) {
+            //urzywa rogu dowódcy dla katapult (dodaje karte a nie zabiera z tali czy kupki)
+        }
     },
 
     {
@@ -47,7 +56,10 @@ const krole = [
         opis: '"Cóż za piękny dzień na bitwę!"',
         frakcja: "1",
         numer: "1004",
-        umiejetnosc: "Zniszcz najsilniejszą jednostke/ jednostki oblężniczą/e twojego przeciwnika, jeśli suma siły wszystkich jego kart oblężniczych wynosi 10 bądź więcej."
+        umiejetnosc: "Zniszcz najsilniejszą jednostke/ jednostki oblężniczą/e twojego przeciwnika, jeśli suma siły wszystkich jego kart oblężniczych wynosi 10 bądź więcej.",
+        funkcja: function (gameState) {
+            // Niszczy najsilniejszą jednostke/i katapult twojego przeciwnika, jeśli suma siły jego katapult wynosi 10 lub więcej.
+        }
     },
 
     {
@@ -58,7 +70,10 @@ const krole = [
         opis: '"Ja tu rządę i nie będę się krył po kątach".',
         frakcja: "1",
         numer: "1005",
-        umiejetnosc: "Niszczy najsilniejszą jednostke/i dalekiego zasięgu twojego przeciwnika, jeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 lub więcej."
+        umiejetnosc: "Niszczy najsilniejszą jednostke/i dalekiego zasięgu twojego przeciwnika, jeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 lub więcej.",
+        funkcja: function (gameState) {
+            // Niszczy najsilniejszą jednostke/i łuczników twojego przeciwnika, jeśli suma siły jego łuczników wynosi 10 lub więcej.
+        }
     },
 
     // Nilfgaard ██████████████████████████████████████████████████████████████████████████████████████████████████
@@ -71,7 +86,10 @@ const krole = [
         opis: '"Niebo nie płakało, gdy zabrali mi Pawette".',
         frakcja: "2",
         numer: "2001",
-        umiejetnosc: "Znajdź w swojej talii kartę Deszcz i natychmiast ją zagraj."
+        umiejetnosc: "Znajdź w swojej talii kartę Deszcz i natychmiast ją zagraj.",
+        funkcja: function (gameState) {
+            // sprzawdza czy w kupce i w talli gry znajduje sie karta deszcz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)    
+        }
     },
 
     {
@@ -82,7 +100,10 @@ const krole = [
         opis: '"Nie interesują mnie twoje przesłaniki. Oczekikję wyników".',
         frakcja: "2",
         numer: "2002",
-        umiejetnosc: "Obejrzyj trzy losowe karty z ręki przeciwnika"
+        umiejetnosc: "Obejrzyj trzy losowe karty z ręki przeciwnika",
+        funkcja: function (gameState) {
+            // w podglądzie widzisz 3 losowe karty z ręki przeciwnika nic więcej nie możesz z nimi zrobić
+        }
     },
 
     {
@@ -93,7 +114,10 @@ const krole = [
         opis: '"Miecz jest raptem jednym z narzędzi w dyspozycji cesarza".',
         frakcja: "2",
         numer: "2003",
-        umiejetnosc: "Blokuję umiejętności dowódcy twojego przeciwnika."
+        umiejetnosc: "Blokuję umiejętności dowódcy twojego przeciwnika.",
+        funkcja: function (gameState) {
+            //blokuje umiejątnośc dowódcy twojego przeciwnika (czyli nie może on użyć swojej umiejętności) jest odrazu aktywowane
+        }
     },
 
     {
@@ -104,7 +128,10 @@ const krole = [
         opis: '"Nie jestem znany ze swojej cierpliwości. Poczyń, prosze, kroki , abym nie być znanym z braku głowy na karku".',
         frakcja: "2",
         numer: "2004",
-        umiejetnosc: "Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika."
+        umiejetnosc: "Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika.",
+        funkcja: function (gameState) {
+            //Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika
+        }
     },
 
     {
@@ -112,10 +139,15 @@ const krole = [
         nazwa: "Emhyr var Emreis Najeźca Północy",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr5.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2005.webp",
-        opis: '"Cesarze władają imperium, ale dwiem rzeczami rządzić nie mogą swojim sercem i swojim czasie".',
+        opis: '"Cesarze władają imperium, ale dwiem rzeczami rządzić nie mogą swojim sercem i swojim czasem".',
         frakcja: "2",
         numer: "2005",
-        umiejetnosc: "Gdy gracz przywraca jednostkę na pole bitwy, przywrócona zostaje losowa jednostka. Dotyczy obu graczy."
+        umiejetnosc: "Gdy gracz przywraca jednostkę na pole bitwy, przywrócona zostaje losowa jednostka. Dotyczy obu graczy.",
+        funkcja: function (gameState) {
+            //jeśli gracz spróbuje urzyć np medyka to zostanie urzyty ale gracz nie będzie miał wyboru jaką karte 
+            //wybiera (poprostu ta sie losuje), chyba że gracz zagra medyka bohatera wtedy ten wybór ma 
+            // (karta jest nie aktywowalna ręcznie bo jest aktywan od początku gry)
+        }
     },
 
     // Scoia'tael ██████████████████████████████████████████████████████████████████████████████████████████████████
@@ -128,7 +160,10 @@ const krole = [
         opis: '"Znowu jesteśmy Ludem, aie wygnańcami. A popiół użyźnia".',
         frakcja: "3",
         numer: "3001",
-        umiejetnosc: "Znajdź w swojej talii kartę Trzaskający Mróz i natychmiast ją zagraj."
+        umiejetnosc: "Znajdź w swojej talii kartę Trzaskający Mróz i natychmiast ją zagraj.",
+        funkcja: function (gameState) {
+            //sprzawdza czy w kupce i w talli gry znajduje sie karta tzrzaskający mróz i ją wrzuca na plansze gry (jeśnie jej nie ma któl na effekt urzycia i nie da sie go urzyć)
+        }
     },
 
     {
@@ -139,7 +174,10 @@ const krole = [
         opis: '"Powszechnei uważa się ją za najpiękniejszą kobietę świata".',
         frakcja: "3",
         numer: "3002",
-        umiejetnosc: "Weź o jedną kartę więcej na początku bitwy."
+        umiejetnosc: "Weź o jedną kartę więcej na początku bitwy.",
+        funkcja: function (gameState) {
+            // na początku bitwy bierze o jedną kartę więcej (czyli 11 zamiast 10) i dodaje ją do ręki gracza
+        }
     },
 
     {
@@ -150,7 +188,10 @@ const krole = [
         opis: '"Komanda muszą nadal prowadzić walkę".',
         frakcja: "3",
         numer: "3003",
-        umiejetnosc: "Podwaja siłę twoich jednostek dalekiego zasięgu (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
+        umiejetnosc: "Podwaja siłę twoich jednostek dalekiego zasięgu (o ile w ich rzędzie nie ma już Rogu Dowódcy).",
+        funkcja: function (gameState) {
+            // urzywa rogu dowódcy dla łuczników (dodaje karte a nie zabiera z tali czy kupki)
+        }
     },
 
     {
@@ -161,7 +202,10 @@ const krole = [
         opis: '"Wszystko ma swoją cenę. Wojna wymaga ofiar. Pokój, jak się okazuje, również".',
         frakcja: "3",
         numer: "3004",
-        umiejetnosc: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 lub więcej."
+        umiejetnosc: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 lub więcej.",
+        funkcja: function (gameState) {
+            // Niszczy najsilniejszą jednostke/i wojowników twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej.
+        }
     },
 
     {
@@ -172,7 +216,10 @@ const krole = [
         opis: '"Daede sian caente, Aen Seidhe en\'allane ael coeden...".',
         frakcja: "3",
         numer: "3005",
-        umiejetnosc: "Przesuwa jednostki ze zdolnością Zręczności do rzędóow, które maksymalizują ich siłę. (jednostki w optymalnych miejscach nie zostaną przesunięte)."
+        umiejetnosc: "Przesuwa jednostki ze zdolnością Zręczności do rzędóow, które maksymalizują ich siłę. (jednostki w optymalnych miejscach nie zostaną przesunięte).",
+        funkcja: function (gameState) {
+            //karty z umiejętnością zręczności zostaną przesunięte do rzędów, które maksymalizują ich siłę (np. łucznicy do rzędu wojowników jeśli w tym rzędzie jest róg który podwoji ich siłę)
+        }
     },
 
     // Potwory ██████████████████████████████████████████████████████████████████████████████████████████████████
@@ -185,7 +232,10 @@ const krole = [
         opis: '"Va faill, luned".',
         frakcja: "4",
         numer: "4001",
-        umiejetnosc: "Wybierz dowolną karte pogody ze swojej talii i natychmiast ją zagraj."
+        umiejetnosc: "Wybierz dowolną karte pogody ze swojej talii i natychmiast ją zagraj.",
+        funkcja: function (gameState) {
+            // aktywóje podgląd i pokazuje wszystkie dostępne karty pogodowe (jeśnie ich nie ma któl na effekt urzycia, i nie da sie go urzyć)
+        }
     },
 
     {
@@ -196,7 +246,10 @@ const krole = [
         opis: '"Król Goun śmieje się, kłapią przegniłe\nzęby nad zardzewiałym kołnierzem zbroi".',
         frakcja: "4",
         numer: "4002",
-        umiejetnosc: "Podwój siłę wszystkich swoich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
+        umiejetnosc: "Podwój siłę wszystkich swoich jednostek bliskiego starcia (o ile w ich rzędzie nie ma już Rogu Dowódcy).",
+        funkcja: function (gameState) {
+            //dodaje róg dowódcy do wojowników (czyli podwaja ich siłę) (dodaje karte a nie zabiera z tali czy kupki)
+        }
     },
 
     {
@@ -207,7 +260,10 @@ const krole = [
         opis: '"Im byli bliżej, tym piękno tego miejsca\nsilniej chwytało za serce".',
         frakcja: "4",
         numer: "4003",
-        umiejetnosc: 'Odrzuć dwie karty, a następnie wybierz jedną dowolną kratę ze swojej talii.'
+        umiejetnosc: 'Odrzuć dwie karty, a następnie wybierz jedną dowolną kratę ze swojej talii.',
+        funkcja: function (gameState) {
+            //owtiera podgląd wszystkich wylosowanych kart gracz musi odrzucić 2 karty, a następnie wybiera jedną dowolną kartę ze swojej talii 
+        }
     },
 
     {
@@ -218,7 +274,10 @@ const krole = [
         opis: '"Czerwpni Jeźdżcy zdołają doścignąć cię nawet w odchłani czasów i  miejsc".',
         frakcja: "4",
         numer: "4004",
-        umiejetnosc: 'Weź karte ze stosu kart odrzuconych.'
+        umiejetnosc: 'Weź karte ze stosu kart odrzuconych.',
+        funkcja: function (gameState) {
+            // weź 1 karte ze stosu odrzuconych kart  aktywuje sie podgląd kart odrzuconych i można wybrać 1 kartę która wróci do ręki gracza 
+        }
     },
 
     {
@@ -229,7 +288,10 @@ const krole = [
         opis: '"Bo się tobą bawię".',
         frakcja: "4",
         numer: "4005",
-        umiejetnosc: 'Pasywna - podwaja siłę kart Szpiegów obu graczy.'
+        umiejetnosc: 'Pasywna - podwaja siłę kart Szpiegów obu graczy.',
+        funkcja: function (gameState) {
+            //szpiedzy dostają podwojenie punktów siły (czyli jeśli szpieg ma 3 punkty siły to będzie miał 6 punktów siły)
+        }
     },
 
 
@@ -243,7 +305,10 @@ const krole = [
         opis: '"Nikt nie zastąpi Brana. Moge jedynie próbować."',
         frakcja: "5",
         numer: "5001",
-        umiejetnosc: "Pod wpływem złych warunków atmosferycznych, jednostki tracą tylko połowę\nswojej siły bojowej"
+        umiejetnosc: "Pod wpływem złych warunków atmosferycznych, jednostki tracą tylko połowę\nswojej siły bojowej",
+        funkcja: function (gameState) {
+            // jeśli ten dowódca jest wybrany to nie musi być aktywowany działa całyczas i karty tracą tylko połowe podczs niesprzyjające pogody
+        }
     },
 
     {
@@ -254,7 +319,10 @@ const krole = [
         opis: '"Król musi być madry. Król musi cieszyć\nsię szacunkiem. Król miusi mieć jaja".',
         frakcja: "5",
         numer: "5002",
-        umiejetnosc: "Karty odrzucone każdego z graczy zostają przetasowane i przywrócone do talii."
+        umiejetnosc: "Karty odrzucone każdego z graczy zostają przetasowane i przywrócone do talii.",
+        funkcja: function (gameState) {
+            // karty odrzucone każdego gracza zostają przetasowane i przywrócone do talii
+        }
     }
 ];
 

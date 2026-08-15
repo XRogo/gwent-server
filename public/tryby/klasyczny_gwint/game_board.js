@@ -1625,21 +1625,10 @@ function calculateScores() {
 
             const card = cards.find(c => String(c.numer) === String(cardNum));
             if (card && typeof card.punkty === 'number') {
-                let groupKey = card.numer;
-                const existingKey = Object.keys(rowDict).find(k => {
-                    const c1 = rowDict[k].card;
-                    if (c1.nazwa === card.nazwa) return true;
-                    const s1 = c1.summon ? c1.summon.split(',').map(s=>s.trim()) : [];
-                    const s2 = card.summon ? card.summon.split(',').map(s=>s.trim()) : [];
-                    return s1.includes(String(card.numer)) || s2.includes(String(c1.numer));
-                });
-                if (existingKey) groupKey = existingKey;
-
-                if (!rowDict[groupKey]) {
-                    rowDict[groupKey] = { count: 0, card: card, members: [] };
+                if (!rowDict[card.numer]) {
+                    rowDict[card.numer] = { count: 0, card: card };
                 }
-                rowDict[groupKey].count++;
-                rowDict[groupKey].members.push(card.numer);
+                rowDict[card.numer].count++;
 
                 // Morale buff (liczymy wszystkie jednostki z morale w rzędzie prócz bohaterów)
                 if (!card.bohater && card.moc === 'morale') moraleCount++;
@@ -1656,18 +1645,7 @@ function calculateScores() {
             if (c.bohater) {
                 sum += c.punkty * count;
             } else {
-                let pts = c.punkty;
-                const rSide = rowKey.startsWith('p1') ? 'p1' : 'p2';
-                const leaderId = rSide === 'p1' ? window.playerLeaderObj?.numer : window.opponentLeaderObj?.numer;
-
-                if (weatherActive) {
-                    if (leaderId === '5001') pts = Math.ceil(c.punkty / 2);
-                    else pts = 1;
-                }
-
-                if (leaderId === '4005' && c.moc === 'szpieg') {
-                    pts *= 2;
-                }
+                let pts = weatherActive ? 1 : c.punkty;
 
                 // 1. Więź (x2 za każdą kolejną kartę o tej samej nazwie/numerze)
                 if (c.moc === 'wiez') {
@@ -2419,26 +2397,11 @@ function renderRows(overlay) {
                         return wc && (wc.moc === t || (wc.moc === 'sztorm' && (t === 'mgla' || t === 'deszcz')));
                     });
                     const rowNum = parseInt(rowKey.slice(-1));
-                    const rSide = rowKey.startsWith('p1') ? 'p1' : 'p2';
-                    const leaderId = rSide === 'p1' ? window.playerLeaderObj?.numer : window.opponentLeaderObj?.numer;
-
                     if ((rowNum === 1 && checkW('mroz')) || (rowNum === 2 && checkW('mgla')) || (rowNum === 3 && checkW('deszcz'))) {
-                        if (leaderId === '5001') cardScore = Math.ceil(card.punkty / 2);
-                        else cardScore = 1;
-                    }
-
-                    if (leaderId === '4005' && card.moc === 'szpieg') {
-                        cardScore *= 2;
+                        cardScore = 1;
                     }
                     // Więź
-                    const bondCnt = cardsInRowNumers.filter(n => {
-                        const c1 = cards.find(c => String(c.numer) === String(n));
-                        if (!c1) return false;
-                        if (c1.nazwa === card.nazwa) return true;
-                        const s1 = c1.summon ? c1.summon.split(',').map(s=>s.trim()) : [];
-                        const s2 = card.summon ? card.summon.split(',').map(s=>s.trim()) : [];
-                        return s1.includes(String(card.numer)) || s2.includes(String(c1.numer));
-                    }).length;
+                    const bondCnt = cardsInRowNumers.filter(n => n === card.numer).length;
                     if (card.moc === 'wiez') {
                         const bKey = `${rowKey}_${card.numer}`;
                         const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
