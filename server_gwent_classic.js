@@ -160,8 +160,7 @@ function initializeGameLeaders(game) {
     }
 }
 
-function executeMedicResurrection(game, socket, io, isPlayer1, cardNumer, targetRow) {
-    const gameCode = Object.keys(games).find(key => games[key] === game) || Array.from(socket.rooms)[1];
+function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNumer, targetRow) {
     const state = game.gameState;
     const grave = isPlayer1 ? state.p1Graveyard : state.p2Graveyard;
     const cardIdx = grave.indexOf(cardNumer);
@@ -230,7 +229,7 @@ function executeMedicResurrection(game, socket, io, isPlayer1, cardNumer, target
                     });
 
                     setTimeout(() => {
-                        executeMedicResurrection(game, socket, io, isPlayer1, randomCardNumer, null);
+                        executeMedicResurrection(game, gameCode, socket, io, isPlayer1, randomCardNumer, null);
                     }, 1000);
                     return;
                 } else {
@@ -1074,7 +1073,7 @@ function registerClassicGwentEvents(socket, io, games) {
                                 console.log(`[GAME CLASSIC] Emhyr 2005 active on play-card: automatically revived random card ${randomCardNumer}`);
                                 state.medicPending = true;
                                 setTimeout(() => {
-                                    executeMedicResurrection(game, socket, io, isPlayer1, randomCardNumer, null);
+                                    executeMedicResurrection(game, gameCode, socket, io, isPlayer1, randomCardNumer, null);
                                 }, 800);
                             } else {
                                 state.medicPending = true;
@@ -1235,7 +1234,7 @@ function registerClassicGwentEvents(socket, io, games) {
             const myTurn = state.currentTurn === socket.id;
             if (!myTurn) return;
 
-            executeMedicResurrection(game, socket, io, isPlayer1, cardNumer, targetRow);
+            executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNumer, targetRow);
         }
     });
 
