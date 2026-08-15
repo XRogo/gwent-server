@@ -52,13 +52,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
 
     const wiezCount = rowCards.filter(n => {
         const c1 = _cards.find(x => String(x.numer) === String(n));
-        if (!c1) return false;
-        if (c1.nazwa === card.nazwa) return true;
-        
-        // Sprawdzenie, czy jedna karta wymienia drugą w polu "summon" jako partnera do więzi
-        const summonListCard = card.summon ? card.summon.split(',').map(s => s.trim()) : [];
-        const summonListC1 = c1.summon ? c1.summon.split(',').map(s => s.trim()) : [];
-        return summonListCard.includes(String(c1.numer)) || summonListC1.includes(String(card.numer));
+        return c1 && c1.nazwa === card.nazwa;
     }).length;
 
     const leaderForSide = rowSide === 'p1' ? state.p1Leader : state.p2Leader;
@@ -73,7 +67,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
         }
     }
 
-    const isEredin4005Active = String(leaderForSide) === '4005';
+    const isEredin4005Active = String(state.p1Leader) === '4005' || String(state.p2Leader) === '4005';
     if (isEredin4005Active && card.moc === 'szpieg') {
         pts *= 2;
     }
@@ -123,8 +117,7 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
         // --- PÓŁNOC ---
         case "1001": // Foltest Król Temerii: Zagraj Gęstą mgłę z talii
             return deck.some(num => {
-                const numStr = typeof num === 'object' ? num.numer : num;
-                const c = _c.find(x => String(x.numer) === String(numStr));
+                const c = _c.find(x => String(x.numer) === String(num));
                 return c && c.moc === 'mgla';
             });
         case "1002": // Foltest Dowódca Północy: Usuń efekty pogodowe
@@ -139,8 +132,7 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
         // --- NILFGAARD ---
         case "2001": // Emhyr Jeż z Erlenwaldu: Zagraj Deszcz z talii
             return deck.some(num => {
-                const numStr = typeof num === 'object' ? num.numer : num;
-                const c = _c.find(x => String(x.numer) === String(numStr));
+                const c = _c.find(x => String(x.numer) === String(num));
                 return c && c.moc === 'deszcz';
             });
         case "2002": // Emhyr Cesarz Nilfgaardu: Zobacz 3 losowe karty z ręki przeciwnika
@@ -150,16 +142,14 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
             return false; // pasywne, nieaktywowalne
         case "2004": // Emhyr Pan Południa: Wybierz kartę z cmentarza przeciwnika
             return oppGraveyard.some(num => {
-                const numStr = typeof num === 'object' ? num.numer : num;
-                const c = _c.find(x => String(x.numer) === String(numStr));
+                const c = _c.find(x => String(x.numer) === String(num));
                 return isNormalUnit(c);
             });
 
         // --- SCOIA'TAEL ---
         case "3001": // Francesca Elfka czystej krwi: Zagraj Trzaskający Mróz z talii
             return deck.some(num => {
-                const numStr = typeof num === 'object' ? num.numer : num;
-                const c = _c.find(x => String(x.numer) === String(numStr));
+                const c = _c.find(x => String(x.numer) === String(num));
                 return c && c.moc === 'mroz';
             });
         case "3002": // Francesca Stokrotka: Pasywna
@@ -173,8 +163,7 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
                 const r1 = state.board[`${side}R1`] || [];
                 const r2 = state.board[`${side}R2`] || [];
                 return r1.concat(r2).some(num => {
-                    const numStr = typeof num === 'object' ? num.numer : num;
-                    const c = _c.find(x => String(x.numer) === String(numStr));
+                    const c = _c.find(x => String(x.numer) === String(num));
                     return c && c.pozycja === 4;
                 });
             }
@@ -182,8 +171,7 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
         // --- POTWORY ---
         case "4001": // Eredin Król Dzikiego Gonu: Wybierz pogodę z talii
             return deck.some(num => {
-                const numStr = typeof num === 'object' ? num.numer : num;
-                const c = _c.find(x => String(x.numer) === String(numStr));
+                const c = _c.find(x => String(x.numer) === String(num));
                 return isWeather(c);
             });
         case "4002": // Eredin Dowódca: Róg w zwarciu (S1)
@@ -192,8 +180,7 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
             return hand.length >= 2 && deck.length > 0;
         case "4004": // Eredin Zabójca: Weź kartę z własnego cmentarza
             return graveyard.some(num => {
-                const numStr = typeof num === 'object' ? num.numer : num;
-                const c = _c.find(x => String(x.numer) === String(numStr));
+                const c = _c.find(x => String(x.numer) === String(num));
                 return isNormalUnit(c);
             });
         case "4005": // Eredin Zdradziecki: Pasywna

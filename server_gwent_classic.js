@@ -102,15 +102,8 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
         return (c && !c.bohater && c.moc === 'morale') ? acc + 1 : acc;
     }, 0);
 
-    // Więź Count (ile kart o tym samym numerze lub wzajemnie się wzywających)
-    const wiezCount = rowCards.filter(n => {
-        const c1 = cards.find(x => String(x.numer) === String(n));
-        if (!c1) return false;
-        if (c1.nazwa === card.nazwa) return true;
-        const summonListCard = card.summon ? card.summon.split(',').map(s => s.trim()) : [];
-        const summonListC1 = c1.summon ? c1.summon.split(',').map(s => s.trim()) : [];
-        return summonListCard.includes(String(c1.numer)) || summonListC1.includes(String(card.numer));
-    }).length;
+    // Więź Count (ile kart o tym samym numerze)
+    const wiezCount = rowCards.filter(n => String(n) === String(cardNum)).length;
 
     // King Bran 5001 check
     const leaderForSide = rowSide === 'p1' ? state.p1Leader : state.p2Leader;
@@ -125,8 +118,8 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
         }
     }
 
-    // Eredin 4005 check (tylko dla strony gracza, który ma tego lidera)
-    const isEredin4005Active = String(leaderForSide) === '4005';
+    // Eredin 4005 check
+    const isEredin4005Active = String(state.p1Leader) === '4005' || String(state.p2Leader) === '4005';
     if (isEredin4005Active && card.moc === 'szpieg') {
         pts *= 2;
     }
@@ -167,7 +160,8 @@ function initializeGameLeaders(game) {
     }
 }
 
-function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNumer, targetRow) {
+function executeMedicResurrection(game, socket, io, isPlayer1, cardNumer, targetRow) {
+    const gameCode = Object.keys(games).find(key => games[key] === game) || Array.from(socket.rooms)[1];
     const state = game.gameState;
     const grave = isPlayer1 ? state.p1Graveyard : state.p2Graveyard;
     const cardIdx = grave.indexOf(cardNumer);
@@ -236,7 +230,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                     });
 
                     setTimeout(() => {
-                        executeMedicResurrection(game, gameCode, socket, io, isPlayer1, randomCardNumer, null);
+                        executeMedicResurrection(game, socket, io, isPlayer1, randomCardNumer, null);
                     }, 1000);
                     return;
                 } else {
@@ -283,7 +277,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                 state.currentTurn = nextPlayer;
             }
 
-            io.to(gameCodeLocal || socket.rooms).emit('board-updated', {
+            io.to(gameCode).emit('board-updated', {
                 board: state.board,
                 currentTurn: state.currentTurn,
                 p1HandCount: state.p1Hand.length,
@@ -1011,7 +1005,7 @@ function registerClassicGwentEvents(socket, io, games) {
                     hand.splice(cardIdx, 1);
 
                     // Wezwanie (Muster) logic
-                    if (cardObj.moc === 'wezwanie' && cardObj.summon) {
+                    if (cardObj.summon) {
                         const summonIds = cardObj.summon.split(',').map(s => s.trim());
                         const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
 
@@ -1080,7 +1074,7 @@ function registerClassicGwentEvents(socket, io, games) {
                                 console.log(`[GAME CLASSIC] Emhyr 2005 active on play-card: automatically revived random card ${randomCardNumer}`);
                                 state.medicPending = true;
                                 setTimeout(() => {
-                                    executeMedicResurrection(game, gameCode, socket, io, isPlayer1, randomCardNumer, null);
+                                    executeMedicResurrection(game, socket, io, isPlayer1, randomCardNumer, null);
                                 }, 800);
                             } else {
                                 state.medicPending = true;
@@ -1241,7 +1235,7 @@ function registerClassicGwentEvents(socket, io, games) {
             const myTurn = state.currentTurn === socket.id;
             if (!myTurn) return;
 
-            executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNumer, targetRow);
+            executeMedicResurrection(game, socket, io, isPlayer1, cardNumer, targetRow);
         }
     });
 

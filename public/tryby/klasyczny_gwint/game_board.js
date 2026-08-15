@@ -2,6 +2,7 @@ import cards from './cards.js';
 import { renderCardHTML } from './bcard_render.js';
 import { showPowiek, renderPowiek } from './rcard.js';
 import { krole } from './krole.js';
+import { isLeaderUsable } from './krol_code.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
 import { animateLeaderFromDeck, animateOpponentLeaderFromDeck, animateDeckToHand, animateBoardToGraveyard, animateCardToDeck, animateElement, getElement4KPos } from './animacje.js';
 
@@ -154,6 +155,16 @@ function reconcileArrivedCards(board, excludeNumerStrings = []) {
     });
 }
 
+function reconcileArrivedWeatherCards(weather, excludeWeatherStr = null) {
+    if (!window.arrivedWeatherCards) window.arrivedWeatherCards = new Set();
+    if (!weather) return;
+    weather.forEach(wStr => {
+        if (wStr !== excludeWeatherStr && !window.arrivedWeatherCards.has(wStr)) {
+            window.arrivedWeatherCards.add(wStr);
+        }
+    });
+}
+
 const handleCardAnimationSequence = async (data) => {
     const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
     const usedSlotsInSequence = new Set();
@@ -242,8 +253,30 @@ const handleCardAnimationSequence = async (data) => {
         } else if (lpc.typ === 'pogoda' || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(lpc.moc)) {
             const weatherEl = document.getElementById('weather-container');
             if (weatherEl) {
-                to4K = getElement4KPos(weatherEl);
-                to4K.x += 100;
+                const weatherList = boardState.weather || [];
+                if (lpc.moc === 'niebo') {
+                    to4K = getElement4KPos(weatherEl);
+                    to4K.x += (549 / 2) - 90; // Center (width 549, card width ~180)
+                } else {
+                    const last3 = weatherList.slice(-3);
+                    let foundIndex = last3.findIndex(wStr => wStr.split('-')[1] === String(lpc.numer));
+                    if (foundIndex === -1) {
+                        foundIndex = Math.max(0, last3.length - 1);
+                    }
+                    const count = Math.min(weatherList.length, 3);
+                    const wW = 549;
+                    const cW = 239 * (180 / 240);
+                    let cStep = cW + 5;
+                    if (count * cStep > wW) {
+                        cStep = (wW - cW) / Math.max(1, count - 1);
+                    }
+                    const startX = (wW - (count > 0 ? (count - 1) * cStep + cW : 0)) / 2;
+                    const containerPos = getElement4KPos(weatherEl);
+                    to4K = {
+                        x: containerPos.x + startX + foundIndex * cStep,
+                        y: containerPos.y
+                    };
+                }
             }
         }
 
@@ -322,7 +355,7 @@ const handleCardAnimationSequence = async (data) => {
                                 window.lastDestroyedCardsDOM.forEach(item => {
                                     const graveyard4K = item.side === 'p1' ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
                                     const del = createAnimationCardElement(item.card, 180, 239);
-                                    animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => {});
+                                    animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => { });
                                     requestAnimationFrame(() => requestAnimationFrame(() => {
                                         const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                                         const bL = (window.innerWidth - 3840 * scale) / 2;
@@ -368,7 +401,7 @@ const handleCardAnimationSequence = async (data) => {
                         window.lastDestroyedCardsDOM.forEach(item => {
                             const graveyard4K = item.side === 'p1' ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
                             const del = createAnimationCardElement(item.card, 180, 239);
-                            animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => {});
+                            animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => { });
                             requestAnimationFrame(() => requestAnimationFrame(() => {
                                 const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                                 const bL = (window.innerWidth - 3840 * scale) / 2;
@@ -524,7 +557,105 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
             window.activeDecoySequences.delete(`${d.row}_${d.index}`);
         }
 
-        markArrivedInState(data.lastPlayedCard, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
+        const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
+        const isWeather = lpc.typ === 'pogoda' || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(lpc.moc);
+
+        if (isWeather) {
+            // Check if it was duplicate weather card
+            const isDuplicateWeather = lpc.moc !== 'niebo' && window.oldWeatherList && window.oldWeatherList.some(wStr => {
+                const wNum = wStr.split('-')[1];
+                const existingCard = cards.find(c => String(c.numer) === String(wNum));
+                return existingCard && existingCard.moc === lpc.moc;
+            });
+
+            // 1. Hide animating weather cards from slots, clear sky clears all
+            if (lpc.moc === 'niebo') {
+                window.arrivedWeatherCards.clear();
+            }
+            window.animatingWeatherCards.clear();
+
+            // 2. Animate removed weather cards to graveyard
+            const removedWeatherCards = [];
+            if (window.oldWeatherCards && window.oldWeatherCards.length > 0) {
+                window.oldWeatherCards.forEach(item => {
+                    const stillActive = boardState.weather && boardState.weather.includes(item.wstr);
+                    if (!stillActive) {
+                        removedWeatherCards.push(item);
+                    }
+                });
+            }
+
+            // Calculate graveyard animating counts
+            let myGyCount = 0;
+            let oppGyCount = 0;
+            if (lpc.moc === 'niebo' || isDuplicateWeather) {
+                if (isMe) myGyCount++; else oppGyCount++;
+            }
+            removedWeatherCards.forEach(item => {
+                const isInMyGy = playerGraveyard.some(c => String(c.numer) === String(item.card.numer));
+                if (isInMyGy) myGyCount++; else oppGyCount++;
+            });
+
+            window.playerGraveyardAnimatingCount = myGyCount;
+            window.opponentGraveyardAnimatingCount = oppGyCount;
+
+            if (removedWeatherCards.length > 0) {
+                removedWeatherCards.forEach((item) => {
+                    const isInMyGy = playerGraveyard.some(c => String(c.numer) === String(item.card.numer));
+                    const graveyard4K = isInMyGy ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
+
+                    const del = createAnimationCardElement(item.card, 180, 239);
+                    animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => {
+                        if (graveyard4K.y > 1000) {
+                            window.playerGraveyardAnimatingCount = Math.max(0, window.playerGraveyardAnimatingCount - 1);
+                        } else {
+                            window.opponentGraveyardAnimatingCount = Math.max(0, window.opponentGraveyardAnimatingCount - 1);
+                        }
+                        renderAll(currentNick);
+                    });
+
+                    requestAnimationFrame(() => requestAnimationFrame(() => {
+                        const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                        const bL = (window.innerWidth - 3840 * scale) / 2;
+                        const bT = (window.innerHeight - 2160 * scale) / 2;
+                        del.style.left = `${graveyard4K.x * scale + bL}px`;
+                        del.style.top = `${graveyard4K.y * scale + bT}px`;
+                    }));
+                });
+            }
+            window.oldWeatherCards = []; // ALWAYS clear!
+
+            // 3. Handle played weather card arrival or graveyard fly if duplicate or clear sky
+            if (lpc.moc === 'niebo' || isDuplicateWeather) {
+                const activeGraveyard4K = isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
+                const clearSkyEl = createAnimationCardElement(lpc, 180, 239);
+                animateElement(clearSkyEl, to4K, activeGraveyard4K, 180, 239, () => {
+                    if (activeGraveyard4K.y > 1000) {
+                        window.playerGraveyardAnimatingCount = Math.max(0, window.playerGraveyardAnimatingCount - 1);
+                    } else {
+                        window.opponentGraveyardAnimatingCount = Math.max(0, window.opponentGraveyardAnimatingCount - 1);
+                    }
+                    renderAll(currentNick);
+                });
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                    const bL = (window.innerWidth - 3840 * scale) / 2;
+                    const bT = (window.innerHeight - 2160 * scale) / 2;
+                    clearSkyEl.style.left = `${activeGraveyard4K.x * scale + bL}px`;
+                    clearSkyEl.style.top = `${activeGraveyard4K.y * scale + bT}px`;
+                }));
+            } else {
+                const weatherList = boardState.weather || [];
+                const newWeatherStr = weatherList[weatherList.length - 1];
+                if (newWeatherStr) {
+                    window.arrivedWeatherCards.add(newWeatherStr);
+                }
+            }
+
+            renderAll(currentNick);
+        } else {
+            markArrivedInState(data.lastPlayedCard, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
+        }
 
         if (data.decoyDetails) {
             if (window.playSound) window.playSound('manekinSound');
@@ -568,6 +699,10 @@ let playerPassed = false;
 let opponentPassed = false;
 let playerLeaderObj = null;
 let opponentLeaderObj = null;
+let playerLeaderUsed = false;
+let opponentLeaderUsed = false;
+let playerLeaderBlocked = false;
+let opponentLeaderBlocked = false;
 let currentTurn = null;
 let selectedHandIndex = -1;
 let currentNick = '';
@@ -579,6 +714,34 @@ let boardState = {
     p1S1: null, p1S2: null, p1S3: null, // Horn slots
     p2S1: null, p2S2: null, p2S3: null
 };
+
+// Cache walidacji lidera — obliczane raz po każdej zmianie stanu, nie przy każdym renderze
+function updateLeaderCache() {
+    if (!playerLeaderObj || playerLeaderUsed || playerLeaderBlocked) {
+        window.cachedLeaderCanUse = false;
+        return;
+    }
+    try {
+        const localState = {
+            p1LeaderUsed: playerLeaderUsed,
+            p2LeaderUsed: opponentLeaderUsed,
+            p1LeaderBlocked: playerLeaderBlocked,
+            p2LeaderBlocked: opponentLeaderBlocked,
+            p1Deck: isPlayer1Local ? drawPile.map(c => c.numer) : [],
+            p2Deck: isPlayer1Local ? [] : drawPile.map(c => c.numer),
+            p1Hand: isPlayer1Local ? playerHand.map(c => c.numer) : [],
+            p2Hand: isPlayer1Local ? [] : playerHand.map(c => c.numer),
+            oppHandCount: opponentHandCount,
+            p1Graveyard: isPlayer1Local ? playerGraveyard.map(c => c.numer) : opponentGraveyard.map(c => c.numer),
+            p2Graveyard: isPlayer1Local ? opponentGraveyard.map(c => c.numer) : playerGraveyard.map(c => c.numer),
+            board: boardState
+        };
+        window.cachedLeaderCanUse = isLeaderUsable(playerLeaderObj.numer, localState, isPlayer1Local);
+    } catch (e) {
+        window.cachedLeaderCanUse = false;
+    }
+}
+
 const factionInfo = {
     "1": { name: "Królestwa Północy", logo: "tpolnoc.webp", reverse: "polnoc_rewers.webp" },
     "2": { name: "Cesarstwo Nilfgaardu", logo: "tnilfgaard.webp", reverse: "nilftgard_rewers.webp" },
@@ -601,6 +764,11 @@ window.opponentLeaderAnimated = false;
 window.cardsAnimated = false;
 window.arrivedCards = new Set();
 window.arrivedBoardCards = new Set(); // Klucze w formacie: "p1R1_0", "p1R1_1" etc.
+window.arrivedWeatherCards = new Set();
+window.animatingWeatherCards = new Set();
+window.oldWeatherList = [];
+window.playerGraveyardAnimatingCount = 0;
+window.opponentGraveyardAnimatingCount = 0;
 window.proposedCard = null; // Karta wybrana do potwierdzenia propozycji zagrania
 window.proposedTargetRow = null;
 window.bondMultiplierActive = false;
@@ -665,6 +833,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             playerHand.forEach(c => window.arrivedCards.add(c));
             window.cardsAnimated = true;
 
+            // Sync weather cards
+            if (!window.arrivedWeatherCards) window.arrivedWeatherCards = new Set();
+            window.arrivedWeatherCards.clear();
+            if (data.board && data.board.weather) {
+                data.board.weather.forEach(w => window.arrivedWeatherCards.add(w));
+            }
+
             opponentHandCount = data.opponentHandCount;
             opponentDeckCount = data.opponentDeckCount;
             window.playerFaction = data.faction || localStorage.getItem('faction') || '1';
@@ -676,6 +851,11 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             if (data.leader) playerLeaderObj = krole.find(k => k.numer === data.leader);
             if (data.opponentLeader) opponentLeaderObj = krole.find(k => k.numer === data.opponentLeader);
 
+            playerLeaderUsed = isPlayer1Local ? data.p1LeaderUsed : data.p2LeaderUsed;
+            opponentLeaderUsed = isPlayer1Local ? data.p2LeaderUsed : data.p1LeaderUsed;
+            playerLeaderBlocked = isPlayer1Local ? data.p1LeaderBlocked : data.p2LeaderBlocked;
+            opponentLeaderBlocked = isPlayer1Local ? data.p2LeaderBlocked : data.p1LeaderBlocked;
+
             playerLives = isPlayer1Local ? (data.p1Lives !== undefined ? data.p1Lives : 2) : (data.p2Lives !== undefined ? data.p2Lives : 2);
             opponentLives = isPlayer1Local ? (data.p2Lives !== undefined ? data.p2Lives : 2) : (data.p1Lives !== undefined ? data.p1Lives : 2);
             playerPassed = isPlayer1Local ? data.p1Passed : data.p2Passed;
@@ -684,6 +864,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             if (data.currentTurn) currentTurn = data.currentTurn;
             if (data.board) boardState = data.board;
 
+            updateLeaderCache();
             sortHand();
             console.log(`[BOARD] Game state initialized. Local: ${nick}, Opponent: ${window.opponentNickname}, Status: ${data.status}`);
 
@@ -956,6 +1137,55 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         renderAll(nick);
     });
 
+    socket.on('leader-select-prompt', (data) => {
+        const { type, cards: numers } = data;
+        if (type === 'discard_two') {
+            let selectedToDiscard = [];
+            const handObjs = playerHand;
+
+            window.showPowiek(handObjs, 0, 'game', {
+                isMedic: true,
+                onSelect: (selectedCard) => {
+                    if (selectedToDiscard.includes(selectedCard.numer)) {
+                        selectedToDiscard = selectedToDiscard.filter(n => n !== selectedCard.numer);
+                    } else {
+                        selectedToDiscard.push(selectedCard.numer);
+                    }
+
+                    if (selectedToDiscard.length >= 2) {
+                        socket.emit('leader-select-choice', {
+                            gameCode: gameCodeLocal,
+                            isPlayer1: isPlayer1Local,
+                            choice: selectedToDiscard
+                        });
+                        if (window.hidePowiek) window.hidePowiek();
+                    } else {
+                        alert(`Wybierz jeszcze ${2 - selectedToDiscard.length} kartę/y do odrzucenia.`);
+                    }
+                }
+            });
+        } else {
+            const selectObjs = numers.map(num => {
+                const c = cards.find(card => card.numer === String(num));
+                return c ? { ...c, _id: Math.random() } : null;
+            }).filter(Boolean);
+
+            if (selectObjs.length > 0) {
+                window.showPowiek(selectObjs, 0, 'game', {
+                    isMedic: true,
+                    onSelect: (selectedCard) => {
+                        socket.emit('leader-select-choice', {
+                            gameCode: gameCodeLocal,
+                            isPlayer1: isPlayer1Local,
+                            choice: selectedCard.numer
+                        });
+                        if (window.hidePowiek) window.hidePowiek();
+                    }
+                });
+            }
+        }
+    });
+
     socket.on('update-deck', (data) => {
         if (data.deck) {
             const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === num)).filter(Boolean);
@@ -966,31 +1196,37 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('board-updated', (data) => {
         console.log("[BOARD] Received board-updated:", data);
-        
+
         // Zbierz karty do animacji zniszczenia przed nadpisaniem stanu
-        const oldCards = collectCardsOnBoardDOM(false).map(i => ({...i, side: isPlayer1Local ? 'p1' : 'p2'}))
-                        .concat(collectCardsOnBoardDOM(true).map(i => ({...i, side: isPlayer1Local ? 'p2' : 'p1'})));
+        const oldCards = collectCardsOnBoardDOM(false).map(i => ({ ...i, side: isPlayer1Local ? 'p1' : 'p2' }))
+            .concat(collectCardsOnBoardDOM(true).map(i => ({ ...i, side: isPlayer1Local ? 'p2' : 'p1' })));
+
+        // NEW: Collect old weather cards
+        window.oldWeatherCards = collectWeatherCardsDOM();
+        window.oldWeatherList = [...(boardState.weather || [])];
 
         const prevTurn = currentTurn;
         boardState = data.board;
         currentTurn = data.currentTurn;
+        // Cache musi być odświeżony po zmianie tury (lider dostępny tylko w swojej turze)
+        updateLeaderCache();
 
         // Znajdź usunięte karty (np. przez pożogę)
         const newBoardCounts = {};
-        ['p1R1','p1R2','p1R3','p2R1','p2R2','p2R3'].forEach(r => {
-             (data.board[r] || []).forEach(n => {
-                 newBoardCounts[n] = (newBoardCounts[n] || 0) + 1;
-             });
+        ['p1R1', 'p1R2', 'p1R3', 'p2R1', 'p2R2', 'p2R3'].forEach(r => {
+            (data.board[r] || []).forEach(n => {
+                newBoardCounts[n] = (newBoardCounts[n] || 0) + 1;
+            });
         });
         window.lastDestroyedCardsDOM = [];
         oldCards.forEach(item => {
-             if (newBoardCounts[item.card.numer] > 0) {
-                 newBoardCounts[item.card.numer]--;
-             } else {
-                 if (!data.decoyDetails || String(data.decoyDetails.replacedNumer) !== String(item.card.numer)) {
-                     window.lastDestroyedCardsDOM.push(item);
-                 }
-             }
+            if (newBoardCounts[item.card.numer] > 0) {
+                newBoardCounts[item.card.numer]--;
+            } else {
+                if (!data.decoyDetails || String(data.decoyDetails.replacedNumer) !== String(item.card.numer)) {
+                    window.lastDestroyedCardsDOM.push(item);
+                }
+            }
         });
 
         // --- SYNCHRONIZACJA WIDOCZNOŚCI ---
@@ -1001,6 +1237,30 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             data.musteredDetails.forEach(m => excludeList.push(String(m.numer)));
         }
         reconcileArrivedCards(data.board, excludeList);
+
+        // NEW: Reconcile weather cards
+        const weatherList = data.board.weather || [];
+        const newWeatherStr = (weatherList.length > 0) ? weatherList[weatherList.length - 1] : null;
+        const lpc = cards.find(c => String(c.numer) === String(data.lastPlayedCard));
+        const isWeatherLPC = lpc && (lpc.typ === 'pogoda' || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(lpc.moc));
+
+        if (isWeatherLPC) {
+            window.animatingWeatherCards.clear();
+            const nextWeather = data.board.weather || [];
+            window.oldWeatherList.forEach(wStr => {
+                if (!nextWeather.includes(wStr)) {
+                    window.animatingWeatherCards.add(wStr);
+                }
+            });
+
+            if (lpc.moc === 'niebo') {
+                // Clear sky: do not clear arrived cards immediately so they stay rendered during dollot
+            } else {
+                reconcileArrivedWeatherCards(weatherList, newWeatherStr);
+            }
+        } else {
+            reconcileArrivedWeatherCards(weatherList, null);
+        }
         // ---------------------------------
 
         const newOppHandCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
@@ -1043,11 +1303,23 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
         }
 
+        if (data.p1LeaderUsed !== undefined) {
+            playerLeaderUsed = isPlayer1Local ? data.p1LeaderUsed : data.p2LeaderUsed;
+            opponentLeaderUsed = isPlayer1Local ? data.p2LeaderUsed : data.p1LeaderUsed;
+            playerLeaderBlocked = isPlayer1Local ? data.p1LeaderBlocked : data.p2LeaderBlocked;
+            opponentLeaderBlocked = isPlayer1Local ? data.p2LeaderBlocked : data.p1LeaderBlocked;
+            updateLeaderCache();
+        }
+
         const performUpdateSequence = async () => {
             try {
                 opponentHandCount = newOppHandCount;
                 if (data.spyDrawn && data.spyDrawn.length > 0 && data.spyPlayer !== (isPlayer1Local ? 'p1' : 'p2')) {
                     opponentDeckCount -= data.spyDrawn.length;
+                }
+
+                if (data.leaderPlayed) {
+                    await animateLeaderPlay(data.leaderPlayed);
                 }
 
                 // Przygotuj (preload) obrazki dobieranych kart w trakcie poprzedzającej animacji
@@ -1554,8 +1826,13 @@ function renderProposedCard(overlay) {
         if (name) name.style.fontSize = (dkartaH * 0.044) + 'px';
     }
 
-    // Pozwala odkliknąć wybór
+    // Pozwala odkliknąć wybór lub zagrać lidera
     overlay.onmousedown = (e) => {
+        if (window.proposedCard && window.proposedCard === playerLeaderObj) {
+            e.stopPropagation();
+            confirmPlayLeader();
+            return;
+        }
         if (e.target === overlay && window.proposedCard) {
             window.proposedCard = null;
             renderAll(currentNick);
@@ -2088,8 +2365,8 @@ function renderGraveyards(overlay) {
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const renderGraveyardGroup = (x, y, cardList) => {
-        const count = cardList.length;
+    const renderGraveyardGroup = (x, y, cardList, animatingCount = 0) => {
+        const count = Math.max(0, cardList.length - animatingCount);
         if (count === 0) return;
 
         // Renderujemy stos (warstwy)
@@ -2125,8 +2402,86 @@ function renderGraveyards(overlay) {
         }
     };
 
-    renderGraveyardGroup(3110, 1682, playerGraveyard);
-    renderGraveyardGroup(3110, 168, opponentGraveyard);
+    renderGraveyardGroup(3110, 1682, playerGraveyard, window.playerGraveyardAnimatingCount || 0);
+    renderGraveyardGroup(3110, 168, opponentGraveyard, window.opponentGraveyardAnimatingCount || 0);
+}
+
+function confirmPlayLeader() {
+    if (isProcessingMove) return;
+    isProcessingMove = true;
+
+    window.socket.emit('play-leader', {
+        gameCode: gameCodeLocal,
+        isPlayer1: isPlayer1Local
+    });
+
+    window.proposedCard = null;
+    renderAll(currentNick);
+}
+
+async function animateLeaderPlay(leaderPlayed) {
+    const leaderObj = krole.find(k => k.numer === String(leaderPlayed.leader));
+    if (!leaderObj) return;
+
+    const isMe = leaderPlayed.playedBy === (isPlayer1Local ? 'p1' : 'p2');
+    const start4K = isMe ? { x: 286, y: 1679 } : { x: 286, y: 174 };
+    const preview4K = { x: 3120, y: 1080 - 992 / 2 };
+
+    if (window.playSound) window.playSound('wezwanieSound');
+
+    await new Promise(resolve => {
+        const flyEl = createAnimationCardElement(leaderObj, 523, 992, true, true);
+        animateElement(flyEl, start4K, preview4K, 523, 992, () => {
+            const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+            const bL = (window.innerWidth - 3840 * scale) / 2;
+            const bT = (window.innerHeight - 2160 * scale) / 2;
+
+            const hdEl = createAnimationCardElement(leaderObj, 523, 992, true, true);
+            hdEl.style.position = 'fixed';
+            hdEl.style.zIndex = '5000';
+            hdEl.style.width = `${523 * scale}px`;
+            hdEl.style.height = `${992 * scale}px`;
+            hdEl.style.left = `${3120 * scale + bL}px`;
+            hdEl.style.top = `${(1080 - 992 / 2) * scale + bT}px`;
+            document.body.appendChild(hdEl);
+
+            setTimeout(() => {
+                if (hdEl.parentNode) hdEl.parentNode.removeChild(hdEl);
+
+                const returnEl = createAnimationCardElement(leaderObj, 180, 240);
+                animateElement(returnEl, preview4K, start4K, 180, 240, () => {
+                    resolve();
+                }, 180, 240);
+
+                returnEl.style.transformOrigin = 'top left';
+                returnEl.style.transform = `scale(${523 / 180}, ${992 / 240})`;
+                returnEl.style.transition += `, transform ${returnEl._duration}s ease-in-out`;
+
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+                    const bL = (window.innerWidth - 3840 * scale) / 2;
+                    const bT = (window.innerHeight - 2160 * scale) / 2;
+                    returnEl.style.left = `${start4K.x * scale + bL}px`;
+                    returnEl.style.top = `${start4K.y * scale + bT}px`;
+                    returnEl.style.transform = `scale(1, 1)`;
+                }));
+
+            }, 1500);
+        }, 523, 992);
+
+        flyEl.style.transformOrigin = 'top left';
+        flyEl.style.transform = `scale(${180 / 523}, ${240 / 992})`;
+        flyEl.style.transition += `, transform ${flyEl._duration}s ease-in-out`;
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+            const bL = (window.innerWidth - 3840 * scale) / 2;
+            const bT = (window.innerHeight - 2160 * scale) / 2;
+            flyEl.style.left = `${preview4K.x * scale + bL}px`;
+            flyEl.style.top = `${preview4K.y * scale + bT}px`;
+            flyEl.style.transform = `scale(1, 1)`;
+        }));
+    });
 }
 
 function confirmPlayProposed(targetData = {}) {
@@ -2220,7 +2575,14 @@ function renderWeather(overlay) {
     }
 
     const weatherList = boardState.weather || [];
-    const count = Math.min(weatherList.length, 3);
+    let count = Math.min(weatherList.length, 3);
+
+    // NEW: If weather cards are animating (removing), keep rendering the old list!
+    const isAnimating = window.animatingWeatherCards && window.animatingWeatherCards.size > 0;
+    if (isAnimating && window.oldWeatherList && window.oldWeatherList.length > 0) {
+        weatherList = window.oldWeatherList;
+        count = Math.min(weatherList.length, 3);
+    }
 
     let cardStep = cardW + (5 * scale);
     if (count * cardStep > weatherW) {
@@ -2230,10 +2592,16 @@ function renderWeather(overlay) {
 
     container.innerHTML = '';
     weatherList.slice(-3).forEach((wStr, i) => {
+        // ONLY RENDER IF ARRIVED!
+        if (window.arrivedWeatherCards && !window.arrivedWeatherCards.has(wStr)) return;
+
         const wNum = wStr.split('-')[1];
         const card = cards.find(c => String(c.numer) === String(wNum));
         if (card) {
             const wrapper = document.createElement('div');
+            wrapper.className = 'weather-card-wrapper';
+            wrapper.dataset.wstr = wStr;
+            wrapper.dataset.numer = card.numer;
             wrapper.style.position = 'absolute';
             wrapper.style.height = '100%';
             wrapper.style.width = `${cardW}px`;
@@ -2613,7 +2981,54 @@ function renderLeaders(overlay) {
         img.style.width = `${180 * scale}px`;
         img.style.height = `${240 * scale}px`;
         img.style.cursor = 'pointer';
-        img.onclick = () => { if (window.showPowiek) window.showPowiek([leaderObj], 0, 'leaders'); };
+
+        const used = isOpponent ? opponentLeaderUsed : playerLeaderUsed;
+        const blocked = isOpponent ? opponentLeaderBlocked : playerLeaderBlocked;
+        const isMyTurn = (currentTurn === window.socket.id);
+        // canUse is cached in window.cachedLeaderCanUse, updated after each state change
+        const canUse = !isOpponent && isMyTurn && !used && !blocked && (window.cachedLeaderCanUse === true);
+
+        if (!canUse) {
+            img.style.filter = 'grayscale(50%)';
+            img.style.boxShadow = `0 0 ${15 * scale}px #0a0b0a`;
+            img.style.border = `${2 * scale}px solid #0a0b0a`;
+        } else {
+            img.style.filter = 'none';
+            img.style.boxShadow = `0 0 ${15 * scale}px #232423`;
+            img.style.border = `${2 * scale}px solid #b28a41`;
+        }
+
+        img.oncontextmenu = (e) => {
+            e.preventDefault();
+            if (window.showPowiek) window.showPowiek([leaderObj], 0, 'game');
+        };
+
+        img.onclick = (e) => {
+            e.stopPropagation();
+            if (isOpponent) return;
+            if (!canUse) return;
+
+            if (window.proposedCard === leaderObj) {
+                window.proposedCard = null;
+                window.lastProposedStartRect = null;
+            } else {
+                const rect = img.getBoundingClientRect();
+                window.lastProposedStartRect = {
+                    left: rect.left, top: rect.top, width: rect.width, height: rect.height
+                };
+                window.proposedCard = leaderObj;
+            }
+            renderAll(currentNick);
+        };
+
+        if (window.proposedCard === leaderObj) {
+            img.style.visibility = 'hidden';
+            img.style.pointerEvents = 'none';
+        } else {
+            img.style.visibility = 'visible';
+            img.style.pointerEvents = 'auto';
+        }
+
         overlay.appendChild(img);
     };
     createLeader(playerLeaderObj, 286, 1679, false);
@@ -2678,6 +3093,29 @@ function collectCardsOnBoardDOM(isOpponent) {
         }
     });
     return boardCards;
+}
+
+function collectWeatherCardsDOM() {
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const weatherCards = [];
+    document.querySelectorAll('.weather-card-wrapper').forEach(w => {
+        const rect = w.getBoundingClientRect();
+        const cardObj = cards.find(c => String(c.numer) === String(w.dataset.numer));
+        if (cardObj) {
+            weatherCards.push({
+                card: cardObj,
+                wstr: w.dataset.wstr,
+                currentPos4K: {
+                    x: (rect.left - boardLeft) / scale,
+                    y: (rect.top - boardTop) / scale
+                }
+            });
+        }
+    });
+    return weatherCards;
 }
 
 function handleRoundEnd(data) {

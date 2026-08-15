@@ -1,6 +1,6 @@
 const cards = [
     //pogoda===============================================================================================
-
+//"Manekin do ćwiczeń"
     {
         nazwa: "Manekin do ćwiczeń",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/manekin_do_cwiczen.webp",
@@ -12,7 +12,7 @@ const cards = [
         ilosc: 3,
         numer: "001"
     },
-
+//"Róg dowódcy"
     {
         nazwa: "Róg dowódcy",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/rog_dowodcy.webp",
@@ -24,7 +24,7 @@ const cards = [
         ilosc: 3,
         numer: "002"
     },
-
+//"Pożoga"
     {
         nazwa: "Pożoga",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/pozoga.webp",
@@ -36,7 +36,7 @@ const cards = [
         ilosc: 3,
         numer: "003"
     },
-
+//"Trzaskający mróz"
     {
         nazwa: "Trzaskający mróz",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/trzaskajacy_mroz.webp",
@@ -48,7 +48,7 @@ const cards = [
         ilosc: 3,
         numer: "004"
     },
-
+//"Gęsta mgła"
     {
         nazwa: "Gęsta mgła",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/gesta_mgla.webp",
@@ -60,7 +60,7 @@ const cards = [
         ilosc: 3,
         numer: "005"
     },
-
+//"Ulewny deszcz"
     {
         nazwa: "Ulewny deszcz",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/ulewny_deszcz.webp",
@@ -72,7 +72,7 @@ const cards = [
         ilosc: 3,
         numer: "006"
     },
-
+//"Czyste niebo"
     {
         nazwa: "Czyste niebo",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/czyste_niebo.webp",
@@ -84,7 +84,7 @@ const cards = [
         ilosc: 3,
         numer: "007"
     },
-
+//"Skelligijski sztorm"
     {
         nazwa: "Skelligijski sztorm",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/skelligijski_sztorm.webp",
@@ -96,7 +96,7 @@ const cards = [
         ilosc: 3,
         numer: "008"
     },
-
+//"Mardroeme"
     {
         nazwa: "Mardroeme",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/mardroeme.webp",
@@ -112,7 +112,7 @@ const cards = [
 
 
     //neutralne=============================================================================================================================================================
-
+//geralt z rivi
     {
         nazwa: "Geralt z Rivi",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/geralt_z_rivi.webp",
@@ -127,7 +127,7 @@ const cards = [
         ilosc: 1,
         numer: "009"
     },
-
+//Ciri
     {
         nazwa: "Ciri",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/ciri.webp",
@@ -142,7 +142,7 @@ const cards = [
         ilosc: 1,
         numer: "010"
     },
-
+//yennefer z vengerbergu
     {
         nazwa: "Yennefer z Vengerbergu",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/yenneder_z_vengerbergu.webp",
@@ -156,7 +156,7 @@ const cards = [
         ilosc: 1,
         numer: "011"
     },
-
+//triss merigold
     {
         nazwa: "Triss Merigold",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/triss.webp",
@@ -169,7 +169,7 @@ const cards = [
         ilosc: 1,
         numer: "012"
     },
-
+//villentretenmerth
     {
         nazwa: "Villentretenmerth",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/villentretenmerth.webp",
@@ -183,7 +183,7 @@ const cards = [
         ilosc: 1,
         numer: "013"
     },
-
+//vesemir
     {
         nazwa: "Vesemir",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/vesemir.webp",
@@ -196,7 +196,7 @@ const cards = [
         ilosc: 1,
         numer: "014"
     },
-
+//olgierd von everec
     {
         nazwa: "Olgierd von Everec",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/olgierd_von_everec.webp",
@@ -210,7 +210,7 @@ const cards = [
         ilosc: 1,
         numer: "015"
     },
-
+//zoltan chivay
     {
         nazwa: "Zoltan Chivay",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/zoltan_chivay.webp",
@@ -223,7 +223,7 @@ const cards = [
         ilosc: 1,
         numer: "016"
     },
-
+//emiel regis rohellec terzieff
     {
         nazwa: "Emiel Regis Rohellec Terzieff",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/emirl_regis_rohellec_terzieff.webp",
@@ -236,7 +236,7 @@ const cards = [
         ilosc: 1,
         numer: "017"
     },
-
+//guanter o'dim cień
     {
         nazwa: "Guanter O'Dim: Cień",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/gaunter_o'dim_cien.webp",
@@ -251,7 +251,7 @@ const cards = [
         ilosc: 3,
         numer: "018"
     },
-
+//guanter o'dim
     {
         nazwa: "Guanter O'Dim",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/gaunter_o'dim.webp",
@@ -266,7 +266,7 @@ const cards = [
         ilosc: 1,
         numer: "019"
     },
-
+//płotka
     {
         nazwa: "Płotka",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/plotka.webp",
@@ -279,7 +279,7 @@ const cards = [
         ilosc: 1,
         numer: "020"
     },
-
+//jaskier
     {
         nazwa: "Jaskier",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/jaskier.webp",
@@ -293,7 +293,7 @@ const cards = [
         ilosc: 1,
         numer: "021"
     },
-
+//tajemniczy elf
     {
         nazwa: "Tajemniczy elf",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/tajemniczy_elf.webp",
@@ -307,7 +307,7 @@ const cards = [
         ilosc: 1,
         numer: "022"
     },
-
+//krowa
     {
         nazwa: "Krowa",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/krowa.webp",
@@ -324,7 +324,7 @@ const cards = [
     },
 
     //polnoc==============================================================================================================================================================
-
+//vernon roche
     {
         nazwa: "Vernon Roche",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/vernon_rosh.webp",
