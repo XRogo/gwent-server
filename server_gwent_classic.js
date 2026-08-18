@@ -102,8 +102,15 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
         return (c && !c.bohater && c.moc === 'morale') ? acc + 1 : acc;
     }, 0);
 
-    // Więź Count (ile kart o tym samym numerze)
-    const wiezCount = rowCards.filter(n => String(n) === String(cardNum)).length;
+    // Więź: ten sam numer ALBO partner z pola summon
+    let wiezCount = 1;
+    if (card.moc === 'wiez') {
+        const bondIds = new Set([String(cardNum)]);
+        if (card.summon) {
+            card.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
+        }
+        wiezCount = rowCards.filter(n => bondIds.has(String(n))).length;
+    }
 
     // King Bran 5001 check
     const leaderForSide = rowSide === 'p1' ? state.p1Leader : state.p2Leader;
@@ -1004,7 +1011,7 @@ function registerClassicGwentEvents(socket, io, games) {
                     hand.splice(cardIdx, 1);
 
                     // Wezwanie (Muster) logic
-                    if (cardObj.summon) {
+                    if (cardObj.summon && cardObj.moc === 'wezwanie') {
                         const summonIds = cardObj.summon.split(',').map(s => s.trim());
                         const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
 
@@ -1346,7 +1353,14 @@ function registerClassicGwentEvents(socket, io, games) {
                     sum += c.punkty * count;
                 } else {
                     let pts = weatherActive ? 1 : c.punkty;
-                    if (c.moc === 'wiez') pts *= count;
+                    if (c.moc === 'wiez') {
+                        const bondIds = new Set([String(c.numer)]);
+                        if (c.summon) {
+                            c.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
+                        }
+                        const bondCount = rowCards.filter(n => bondIds.has(String(n))).length;
+                        pts *= bondCount;
+                    }
 
                     let mBuff = (c.moc === 'morale') ? (moraleCount - 1) : moraleCount;
                     if (mBuff > 0) pts += mBuff;

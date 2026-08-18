@@ -520,10 +520,14 @@ const handleCardAnimationSequence = async (data) => {
                 // Interesują nas tylko rzędy, do których trafiła nowa karta z Więzią
                 if (!freshNumers.has(sNum)) return;
 
-                const c = cards.find(x => x.numer === sNum);
+                const c = cards.find(x => String(x.numer) === sNum);
                 if (c && c.moc === 'wiez') {
-                    const count = row.filter(n => String(n) === sNum).length;
-                    if (count > 1 && !bondCards.includes(sNum)) {
+                    const bondIds = new Set([String(c.numer)]);
+                    if (c.summon) {
+                        c.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
+                    }
+                    const bondCount = row.filter(n => bondIds.has(String(n))).length;
+                    if (bondCount > 1 && !bondCards.includes(sNum)) {
                         bondCards.push(sNum);
                     }
                 }
@@ -1924,16 +1928,27 @@ function calculateScores() {
             } else {
                 let pts = weatherActive ? 1 : c.punkty;
 
-                // 1. Więź (x2 za każdą kolejną kartę o tej samej nazwie/numerze)
+                // 1. Więź
                 if (c.moc === 'wiez') {
-                    const bKey = `${rowKey}_${c.numer}`;
-                    const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
+                  const bondIds = new Set([String(c.numer)]);
+                  if (c.summon) {
+                 c.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
+                }
 
-                    // Jeśli mnożnik nie jest jeszcze aktywny (trwa animacja), 
-                    // używamy poprzedniej liczby kart (aby utrzymać stary stan punktowy)
-                    const effectiveCount = (window.bondMultiplierActive || prevCount >= count)
-                        ? count
-                        : Math.max(1, prevCount);
+              // ile kart z tej grupy więzi jest w rzędzie
+                let bondCount = 0;
+                   rowCards.forEach((cardNum, i) => {
+                   const key = `${rowKey}_${i}`;
+                   if (!window.arrivedBoardCards.has(key)) return;
+                    if (bondIds.has(String(cardNum))) bondCount++;
+               });
+
+                const bKey = `${rowKey}_bond_${[...bondIds].sort().join('_')}`;
+                const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
+
+                const effectiveCount = (window.bondMultiplierActive || prevCount >= bondCount)
+                    ? bondCount
+                    : Math.max(1, prevCount);
 
                     if (effectiveCount > 1) pts *= effectiveCount;
                 }
@@ -2769,9 +2784,16 @@ function renderRows(overlay) {
                         cardScore = 1;
                     }
                     // Więź
-                    const bondCnt = cardsInRowNumers.filter(n => n === card.numer).length;
+                    // Więź: własny numer + partnerzy z summon
+                    let bondCnt = 0;
                     if (card.moc === 'wiez') {
-                        const bKey = `${rowKey}_${card.numer}`;
+                        const bondIds = new Set([String(card.numer)]);
+                        if (card.summon) {
+                            card.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
+                        }
+                        bondCnt = cardsInRowNumers.filter(n => bondIds.has(String(n))).length;
+
+                        const bKey = `${rowKey}_bond_${[...bondIds].sort().join('_')}`;
                         const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
                         const effectiveCount = (window.bondMultiplierActive || prevCount >= bondCnt)
                             ? bondCnt

@@ -1767,7 +1767,7 @@ const cards = [
         frakcja: "4",
         punkty: 6,
         pozycja: 3,
-        summon: "Krabopająk",
+        summon: "422, 423, 424",
         ilosc: 1,
         numer: "409"
     },
@@ -2468,6 +2468,7 @@ const cards = [
         punkty: 4,
         pozycja: 2,
         ilosc: 3,
+        summon: "518",
         numer: "518"
     },
 
@@ -2482,6 +2483,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        summon: "520, 521",
         numer: "519"
     },
 
@@ -2496,6 +2498,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        summon: "521, 519",
         numer: "520"
     },
 
@@ -2510,6 +2513,7 @@ const cards = [
         punkty: 4,
         pozycja: 1,
         ilosc: 1,
+        summon: "519, 520",
         numer: "521"
     },
 

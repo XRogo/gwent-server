@@ -93,18 +93,18 @@ export function renderCardHTML(card, options = {}) {
             html += `<div class="points" style="color: ${card.bohater ? '#fff !important' : '#000 !important'};">${card.punkty}</div>`;
         }
 
+        if (card.pozycja && !isWeatherCard) {
+            if (card.pozycja === 4 && !card.moc) {
+                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja4.webp');"></div>`;
+            } else {
+                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
+            }
+        }
+
         if (card.moc) {
             const powerImage = getPowerImage(card);
             if (powerImage) {
                 html += `<img src="assets/dkarty/${powerImage}" class="power-icon">`;
-            }
-        }
-
-        if (card.pozycja && !isWeatherCard) {
-            if (card.pozycja === 4 && !card.moc) {
-                html += `<div class="position-icon" style="background-image: url('assets/dkarty/zrecznoac.webp');"></div>`;
-            } else {
-                html += `<div class="position-icon" style="background-image: url('assets/dkarty/pozycja${card.pozycja}.webp');"></div>`;
             }
         }
 
