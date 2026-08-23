@@ -35,24 +35,36 @@ export const grzybki = {
     opis: "Wywołuje tranformację wszystkich kart w rzędzie, które posiadają tryb\nberserkera."
 };
 export const wezwanie = {
-    nazwa: "Braterstwo",
-    opis: "Jeśli w ręku i w talii znajdują się dwie takie same karty, wynajduje je i\nzagrywa nimi",
-    nazwa: "Wezwie Płotkę",
-    opis: "Znajdź w swojej talii kartę Płotka i zagraj ją od razu.",
-    nazwa: "Wezwanie tarczowniczek",
-    opis: "Przywołuje wszystkie twórczości z tali i z ręki."
+    deafult: {
+        nazwa: "Braterstwo",
+        opis: "Jeśli w ręku i w talii znajdują się dwie takie same karty, wynajduje je i\nzagrywa nimi"
+    },
+    plotka: {
+        nazwa: "Wezwie Płotkę",
+        opis: "Znajdź w swojej talii kartę Płotka i zagraj ją od razu."
+    }, 
+    cerys: {
+        nazwa: "Wezwanie tarczowniczek",
+        opis: "Przywołuje wszystkie twórczości z tali i z ręki."
+    }
 };
 export const medyk = {
     nazwa: "Medyk",
     opis: "Przywraca jedną kartę ze zbioru kart odrzuconych (nie dotyczy kart bohaterów\ni kart specjalnych)."
 };
 export const iporz = {
-    nazwa: "Pożoga - jednostka bliskiego starcia",
-    opis: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej.",
-    nazwa: "Wsparcie artyleryjskie",
-    opis: "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej.",
-    nazwa: "Wsparcie ogniowe",
-    opis: "Zniszcz najsilniejszą jednostkę/i dalekiego zasięgu twojego przeciwnika,\njeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 bądź więcej."
+    1: {
+        nazwa: "Pożoga - jednostka bliskiego starcia",
+        opis: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli\nsuma siły jego jednostek bliskiego starcia wynosi 10 bądź więcej.",
+    },
+    2:{
+        nazwa: "Wsparcie artyleryjskie",
+        opis: "Niszcz najsilniejszą/e jednostkę/ki oblężnice twojego przeciwnika, jeśli\nsuma siły jego jednostek oblężniczych wynosi 10 lub więcej.",
+    },
+    3:{
+        nazwa: "Wsparcie ogniowe",
+        opis: "Zniszcz najsilniejszą jednostkę/i dalekiego zasięgu twojego przeciwnika,\njeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 bądź więcej.",
+    }
 };
 export const morale = {
     nazwa: "Wysokie Morale",

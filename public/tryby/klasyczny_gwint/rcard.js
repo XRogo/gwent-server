@@ -271,53 +271,128 @@ export function renderPowiek() {
         overlay.appendChild(cardDiv);
     }
 
-    const card0 = powiekDeck[powiekIndex];
-    if (card0 && card0.moc) {
+        const card0 = powiekDeck[powiekIndex];
+    const isLeader = powiekMode === 'leaders';
+    // Pokazuj panel gdy karta ma moc LUB to dowódca z umiejętnością
+    if (card0 && (card0.moc || (isLeader && card0.umiejetnosc))) {
+        // --- 1. Tło infor.webp: prawdziwy rozmiar 1123 x 305 (1:1 względem planszy 4K) ---
         const infoBox = document.createElement('img');
         infoBox.src = 'assets/asety/infor.webp';
         infoBox.style.position = 'absolute';
-        infoBox.style.left = relW(1356) + 'px';
+        infoBox.style.left = relW(1356) + 'px';   // pozycja OK – nie ruszamy
         infoBox.style.top = relH(1661) + 'px';
-        infoBox.style.width = relW(695) + 'px';
-        infoBox.style.height = relH(202) + 'px';
+        infoBox.style.width = relW(1123) + 'px';  // było 695 – za małe
+        infoBox.style.height = relH(305) + 'px';  // było 202 – za małe
         infoBox.style.zIndex = 200;
         overlay.appendChild(infoBox);
 
-        const powerImage = getPowerImage(card0);
-        if (powerImage) {
+                // --- 2. Ikona mocy ---
+        // Karty specjalne mają inną grafikę → inna pozycja + puste tło mocempty.webp
+        // Tylko PRAWDZIWE karty specjalne (bez punktów), nie jednostki typu Jaskier/Myszowór
+        const specialMocs = ['deszcz', 'grzybki', 'manek', 'mgla', 'mroz', 'niebo', 'porz', 'rog', 'sztorm'];
+        const isSpecialCard = !isLeader
+            && specialMocs.includes(card0.moc)
+            && typeof card0.punkty !== 'number';
+        const powerImage = !isLeader ? getPowerImage(card0) : null;
+
+        if (isSpecialCard) {
+            // Puste tło w miejscu ZWYKŁEJ mocy (jak u normalnych kart)
+            const emptyIcon = document.createElement('img');
+            emptyIcon.src = 'assets/dkarty/mocempty.webp';
+            emptyIcon.style.position = 'absolute';
+            emptyIcon.style.left = relW(1385) + 'px';
+            emptyIcon.style.top = relH(1440) + 'px';
+            emptyIcon.style.height = relH(594) + 'px'; // 2034 - 1440
+            emptyIcon.style.width = 'auto';
+            emptyIcon.style.objectFit = 'contain';
+            emptyIcon.style.zIndex = 201;
+            overlay.appendChild(emptyIcon);
+
+            // Właściwa ikona specjalna: 1386,1694 → dół 2258 (może wyjść poza planszę)
+            if (powerImage) {
+                const mocIcon = document.createElement('img');
+                mocIcon.src = `assets/dkarty/${powerImage}`;
+                mocIcon.style.position = 'absolute';
+                mocIcon.style.left = relW(1386) + 'px';
+                mocIcon.style.top = relH(1694) + 'px';
+                mocIcon.style.height = relH(564) + 'px'; // 2258 - 1694
+                mocIcon.style.width = 'auto';
+                mocIcon.style.objectFit = 'contain';
+                mocIcon.style.zIndex = 202;
+                overlay.appendChild(mocIcon);
+            }
+        } else if (powerImage) {
+            // Zwykłe moce – bez zmian
             const mocIcon = document.createElement('img');
             mocIcon.src = `assets/dkarty/${powerImage}`;
             mocIcon.style.position = 'absolute';
-            mocIcon.style.left = relW(1356 + 10) + 'px';
-            mocIcon.style.top = relH(1661 + 10) + 'px';
-            mocIcon.style.width = relW(64) + 'px';
-            mocIcon.style.height = relH(64) + 'px';
+            mocIcon.style.left = relW(1385) + 'px';
+            mocIcon.style.top = relH(1440) + 'px';
+            mocIcon.style.height = relH(594) + 'px';
+            mocIcon.style.width = 'auto';
+            mocIcon.style.objectFit = 'contain';
             mocIcon.style.zIndex = 201;
             overlay.appendChild(mocIcon);
         }
 
+        // --- 3. Tytuł ---
+                let titleText = '';
+        let descText = '';
+
+        if (isLeader) {
+            titleText = 'Zdolność Dowódcy';
+            descText = card0.umiejetnosc || '';
+        } else {
+            const mocData = moce[card0.moc];
+            let variant = null;
+
+            if (card0.moc === 'wezwanie') {
+                // Geralt 009, Ciri 010 → plotka; Cerys 503 → cerys; reszta → default
+                const n = String(card0.numer);
+                if (n === '009' || n === '010') variant = mocData.plotka;
+                else if (n === '503') variant = mocData.cerys;
+                else variant = mocData.default;
+            } else if (card0.moc === 'iporz') {
+                // według rzędu karty (pozycja 1 / 2 / 3)
+                variant = mocData[card0.pozycja] || mocData[1];
+            } else {
+                // zwykła moc: { nazwa, opis }
+                variant = mocData;
+            }
+
+            titleText = variant?.nazwa || '';
+            descText = variant?.opis || '';
+        }
+
         const mocName = document.createElement('div');
-        mocName.textContent = window.moce?.[card0.moc]?.nazwa || '';
+        mocName.textContent = titleText;
         mocName.style.position = 'absolute';
         mocName.style.left = relW(1356) + 'px';
-        mocName.style.top = relH(1735) + 'px';
-        mocName.style.width = relW(695) + 'px';
+        mocName.style.top = relH(1715) + 'px';      // pas 1715–1760
+        mocName.style.width = relW(1123) + 'px';
+        mocName.style.height = relH(45) + 'px';
+        mocName.style.lineHeight = relH(45) + 'px';
         mocName.style.textAlign = 'center';
-        mocName.style.fontWeight = 'bold';
-        mocName.style.fontSize = relW(44) + 'px';
-        mocName.style.color = '#c7a76e';
+        mocName.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        mocName.style.fontSize = relH(45) + 'px';
+        mocName.style.letterSpacing = relW(-1.1) + 'px';
+        mocName.style.color = '#be9c58';
         mocName.style.zIndex = 202;
         overlay.appendChild(mocName);
 
+        // --- 4. Opis (obsługa \n = nowa linia) ---
         const mocDesc = document.createElement('div');
-        mocDesc.textContent = window.moce?.[card0.moc]?.opis || '';
+        mocDesc.textContent = descText;
         mocDesc.style.position = 'absolute';
         mocDesc.style.left = relW(1356) + 'px';
-        mocDesc.style.top = relH(1814) + 'px';
-        mocDesc.style.width = relW(695) + 'px';
+        mocDesc.style.top = relH(1812) + 'px';
+        mocDesc.style.width = relW(1123) + 'px';
         mocDesc.style.textAlign = 'center';
-        mocDesc.style.fontSize = relW(32) + 'px';
-        mocDesc.style.color = '#c7a76e';
+        mocDesc.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+        mocDesc.style.fontSize = relH(43) + 'px';
+        mocDesc.style.letterSpacing = relW(-1.5) + 'px';
+        mocDesc.style.color = '#c29f5a';
+        mocDesc.style.whiteSpace = 'pre-line'; // dzięki temu \n robi nową linię
         mocDesc.style.zIndex = 203;
         overlay.appendChild(mocDesc);
     }

@@ -65,7 +65,7 @@
                     <div class="menu-label-play" data-i18n="menu.play">Graj</div>
                     <div class="menu-label-test">Test Game (DEV)</div>
                     <div class="menu-label-discord">Discord</div>
-                    <div class="menu-label-info">Info Alpha 9.1</div>
+                    <div class="menu-label-info">Info Alpha 9.2</div>
                     <!-- WWWWWWWWWWWEEEEEEEEEERRRRRRRRRRRRSSSSSSSSSSJJJJJJJJJJJAAAAAAAAAAAAAAA -->
                 </div>
             </div>
@@ -101,17 +101,19 @@
                                     <img src="assets/kod pasek.webp" class="pasek-bg" alt="Pasek">
 
                                     <div class="code-generator">
-                                        <img src="assets/reload.webp" id="reloadBtn" class="reload-btn"
-                                            onclick="resetLobby()" data-i18n-title="dy.generuj" title="Generuj / Resetuje" alt="Reload">
-                                        <span id="displayCode" class="lobby-code" data-i18n="lobby.generate">KLIKNIJ GENERUJ KOD</span>
-                                        <img src="assets/coppy.webp" class="icon-btn copy-btn"
-                                            onclick="copyCodeToClipboard()" data-i18n-title="dy.kopiuj" title="Kopiuj kod" alt="Copy">
+                                     <img src="assets/reload.webp" id="reloadBtn" class="reload-btn"
+                                         onclick="resetLobby()" data-i18n-title="dy.generuj" title="Generuj / Resetuje" alt="Reload">
+                                     <span id="displayCode" class="lobby-code" data-i18n="lobby.generate"
+                                         onclick="resetLobby()" style="cursor: pointer;">KLIKNIJ GENERUJ KOD</span>
+                                     <img src="assets/coppy.webp" class="icon-btn copy-btn"
+                                          onclick="copyCodeToClipboard()" data-i18n-title="dy.kopiuj" title="Kopiuj kod" alt="Copy">
                                     </div>
 
                                     <div class="join-area" id="joinArea">
                                         <span data-i18n="lobby.join">DOŁĄCZ:</span>
                                         <div class="input-wrapper">
-                                            <input type="text" id="sideCodeInput" data-i18n-placeholder="dy.code" placeholder="KOD">
+                                            <input type="text" id="sideCodeInput" data-i18n-placeholder="dy.code" placeholder="KOD"
+                                                onkeydown="if (event.key === 'Enter') joinOrStartGame()">
                                             <img src="assets/paset.webp" class="inner-paste-btn"
                                                 onclick="pasteCodeFromClipboard()" data-i18n-title="dy.paste.code" title="Wklej kod" alt="Paste">
                                         </div>
