@@ -9,15 +9,6 @@ const tryby = [
         stan: 2
     },
     {
-        nazwa: "tryb.test",
-        ikona: "tryby/Test.webp",
-        obraz: "tymczasem.webp",
-        players: 2,
-        opis: "opis.test",
-        gra: "tryby/klasyczny_gwint_beta",
-        stan: 2
-    },
-    {
         nazwa: "tryb.mix",
         ikona: "tryby/mix_cart.webp",
         obraz: "tymczasem.webp",
