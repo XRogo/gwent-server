@@ -164,36 +164,46 @@ io.on('connection', (socket) => {
     };
 
     socket.on('rejoin-game', (data) => {
-        let { gameCode, isPlayer1, nickname } = data;
-        if (games[gameCode]) {
-            const game = games[gameCode];
+    let { gameCode, isPlayer1, nickname } = data;
+    if (!games[gameCode]) return;
 
-            // Host check
-            if (isPlayer1 && game.player1 && game.player1 !== socket.id) {
-                const p1Socket = io.sockets.sockets.get(game.player1);
-                if (p1Socket && p1Socket.connected) {
-                    console.log(`[LOBBY] Forcing ${socket.id} to PLAYER 2 role during rejoin.`);
-                    isPlayer1 = false;
-                }
-            }
+    const game = games[gameCode];
 
-            socket.join(gameCode);
-            if (isPlayer1) {
-                game.player1 = socket.id;
-                game.player1Ready = false;
-                if (nickname) game.player1Nickname = nickname;
-            } else {
-                game.player2 = socket.id;
-                game.player2Ready = false;
-                if (nickname) game.player2Nickname = nickname;
-            }
-            console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isPlayer1 ? 'P1' : 'P2'} (nick: ${nickname || 'brak'})`);
-            broadcastStatus(gameCode, socket);
-
-            const oppId = isPlayer1 ? game.player2 : game.player1;
-            if (oppId) io.to(oppId).emit('opponent-ready-status', { isReady: false });
+    // Nie nadpisuj hosta, jeśli stary socket nadal żyje
+    if (isPlayer1 && game.player1 && game.player1 !== socket.id) {
+        const p1Socket = io.sockets.sockets.get(game.player1);
+        if (p1Socket && p1Socket.connected) {
+            console.log(`[LOBBY] Forcing ${socket.id} to PLAYER 2 role during rejoin.`);
+            isPlayer1 = false;
         }
-    });
+    }
+
+    socket.join(gameCode);
+
+    if (isPlayer1) {
+        // Nadpisuj ID tylko przy prawdziwej zmianie socketu (nawigacja)
+        if (game.player1 !== socket.id) {
+            game.player1 = socket.id;
+            // NIE resetuj player1Ready przy samym rejoinie!
+            // game.player1Ready = false;  ← usuń / zakomentuj
+        }
+        if (nickname) game.player1Nickname = nickname;
+    } else {
+        if (game.player2 !== socket.id) {
+            game.player2 = socket.id;
+            // game.player2Ready = false;  ← usuń / zakomentuj
+        }
+        if (nickname) game.player2Nickname = nickname;
+    }
+
+    console.log(`[LOBBY] Użytkownik ${socket.id} powrócił do gry ${gameCode} jako ${isPlayer1 ? 'P1' : 'P2'}`);
+    broadcastStatus(gameCode, socket);
+
+    // Nie wysyłaj opponent-ready-status: false przy każdym rejoinie –
+    // to psuje drugie lobby / stan gotowości
+    // const oppId = ...
+    // if (oppId) io.to(oppId).emit('opponent-ready-status', { isReady: false });
+});
 
     socket.on('set-nickname', (data) => {
         const { gameCode, isPlayer1, nickname } = data;
@@ -289,28 +299,37 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', (reason) => {
-        console.log(`[CONN] Użytkownik rozłączony: ${socket.id}, powód: ${reason}`);
-        for (const gameCode in games) {
-            const game = games[gameCode];
-            if (game.player1 === socket.id) {
-                console.log(`[LOBBY] P1 rozłączony w grze ${gameCode}. Czekam na powrót.`);
-                broadcastStatus(gameCode);
+    console.log(`[CONN] Użytkownik rozłączony: ${socket.id}, powód: ${reason}`);
 
-                setTimeout(() => {
-                    if (games[gameCode] && games[gameCode].player1 === socket.id && !io.sockets.sockets.get(socket.id)) {
-                        console.log(`[LOBBY] Gra ${gameCode} usunięta z powodu długiego rozłączenia P1.`);
-                        if (game.player2) {
-                            io.to(game.player2).emit('opponent-left', 'Host opuścił grę na stałe.');
-                        }
-                        delete games[gameCode];
+    for (const gameCode in games) {
+        const game = games[gameCode];
+        if (!game) continue;
+
+        if (game.player1 === socket.id) {
+            console.log(`[LOBBY] P1 rozłączony w grze ${gameCode}. Czekam na powrót.`);
+            broadcastStatus(gameCode);
+
+            setTimeout(() => {
+                // Ważne: sprawdź, czy to nadal TEN sam socket i gra istnieje
+                if (
+                    games[gameCode] &&
+                    games[gameCode].player1 === socket.id &&
+                    !io.sockets.sockets.get(socket.id)
+                ) {
+                    console.log(`[LOBBY] Gra ${gameCode} usunięta – P1 nie wrócił.`);
+                    if (game.player2) {
+                        io.to(game.player2).emit('opponent-left', 'Host opuścił grę na stałe.');
                     }
-                }, 30000);
-            } else if (game.player2 === socket.id) {
-                console.log(`[LOBBY] P2 rozłączony w grze ${gameCode}.`);
-                broadcastStatus(gameCode);
-            }
+                    delete games[gameCode];
+                }
+            }, 30000);
+        } else if (game.player2 === socket.id) {
+            console.log(`[LOBBY] P2 rozłączony w grze ${gameCode}.`);
+            broadcastStatus(gameCode);
+            // Opcjonalnie: nie czyść player2 od razu – daj czas na rejoin
         }
-    });
+    }
+});
 });
 
 // --- SERVER CONSOLE COMMANDS ---
