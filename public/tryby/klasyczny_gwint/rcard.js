@@ -243,28 +243,51 @@ export function renderPowiek() {
         });
 
         // Override some styles for zoom view
-        const pointsDiv = inner.querySelector('.points');
+                const pointsDiv = inner.querySelector('.points');
         if (pointsDiv) {
             pointsDiv.style.fontSize = (pos.height * 0.10) + 'px';
             pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
         }
 
+        // Nazwa: 36px, letter-spacing 0.6 przy karcie 523×992
         const nameDiv = inner.querySelector('.name');
         if (nameDiv) {
-            nameDiv.style.fontSize = (pos.height * 0.044) + 'px';
+            nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+            nameDiv.style.fontSize = (pos.height * (36 / 992)) + 'px';
+            nameDiv.style.letterSpacing = (pos.width * (0.6 / 523)) + 'px';
+            nameDiv.style.color = '#484848';
+            nameDiv.style.whiteSpace = 'pre-line';
+            nameDiv.style.wordBreak = 'normal';
+            nameDiv.style.textAlign = 'center';
+            nameDiv.style.top = (pos.height * (768 / 992)) + 'px';
+            nameDiv.style.height = 'auto';
+
             if (powiekMode === 'leaders') {
+                // 0 … 524
                 nameDiv.style.left = '0';
                 nameDiv.style.width = '100%';
+            } else {
+                // 122 … 521
+                nameDiv.style.left = (pos.width * (122 / 523)) + 'px';
+                nameDiv.style.width = (pos.width * ((521 - 122) / 523)) + 'px';
             }
         }
 
+        // Opis: 33px, letter-spacing 0.4, obszar 2,891 → 523
         const descriptionDiv = inner.querySelector('.description');
         if (descriptionDiv) {
             descriptionDiv.style.display = 'block';
-            descriptionDiv.style.fontSize = (pos.height * 0.035) + 'px';
-            descriptionDiv.style.top = '89%';
+            descriptionDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+            descriptionDiv.style.fontSize = (pos.height * (33 / 992)) + 'px';
+            descriptionDiv.style.letterSpacing = (pos.width * (0.4 / 523)) + 'px';
+            descriptionDiv.style.color = '#030303';
+            descriptionDiv.style.whiteSpace = 'pre-line';
+            descriptionDiv.style.wordBreak = 'normal';
+            descriptionDiv.style.textAlign = 'center';
+            descriptionDiv.style.left = (pos.width * (2 / 523)) + 'px';
+            descriptionDiv.style.top = (pos.height * (891 / 992)) + 'px';
+            descriptionDiv.style.width = (pos.width * ((523 - 2) / 523)) + 'px';
             descriptionDiv.style.height = 'auto';
-            descriptionDiv.style.color = '#030303ff';
         }
 
         cardDiv.appendChild(inner);
@@ -273,8 +296,9 @@ export function renderPowiek() {
 
         const card0 = powiekDeck[powiekIndex];
     const isLeader = powiekMode === 'leaders';
-    // Pokazuj panel gdy karta ma moc LUB to dowódca z umiejętnością
-    if (card0 && (card0.moc || (isLeader && card0.umiejetnosc))) {
+    // moc LUB dowódca LUB zręczność (pozycja 4 bez innej mocy)
+    const hasZrecznoscOnly = !isLeader && Number(card0.pozycja) === 4 && !card0.moc;
+    if (card0 && (card0.moc || (isLeader && card0.umiejetnosc) || hasZrecznoscOnly)) {
         // --- 1. Tło infor.webp: prawdziwy rozmiar 1123 x 305 (1:1 względem planszy 4K) ---
         const infoBox = document.createElement('img');
         infoBox.src = 'assets/asety/infor.webp';
@@ -293,7 +317,11 @@ export function renderPowiek() {
         const isSpecialCard = !isLeader
             && specialMocs.includes(card0.moc)
             && typeof card0.punkty !== 'number';
-        const powerImage = !isLeader ? getPowerImage(card0) : null;
+                let powerImage = !isLeader ? getPowerImage(card0) : null;
+        // zręczność bez mocy → ikona (PRZED rysowaniem)
+        if (!powerImage && hasZrecznoscOnly) {
+            powerImage = 'zrecznosci.webp'; // albo 'pozycja4.webp' jeśli tak masz plik
+        }
 
         if (isSpecialCard) {
             // Puste tło w miejscu ZWYKŁEJ mocy (jak u normalnych kart)
@@ -342,27 +370,30 @@ export function renderPowiek() {
         if (isLeader) {
             titleText = 'Zdolność Dowódcy';
             descText = card0.umiejetnosc || '';
-        } else {
+        } else if (card0.moc) {
+            // PRIORYTET: zwykła moc (nie pokazuj zręczności)
             const mocData = moce[card0.moc];
             let variant = null;
 
             if (card0.moc === 'wezwanie') {
-                // Geralt 009, Ciri 010 → plotka; Cerys 503 → cerys; reszta → default
                 const n = String(card0.numer);
                 if (n === '009' || n === '010') variant = mocData.plotka;
                 else if (n === '503') variant = mocData.cerys;
                 else variant = mocData.default;
             } else if (card0.moc === 'iporz') {
-                // według rzędu karty (pozycja 1 / 2 / 3)
                 variant = mocData[card0.pozycja] || mocData[1];
             } else {
-                // zwykła moc: { nazwa, opis }
                 variant = mocData;
             }
 
             titleText = variant?.nazwa || '';
             descText = variant?.opis || '';
+        } else if (Number(card0.pozycja) === 4) {
+            // Brak mocy + pozycja 4 → Zręczność
+            titleText = moce.zrecznosc?.nazwa || 'Zręczność';
+            descText = moce.zrecznosc?.opis || '';
         }
+        
 
         const mocName = document.createElement('div');
         mocName.textContent = titleText;

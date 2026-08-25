@@ -36,6 +36,12 @@ socket.on('join-error', (msg) => {
         });
 
         socket.on('start-game-now', () => {
+        switchToGame();
+        });
+
+        // NOWE: powrót do trwającej partii (F5 / ponowne wejście)
+        socket.on('resume-in-game', (data) => {
+            console.log('[GAME] Wznawiam trwającą grę', data);
             switchToGame();
         });
 

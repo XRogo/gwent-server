@@ -871,17 +871,76 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             updateLeaderCache();
             sortHand();
             console.log(`[BOARD] Game state initialized. Local: ${nick}, Opponent: ${window.opponentNickname}, Status: ${data.status}`);
+            // Czy to powrót do TRWAJĄCEJ gry (nie start od zera)?
+            const boardHasCards = data.board && (
+                (data.board.p1R1 && data.board.p1R1.length) ||
+                (data.board.p1R2 && data.board.p1R2.length) ||
+                (data.board.p1R3 && data.board.p1R3.length) ||
+                (data.board.p2R1 && data.board.p2R1.length) ||
+                (data.board.p2R2 && data.board.p2R2.length) ||
+                (data.board.p2R3 && data.board.p2R3.length) ||
+                (data.board.weather && data.board.weather.length) ||
+                data.board.p1S1 || data.board.p1S2 || data.board.p1S3 ||
+                data.board.p2S1 || data.board.p2S2 || data.board.p2S3
+            );
+            const handAlreadyDealt = Array.isArray(data.hand) && data.hand.length > 0;
+            const midGame = data.status === 'playing' && (boardHasCards || handAlreadyDealt);
 
-            if (!window.gameStarted) {
+                        if (midGame) {
+                // --- WZNOWIENIE PARTII (F5 / rejoin) ---
+                window.gameStarted = true;
+                window.leaderAnimated = true;
+                window.opponentLeaderAnimated = true;
+                window.cardsAnimated = true;
+                window.mulliganFinished = true;
+
+                if (!window.arrivedBoardCards) window.arrivedBoardCards = new Set();
+                window.arrivedBoardCards.clear();
+
+                // WAŻNE: klucze typu "p1R1_0", nie sam numer karty
+                if (typeof reconcileArrivedCards === 'function') {
+                    reconcileArrivedCards(data.board || boardState);
+                } else if (data.board) {
+                    Object.keys(data.board).forEach((rk) => {
+                        const row = data.board[rk];
+                        if (Array.isArray(row)) {
+                            row.forEach((num, idx) => {
+                                window.arrivedBoardCards.add(`${rk}_${idx}`);
+                            });
+                        }
+                    });
+                }
+
+                // Pogoda
+                if (!window.arrivedWeatherCards) window.arrivedWeatherCards = new Set();
+                window.arrivedWeatherCards.clear();
+                if (data.board && data.board.weather) {
+                    data.board.weather.forEach((w) => window.arrivedWeatherCards.add(w));
+                }
+
+                // Ręka – wszystkie karty od razu widoczne
+                if (!window.arrivedCards) window.arrivedCards = new Set();
+                window.arrivedCards.clear();
+                (playerHand || []).forEach((c) => window.arrivedCards.add(c));
+
+                hideScoiaUI();
+                if (typeof hidePrzejscie === 'function') hidePrzejscie(true);
+                if (window.hidePowiek) window.hidePowiek();
+
+                // Podwójny render – na wszelki wypadek po layoutcie
+                renderAll(nick);
+                requestAnimationFrame(() => renderAll(nick));
+
+                console.log('[BOARD] Wznowiono – arrivedBoardCards:', [...window.arrivedBoardCards]);
+            } else if (!window.gameStarted) {
                 if (data.status === 'scoia-decision') {
-                    renderAll(nick); // Zawsze wyrenderuj stan (pusta plansza)
+                    renderAll(nick);
                     handleScoiaDecision(socket, gameCode, data.scoiaDecider);
                 } else if (data.status === 'playing') {
-                    // Mamy ostateczny 'playing' i nie wystartowaliśmy jeszcze gry.
+                    // Prawdziwy START nowej partii (pusta plansza, pierwsze rozdanie)
                     hideScoiaUI();
-                    renderAll(nick); // Zawsze wyrenderuj stan (pusta plansza)
+                    renderAll(nick);
 
-                    // Decydujemy jaki baner użyć na wejście
                     let startBanner = null;
                     const isMyTurn = data.currentTurn === window.socket.id;
 
@@ -893,17 +952,14 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
                     if (startBanner) {
                         window.gameStarted = true;
-                        hidePrzejscie(true); // Natychmiast ukryj ewentualne komunikaty t13
+                        hidePrzejscie(true);
 
-                        // Animacja dowódcy gracza
                         if (playerLeaderObj) {
                             animateLeaderFromDeck(playerLeaderObj, () => {
                                 window.leaderAnimated = true;
                                 renderAll(currentNick);
                             });
                         }
-
-                        // Animacja dowódcy przeciwnika
                         if (opponentLeaderObj) {
                             animateOpponentLeaderFromDeck(opponentLeaderObj, () => {
                                 window.opponentLeaderAnimated = true;
@@ -914,12 +970,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                         showPrzejscie(startBanner, {
                             customCzas: 2000,
                             onFinish: () => {
-                                // Dopiero po banerze prosimy o karty
-                                socket.emit('request-initial-draw', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+                                socket.emit('request-initial-draw', {
+                                    gameCode: gameCodeLocal,
+                                    isPlayer1: isPlayer1Local
+                                });
                             }
                         });
                     } else {
-                        // Fallback
                         window.gameStarted = true;
                         if (playerLeaderObj) {
                             animateLeaderFromDeck(playerLeaderObj, () => {
@@ -933,7 +990,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                                 renderAll(currentNick);
                             });
                         }
-                        socket.emit('request-initial-draw', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+                        socket.emit('request-initial-draw', {
+                            gameCode: gameCodeLocal,
+                            isPlayer1: isPlayer1Local
+                        });
                     }
                 }
             } else {

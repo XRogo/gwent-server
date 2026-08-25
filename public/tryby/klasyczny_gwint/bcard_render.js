@@ -69,7 +69,7 @@ export function renderCardHTML(card, options = {}) {
             <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
             <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
             ${!actualIsKing ? `<div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>` : ''}
-            <div class="name">${card.nazwa}</div>
+            <div class="name${actualIsKing ? ' name-leader' : ''}">${card.nazwa}</div>
     `;
 
     if (isDeckView && typeof card.iloscWTalii === 'number') {
@@ -113,9 +113,9 @@ export function renderCardHTML(card, options = {}) {
         }
     }
 
-    html += `
+       html += `
         </div>
-        ${!actualIsKing ? `<img class="ilosc-layer" src="assets/dkarty/ilosc.webp">` : ''}
+        ${(!actualIsKing && (isDeckView || isCollectionView)) ? `<img class="ilosc-layer" src="assets/dkarty/ilosc.webp">` : ''}
     `;
 
     return html;

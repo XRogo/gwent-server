@@ -671,50 +671,89 @@ function registerClassicGwentEvents(socket, io, games) {
         }
     });
 
-    socket.on('get-game-state', (data) => {
+        socket.on('get-game-state', (data) => {
         const { gameCode, isPlayer1 } = data;
-        if (games[gameCode] && games[gameCode].gameState) {
-            const game = games[gameCode];
-            const state = game.gameState;
+        if (!games[gameCode] || !games[gameCode].gameState) return;
 
-            // Sync socket IDs on reconnect
-            const oldId = isPlayer1 ? game.player1 : game.player2;
-            if (isPlayer1) game.player1 = socket.id;
-            else game.player2 = socket.id;
+        const game = games[gameCode];
+        const state = game.gameState;
 
-            if (state.currentTurn === oldId) {
-                state.currentTurn = socket.id;
-            }
+        // 1) ID graczy – preferuj sloty z lobby (p1/p2), potem legacy
+        if (game.p1 && game.p1.socketId) game.player1 = game.p1.socketId;
+        if (game.p2 && game.p2.socketId) game.player2 = game.p2.socketId;
 
-            socket.join(gameCode);
+        if (isPlayer1) game.player1 = socket.id;
+        else game.player2 = socket.id;
 
-            socket.emit('init-game-state', {
-                hand: isPlayer1 ? state.p1Hand : state.p2Hand,
-                deck: isPlayer1 ? state.p1Deck : state.p2Deck,
-                graveyard: isPlayer1 ? state.p1Graveyard : state.p2Graveyard,
-                faction: isPlayer1 ? state.p1Faction : state.p2Faction,
-                nickname: isPlayer1 ? game.player1Nickname : game.player2Nickname,
-                opponentNickname: isPlayer1 ? game.player2Nickname : game.player1Nickname,
-                leader: isPlayer1 ? game.player1Leader : game.player2Leader,
-                opponentLeader: isPlayer1 ? game.player2Leader : game.player1Leader,
-                swapsPerformed: isPlayer1 ? (game.p1Swaps || 0) : (game.p2Swaps || 0),
-                opponentHandCount: isPlayer1 ? (state.p2Hand ? state.p2Hand.length : 0) : (state.p1Hand ? state.p1Hand.length : 0),
-                opponentDeckCount: isPlayer1 ? (state.p2Deck ? state.p2Deck.length : 0) : (state.p1Deck ? state.p1Deck.length : 0),
-                opponentGraveyard: isPlayer1 ? state.p2Graveyard : state.p1Graveyard,
-                opponentFaction: isPlayer1 ? state.p2Faction : state.p1Faction,
-                p1LeaderUsed: state.p1LeaderUsed,
-                p2LeaderUsed: state.p2LeaderUsed,
-                p1LeaderBlocked: state.p1LeaderBlocked,
-                p2LeaderBlocked: state.p2LeaderBlocked,
-                status: game.status,
-                currentTurn: state.currentTurn,
-                scoiaDecider: state.scoiaDecider,
-                startReason: state.startReason,
-                board: state.board
-            });
-
-            console.log(`[GAME CLASSIC] [${gameCode}] ID Sync: ${isPlayer1 ? 'P1' : 'P2'} reconn as ${socket.id}. Turn: ${state.currentTurn}`);
+        if (game.p1 && isPlayer1) {
+            game.p1.socketId = socket.id;
+            game.p1.connected = true;
         }
+        if (game.p2 && !isPlayer1) {
+            game.p2.socketId = socket.id;
+            game.p2.connected = true;
+        }
+
+        const p1 = game.player1;
+        const p2 = game.player2;
+
+        // 2) NAPRAWA STAREJ TURY (najczęstszy powód „wiesza się po F5 / pass”)
+        if (state.currentTurn !== p1 && state.currentTurn !== p2) {
+            if (state.p1Passed && !state.p2Passed) {
+                state.currentTurn = p2;
+            } else if (state.p2Passed && !state.p1Passed) {
+                state.currentTurn = p1;
+            } else if (state.currentTurnSide === 'p1') {
+                state.currentTurn = p1;
+            } else if (state.currentTurnSide === 'p2') {
+                state.currentTurn = p2;
+            } else {
+                // obaj aktywni, nie wiadomo kto – daj turę temu kto wraca (lepiej niż deadlock)
+                state.currentTurn = isPlayer1 ? p1 : p2;
+            }
+            console.log(`[GAME CLASSIC] [${gameCode}] Naprawiono stale turn → ${state.currentTurn}`);
+        } else if (state.currentTurn === (isPlayer1 ? p1 : p2)) {
+            // już OK – to nasza tura
+        }
+
+        // zapamiętaj stronę tury (przydatne przy kolejnych rejoin)
+        if (state.currentTurn === p1) state.currentTurnSide = 'p1';
+        if (state.currentTurn === p2) state.currentTurnSide = 'p2';
+
+        socket.join(gameCode);
+
+        socket.emit('init-game-state', {
+            hand: isPlayer1 ? state.p1Hand : state.p2Hand,
+            deck: isPlayer1 ? state.p1Deck : state.p2Deck,
+            graveyard: isPlayer1 ? state.p1Graveyard : state.p2Graveyard,
+            faction: isPlayer1 ? state.p1Faction : state.p2Faction,
+            nickname: isPlayer1 ? game.player1Nickname : game.player2Nickname,
+            opponentNickname: isPlayer1 ? game.player2Nickname : game.player1Nickname,
+            leader: isPlayer1 ? game.player1Leader : game.player2Leader,
+            opponentLeader: isPlayer1 ? game.player2Leader : game.player1Leader,
+            swapsPerformed: isPlayer1 ? (game.p1Swaps || 0) : (game.p2Swaps || 0),
+            opponentHandCount: isPlayer1 ? (state.p2Hand ? state.p2Hand.length : 0) : (state.p1Hand ? state.p1Hand.length : 0),
+            opponentDeckCount: isPlayer1 ? (state.p2Deck ? state.p2Deck.length : 0) : (state.p1Deck ? state.p1Deck.length : 0),
+            opponentGraveyard: isPlayer1 ? state.p2Graveyard : state.p1Graveyard,
+            opponentFaction: isPlayer1 ? state.p2Faction : state.p1Faction,
+            p1LeaderUsed: state.p1LeaderUsed,
+            p2LeaderUsed: state.p2LeaderUsed,
+            p1LeaderBlocked: state.p1LeaderBlocked,
+            p2LeaderBlocked: state.p2LeaderBlocked,
+            status: game.status,
+            currentTurn: state.currentTurn,
+            scoiaDecider: state.scoiaDecider,
+            startReason: state.startReason,
+            board: state.board,
+            p1Lives: state.p1Lives,
+            p2Lives: state.p2Lives,
+            p1Passed: state.p1Passed,
+            p2Passed: state.p2Passed,
+            p1HandCount: state.p1Hand ? state.p1Hand.length : 0,
+            p2HandCount: state.p2Hand ? state.p2Hand.length : 0
+        });
+
+        console.log(`[GAME CLASSIC] [${gameCode}] ID Sync: ${isPlayer1 ? 'P1' : 'P2'} reconn as ${socket.id}. Turn: ${state.currentTurn}`);
     });
 
     socket.on('mulligan-swap', (data) => {

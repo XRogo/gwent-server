@@ -35,7 +35,7 @@ export const grzybki = {
     opis: "Wywołuje tranformację wszystkich kart w rzędzie, które posiadają tryb\nberserkera."
 };
 export const wezwanie = {
-    deafult: {
+    default: {
         nazwa: "Braterstwo",
         opis: "Jeśli w ręku i w talii znajdują się dwie takie same karty, wynajduje je i\nzagrywa nimi"
     },
@@ -45,7 +45,7 @@ export const wezwanie = {
     }, 
     cerys: {
         nazwa: "Wezwanie tarczowniczek",
-        opis: "Przywołuje wszystkie twórczości z tali i z ręki."
+        opis: "Przywołuje wszystkie tarczowniczki z tali i z ręki."
     }
 };
 export const medyk = {

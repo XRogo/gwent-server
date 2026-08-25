@@ -46,17 +46,30 @@
 .card-content .name {
     z-index: 11 !important;
     position: absolute;
-    left: 21.76%;
-    width: 76.34%;
-    top: 76%;
+    /* zwykła karta: 122,768 → 521 */
+    left: 23.32696%;          /* 122/523 */
+    top: 77.41935%;           /* 768/992 */
+    width: 76.29063%;         /* (521-122)/523 */
     text-align: center;
-    font-size: 1.2em;
-    color: #333;
-    font-weight: bold;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.1;
-    padding: 0 4px;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+    font-weight: normal;
+    color: #484848;
+    /* 36px przy wysokości 992 → ~3.63% wysokości karty */
+    font-size: 3.629%;
+    letter-spacing: 0.01667em; /* 0.6 / 36 */
+    white-space: pre-line;    /* tylko \n robi nową linię (oraz spacje na końcu linii) */
+    word-break: normal;       /* NIE tnij słów w połowie */
+    overflow-wrap: normal;
+    line-height: 1.05;
+    padding: 0;
+    margin: 0;
+    height: auto;
+    display: block;
+}
+
+.card-content .name.name-leader {
+    left: 0;
+    width: 100%;              /* ~524/523 */
 }
 
 .card-content .points {
@@ -86,15 +99,25 @@
 
 .card-content .description {
     position: absolute;
-    top: 90.533837%;
-    left: 3%;
-    width: 92.129771%;
-    height: 7.653575%;
-    font-size: 3.435115%;
-    color: #333333;
+    /* 2,891 → 523 */
+    left: 0.3824%;            /* 2/523 */
+    top: 89.8185%;            /* 891/992 */
+    width: 99.6176%;          /* (523-2)/523 */
     text-align: center;
-    display: none;
-    z-index: 7;
+    font-family: 'PFDinTextCondPro', sans-serif;
+    color: #030303;
+    /* 33px przy 992 */
+    font-size: 3.327%;
+    letter-spacing: 0.01212em; /* 0.4 / 33 */
+    white-space: pre-line;    /* \n = nowa linia */
+    word-break: normal;
+    overflow-wrap: normal;
+    line-height: 1.1;
+    padding: 0;
+    margin: 0;
+    height: auto;
+    display: none;            /* włączane przy dużym podglądzie */
+    z-index: 11;
 }
 
 .card-content .ilosc-text {

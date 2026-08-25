@@ -190,7 +190,7 @@ const krole = [
 
     {
         ////////////////////////////////////////////////
-        nazwa: "Eredin Bréacc Glas Dowódca Czerwonych Jeźdźców",
+        nazwa: "Eredin Bréacc Glas\nDowódca Czerwonych Jeźdźców",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin2.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4002.webp",
         opis: '"Król Goun śmieje się, kłapią przegniłe\nzęby nad zardzewiałym kołnierzem zbroi".',

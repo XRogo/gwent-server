@@ -259,8 +259,6 @@ function markDisconnected(gameCode, socketId) {
     broadcastStatus(gameCode);
 }
 
-
-
 function scheduleTestCleanup() {
     setTimeout(() => {
         const g = games['TEST'];
@@ -452,7 +450,18 @@ io.on('connection', (socket) => {
 
         console.log(`[LOBBY] Rejoin ${socket.id} → ${gameCode} jako ${assigned.role} (host/P1 prefer=${preferredIsP1})`);
         broadcastStatus(gameCode);
+
+        // Powrót do trwającej partii (nie do wyboru kart)
+        if (game.gameState && (game.status === 'playing' || game.status === 'scoia-decision')) {
+            console.log(`[LOBBY] ${gameCode} – rejoin w trakcie gry → resume`);
+            socket.emit('resume-in-game', {
+                gameCode: gameCode,
+                status: game.status
+            });
+            socket.emit('start-game-now');
+        }
     });
+
 
     socket.on('find-public-game', () => {
         let targetCode = Object.keys(games).find(code => {
@@ -542,24 +551,65 @@ io.on('connection', (socket) => {
         broadcastStatus(gameCode);
     });
 
-    socket.on('player-ready', (data) => {
+        socket.on('player-ready', (data) => {
         const gameCode = data && data.gameCode;
         const isReady = !!(data && data.isReady);
         const game = games[gameCode];
-        if (!game || !game.p1) return;
+        if (!game) return;
 
-        let isP1 = game.p1.socketId === socket.id;
-        let isP2 = game.p2 && game.p2.socketId === socket.id;
+        let isP1 = false;
+        let isP2 = false;
 
-        if (!isP1 && !isP2 && typeof data.isPlayer1 === 'boolean') {
+        // --- Zwykłe lobby (p1 / p2) ---
+        if (game.p1 || game.p2) {
+            isP1 = !!(game.p1 && game.p1.socketId === socket.id);
+            isP2 = !!(game.p2 && game.p2.socketId === socket.id);
+            if (!isP1 && !isP2 && typeof data.isPlayer1 === 'boolean') {
+                isP1 = data.isPlayer1;
+                isP2 = !data.isPlayer1;
+            }
+            if (!isP1 && !isP2) return;
+
+            if (isP1 && game.p1) game.p1.ready = isReady;
+            if (isP2 && game.p2) game.p2.ready = isReady;
+            if (typeof syncLegacy === 'function') syncLegacy(game);
+            else {
+                game.player1Ready = isP1 ? isReady : !!game.player1Ready;
+                game.player2Ready = isP2 ? isReady : !!game.player2Ready;
+                if (isP1) game.player1Ready = isReady;
+                if (isP2) game.player2Ready = isReady;
+            }
+        }
+        // --- TEST (host / players) ---
+        else if (gameCode === 'TEST' || game.host !== undefined) {
+            isP1 = game.host === socket.id || game.player1 === socket.id;
+            isP2 = (game.players && game.players.includes(socket.id)) || game.player2 === socket.id;
+            if (!isP1 && !isP2 && typeof data.isPlayer1 === 'boolean') {
+                isP1 = data.isPlayer1;
+                isP2 = !data.isPlayer1;
+            }
+            if (!isP1 && !isP2) return;
+
+            if (isP1) {
+                game.player1Ready = isReady;
+                game.player1 = socket.id;
+                game.host = socket.id;
+                if (!game.player1Nickname) game.player1Nickname = game.hostNickname || 'test1';
+            } else {
+                game.player2Ready = isReady;
+                game.player2 = socket.id;
+                if (!game.players) game.players = [];
+                if (!game.players.includes(socket.id)) game.players = [socket.id];
+                if (!game.player2Nickname) game.player2Nickname = game.opponentNickname || 'test2';
+            }
+        } else {
+            // fallback: zaufaj isPlayer1 z klienta
+            if (typeof data.isPlayer1 !== 'boolean') return;
             isP1 = data.isPlayer1;
             isP2 = !data.isPlayer1;
+            if (isP1) game.player1Ready = isReady;
+            else game.player2Ready = isReady;
         }
-        if (!isP1 && !isP2) return;
-
-        if (isP1 && game.p1) game.p1.ready = isReady;
-        if (isP2 && game.p2) game.p2.ready = isReady;
-        syncLegacy(game);
 
         console.log(`[GAME] ${isP1 ? 'P1' : 'P2'} ready=${isReady} w ${gameCode}`);
 
@@ -568,12 +618,12 @@ io.on('connection', (socket) => {
             game.selectionTimer = null;
         }
 
-        const r1 = game.p1 && game.p1.ready;
-        const r2 = game.p2 && game.p2.ready;
+        const r1 = !!game.player1Ready;
+        const r2 = !!game.player2Ready;
 
         if (r1 && r2) {
-            game.status = 'frozen';
-            console.log(`[LOBBY] ${gameCode} ZAMROŻONE – obaj ready`);
+            if (game.p1 || game.p2) game.status = 'frozen';
+            console.log(`[GAME] Both ready in ${gameCode}, starting.`);
             io.to(gameCode).emit('force-finish-selection');
         } else if (r1 || r2) {
             let count = 15;
@@ -583,7 +633,7 @@ io.on('connection', (socket) => {
                 if (count < 0) {
                     clearInterval(game.selectionTimer);
                     game.selectionTimer = null;
-                    game.status = 'frozen';
+                    if (game.p1 || game.p2) game.status = 'frozen';
                     io.to(gameCode).emit('force-finish-selection');
                 }
             }, 1000);
@@ -591,7 +641,9 @@ io.on('connection', (socket) => {
             io.to(gameCode).emit('start-game-countdown', { seconds: null });
         }
 
-        const targetId = isP1 ? (game.p2 && game.p2.socketId) : (game.p1 && game.p1.socketId);
+        const targetId = isP1
+            ? (game.player2 || (game.players && game.players[0]) || (game.p2 && game.p2.socketId))
+            : (game.player1 || game.host || (game.p1 && game.p1.socketId));
         if (targetId) io.to(targetId).emit('opponent-ready-status', { isReady });
     });
 
