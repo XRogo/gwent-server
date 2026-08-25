@@ -9,9 +9,9 @@ const io = new Server(server);
 const { registerClassicGwentEvents } = require('./server_gwent_classic');
 const games = {};
 
-const SLOT_RELEASE_MS = 5 * 60 * 1000; // 5 min – zwolnienie slotu po disconnect
-const EMPTY_LOBBY_MS = 30 * 1000;      // 30 s przy 0/2 – kasuj lobby
-const TEST_EMPTY_MS = 5 * 1000;        // 5 s – kasuj TEST gdy pusty
+const SLOT_RELEASE_MS = 5 * 60 * 1000; // 5 min – zwolnij TYLKO slot (nie całą grę)
+const EMPTY_LOBBY_MS = 30 * 1000;      // 30 s przy 0/2 – wtedy dopiero delete lobby
+const TEST_EMPTY_MS = 5 * 1000;
 
 app.use(express.static('public'));
 
@@ -19,16 +19,22 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-// ========== POMOCNICZE FUNKCJE LOBBY ==========
+// ========== HELPERY ==========
+
+function isSocketAlive(socketId) {
+    if (!socketId) return false;
+    const s = io.sockets.sockets.get(socketId);
+    return !!(s && s.connected);
+}
 
 function syncLegacy(game) {
-    // Żeby server_gwent_classic.js i stary klient działały bez zmian
+    // server_gwent_classic.js nadal używa player1 / player2
     game.player1 = game.p1 ? game.p1.socketId : null;
     game.player2 = game.p2 ? game.p2.socketId : null;
     game.player1Nickname = game.p1 ? game.p1.nickname : null;
     game.player2Nickname = game.p2 ? game.p2.nickname : null;
-    game.player1Ready = game.p1 ? !!game.p1.ready : false;
-    game.player2Ready = game.p2 ? !!game.p2.ready : false;
+    game.player1Ready = !!(game.p1 && game.p1.ready);
+    game.player2Ready = !!(game.p2 && game.p2.ready);
     game.isClosed = !!(game.p1 && game.p1.connected && game.p2 && game.p2.connected);
 }
 
@@ -67,6 +73,7 @@ function clearSlotTimer(slot) {
     }
 }
 
+/** Po 5 min offline – zwolnij slot, NIE kasuj całej gry jeśli ktoś jeszcze jest */
 function scheduleSlotRelease(gameCode, which) {
     const game = games[gameCode];
     if (!game || !game[which]) return;
@@ -76,28 +83,36 @@ function scheduleSlotRelease(gameCode, which) {
         const g = games[gameCode];
         if (!g || !g[which] || g[which].connected) return;
 
-        console.log(`[LOBBY] ${gameCode} slot ${which} zwolniony po 5 min`);
+        console.log(`[LOBBY] ${gameCode} slot ${which} zwolniony po 5 min offline`);
         g[which] = null;
         syncLegacy(g);
 
         if (occupiedSlots(g) === 0) {
             scheduleEmptyDelete(gameCode);
         } else {
-            // 1/2 – lobby otwarte na kogoś z kodem
             g.isClosed = false;
-            if (g.status === 'frozen') g.status = 'open';
+            if (g.status === 'frozen') g.status = g.gameState ? 'playing' : 'open';
         }
-
         broadcastStatus(gameCode);
     }, SLOT_RELEASE_MS);
+}
+
+function refreshConnectionFlags(game) {
+    if (!game) return;
+    if (game.p1 && game.p1.socketId && !isSocketAlive(game.p1.socketId)) {
+        game.p1.connected = false;
+    }
+    if (game.p2 && game.p2.socketId && !isSocketAlive(game.p2.socketId)) {
+        game.p2.connected = false;
+    }
 }
 
 function buildStatus(game) {
     return {
         player1Id: game.p1 ? game.p1.socketId : null,
         player2Id: game.p2 ? game.p2.socketId : null,
-        player1Connected: !!(game.p1 && game.p1.connected),
-        player2Connected: !!(game.p2 && game.p2.connected),
+        player1Connected: !!(game.p1 && game.p1.connected && isSocketAlive(game.p1.socketId)),
+        player2Connected: !!(game.p2 && game.p2.connected && isSocketAlive(game.p2.socketId)),
         player1Nickname: game.p1 ? game.p1.nickname : null,
         player2Nickname: game.p2 ? game.p2.nickname : null,
         status: game.status
@@ -106,24 +121,24 @@ function buildStatus(game) {
 
 function broadcastStatus(gameCode, specificSocket = null) {
     const game = games[gameCode];
-    if (!game || gameCode === 'TEST') {
-        // TEST ma inną strukturę – prosty status jeśli trzeba
-        if (game && gameCode === 'TEST') {
-            const statusData = {
-                player1Id: game.host || game.player1 || null,
-                player2Id: (game.players && game.players[0]) || game.player2 || null,
-                player1Connected: !!(game.host && io.sockets.sockets.get(game.host)?.connected),
-                player2Connected: !!(game.players && game.players[0] && io.sockets.sockets.get(game.players[0])?.connected),
-                player1Nickname: game.hostNickname || null,
-                player2Nickname: game.opponentNickname || null,
-                status: game.status
-            };
-            if (specificSocket) specificSocket.emit('opponent-status', statusData);
-            else io.to(gameCode).emit('opponent-status', statusData);
-        }
+    if (!game) return;
+
+    if (gameCode === 'TEST') {
+        const statusData = {
+            player1Id: game.host || null,
+            player2Id: (game.players && game.players[0]) || null,
+            player1Connected: !!(game.host && isSocketAlive(game.host)),
+            player2Connected: !!(game.players && game.players[0] && isSocketAlive(game.players[0])),
+            player1Nickname: game.hostNickname || null,
+            player2Nickname: game.opponentNickname || null,
+            status: game.status
+        };
+        if (specificSocket) specificSocket.emit('opponent-status', statusData);
+        else io.to(gameCode).emit('opponent-status', statusData);
         return;
     }
 
+    refreshConnectionFlags(game);
     syncLegacy(game);
     const statusData = buildStatus(game);
     console.log(`[STATUS] ${gameCode} P1:${statusData.player1Connected} P2:${statusData.player2Connected} status=${game.status}`);
@@ -135,25 +150,17 @@ function broadcastStatus(gameCode, specificSocket = null) {
 function tryUnfreeze(game) {
     if (game.status === 'frozen' && game.p1 && game.p1.connected && game.p2 && game.p2.connected) {
         game.status = game.gameState ? 'playing' : 'open';
-        console.log(`[LOBBY] Odmrożono lobby (oba connected)`);
+        console.log(`[LOBBY] ${game.code || '?'} odmrożone`);
     }
 }
 
 /**
- * Przypisz socket do slotu:
- * - ten sam socket → odśwież connected
- * - slot disconnected → przejmij (F5 / inna przeglądarka / nowy gracz z kodem)
- * - wolny slot → zajmij
- * - obaj online → null (pełne)
+ * preferredIsP1: true/false/null
+ * forceReclaim: true przy rejoin (menu→gra / F5) – NADPISZ slot wg roli z URL
  */
-/**
- * @param preferredIsP1 - przy rejoin z game.html: true/false/null
- * @param forceReclaim  - true przy rejoin (wolno nadpisać stary socket na slocie)
- */
-function assignToGame(game, socket, nickname, preferredIsP1 = null, forceReclaim = false) {
+function assignToGame(game, socket, nickname, preferredIsP1, forceReclaim) {
     refreshConnectionFlags(game);
 
-    // Ten sam socket – OK
     if (game.p1 && game.p1.socketId === socket.id) {
         game.p1.connected = true;
         clearSlotTimer(game.p1);
@@ -169,7 +176,7 @@ function assignToGame(game, socket, nickname, preferredIsP1 = null, forceReclaim
         return { isPlayer1: false, role: 'p2' };
     }
 
-    // REJOIN: twardo weź slot P1 albo P2 (nawet gdy stary socket jeszcze „żyje”)
+    // REJOIN: zawsze slot z host= (NIGDY nie forsuj na drugą rolę)
     if (forceReclaim && preferredIsP1 === true) {
         if (!game.p1) {
             game.p1 = { socketId: socket.id, nickname: nickname || null, ready: false, connected: true, leaveTimer: null };
@@ -196,7 +203,7 @@ function assignToGame(game, socket, nickname, preferredIsP1 = null, forceReclaim
         return { isPlayer1: false, role: 'p2' };
     }
 
-    // Martwy slot
+    // Martwy slot (offline)
     if (game.p1 && !game.p1.connected) {
         clearSlotTimer(game.p1);
         game.p1.socketId = socket.id;
@@ -215,7 +222,7 @@ function assignToGame(game, socket, nickname, preferredIsP1 = null, forceReclaim
         return { isPlayer1: false, role: 'p2' };
     }
 
-    // Wolny slot
+    // Wolny slot (pierwsze dołączenie z menu)
     if (!game.p1) {
         game.p1 = { socketId: socket.id, nickname: nickname || null, ready: false, connected: true, leaveTimer: null };
         clearEmptyTimer(game);
@@ -228,59 +235,51 @@ function assignToGame(game, socket, nickname, preferredIsP1 = null, forceReclaim
         return { isPlayer1: false, role: 'p2' };
     }
 
-    return null; // pełne i obaj naprawdę online
+    return null;
 }
 
 function markDisconnected(gameCode, socketId) {
     const game = games[gameCode];
-    if (!game || gameCode === 'TEST') return false;
+    if (!game || gameCode === 'TEST') return;
 
     let which = null;
     if (game.p1 && game.p1.socketId === socketId) which = 'p1';
-    if (game.p2 && game.p2.socketId === socketId) which = 'p2';
-    if (!which) return false;
+    else if (game.p2 && game.p2.socketId === socketId) which = 'p2';
+    if (!which) return;
+
+    // Ważne: nie ruszamy slotu, jeśli już ktoś inny go przejął
+    if (game[which].socketId !== socketId) return;
 
     game[which].connected = false;
     game[which].ready = false;
     syncLegacy(game);
 
-    console.log(`[LOBBY] ${which} disconnect w ${gameCode} (status=${game.status})`);
+    console.log(`[LOBBY] ${which} offline w ${gameCode} (status=${game.status}) – gra NIE jest kasowana`);
     scheduleSlotRelease(gameCode, which);
     broadcastStatus(gameCode);
-    return true;
 }
+
+
 
 function scheduleTestCleanup() {
     setTimeout(() => {
         const g = games['TEST'];
         if (!g) return;
 
-        const hostOk = g.host && io.sockets.sockets.get(g.host)?.connected;
+        const hostOk = g.host && isSocketAlive(g.host);
         const p2Id = g.players && g.players[0];
-        const p2Ok = p2Id && io.sockets.sockets.get(p2Id)?.connected;
+        const p2Ok = p2Id && isSocketAlive(p2Id);
+
+        // Jeśli gra już wystartowała – nie kasuj samego lobby TEST tak agresywnie
+        if (g.gameState || g.status === 'playing' || g.status === 'frozen') {
+            return;
+        }
 
         if (!hostOk && !p2Ok) {
-            console.log('[TEST] Lobby wyczyszczone – nikt niepołączony przez 5s');
+            console.log('[TEST] Lobby wyczyszczone – nikt online przez 60s (lobby)');
             delete games['TEST'];
         }
-    }, TEST_EMPTY_MS);
-}
-
-function isSocketAlive(socketId) {
-    if (!socketId) return false;
-    const s = io.sockets.sockets.get(socketId);
-    return !!(s && s.connected);
-}
-
-/** Ustaw connected=false, jeśli socket już nie istnieje w Socket.IO */
-function refreshConnectionFlags(game) {
-    if (!game || !game.p1 && !game.p2) return;
-    if (game.p1 && game.p1.socketId && !isSocketAlive(game.p1.socketId)) {
-        game.p1.connected = false;
-    }
-    if (game.p2 && game.p2.socketId && !isSocketAlive(game.p2.socketId)) {
-        game.p2.connected = false;
-    }
+    }, 60 * 1000); // było 5s → 60s
 }
 
 // ========== SOCKET.IO ==========
@@ -288,7 +287,6 @@ function refreshConnectionFlags(game) {
 io.on('connection', (socket) => {
     console.log(`[CONN] Nowy użytkownik połączony: ${socket.id}`);
 
-    // --- CREATE ---
     socket.on('create-game', () => {
         let gameCode;
         do {
@@ -297,7 +295,7 @@ io.on('connection', (socket) => {
 
         games[gameCode] = {
             code: gameCode,
-            status: 'open', // open | frozen | playing
+            status: 'open',
             p1: null,
             p2: null,
             emptyTimer: null,
@@ -313,14 +311,13 @@ io.on('connection', (socket) => {
             selectionTimer: null
         };
 
-        assignToGame(games[gameCode], socket, null);
+        assignToGame(games[gameCode], socket, null, true, true);
         socket.join(gameCode);
         socket.emit('game-created', { gameCode, isPlayer1: true, role: 'p1' });
         console.log(`[LOBBY] Utworzono ${gameCode} przez ${socket.id}`);
         broadcastStatus(gameCode);
     });
 
-    // --- JOIN (menu: wpisanie kodu) ---
     socket.on('join-game', (data) => {
         const gameCode = String((data && data.gameCode) || '').trim();
         const nickname = (data && data.nickname) || null;
@@ -330,15 +327,14 @@ io.on('connection', (socket) => {
             socket.emit('join-error', 'Gra o tym kodzie nie istnieje!');
             return;
         }
-
-        // TEST / public – nie tym handlerem
         if (gameCode === 'TEST' || game.isPublic) {
-            socket.emit('join-error', 'Użyj odpowiedniego trybu do tej gry.');
+            socket.emit('join-error', 'Użyj innego trybu dla tej gry.');
             return;
         }
 
-        // Obaj online → pełne
-        if (game.p1 && game.p1.connected && game.p2 && game.p2.connected) {
+        refreshConnectionFlags(game);
+        if (game.p1 && game.p1.connected && isSocketAlive(game.p1.socketId)
+            && game.p2 && game.p2.connected && isSocketAlive(game.p2.socketId)) {
             socket.emit('join-error', 'Gra jest już pełna!');
             return;
         }
@@ -360,10 +356,10 @@ io.on('connection', (socket) => {
             player2Id: game.player2
         });
 
-        if (assigned.role === 'p2' && game.p1 && game.p1.socketId) {
+        if (assigned.role === 'p2' && game.p1) {
             io.to(game.p1.socketId).emit('opponent-joined', { opponentId: socket.id });
         }
-        if (assigned.role === 'p1' && game.p2 && game.p2.socketId) {
+        if (assigned.role === 'p1' && game.p2) {
             io.to(game.p2.socketId).emit('opponent-joined', { opponentId: socket.id });
         }
 
@@ -372,59 +368,92 @@ io.on('connection', (socket) => {
     });
 
     socket.on('rejoin-game', (data) => {
-    const gameCode = String((data && data.gameCode) || '').trim();
-    const nickname = (data && data.nickname) || null;
-    // z URL host=true/false – KLUCZOWE przy przejściu menu→gra
-    let preferredIsP1 = null;
-    if (typeof data.isPlayer1 === 'boolean') {
-        preferredIsP1 = data.isPlayer1;
-    }
+        const gameCode = String((data && data.gameCode) || '').trim();
+        const nickname = (data && data.nickname) || null;
+        let preferredIsP1 = null;
+        if (typeof (data && data.isPlayer1) === 'boolean') {
+            preferredIsP1 = data.isPlayer1;
+        }
 
-    const game = games[gameCode];
+        const game = games[gameCode];
+        if (!game) {
+            socket.emit('join-error', 'Lobby nie istnieje lub wygasło.');
+            return;
+        }
 
+        if (gameCode === 'TEST') {
+    let game = games['TEST'];
     if (!game) {
-        socket.emit('join-error', 'Lobby nie istnieje lub wygasło.');
-        return;
+        // Odtwórz puste TEST przy rejoin (po przypadkowym cleanup)
+        game = games['TEST'] = {
+            host: null,
+            players: [],
+            isClosed: false,
+            hostNickname: 'test1',
+            opponentNickname: null,
+            status: 'waiting',
+            player1Ready: true,
+            player2Ready: true,
+            player1: null,
+            player2: null
+        };
     }
 
-    if (gameCode === 'TEST') {
+    const preferredIsP1 = typeof (data && data.isPlayer1) === 'boolean'
+        ? data.isPlayer1
+        : null;
+
+    // Przypisz slot jak przy normalnym lobby
+    if (preferredIsP1 === true || (preferredIsP1 === null && !game.host)) {
+        game.host = socket.id;
+        game.player1 = socket.id;
+        if (nickname) game.hostNickname = nickname || 'test1';
         socket.join('TEST');
-        socket.emit('join-success', { gameCode: 'TEST', isPlayer1: true });
-        return;
+        socket.emit('join-success', { gameCode: 'TEST', isPlayer1: true, role: 'p1' });
+        socket.emit('test-game-joined', { gameCode: 'TEST', isHost: true, nickname: game.hostNickname || 'test1' });
+        console.log(`[TEST] Rejoin jako test1: ${socket.id}`);
+    } else {
+        if (!game.players) game.players = [];
+        if (!game.players.includes(socket.id)) {
+            game.players = [socket.id];
+        }
+        game.player2 = socket.id;
+        game.isClosed = true;
+        if (nickname) game.opponentNickname = nickname || 'test2';
+        socket.join('TEST');
+        socket.emit('join-success', { gameCode: 'TEST', isPlayer1: false, role: 'p2' });
+        socket.emit('test-game-joined', { gameCode: 'TEST', isHost: false, nickname: game.opponentNickname || 'test2' });
+        console.log(`[TEST] Rejoin jako test2: ${socket.id}`);
     }
 
-    refreshConnectionFlags(game);
+    if (game.host) game.player1 = game.host;
+    if (game.players && game.players[0]) game.player2 = game.players[0];
+    broadcastStatus('TEST');
+    return;
+}
 
-    // Pełne TYLKO gdy obaj sockety naprawdę żyją I to nie nasz rejoin z preferencją slotu
-    const bothAlive =
-        game.p1 && isSocketAlive(game.p1.socketId) &&
-        game.p2 && isSocketAlive(game.p2.socketId);
+        // ZAWSZE force + rola z URL – bez "Forcing to P2"
+        const assigned = assignToGame(game, socket, nickname, preferredIsP1, true);
+        if (!assigned) {
+            socket.emit('join-error', 'Gra jest już pełna!');
+            return;
+        }
 
-    // Przy rejoin ZAWSZE forceReclaim + preferredIsP1 z klienta
-    const assigned = assignToGame(game, socket, nickname, preferredIsP1, true);
+        socket.join(gameCode);
+        tryUnfreeze(game);
 
-    if (!assigned) {
-        // Ostateczność: obaj żywi i bez preferencji
-        socket.emit('join-error', 'Gra jest już pełna!');
-        return;
-    }
+        socket.emit('join-success', {
+            gameCode,
+            isPlayer1: assigned.isPlayer1,
+            role: assigned.role,
+            player1Id: game.player1,
+            player2Id: game.player2
+        });
 
-    socket.join(gameCode);
-    tryUnfreeze(game);
-
-    socket.emit('join-success', {
-        gameCode,
-        isPlayer1: assigned.isPlayer1,
-        role: assigned.role,
-        player1Id: game.player1,
-        player2Id: game.player2
+        console.log(`[LOBBY] Rejoin ${socket.id} → ${gameCode} jako ${assigned.role} (host/P1 prefer=${preferredIsP1})`);
+        broadcastStatus(gameCode);
     });
 
-    console.log(`[LOBBY] Rejoin ${socket.id} → ${gameCode} jako ${assigned.role} (prefer P1=${preferredIsP1})`);
-    broadcastStatus(gameCode);
-});
-
-    // --- PUBLIC (zostawione jak było, lekko) ---
     socket.on('find-public-game', () => {
         let targetCode = Object.keys(games).find(code => {
             const g = games[code];
@@ -432,7 +461,6 @@ io.on('connection', (socket) => {
         });
 
         if (targetCode) {
-            console.log(`[LOBBY] Znaleziono publiczną grę ${targetCode} dla ${socket.id}`);
             socket.emit('public-game-found', { gameCode: targetCode });
         } else {
             const newCode = 'PUB' + Math.floor(1000 + Math.random() * 9000);
@@ -449,11 +477,9 @@ io.on('connection', (socket) => {
             };
             socket.join(newCode);
             socket.emit('join-success', { gameCode: newCode, isHost: true });
-            console.log(`[LOBBY] Utworzono publiczną grę ${newCode}`);
         }
     });
 
-    // --- TEST (zostawione + cleanup 5s) ---
     socket.on('find-test-game', () => {
         const testCode = 'TEST';
         if (!games[testCode]) {
@@ -483,7 +509,7 @@ io.on('connection', (socket) => {
             io.to(games[testCode].host).emit('opponent-joined', { opponentId: socket.id });
             console.log(`[TEST] ${socket.id} jako test2`);
             broadcastStatus(testCode);
-        } else if (games[testCode].host === socket.id || games[testCode].players.includes(socket.id)) {
+        } else if (games[testCode].host === socket.id || (games[testCode].players || []).includes(socket.id)) {
             const isHost = games[testCode].host === socket.id;
             socket.emit('test-game-joined', {
                 gameCode: testCode,
@@ -495,9 +521,9 @@ io.on('connection', (socket) => {
         }
     });
 
-    // --- NICK ---
     socket.on('set-nickname', (data) => {
-        const { gameCode, nickname } = data || {};
+        const gameCode = data && data.gameCode;
+        const nickname = data && data.nickname;
         const game = games[gameCode];
         if (!game || gameCode === 'TEST') return;
 
@@ -516,30 +542,26 @@ io.on('connection', (socket) => {
         broadcastStatus(gameCode);
     });
 
-    // --- READY ---
     socket.on('player-ready', (data) => {
-        const { gameCode, isReady } = data || {};
+        const gameCode = data && data.gameCode;
+        const isReady = !!(data && data.isReady);
         const game = games[gameCode];
         if (!game || !game.p1) return;
 
         let isP1 = game.p1.socketId === socket.id;
         let isP2 = game.p2 && game.p2.socketId === socket.id;
 
-        // Kompatybilność: klient może jeszcze wysyłać isPlayer1
         if (!isP1 && !isP2 && typeof data.isPlayer1 === 'boolean') {
             isP1 = data.isPlayer1;
             isP2 = !data.isPlayer1;
         }
         if (!isP1 && !isP2) return;
 
-        if (isP1 && game.p1) {
-            game.p1.ready = !!isReady;
-        } else if (isP2 && game.p2) {
-            game.p2.ready = !!isReady;
-        }
+        if (isP1 && game.p1) game.p1.ready = isReady;
+        if (isP2 && game.p2) game.p2.ready = isReady;
         syncLegacy(game);
 
-        console.log(`[GAME] ${isP1 ? 'P1' : 'P2'} ready=${!!isReady} w ${gameCode}`);
+        console.log(`[GAME] ${isP1 ? 'P1' : 'P2'} ready=${isReady} w ${gameCode}`);
 
         if (game.selectionTimer) {
             clearInterval(game.selectionTimer);
@@ -570,34 +592,30 @@ io.on('connection', (socket) => {
         }
 
         const targetId = isP1 ? (game.p2 && game.p2.socketId) : (game.p1 && game.p1.socketId);
-        if (targetId) {
-            io.to(targetId).emit('opponent-ready-status', { isReady: !!isReady });
-        }
+        if (targetId) io.to(targetId).emit('opponent-ready-status', { isReady });
     });
 
-    // Classic Gwent (bez zmian w tym pliku)
     registerClassicGwentEvents(socket, io, games);
 
     socket.on('send-to-p1', (data) => {
-        const { gameCode, message } = data || {};
-        if (games[gameCode] && games[gameCode].player1) {
-            io.to(games[gameCode].player1).emit('message-from-p2', { player2Id: socket.id, message });
+        const game = games[data && data.gameCode];
+        if (game && game.player1) {
+            io.to(game.player1).emit('message-from-p2', { player2Id: socket.id, message: data.message });
         }
     });
 
     socket.on('send-to-p2', (data) => {
-        const { player2Id, message } = data || {};
-        if (player2Id) io.to(player2Id).emit('message-from-p1', message);
+        if (data && data.player2Id) {
+            io.to(data.player2Id).emit('message-from-p1', data.message);
+        }
     });
 
-    // Wyjście z lobby z menu
     socket.on('p1Left', () => {
         console.log(`[LOBBY] p1Left od ${socket.id}`);
         for (const gameCode of Object.keys(games)) {
             if (gameCode === 'TEST') continue;
             const game = games[gameCode];
-            if (!game || !game.p1) continue;
-            if (game.p1.socketId !== socket.id) continue;
+            if (!game || !game.p1 || game.p1.socketId !== socket.id) continue;
 
             if (game.p2 && game.p2.socketId) {
                 io.to(game.p2.socketId).emit('opponent-left', 'Host zamknął lobby.');
@@ -606,7 +624,7 @@ io.on('connection', (socket) => {
             if (game.p1) clearSlotTimer(game.p1);
             if (game.p2) clearSlotTimer(game.p2);
             delete games[gameCode];
-            console.log(`[LOBBY] Usunięto ${gameCode} (host wyszedł z menu)`);
+            console.log(`[LOBBY] Usunięto ${gameCode} (host z menu)`);
         }
     });
 
@@ -615,14 +633,12 @@ io.on('connection', (socket) => {
         for (const gameCode of Object.keys(games)) {
             if (gameCode === 'TEST') continue;
             const game = games[gameCode];
-            if (!game || !game.p2) continue;
-            if (game.p2.socketId !== socket.id) continue;
+            if (!game || !game.p2 || game.p2.socketId !== socket.id) continue;
 
             clearSlotTimer(game.p2);
             game.p2 = null;
-            if (game.status === 'frozen') game.status = 'open';
+            if (game.status === 'frozen') game.status = game.gameState ? 'playing' : 'open';
             syncLegacy(game);
-
             if (game.p1 && game.p1.socketId) {
                 io.to(game.p1.socketId).emit('opponentLeft', message || 'Przeciwnik opuścił lobby.');
             }
@@ -636,19 +652,16 @@ io.on('connection', (socket) => {
         for (const gameCode of Object.keys(games)) {
             if (gameCode === 'TEST') {
                 const g = games['TEST'];
-                if (!g) continue;
-                if (g.host === socket.id || (g.players && g.players.includes(socket.id))) {
+                if (g && (g.host === socket.id || (g.players || []).includes(socket.id))) {
                     scheduleTestCleanup();
                 }
                 continue;
             }
-
             markDisconnected(gameCode, socket.id);
         }
     });
 });
 
-// --- KONSOLA: rt = restart TEST ---
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (data) => {
     const input = data.trim().toLowerCase();
