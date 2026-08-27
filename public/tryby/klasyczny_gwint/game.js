@@ -1,4 +1,4 @@
-import { initSelection, getSelectedDeck, getSelectedLeader, updatePositionsAndScaling } from './selection_card.js';
+import { initSelection, getSelectedDeck, getSelectedLeader, updatePositionsAndScaling, getUnitCount } from './selection_card.js';
 import { initGameBoard, renderAll } from './game_board.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,15 +45,30 @@ socket.on('join-error', (msg) => {
             switchToGame();
         });
 
-        let countdownInterval = null;
         socket.on('start-game-countdown', (data) => {
-            const btn = document.getElementById('goToGameButton');
-            if (data.seconds === null) {
-                btn.innerText = 'Przejdź do gry';
-                return;
-            }
-            btn.innerText = `Start za ${data.seconds}...`;
-        });
+    if (data.seconds === null) {
+        countdownActive = false;
+        if (countdownLineId) {
+            removeStatusLine(countdownLineId);
+            countdownLineId = null;
+        }
+        return;
+    }
+
+    countdownActive = true;
+    const sec = data.seconds;
+
+    // isReadyStatus = TY kliknąłeś gotowość
+    const html = isReadyStatus
+        ? `Jesteś gotowy, czekanie na przeciwnika ${secHtml(sec)}`
+        : `Przeciwnik jest gotowy, za ${secHtml(sec)} rozpoczęcie gry`;
+
+    if (!countdownLineId) {
+        countdownLineId = addStatusLine(html, { sticky: true, id: 'countdown' });
+    } else {
+        updateStatusLine(countdownLineId, html);
+    }
+});
 
         socket.on('force-finish-selection', () => {
             const deck = getSelectedDeck();
@@ -133,44 +148,131 @@ socket.on('join-error', (msg) => {
     }
 
     let isReadyStatus = false;
-    document.getElementById('goToGameButton').onclick = () => {
-        isReadyStatus = !isReadyStatus;
-        const btn = document.getElementById('goToGameButton');
+const readyBtn = document.getElementById('goToGameButton');
+const readyLabel = readyBtn.querySelector('.deck-action-label');
 
-        if (isReadyStatus) {
-            const currentDeckCards = getSelectedDeck();
-            const currentLeader = getSelectedLeader();
-            const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
+function refreshReadyButtonState() {
+    if (isReadyStatus) {
+        readyBtn.disabled = false;
+        readyLabel.textContent = 'Cofnij gotowość';
+        return;
+    }
+    const units = getUnitCount();
+    readyBtn.disabled = units < 22;
+    readyLabel.textContent = 'Rozpocznij grę';
+}
 
-            // Save to server
-            socket.emit('save-full-deck', {
-                gameCode,
-                isPlayer1: isP1,
-                deck: currentDeckCards.map(c => c.numer),
-                leader: currentLeader ? currentLeader.numer : null,
-                factionId: factionId
-            });
+// odświeżaj przy każdej zmianie talii
+const _oldUpdate = window.updateSelectionUI;
+window.updateSelectionUI = function () {
+    if (_oldUpdate) _oldUpdate();
+    refreshReadyButtonState();
+};
+isReadyStatus = true;
+readyLabel.textContent = 'Cofnij gotowość';
+// od razu info u Ciebie (timer dopisze serwer)
+addStatusLine('Jesteś gotowy, czekanie na przeciwnika…', { ttl: 2500 });
+isReadyStatus = false;
+if (countdownLineId) {
+    removeStatusLine(countdownLineId);
+    countdownLineId = null;
+}
+countdownActive = false;
 
-            // Mark as ready
-            socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
-            btn.innerText = "Oczekiwanie...";
-        } else {
-            // Cancel ready
-            socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: false });
-            btn.innerText = "Przejdź do gry";
+readyBtn.onclick = () => {
+    if (!isReadyStatus) {
+        if (getUnitCount() < 22) {
+            setSelectionStatus('Potrzebujesz minimum 22 kart jednostek w talii');
+            return;
         }
-    };
-
-    document.getElementById('saveDeckButton').onclick = () => {
+        isReadyStatus = true;
         const currentDeckCards = getSelectedDeck();
         const currentLeader = getSelectedLeader();
         const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
 
-        if (window.saveDeck) {
-            window.saveDeck(factionId, currentLeader ? currentLeader.numer : null, currentDeckCards.map(c => c.numer));
-            alert('Talia zapisana!');
-        }
-    };
+        socket.emit('save-full-deck', {
+            gameCode,
+            isPlayer1: isP1,
+            deck: currentDeckCards.map(c => c.numer),
+            leader: currentLeader ? currentLeader.numer : null,
+            factionId
+        });
+        socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
+        readyLabel.textContent = 'Cofnij gotowość';
+    } else {
+        isReadyStatus = false;
+        socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: false });
+        readyLabel.textContent = 'Rozpocznij grę';
+        refreshReadyButtonState();
+    }
+};
+
+let statusHideTimer = null;
+let countdownActive = false;
+let countdownLineId = null;
+let statusLineId = 0;
+
+function getStatusBar() {
+    return document.getElementById('selectionStatusBar');
+}
+
+function addStatusLine(html, { sticky = false, id = null, ttl = 3000 } = {}) {
+    const bar = getStatusBar();
+    if (!bar) return null;
+
+    const line = document.createElement('div');
+    line.className = 'status-line';
+    const lineId = id || `s${++statusLineId}`;
+    line.dataset.id = lineId;
+    line.innerHTML = html;
+    bar.appendChild(line);
+
+    if (!sticky && ttl > 0) {
+        setTimeout(() => {
+            line.classList.add('fade-out');
+            setTimeout(() => line.remove(), 650);
+        }, ttl);
+    }
+    return lineId;
+}
+
+function updateStatusLine(id, html) {
+    const bar = getStatusBar();
+    if (!bar) return;
+    const line = bar.querySelector(`.status-line[data-id="${id}"]`);
+    if (line) line.innerHTML = html;
+}
+
+function removeStatusLine(id) {
+    const bar = getStatusBar();
+    if (!bar) return;
+    const line = bar.querySelector(`.status-line[data-id="${id}"]`);
+    if (!line) return;
+    line.classList.add('fade-out');
+    setTimeout(() => line.remove(), 650);
+}
+
+function secHtml(seconds) {
+    let color = '#35a842';
+    if (seconds <= 5) color = '#ff1a1a';
+    else if (seconds <= 20) color = '#e6c200';
+    return `<span class="status-sec" style="color:${color}">${seconds}s</span>`;
+}
+
+function setSelectionStatus(text, opts = {}) {
+    // prosta wiadomość (np. Zapisano talię)
+    addStatusLine(text, { ttl: opts.sticky ? 0 : 3000, sticky: !!opts.sticky });
+}
+
+    document.getElementById('saveDeckButton').onclick = () => {
+    const currentDeckCards = getSelectedDeck();
+    const currentLeader = getSelectedLeader();
+    const factionId = window.selectedFaction || localStorage.getItem('faction') || '1';
+    if (window.saveDeck) {
+        window.saveDeck(factionId, currentLeader ? currentLeader.numer : null, currentDeckCards.map(c => c.numer));
+        setSelectionStatus('Zapisano talię');
+    }
+};
 
     window.addEventListener('resize', () => {
         updatePositionsAndScaling();

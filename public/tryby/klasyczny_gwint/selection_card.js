@@ -246,10 +246,6 @@ function updateStats(statsContainer) {
         { text: heroCardsCount, y1: 1660, y2: 1692, color: C_GOLD, center: false }
     ];
 
-    if (window.opponentReady) {
-        statsData.push({ text: "PRZECIWNIK GOTOWY", y1: 1800, y2: 1850, color: C_SILA, center: true });
-    }
-
     statsData.forEach(d => {
         const el = document.createElement('div');
         el.className = 'stat-item';
@@ -522,6 +518,37 @@ export function updatePositionsAndScaling() {
         saveDeckButton.style.fontSize = `${(24 / GUI_WIDTH) * backgroundWidth}px`;
         saveDeckButton.style.transform = `translateX(-50%)`;
     }
+        // --- Przyciski gotowości / zapisu (4K: 262×70) ---
+    // Start: 1774,1852 → 2035,1921
+    // Zapisz: 95px wyżej → top 1757
+    const placeActionBtn = (el, left4k, top4k) => {
+    if (!el) return;
+    el.style.position = 'absolute';
+    el.style.left = `${backgroundLeft + (left4k / GUI_WIDTH) * backgroundWidth}px`;
+    el.style.top = `${backgroundTop + (top4k / GUI_HEIGHT) * backgroundHeight}px`;
+    el.style.width = `${(262 / GUI_WIDTH) * backgroundWidth}px`;
+    el.style.height = `${(70 / GUI_HEIGHT) * backgroundHeight}px`;
+    el.style.transform = 'none'; // ważne – nic nie centruje
+    el.style.margin = '0';
+    const label = el.querySelector('.deck-action-label');
+    if (label) {
+        label.style.fontSize = `${(47 / GUI_HEIGHT) * backgroundHeight}px`;
+        label.style.letterSpacing = `${(-3 / GUI_WIDTH) * backgroundWidth}px`;
+    }
+};
+placeActionBtn(document.getElementById('goToGameButton'), 1774, 1852);
+placeActionBtn(document.getElementById('saveDeckButton'), 1774, 1757); // 1852 - 95
+
+    // Pasek statusu: 966,1982 → 2873,2158
+    const statusBar = document.getElementById('selectionStatusBar');
+    if (statusBar) {
+        statusBar.style.left = `${backgroundLeft + (966 / GUI_WIDTH) * backgroundWidth}px`;
+        statusBar.style.top = `${backgroundTop + (1982 / GUI_HEIGHT) * backgroundHeight}px`;
+        statusBar.style.width = `${((2873 - 966) / GUI_WIDTH) * backgroundWidth}px`;
+        statusBar.style.height = `${((2158 - 1982) / GUI_HEIGHT) * backgroundHeight}px`;
+        statusBar.style.fontSize = `${(55 / GUI_HEIGHT) * backgroundHeight}px`;
+        statusBar.style.letterSpacing = `${(-0.5 / GUI_WIDTH) * backgroundWidth}px`;
+    }
 }
 
 function updateCardArea(area, areaWidth, areaHeight, backgroundWidth, backgroundHeight) {
@@ -570,3 +597,10 @@ function updateCardArea(area, areaWidth, areaHeight, backgroundWidth, background
 
 export function getSelectedDeck() { return deck; }
 export function getSelectedLeader() { return selectedLeader; }
+export function countUnitCards(deckArr) {
+    return (deckArr || []).filter(c => typeof c.punkty === 'number').length;
+}
+
+export function getUnitCount() {
+    return countUnitCards(deck);
+}

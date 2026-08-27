@@ -626,7 +626,7 @@ io.on('connection', (socket) => {
             console.log(`[GAME] Both ready in ${gameCode}, starting.`);
             io.to(gameCode).emit('force-finish-selection');
         } else if (r1 || r2) {
-            let count = 15;
+            let count = 60;
             game.selectionTimer = setInterval(() => {
                 io.to(gameCode).emit('start-game-countdown', { seconds: count });
                 count--;

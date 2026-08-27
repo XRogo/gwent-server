@@ -340,6 +340,17 @@ function registerClassicGwentEvents(socket, io, games) {
                 return;
             }
 
+            // Nie startuj, dopóki obie talie nie są na serwerze
+            if (!game.player1FullDeck || !game.player2FullDeck) {
+                console.log(
+                    `[GAME CLASSIC] Waiting for both decks in ${gameCode}. ` +
+                    `P1=${!!game.player1FullDeck} (${game.player1FullDeck?.length || 0}) ` +
+                    `P2=${!!game.player2FullDeck} (${game.player2FullDeck?.length || 0})`
+                );
+
+                return; // NIE ustawiaj status=playing, NIE emituj start-game-now
+            }
+
             // 1. Inicjalizacja pustego stanu gry (jeśli nie istnieje)
             if (!game.gameState) {
                 game.gameState = {
