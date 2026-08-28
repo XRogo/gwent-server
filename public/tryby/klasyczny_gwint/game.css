@@ -379,84 +379,39 @@ body {
     background-repeat: no-repeat;
 }
 
-.deck-action-btn {
+#goToGameButton {
     position: absolute;
-    z-index: 20;
     cursor: pointer;
+    z-index: 4;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
     border: none;
-    padding: 0;
-    margin: 0;
-    background: url('assets/wybor/statrt_button.webp') center / 100% 100% no-repeat;
-    background-color: transparent;
-    color: #ffffff;
-    font-family: 'PFDinTextCondPro', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 5px;
+    max-width: 300px;
+    max-height: 60px;
     box-sizing: border-box;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.deck-action-btn:focus,
-.deck-action-btn:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-.deck-action-btn .deck-action-label {
-    pointer-events: none;
-    text-align: center;
-    white-space: nowrap;
-    line-height: 1;
-}
-
-.deck-action-btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.deck-action-btn:not(:disabled):hover {
-    filter: brightness(1.08);
-}
-
-.selection-status-bar {
-    position: absolute;
-    z-index: 25;
-    pointer-events: none;
-    text-align: center;
-    font-family: 'PFDinTextCondPro', sans-serif;
-    color: #d1a071;
-    display: flex;
-    flex-direction: column-reverse; /* najnowsze u góry stosu od dołu */
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.15em;
-    line-height: 1.15;
-    overflow: hidden;
-}
-
-.selection-status-bar .status-line {
-    width: 100%;
-    opacity: 1;
-    transition: opacity 0.6s ease;
-}
-
-.selection-status-bar .status-line.fade-out {
-    opacity: 0;
-}
-
-.selection-status-bar .status-sec {
-    /* kolor sekundy ustawiany w JS */
 }
 
 .game-content {
     color: #fff;
     text-align: center;
     padding: 20px;
+}
+
+#saveDeckButton {
+    position: absolute;
+    cursor: pointer;
+    z-index: 4;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid #7d6a45;
+    border-radius: 5px;
+    box-sizing: border-box;
+    /* Dynamic positioning in JS */
+}
+
+#saveDeckButton:hover {
+    background-color: rgba(40, 40, 40, 0.7);
 }
 
 .card-content .ilosc-layer {
