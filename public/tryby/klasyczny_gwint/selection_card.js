@@ -71,6 +71,9 @@ export function initSelection(socket, gameCode, isPlayer1) {
         displayCards(currentDeckFilter, deckArea, factions[currentPage - 1].id, grouped, false, deck);
         updateStats(stats);
         updatePositionsAndScaling();
+        if (typeof window.updateGoToGameButton === 'function') {
+            window.updateGoToGameButton();
+        }
     };
 
     function updateSelectionUI() {
@@ -570,3 +573,7 @@ function updateCardArea(area, areaWidth, areaHeight, backgroundWidth, background
 
 export function getSelectedDeck() { return deck; }
 export function getSelectedLeader() { return selectedLeader; }
+export function getUnitCardCount() {
+    return deck.filter(c => typeof c.punkty === 'number').length;
+}
+

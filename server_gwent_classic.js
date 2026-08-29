@@ -310,6 +310,59 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
     }
 }
 
+function autofillDeckToMinUnits(deckNumbers, factionId, playerName, gameCode) {
+    let currentDeck = Array.isArray(deckNumbers) ? [...deckNumbers] : [];
+    
+    // Zlicz ile jednostek gracz już ma w talii
+    const isUnitCard = (c) => c && typeof c.punkty === 'number';
+    let unitCount = currentDeck.filter(num => {
+        const c = cards.find(item => item.numer === num);
+        return isUnitCard(c);
+    }).length;
+
+    if (unitCount >= 22) {
+        return currentDeck;
+    }
+
+    const needed = 22 - unitCount;
+    console.log(`[GAME CLASSIC] ${playerName} in ${gameCode} has only ${unitCount}/22 unit cards. Auto-filling ${needed} unit cards...`);
+
+    // Zlicz ile kopii każdego numeru gracz już ma w wybranej talii
+    const chosenCounts = {};
+    for (const num of currentDeck) {
+        chosenCounts[num] = (chosenCounts[num] || 0) + 1;
+    }
+
+    // Pula dostępnych kart jednostek (frakcja gracza + neutralne "nie")
+    // Respektujemy limit 'ilosc' dla każdej karty
+    const availablePool = [];
+    for (const card of cards) {
+        if (!isUnitCard(card)) continue;
+        if (card.frakcja !== String(factionId) && card.frakcja !== 'nie') continue;
+
+        const maxAllowed = typeof card.ilosc === 'number' ? card.ilosc : 1;
+        const alreadyInDeck = chosenCounts[card.numer] || 0;
+        const canAdd = maxAllowed - alreadyInDeck;
+
+        for (let i = 0; i < canAdd; i++) {
+            availablePool.push(card.numer);
+        }
+    }
+
+    // Tasowanie puli dostępnych kart (Fisher-Yates)
+    for (let i = availablePool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [availablePool[i], availablePool[j]] = [availablePool[j], availablePool[i]];
+    }
+
+    // Dobierz brakujące karty jednostek
+    const addedCards = availablePool.slice(0, needed);
+    currentDeck.push(...addedCards);
+
+    console.log(`[GAME CLASSIC] Auto-filled ${addedCards.length} cards for ${playerName} in ${gameCode}. Total unit cards: ${unitCount + addedCards.length}`);
+    return currentDeck;
+}
+
 function registerClassicGwentEvents(socket, io, games) {
     socket.on('save-full-deck', (data) => {
         const { gameCode, isPlayer1, deck, factionId, leader } = data;
@@ -350,6 +403,20 @@ function registerClassicGwentEvents(socket, io, games) {
 
                 return; // NIE ustawiaj status=playing, NIE emituj start-game-now
             }
+
+            // Dopełnienie talii graczy do min. 22 kart jednostek (jeśli brakuje)
+            game.player1FullDeck = autofillDeckToMinUnits(
+                game.player1FullDeck,
+                game.player1Faction || '1',
+                game.player1Nickname || 'P1',
+                gameCode
+            );
+            game.player2FullDeck = autofillDeckToMinUnits(
+                game.player2FullDeck,
+                game.player2Faction || '1',
+                game.player2Nickname || 'P2',
+                gameCode
+            );
 
             // 1. Inicjalizacja pustego stanu gry (jeśli nie istnieje)
             if (!game.gameState) {

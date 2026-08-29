@@ -392,6 +392,14 @@ body {
     box-sizing: border-box;
 }
 
+#goToGameButton:disabled,
+#goToGameButton.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(80%);
+    pointer-events: none;
+}
+
 .game-content {
     color: #fff;
     text-align: center;

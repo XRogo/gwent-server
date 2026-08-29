@@ -1,4 +1,4 @@
-import { initSelection, getSelectedDeck, getSelectedLeader, updatePositionsAndScaling } from './selection_card.js';
+import { initSelection, getSelectedDeck, getSelectedLeader, getUnitCardCount, updatePositionsAndScaling } from './selection_card.js';
 import { initGameBoard, renderAll } from './game_board.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -181,9 +181,30 @@ socket.on('join-error', (msg) => {
     }
 
     let isReadyStatus = false;
-    document.getElementById('goToGameButton').onclick = () => {
+    const goToGameButton = document.getElementById('goToGameButton');
+
+    function updateGoToGameButton() {
+        if (!goToGameButton) return;
+        if (isReadyStatus) return; // Jeśli gracz jest już w stanie "Oczekiwanie...", nie nadpisuj
+        const unitCount = getUnitCardCount();
+        if (unitCount < 22) {
+            goToGameButton.disabled = true;
+            goToGameButton.classList.add('disabled');
+        } else {
+            goToGameButton.disabled = false;
+            goToGameButton.classList.remove('disabled');
+        }
+    }
+    window.updateGoToGameButton = updateGoToGameButton;
+    updateGoToGameButton();
+
+    goToGameButton.onclick = () => {
+        if (!isReadyStatus && getUnitCardCount() < 22) {
+            return;
+        }
+
         isReadyStatus = !isReadyStatus;
-        const btn = document.getElementById('goToGameButton');
+        const btn = goToGameButton;
 
         if (isReadyStatus) {
             const currentDeckCards = getSelectedDeck();
@@ -206,6 +227,7 @@ socket.on('join-error', (msg) => {
             // Cancel ready
             socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: false });
             btn.innerText = "Przejdź do gry";
+            updateGoToGameButton();
         }
     };
 
