@@ -7,8 +7,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const socket = typeof io !== 'undefined' ? io() : null;
     const urlParams = new URLSearchParams(window.location.search);
     const gameCode = urlParams.get('code');
-    const isP1 = urlParams.get('host') === 'true';
-    const nick = urlParams.get('nick') || localStorage.getItem('nickname') || (isP1 ? 'Gospodarz' : 'Gość');
+const isP1 = urlParams.get('host') === 'true';
+const nick = urlParams.get('nick') || localStorage.getItem('nickname') || (isP1 ? 'Gospodarz' : 'Gość');
+
+function getGameToken(code) {
+    try {
+        return localStorage.getItem('gwent_token_' + code);
+    } catch (e) {
+        return null;
+    }
+}
+function saveGameToken(code, token) {
+    if (!code || !token) return;
+    try {
+        localStorage.setItem('gwent_token_' + code, token);
+    } catch (e) {}
+}
+
+if (socket && gameCode) {
+    if (window.ConnectionUI) {
+        window.ConnectionUI.init(socket, gameCode, isP1, nick);
+    }
+
+    const token = getGameToken(gameCode);
+    socket.emit('rejoin-game', {
+        gameCode,
+        isPlayer1: isP1,
+        nickname: nick,
+        token: token || undefined
+    });
+
+    socket.on('join-success', (data) => {
+        if (typeof data.isPlayer1 === 'boolean') {
+            console.log('[REJOIN] Serwer ustawił rolę:', data.isPlayer1 ? 'P1' : 'P2');
+        }
+        // Odśwież token (ten sam albo nowy) – tylko u nas
+        if (data.token) saveGameToken(gameCode, data.token);
+    });
+
+    socket.on('join-error', (msg) => {
+        alert(msg || 'Nie można dołączyć do lobby');
+        window.location.href = '/';
+    });
+
+    socket.on('session-taken', (msg) => {
+        alert(msg || 'Sesja przejęta przez inne połączenie.');
+        window.location.href = '/';
+    });
+
+    // ... reszta bez zmian ...
+}
 
     if (socket && gameCode) {
         if (window.ConnectionUI) {
