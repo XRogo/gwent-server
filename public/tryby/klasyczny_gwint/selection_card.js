@@ -236,57 +236,72 @@ function updateStats(statsContainer) {
     const C_BERZ = '#a69377', C_GOLD = '#a27e3d', C_SILA = '#35a842', C_RED = '#ff1a1a';
 
     const statsData = [
-        { text: "Dowódca", y1: 457, y2: 496, color: C_GOLD, center: true },
-        { text: "Wszystkie karty w talii", y1: 1119, y2: 1158, color: C_BERZ, center: true },
-        { text: totalCards, y1: 1180, y2: 1212, color: C_GOLD, center: false },
-        { text: "Liczba kart jednostek", y1: 1238, y2: 1277, color: C_BERZ, center: true },
-        { text: unitCards < 22 ? `${unitCards}/22` : unitCards, y1: 1300, y2: 1332, color: unitCards < 22 ? C_RED : C_GOLD, center: false },
-        { text: "Karty specjalne", y1: 1360, y2: 1399, color: C_BERZ, center: true },
-        { text: `${specialCardsCount}/10`, y1: 1420, y2: 1455, color: C_SILA, center: false },
-        { text: "Całkowita Siła Jednostek", y1: 1480, y2: 1519, color: C_BERZ, center: true },
-        { text: totalStrength, y1: 1539, y2: 1572, color: C_GOLD, center: false },
-        { text: "Karty bohaterów", y1: 1598, y2: 1637, color: C_BERZ, center: true },
-        { text: heroCardsCount, y1: 1660, y2: 1692, color: C_GOLD, center: false }
+        // Napis "Dowódca" na środku nad kartą dowódcy
+        { text: "Dowódca", y: 456, color: C_GOLD, isLabel: true, size: 44, letterSpacing: 0.2, center: true },
+        // Etykiety
+        { text: "Wszystkie karty w talii", y: 1116, color: C_BERZ, isLabel: true, size: 43, letterSpacing: -0.2, center: true },
+        { text: "Liczba kart jednostek", y: 1236, color: C_BERZ, isLabel: true, size: 43, letterSpacing: -0.2, center: true },
+        { text: "Karty specjalne", y: 1357, color: C_BERZ, isLabel: true, size: 43, letterSpacing: -0.2, center: true },
+        { text: "Całkowita Siła Jednostek", y: 1475, color: C_BERZ, isLabel: true, size: 43, letterSpacing: -0.2, center: true },
+        { text: "Karty bohaterów", y: 1596, color: C_BERZ, isLabel: true, size: 43, letterSpacing: -0.2, center: true },
+        // Wartości liczbowe
+        { text: totalCards, y: 1177, color: C_GOLD, isLabel: false, size: 46, letterSpacing: -0.2, center: false },
+        { text: unitCards < 22 ? `${unitCards}/22` : unitCards, y: 1297, color: unitCards < 22 ? C_RED : C_GOLD, isLabel: false, size: 46, letterSpacing: -0.2, center: false },
+        { text: `${specialCardsCount}/10`, y: 1419, color: C_SILA, isLabel: false, size: 46, letterSpacing: -0.2, center: false },
+        { text: totalStrength, y: 1537, color: C_GOLD, isLabel: false, size: 46, letterSpacing: -0.2, center: false },
+        { text: heroCardsCount, y: 1657, color: C_GOLD, isLabel: false, size: 46, letterSpacing: -0.2, center: false }
     ];
 
     statsData.forEach(d => {
         const el = document.createElement('div');
         el.className = 'stat-item';
-        el.dataset.y1 = d.y1;
-        el.dataset.y2 = d.y2;
+        el.dataset.y = d.y;
+        el.dataset.size = d.size;
+        el.dataset.letterSpacing = d.letterSpacing;
         el.dataset.center = d.center;
         el.innerHTML = d.text;
         el.style.position = 'absolute';
-        el.style.left = '50.39%';
         el.style.color = d.color;
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
+        el.style.display = 'block';
         el.style.whiteSpace = 'nowrap';
+        el.style.fontFamily = "'PFDinTextCondPro', sans-serif";
+        el.style.lineHeight = '1';
+        el.style.margin = '0';
+        el.style.padding = '0';
+
         if (d.center) {
-            el.style.transform = 'translate(-50%, 0)';
-            el.style.justifyContent = 'center';
+            el.style.left = '50%';
+            el.style.transform = 'translateX(-50%)';
+            el.style.textAlign = 'center';
+        } else {
+            // Wyrównanie do lewej do 1934 w 4K
+            el.style.left = `${(1934 / GUI_WIDTH) * 100}%`;
+            el.style.transform = 'none';
+            el.style.textAlign = 'left';
         }
         statsContainer.appendChild(el);
     });
 
-    // Initial scaling
     scaleStats(statsContainer);
 }
 
 function scaleStats(statsContainer) {
     if (!statsContainer) return;
     const bgH = statsContainer.offsetHeight;
-    if (bgH <= 0) return;
+    const bgW = statsContainer.offsetWidth;
+    if (bgH <= 0 || bgW <= 0) return;
+
+    const scaleW = bgW / GUI_WIDTH;
+    const scaleH = bgH / GUI_HEIGHT;
 
     statsContainer.querySelectorAll('.stat-item').forEach(el => {
-        const y1 = parseFloat(el.dataset.y1);
-        const y2 = parseFloat(el.dataset.y2);
-        const topPct = (y1 / GUI_HEIGHT) * 100;
-        const heightPct = ((y2 - y1) / GUI_HEIGHT) * 100;
+        const y = parseFloat(el.dataset.y);
+        const size = parseFloat(el.dataset.size);
+        const letterSpacing = parseFloat(el.dataset.letterSpacing || 0);
 
-        el.style.top = `${topPct}%`;
-        el.style.height = `${heightPct}%`;
-        el.style.fontSize = `${(bgH * heightPct / 100) * 0.9}px`;
+        el.style.top = `${y * scaleH}px`;
+        el.style.fontSize = `${size * scaleW}px`;
+        el.style.letterSpacing = `${letterSpacing * scaleW}px`;
     });
 }
 
@@ -402,34 +417,77 @@ export function updatePositionsAndScaling() {
     }
 
     const faction = factions[currentPage - 1];
-    const shield = document.querySelector('.faction-shield');
-    if (shield) {
-        shield.src = faction.shield;
-        shield.style.width = `${106 * scale}px`;
-        shield.style.height = `${110 * scale}px`;
-    }
+    const scaleW = backgroundWidth / GUI_WIDTH;
+    const scaleH = backgroundHeight / GUI_HEIGHT;
 
     const factionInfo = document.querySelector('.faction-info');
     if (factionInfo) {
-        factionInfo.style.width = `${backgroundWidth}px`;
-        factionInfo.style.left = `${backgroundLeft}px`;
-        factionInfo.style.top = `${backgroundTop + ((174 - 60) / GUI_HEIGHT) * backgroundHeight}px`;
+        factionInfo.style.position = 'absolute';
+        factionInfo.style.left = '0';
+        factionInfo.style.top = '0';
+        factionInfo.style.width = '100%';
+        factionInfo.style.height = '100%';
+        factionInfo.style.pointerEvents = 'none';
+        factionInfo.style.zIndex = '10';
+    }
+
+    const factionHeader = document.querySelector('.faction-header');
+    if (factionHeader) {
+        factionHeader.style.position = 'absolute';
+        factionHeader.style.left = '50%';
+        factionHeader.style.top = `${backgroundTop + (150 / GUI_HEIGHT) * backgroundHeight}px`;
+        factionHeader.style.transform = 'translateX(-50%)';
+        factionHeader.style.display = 'inline-flex';
+        factionHeader.style.width = 'auto';
+        factionHeader.style.alignItems = 'center';
+        factionHeader.style.justifyContent = 'center';
+        factionHeader.style.margin = '0';
+        factionHeader.style.padding = '0';
+        factionHeader.style.lineHeight = '1';
+        factionHeader.style.zIndex = '20';
+    }
+
+    const shield = document.querySelector('.faction-shield');
+    if (shield) {
+        shield.src = faction.shield;
+        shield.style.display = 'block';
+        shield.style.width = `${106 * scaleW}px`;
+        shield.style.height = `${110 * scaleH}px`;
+        shield.style.position = 'absolute';
+        shield.style.right = '100%';
+        shield.style.top = '50%';
+        shield.style.transform = `translateY(-50%)`;
+        shield.style.marginRight = `${15 * scaleW}px`;
+        shield.style.zIndex = '21';
     }
 
     const name = document.querySelector('.faction-name');
     if (name) {
         name.innerText = faction.name;
-        name.style.fontSize = `${Math.min((48 / GUI_WIDTH) * backgroundWidth, (72 / GUI_WIDTH) * backgroundWidth)}px`;
-        name.style.lineHeight = `${(110 / GUI_HEIGHT) * backgroundHeight}px`;
+        name.style.fontSize = `${60 * scaleW}px`;
+        name.style.letterSpacing = `${-0.1 * scaleW}px`;
+        name.style.lineHeight = '1';
+        name.style.margin = '0';
+        name.style.padding = '0';
+        name.style.whiteSpace = 'nowrap';
+        name.style.fontFamily = "'PFDinTextCondPro', sans-serif";
     }
 
     const ability = document.querySelector('.faction-ability');
     if (ability) {
         ability.innerText = faction.ability;
-        ability.style.fontSize = `${Math.min((29 / GUI_WIDTH) * backgroundWidth, (43 / GUI_WIDTH) * backgroundWidth)}px`;
-        ability.style.left = `${(GUI_WIDTH / 2) * scale}px`;
-        ability.style.top = `${((276 - (174 - 60)) / GUI_HEIGHT) * backgroundHeight}px`;
+        ability.style.position = 'absolute';
+        ability.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scaleW}px`;
+        ability.style.top = `${backgroundTop + (253 / GUI_HEIGHT) * backgroundHeight}px`;
         ability.style.transform = `translateX(-50%)`;
+        ability.style.fontSize = `${46 * scaleW}px`;
+        ability.style.letterSpacing = `${-0.5 * scaleW}px`;
+        ability.style.lineHeight = '1';
+        ability.style.margin = '0';
+        ability.style.padding = '0';
+        ability.style.fontFamily = "'PFDinTextCondPro', sans-serif";
+        ability.style.textAlign = 'center';
+        ability.style.whiteSpace = 'nowrap';
     }
 
     const pageLeft = document.querySelector('.page-left');
@@ -489,15 +547,18 @@ export function updatePositionsAndScaling() {
         leaderCard.appendChild(img);
 
         const nameDiv = document.createElement('div');
-        nameDiv.innerText = selectedLeader.nazwa;
+        nameDiv.innerText = (selectedLeader.nazwa || '').replace(/\\n/g, ' ').replace(/\n/g, ' ');
         nameDiv.style.position = 'absolute';
         nameDiv.style.left = '50%';
-        nameDiv.style.top = ((guiH - 60) * scaleH) + 'px';
+        nameDiv.style.top = ((920 - guiTop) * scaleH) + 'px';
+        nameDiv.style.width = '100%';
         nameDiv.style.transform = 'translateX(-50%)';
         nameDiv.style.fontFamily = 'PFDinTextCondPro-Bold, Cinzel, serif';
         nameDiv.style.fontWeight = 'bold';
-        nameDiv.style.color = '#474747';
-        nameDiv.style.fontSize = (32 * scaleW) + 'px';
+        nameDiv.style.color = '#484848';
+        nameDiv.style.fontSize = (29 * scaleW) + 'px';
+        nameDiv.style.letterSpacing = (0.2 * scaleW) + 'px';
+        nameDiv.style.lineHeight = ((29 + 5.4) * scaleH) + 'px';
         nameDiv.style.textAlign = 'center';
         nameDiv.style.zIndex = '3';
         leaderCard.appendChild(nameDiv);

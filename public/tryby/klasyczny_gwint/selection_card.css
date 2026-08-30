@@ -60,16 +60,19 @@
 }
 
 .faction-header {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: auto;
+    position: absolute;
+    pointer-events: none;
+    z-index: 20;
 }
 
 .faction-name {
     color: #fff;
     font-family: 'PFDinTextCondPro-Bold', sans-serif;
-    margin-left: 15px;
+    margin: 0;
 }
 
 .faction-ability {
