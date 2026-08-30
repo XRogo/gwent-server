@@ -13,10 +13,10 @@ const GUI_HEIGHT = 2160;
 
 const factions = [
     { id: "1", name: "Królestwa Północy", shield: "assets/asety/tpolnoc.webp", ability: "Za każdym razem, kiedy wygrywasz bitwę, weź o jedną kartę więcej." },
-    { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Jeśli rozgrywka zakończy się remisem, to ty odnosisz zwycięstwo." },
     { id: "3", name: "Scoia'tael", shield: "assets/asety/tscoiatael.webp", ability: "Zdecyduj, kto rozpoczyna rozgrywkę." },
-    { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zatrzymaj losowo wybraną jednostkę na polu bitwy po każdej rundzie." },
     { id: "5", name: "Skellige", shield: "assets/asety/tskellige.webp", ability: "W trzeciej rundzie dwie przypadkowe karty ze stosu kart odrzuconych wracają na stół." },
+    { id: "4", name: "Potwory", shield: "assets/asety/tpotwory.webp", ability: "Zatrzymaj losowo wybraną jednostkę na polu bitwy po każdej rundzie." },
+    { id: "2", name: "Cesarstwo Nilfgaardu", shield: "assets/asety/tnilfgaard.webp", ability: "Jeśli rozgrywka zakończy się remisem, to ty odnosisz zwycięstwo." },
 ];
 
 export function initSelection(socket, gameCode, isPlayer1) {
@@ -506,6 +506,113 @@ export function updatePositionsAndScaling() {
         pageRight.style.left = `${backgroundLeft + (2338 / GUI_WIDTH) * backgroundWidth}px`;
         pageRight.style.top = `${backgroundTop + (154 / GUI_HEIGHT) * backgroundHeight}px`;
         pageRight.style.backgroundImage = `url('assets/wybor/wprawo.webp')`;
+    }
+
+    // 2. Znaczek informujący o stronie (strona.webp 25x22 w 4K)
+    const dot = document.querySelector('.page-indicator-dot');
+    if (dot) {
+        // Pozycje X dla poszczególnych frakcji w 4K
+        const dotPositions = {
+            "4": 1862, // Potwory
+            "2": 1888, // Nilfgaard
+            "1": 1915, // Królestwa Północy
+            "3": 1941, // Scoia'tael
+            "5": 1967  // Skellige
+        };
+        const dotX = dotPositions[faction.id] || 1915;
+        const dotY = 208;
+        dot.style.width = `${25 * scaleW}px`;
+        dot.style.height = `${22 * scaleH}px`;
+        dot.style.left = `${backgroundLeft + dotX * scaleW}px`;
+        dot.style.top = `${backgroundTop + dotY * scaleH}px`;
+    }
+
+    // 3. Nazwy następnych frakcji (w lewo i w prawo)
+    const prevFaction = factions[(currentPage - 2 + factions.length) % factions.length];
+    const nextFaction = factions[currentPage % factions.length];
+
+    const prevNameEl = document.querySelector('.faction-prev-name');
+    if (prevNameEl) {
+        prevNameEl.innerText = prevFaction.name;
+        prevNameEl.style.left = `${backgroundLeft + 1411 * scaleW}px`;
+        prevNameEl.style.top = `${backgroundTop + 165 * scaleH}px`;
+        prevNameEl.style.color = '#846b57';
+        prevNameEl.style.fontSize = `${46 * scaleW}px`;
+        prevNameEl.style.letterSpacing = `${-0.2 * scaleW}px`;
+        prevNameEl.style.textAlign = 'right';
+        prevNameEl.style.transform = 'translateX(-100%)';
+    }
+
+    const nextNameEl = document.querySelector('.faction-next-name');
+    if (nextNameEl) {
+        nextNameEl.innerText = nextFaction.name;
+        nextNameEl.style.left = `${backgroundLeft + 2426 * scaleW}px`;
+        nextNameEl.style.top = `${backgroundTop + 165 * scaleH}px`;
+        nextNameEl.style.color = '#846b57';
+        nextNameEl.style.fontSize = `${46 * scaleW}px`;
+        nextNameEl.style.letterSpacing = `${-0.2 * scaleW}px`;
+        nextNameEl.style.textAlign = 'left';
+        nextNameEl.style.transform = 'none';
+    }
+
+    // 4. Nazwa kontenera kart (Kolekcja kart i Karty w talii)
+    const colTitle = document.querySelector('.collection-title');
+    if (colTitle) {
+        colTitle.style.left = `${backgroundLeft + 329 * scaleW}px`;
+        colTitle.style.top = `${backgroundTop + 208 * scaleH}px`;
+        colTitle.style.color = '#c5c5c5';
+        colTitle.style.fontSize = `${57 * scaleW}px`;
+        colTitle.style.letterSpacing = `${-0.2 * scaleW}px`;
+        colTitle.style.textAlign = 'left';
+        colTitle.style.transform = 'none';
+    }
+
+    const deckTitle = document.querySelector('.deck-title');
+    if (deckTitle) {
+        deckTitle.style.left = `${backgroundLeft + 3518 * scaleW}px`;
+        deckTitle.style.top = `${backgroundTop + 215 * scaleH}px`;
+        deckTitle.style.color = '#c5c5c5';
+        deckTitle.style.fontSize = `${57 * scaleW}px`;
+        deckTitle.style.letterSpacing = `${-0.2 * scaleW}px`;
+        deckTitle.style.textAlign = 'right';
+        deckTitle.style.transform = 'translateX(-100%)';
+    }
+
+    // 5. Nazwa obecnego filtra w danym kontenerze
+    const filterNamesMap = {
+        'all': 'WSZYSTKIE KARTY',
+        'miecz': 'KARTY PIECHOTY',
+        'luk': 'KARTY JEDNOSTEK DALEKIEGO ZASIĘGU',
+        'oblezenie': 'KARTY JEDNOSTEK OBLĘŻNICZYCH',
+        'bohater': 'KARTY BOHATERÓW',
+        'pogoda': 'KARTY POGODY',
+        'specjalne': 'KARTY SPECJALNE'
+    };
+
+    const colFilterName = document.querySelector('.collection-filter-name');
+    if (colFilterName) {
+        colFilterName.innerText = filterNamesMap[currentCollectionFilter] || 'WSZYSTKIE KARTY';
+        colFilterName.style.left = `${backgroundLeft + 332 * scaleW}px`;
+        colFilterName.style.top = `${backgroundTop + 280 * scaleH}px`;
+        colFilterName.style.color = '#c5c5c5';
+        colFilterName.style.fontSize = `${45 * scaleW}px`;
+        colFilterName.style.letterSpacing = `${-0.2 * scaleW}px`;
+        colFilterName.style.textAlign = 'left';
+        colFilterName.style.transform = 'none';
+        colFilterName.style.textShadow = `0 0 ${40 * scaleW}px rgba(195, 154, 55, 0.45)`;
+    }
+
+    const deckFilterName = document.querySelector('.deck-filter-name');
+    if (deckFilterName) {
+        deckFilterName.innerText = filterNamesMap[currentDeckFilter] || 'WSZYSTKIE KARTY';
+        deckFilterName.style.left = `${backgroundLeft + 3514 * scaleW}px`;
+        deckFilterName.style.top = `${backgroundTop + 282 * scaleH}px`;
+        deckFilterName.style.color = '#c5c5c5';
+        deckFilterName.style.fontSize = `${45 * scaleW}px`;
+        deckFilterName.style.letterSpacing = `${-0.2 * scaleW}px`;
+        deckFilterName.style.textAlign = 'right';
+        deckFilterName.style.transform = 'translateX(-100%)';
+        deckFilterName.style.textShadow = `0 0 ${40 * scaleW}px rgba(195, 154, 55, 0.45)`;
     }
 
     const leaderCard = document.querySelector('.leader-card');

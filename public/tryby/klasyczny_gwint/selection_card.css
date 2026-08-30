@@ -49,6 +49,28 @@
     z-index: 50;
 }
 
+.faction-prev-name,
+.faction-next-name,
+.collection-title,
+.deck-title,
+.collection-filter-name,
+.deck-filter-name {
+    position: absolute;
+    pointer-events: none;
+    z-index: 20;
+    white-space: nowrap;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    font-family: 'PFDinTextCondPro', sans-serif;
+}
+
+.page-indicator-dot {
+    position: absolute;
+    pointer-events: none;
+    z-index: 20;
+}
+
 .faction-info {
     position: absolute;
     width: 100%;
