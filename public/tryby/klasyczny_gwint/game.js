@@ -77,14 +77,73 @@ socket.on('join-error', (msg) => {
     window.location.href = '/';
 });
 
+        let currentCountdownSeconds = null;
+
+        function getSecondsHtml(seconds) {
+            let colorClass = 'time-green';
+            if (seconds <= 5) {
+                colorClass = 'time-red';
+            } else if (seconds <= 20) {
+                colorClass = 'time-yellow';
+            }
+            return `<span class="${colorClass}">${seconds}s</span>`;
+        }
+
+        function updateCountdownNotification() {
+            const notifArea = document.getElementById('selectionNotificationArea');
+            if (!notifArea) return;
+
+            let countdownItem = notifArea.querySelector('.countdown-notification');
+            if (currentCountdownSeconds === null) {
+                if (countdownItem) {
+                    countdownItem.classList.add('fade-out');
+                    setTimeout(() => countdownItem.remove(), 500);
+                }
+                return;
+            }
+
+            let textHtml = '';
+            if (isReadyStatus) {
+                textHtml = `Czekanie na gotowość przeciwnika ${getSecondsHtml(currentCountdownSeconds)}`;
+            } else {
+                textHtml = `Przeciwnik jest gotowy, za ${getSecondsHtml(currentCountdownSeconds)} rozpoczęcie gry`;
+            }
+
+            if (!countdownItem) {
+                countdownItem = document.createElement('div');
+                countdownItem.className = 'selection-notification-item countdown-notification';
+                notifArea.appendChild(countdownItem); // przy column-reverse wstawi się na dole
+            }
+            countdownItem.innerHTML = textHtml;
+        }
+
+        function showSelectionNotification(text, duration = 3000) {
+            const notifArea = document.getElementById('selectionNotificationArea');
+            if (!notifArea) return;
+
+            const item = document.createElement('div');
+            item.className = 'selection-notification-item';
+            item.innerText = text;
+            notifArea.appendChild(item);
+
+            setTimeout(() => {
+                item.classList.add('fade-out');
+                setTimeout(() => {
+                    item.remove();
+                }, 500);
+            }, duration);
+        }
+        window.showSelectionNotification = showSelectionNotification;
+
         socket.on('opponent-ready-status', (data) => {
             window.opponentReady = data.isReady;
             if (data.isReady) playSound('joinSound');
             if (window.updateSelectionUI) window.updateSelectionUI();
+            updateCountdownNotification();
         });
 
         socket.on('start-game-now', () => {
-        switchToGame();
+            switchToGame();
         });
 
         // NOWE: powrót do trwającej partii (F5 / ponowne wejście)
@@ -93,14 +152,9 @@ socket.on('join-error', (msg) => {
             switchToGame();
         });
 
-        let countdownInterval = null;
         socket.on('start-game-countdown', (data) => {
-            const btn = document.getElementById('goToGameButton');
-            if (data.seconds === null) {
-                btn.innerText = 'Przejdź do gry';
-                return;
-            }
-            btn.innerText = `Start za ${data.seconds}...`;
+            currentCountdownSeconds = data && typeof data.seconds === 'number' ? data.seconds : null;
+            updateCountdownNotification();
         });
 
         socket.on('force-finish-selection', () => {
@@ -185,7 +239,7 @@ socket.on('join-error', (msg) => {
 
     function updateGoToGameButton() {
         if (!goToGameButton) return;
-        if (isReadyStatus) return; // Jeśli gracz jest już w stanie "Oczekiwanie...", nie nadpisuj
+        if (isReadyStatus) return; // Jeśli gracz jest już w stanie "Anuluj", nie nadpisuj tekstu i stanu
         const unitCount = getUnitCardCount();
         if (unitCount < 22) {
             goToGameButton.disabled = true;
@@ -194,6 +248,7 @@ socket.on('join-error', (msg) => {
             goToGameButton.disabled = false;
             goToGameButton.classList.remove('disabled');
         }
+        goToGameButton.innerText = "Rozpocznij grę";
     }
     window.updateGoToGameButton = updateGoToGameButton;
     updateGoToGameButton();
@@ -222,13 +277,14 @@ socket.on('join-error', (msg) => {
 
             // Mark as ready
             socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: true });
-            btn.innerText = "Oczekiwanie...";
+            btn.innerText = "Anuluj";
         } else {
             // Cancel ready
             socket.emit('player-ready', { gameCode, isPlayer1: isP1, isReady: false });
-            btn.innerText = "Przejdź do gry";
+            btn.innerText = "Rozpocznij grę";
             updateGoToGameButton();
         }
+        updateCountdownNotification();
     };
 
     document.getElementById('saveDeckButton').onclick = () => {
@@ -238,7 +294,7 @@ socket.on('join-error', (msg) => {
 
         if (window.saveDeck) {
             window.saveDeck(factionId, currentLeader ? currentLeader.numer : null, currentDeckCards.map(c => c.numer));
-            alert('Talia zapisana!');
+            showSelectionNotification('Zapisano talię w pamięci lokalnej', 3000);
         }
     };
 

@@ -249,10 +249,6 @@ function updateStats(statsContainer) {
         { text: heroCardsCount, y1: 1660, y2: 1692, color: C_GOLD, center: false }
     ];
 
-    if (window.opponentReady) {
-        statsData.push({ text: "PRZECIWNIK GOTOWY", y1: 1800, y2: 1850, color: C_SILA, center: true });
-    }
-
     statsData.forEach(d => {
         const el = document.createElement('div');
         el.className = 'stat-item';
@@ -509,21 +505,45 @@ export function updatePositionsAndScaling() {
 
     const goToGameButton = document.getElementById('goToGameButton');
     if (goToGameButton) {
-        goToGameButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        goToGameButton.style.bottom = `${(43 / GUI_HEIGHT) * backgroundHeight}px`;
-        goToGameButton.style.padding = `${(10 / GUI_HEIGHT) * backgroundHeight}px ${(20 / GUI_WIDTH) * backgroundWidth}px`;
-        goToGameButton.style.fontSize = `${(30 / GUI_WIDTH) * backgroundWidth}px`;
-        goToGameButton.style.transform = `translateX(-50%)`;
+        const btnX = 1768, btnY = 1852, btnW = 274, btnH = 70;
+        const scaleW = backgroundWidth / GUI_WIDTH;
+        const scaleH = backgroundHeight / GUI_HEIGHT;
+        goToGameButton.style.left = `${backgroundLeft + btnX * scaleW}px`;
+        goToGameButton.style.top = `${backgroundTop + btnY * scaleH}px`;
+        goToGameButton.style.width = `${btnW * scaleW}px`;
+        goToGameButton.style.height = `${btnH * scaleH}px`;
+        goToGameButton.style.fontSize = `${47 * scaleW}px`;
+        goToGameButton.style.letterSpacing = `${0 * scaleW}px`;
+        goToGameButton.style.transform = 'none';
     }
 
     const saveDeckButton = document.getElementById('saveDeckButton');
     if (saveDeckButton) {
-        const saveY = 1850;
-        saveDeckButton.style.left = `${backgroundLeft + (GUI_WIDTH / 2) * scale}px`;
-        saveDeckButton.style.top = `${backgroundTop + (saveY / GUI_HEIGHT) * backgroundHeight}px`;
-        saveDeckButton.style.padding = `${(8 / GUI_HEIGHT) * backgroundHeight}px ${(16 / GUI_WIDTH) * backgroundWidth}px`;
-        saveDeckButton.style.fontSize = `${(24 / GUI_WIDTH) * backgroundWidth}px`;
-        saveDeckButton.style.transform = `translateX(-50%)`;
+        const btnX = 1768, btnY = 1852 - 95, btnW = 274, btnH = 70;
+        const scaleW = backgroundWidth / GUI_WIDTH;
+        const scaleH = backgroundHeight / GUI_HEIGHT;
+        saveDeckButton.style.left = `${backgroundLeft + btnX * scaleW}px`;
+        saveDeckButton.style.top = `${backgroundTop + btnY * scaleH}px`;
+        saveDeckButton.style.width = `${btnW * scaleW}px`;
+        saveDeckButton.style.height = `${btnH * scaleH}px`;
+        saveDeckButton.style.fontSize = `${47 * scaleW}px`;
+        saveDeckButton.style.letterSpacing = `${0 * scaleW}px`;
+        saveDeckButton.style.transform = 'none';
+    }
+
+    const notificationArea = document.getElementById('selectionNotificationArea');
+    if (notificationArea) {
+        const notifX1 = 966, notifY1 = 1982, notifX2 = 2873, notifY2 = 2158;
+        const notifW = notifX2 - notifX1;
+        const notifH = notifY2 - notifY1;
+        const scaleW = backgroundWidth / GUI_WIDTH;
+        const scaleH = backgroundHeight / GUI_HEIGHT;
+        notificationArea.style.left = `${backgroundLeft + notifX1 * scaleW}px`;
+        notificationArea.style.top = `${backgroundTop + notifY1 * scaleH}px`;
+        notificationArea.style.width = `${notifW * scaleW}px`;
+        notificationArea.style.height = `${notifH * scaleH}px`;
+        notificationArea.style.fontSize = `${55 * scaleW}px`;
+        notificationArea.style.letterSpacing = `${-0.5 * scaleW}px`;
     }
 }
 

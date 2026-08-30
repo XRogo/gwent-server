@@ -87,9 +87,73 @@
 #saveDeckButton {
     position: absolute;
     cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #fff;
-    border: 1px solid #7d6a45;
-    border-radius: 5px;
-    transform: translateX(-50%);
+    background: url('assets/wybor/statrt_button.webp') no-repeat center;
+    background-size: 100% 100%;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'PFDinTextCondPro', sans-serif;
+    letter-spacing: 0px;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 4;
+}
+
+#goToGameButton:disabled,
+#goToGameButton.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(80%);
+    pointer-events: none;
+}
+
+.selection-notification-area {
+    position: absolute;
+    pointer-events: none;
+    z-index: 60;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: 'PFDinTextCondPro', sans-serif;
+    color: #d1a071;
+    letter-spacing: -0.5px;
+    text-align: center;
+}
+
+.selection-notification-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    margin: 2px 0;
+}
+
+.selection-notification-item.fade-out {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.selection-notification-item .time-green {
+    color: #35a842;
+    margin: 0 4px;
+}
+
+.selection-notification-item .time-yellow {
+    color: #f5d342;
+    margin: 0 4px;
+}
+
+.selection-notification-item .time-red {
+    color: #ff1a1a;
+    margin: 0 4px;
 }
