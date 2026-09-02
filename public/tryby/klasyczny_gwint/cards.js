@@ -2345,7 +2345,7 @@ const cards = [
         bohater: false,
         frakcja: "5",
         punkty: 6,
-        pozycja: 5,
+        pozycja: 2,
         ilosc: 3,
         numer: "509"
     },
