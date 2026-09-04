@@ -529,7 +529,6 @@ io.on('connection', (socket) => {
                 gameCode: gameCode,
                 status: game.status
             });
-            socket.emit('start-game-now');
         }
     });
 

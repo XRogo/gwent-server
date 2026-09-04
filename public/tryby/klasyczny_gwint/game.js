@@ -55,29 +55,7 @@ if (socket && gameCode) {
         window.location.href = '/';
     });
 
-    // ... reszta bez zmian ...
-}
-
-    if (socket && gameCode) {
-        if (window.ConnectionUI) {
-            window.ConnectionUI.init(socket, gameCode, isP1, nick);
-        }
-        socket.emit('rejoin-game', { gameCode, isPlayer1: isP1, nickname: nick });
-        socket.on('join-success', (data) => {
-    // nadpisz rolę tym, co powiedział serwer
-    if (typeof data.isPlayer1 === 'boolean') {
-        // jeśli masz zmienną isP1 w tym pliku – zaktualizuj
-        // isP1 = data.isPlayer1;
-        console.log('[REJOIN] Serwer ustawił rolę:', data.isPlayer1 ? 'P1' : 'P2');
-    }
-});
-
-socket.on('join-error', (msg) => {
-    alert(msg || 'Nie można dołączyć do lobby');
-    window.location.href = '/';
-});
-
-        let currentCountdownSeconds = null;
+    let currentCountdownSeconds = null;
 
         function getSecondsHtml(seconds) {
             let colorClass = 'time-green';
@@ -226,7 +204,10 @@ socket.on('join-error', (msg) => {
 
     initSelection(socket, gameCode, isP1);
 
+    let gameSwitched = false;
     function switchToGame() {
+        if (gameSwitched && gameScreen && gameScreen.style.display === 'block') return;
+        gameSwitched = true;
         playSound('joinSound');
         cardSelectionScreen.style.display = 'none';
         gameScreen.style.display = 'block';

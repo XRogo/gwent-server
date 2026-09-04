@@ -9,7 +9,7 @@ let currentBanner = null;
 let bannerQueue = [];
 let isShowing = false;
 let currentTimeout = null;
-let currentOnFinish = null;
+let currentActiveItem = null;
 
 export function getIsShowing() { return isShowing; }
 
@@ -22,6 +22,15 @@ export function showPrzejscie(numer, opcje = {}) {
     const przejscie = przejscia.find(p => p.numer === numer);
     if (!przejscie) {
         console.warn(`[PRZEJSCIE] Nie znaleziono przejścia: ${numer}`);
+        return;
+    }
+
+    // Deduplikacja: zapobiegaj natychmiastowemu powielaniu identycznego banera
+    if (isShowing && currentActiveItem && currentActiveItem.numer === numer && !opcje.customOpis && opcje.countDown === undefined) {
+        return;
+    }
+    const lastQueued = bannerQueue[bannerQueue.length - 1];
+    if (lastQueued && lastQueued.numer === numer && !opcje.customOpis && opcje.countDown === undefined) {
         return;
     }
 
@@ -41,6 +50,7 @@ export function showPrzejscie(numer, opcje = {}) {
 
 function displayBanner(item) {
     isShowing = true;
+    currentActiveItem = item;
 
     // --- Dźwięki banerów ---
     if (window.playSound) {
@@ -165,7 +175,6 @@ function displayBanner(item) {
     banner.appendChild(inner);
     document.body.appendChild(banner);
     currentBanner = banner;
-    currentOnFinish = item.opcje.onFinish || null;
 
     // Animacja wejścia
     requestAnimationFrame(() => {
@@ -178,88 +187,89 @@ function displayBanner(item) {
     // Automatyczne zniknięcie
     const displayTime = item.opcje.customCzas || item.czas || 2000;
     currentTimeout = setTimeout(() => {
-        // Fade Out
-        banner.style.opacity = '0';
-        inner.style.transform = 'translateX(30px)';
-        
-        setTimeout(() => {
-            if (banner.dataset.timerId) clearInterval(parseInt(banner.dataset.timerId));
-            banner.remove();
-            currentBanner = null;
-            currentOnFinish = null;
-            isShowing = false;
-            
-            if (item.opcje.onFinish) item.opcje.onFinish();
-
-            // Pokaż następny z kolejki
-            if (bannerQueue.length > 0) {
-                const next = bannerQueue.shift();
-                displayBanner(next);
-            }
-        }, 400);
+        closeCurrentBanner(false);
     }, displayTime);
 }
 
-function skipCurrentBanner() {
-    if (!isShowing || !currentBanner) return;
-
-    // Anuluj aktualny timeout
+function closeCurrentBanner(instant = false) {
     if (currentTimeout) {
         clearTimeout(currentTimeout);
         currentTimeout = null;
     }
 
-    // Szybki fade-out (przyspieszony)
-    currentBanner.style.transition = 'opacity 0.15s ease-out';
-    currentBanner.style.opacity = '0';
-
-    setTimeout(() => {
-        if (currentBanner && currentBanner.parentNode) {
-            currentBanner.parentNode.removeChild(currentBanner);
-        }
-        const onFinish = currentOnFinish;
-        currentBanner = null;
-        currentOnFinish = null;
-        isShowing = false;
-        if (onFinish) onFinish();
-        processQueue();
-    }, 150);
-}
-
-function hideBanner(callback, instant = false) {
     if (!currentBanner) {
-        isShowing = false;
-        if (callback) callback();
+        finishBanner();
         return;
     }
 
+    const banner = currentBanner;
+    if (banner.dataset.timerId) {
+        clearInterval(parseInt(banner.dataset.timerId));
+    }
+
     if (instant) {
-        if (currentBanner && currentBanner.parentNode) {
-            currentBanner.parentNode.removeChild(currentBanner);
-        }
-        currentBanner = null;
-        currentOnFinish = null;
-        isShowing = false;
-        if (callback) callback();
+        finishBanner();
     } else {
-        currentBanner.style.opacity = '0';
-        setTimeout(() => {
-            if (currentBanner && currentBanner.parentNode) {
-                currentBanner.parentNode.removeChild(currentBanner);
-            }
-            currentBanner = null;
-            currentOnFinish = null;
-            isShowing = false;
-            if (callback) callback();
-        }, 400); // Czas animacji fade-out
+        banner.style.opacity = '0';
+        const inner = banner.firstElementChild;
+        if (inner) inner.style.transform = 'translateX(30px)';
+
+        currentTimeout = setTimeout(() => {
+            finishBanner();
+        }, 400);
     }
 }
 
-function processQueue() {
+function finishBanner() {
+    if (currentTimeout) {
+        clearTimeout(currentTimeout);
+        currentTimeout = null;
+    }
+
+    // Usuń z DOM wszystkie elementy banerów
+    document.querySelectorAll('.przejscie-banner').forEach(el => {
+        if (el.dataset.timerId) clearInterval(parseInt(el.dataset.timerId));
+        el.remove();
+    });
+    currentBanner = null;
+
+    const finishedItem = currentActiveItem;
+    currentActiveItem = null;
+
+    // Wywołaj onFinish dopóki isShowing jest nadal true,
+    // dzięki czemu showPrzejscie() wywołane wewnątrz onFinish bezpiecznie trafi do bannerQueue
+    if (finishedItem && finishedItem.opcje && finishedItem.opcje.onFinish) {
+        try {
+            finishedItem.opcje.onFinish();
+        } catch (err) {
+            console.error('[PRZEJSCIE] Błąd w onFinish:', err);
+        }
+    }
+
+    // Oznaczamy koniec bieżącego banera
+    isShowing = false;
+
+    // Jeśli w kolejce czekają kolejne banery – pokaż następny
     if (bannerQueue.length > 0) {
         const next = bannerQueue.shift();
         displayBanner(next);
     }
+}
+
+function skipCurrentBanner() {
+    if (!isShowing || !currentBanner) return;
+
+    if (currentTimeout) {
+        clearTimeout(currentTimeout);
+        currentTimeout = null;
+    }
+
+    currentBanner.style.transition = 'opacity 0.15s ease-out';
+    currentBanner.style.opacity = '0';
+
+    currentTimeout = setTimeout(() => {
+        finishBanner();
+    }, 150);
 }
 
 /**
@@ -271,8 +281,13 @@ export function hidePrzejscie(instant = false) {
         currentTimeout = null;
     }
     bannerQueue = [];
-    currentOnFinish = null;
-    hideBanner(null, instant);
+    currentActiveItem = null;
+    isShowing = false;
+    document.querySelectorAll('.przejscie-banner').forEach(el => {
+        if (el.dataset.timerId) clearInterval(parseInt(el.dataset.timerId));
+        el.remove();
+    });
+    currentBanner = null;
 }
 
 // Spacją pomijamy aktualny baner

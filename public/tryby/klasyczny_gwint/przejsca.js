@@ -53,8 +53,8 @@ const przejscia = [
     },
     {
         numer: "t12",
-        opis: "Dzięki zdolności talii .",
-        obraz: "assets/asety/przejscia/umiejentnosc_nilfgardu.webp",
+        opis: "Dzięki zdolności talii Nilfgaardu zamiast remisu następuje\nwygrana Nilfgaardu.",
+        obraz: "assets/asety/przejscia/umiejentnosc_nilfgard.webp",
         czas: 2000
     },
     {
@@ -65,7 +65,7 @@ const przejscia = [
     },
     {
         numer: "t14",
-        opis: "umiem potwory",
+        opis: "Dzięki zdolności talii Potworów losowo wybrana jednostka\nzostaje do następnej rundy.",
         obraz: "assets/asety/przejscia/umiejentnosc_potwory.webp",
         czas: 2000
     },

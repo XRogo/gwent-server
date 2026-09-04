@@ -1599,26 +1599,71 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             syncHand(serverHand);
         }
 
+        if (!window.arrivedBoardCards) window.arrivedBoardCards = new Set();
+        if (data.monstersKept) {
+            if (data.monstersKept.p1) window.arrivedBoardCards.add(`${data.monstersKept.p1.row}_0`);
+            if (data.monstersKept.p2) window.arrivedBoardCards.add(`${data.monstersKept.p2.row}_0`);
+        }
+
         renderAll(currentNick);
 
-        // Faza startowa rundy - t05, potem t07/08
+        // Faza startowa rundy - t05, potem ew. Skellige (t15), Potwory (t14), Północ (t11), a na końcu t07/t08
         showPrzejscie('t05', {
             onFinish: () => {
                 if (data.cowTransformed && window.playSound) {
                     window.playSound('krowaSound');
                 }
-                const myNrDraw = data.northernRealmsDraw && (isPlayer1Local ? data.northernRealmsDraw.p1 : data.northernRealmsDraw.p2);
-                if (myNrDraw) {
-                    showPrzejscie('t11', {
-                        onFinish: () => {
-                            const isMyTurn = currentTurn === window.socket.id;
-                            showPrzejscie(isMyTurn ? 't07' : 't08');
+
+                // Kolejka banerów zdolności frakcji
+                const abilityBanners = [];
+
+                // 1. Skellige (frakcja 5) - przywrócenie kart w 3. rundzie
+                const hasSkellige = data.skelligeResurrect && (
+                    (data.skelligeResurrect.p1 && data.skelligeResurrect.p1.length > 0) ||
+                    (data.skelligeResurrect.p2 && data.skelligeResurrect.p2.length > 0)
+                );
+                if (hasSkellige) {
+                    abilityBanners.push({
+                        code: 't15',
+                        action: () => {
+                            if (window.playSound) window.playSound('medykSound');
                         }
                     });
-                } else {
-                    const isMyTurn = currentTurn === window.socket.id;
-                    showPrzejscie(isMyTurn ? 't07' : 't08');
                 }
+
+                // 2. Potwory (frakcja 4) - jednostka pozostaje na polu bitwy
+                const hasMonsters = data.monstersKept && (data.monstersKept.p1 || data.monstersKept.p2);
+                if (hasMonsters) {
+                    abilityBanners.push({
+                        code: 't14',
+                        action: () => {
+                            if (window.playSound) window.playSound('zagranie2Sound');
+                        }
+                    });
+                }
+
+                // 3. Królestwa Północy (frakcja 1) - dobranie karty po wygranej rundzie
+                const myNrDraw = data.northernRealmsDraw && (isPlayer1Local ? data.northernRealmsDraw.p1 : data.northernRealmsDraw.p2);
+                if (myNrDraw) {
+                    abilityBanners.push({
+                        code: 't11'
+                    });
+                }
+
+                const runNextBanner = (idx) => {
+                    if (idx >= abilityBanners.length) {
+                        const isMyTurn = currentTurn === window.socket.id;
+                        showPrzejscie(isMyTurn ? 't07' : 't08');
+                        return;
+                    }
+                    const b = abilityBanners[idx];
+                    if (b.action) b.action();
+                    showPrzejscie(b.code, {
+                        onFinish: () => runNextBanner(idx + 1)
+                    });
+                };
+
+                runNextBanner(0);
             }
         });
     });
@@ -2825,6 +2870,7 @@ function renderRows(overlay) {
                 wrapper.style.zIndex = i + 1;
                 wrapper.dataset.numer = card.numer;
                 wrapper.dataset.side = rowKey.startsWith('p1') ? 'p1' : 'p2';
+                wrapper.dataset.row = rowKey;
 
                 const img = document.createElement('img');
                 img.src = card.karta;
@@ -3151,16 +3197,22 @@ function renderLeaders(overlay) {
     }
 }
 
-function collectCardsOnBoardDOM(isOpponent) {
+function collectCardsOnBoardDOM(isOpponent, keptCard) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const boardCards = [];
+    let keptExcluded = false;
     document.querySelectorAll('.board-card-wrapper').forEach(w => {
         const side = w.dataset.side;
         const isActuallyOpponent = (isPlayer1Local && side === 'p2') || (!isPlayer1Local && side === 'p1');
         if (isActuallyOpponent === isOpponent) {
+            const cardRow = w.dataset.row || (w.parentElement && w.parentElement.dataset.row);
+            if (keptCard && !keptExcluded && String(w.dataset.numer) === String(keptCard.numer) && cardRow === keptCard.row) {
+                keptExcluded = true;
+                return;
+            }
             const rect = w.getBoundingClientRect();
             const cardObj = cards.find(c => c.numer === w.dataset.numer);
             if (cardObj) {
@@ -3215,27 +3267,53 @@ function handleRoundEnd(data) {
     }
     const winner = roundResult;
 
-    const myBoardCards = collectCardsOnBoardDOM(false);
-    const oppBoardCards = collectCardsOnBoardDOM(true);
+    const myKept = data.monstersKept && (isPlayer1Local ? data.monstersKept.p1 : data.monstersKept.p2);
+    const oppKept = data.monstersKept && (isPlayer1Local ? data.monstersKept.p2 : data.monstersKept.p1);
+
+    const myBoardCards = collectCardsOnBoardDOM(false, myKept);
+    const oppBoardCards = collectCardsOnBoardDOM(true, oppKept);
 
     let bannerCode = 't24';
     if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23';
     else if (winner) bannerCode = 't22';
 
-    showPrzejscie(bannerCode, {
-        onFinish: () => {
-            playerLives = isPlayer1Local ? p1Lives : p2Lives;
-            opponentLives = isPlayer1Local ? p2Lives : p1Lives;
-            renderAll(currentNick);
-        }
-    });
+    // Jeśli to wygrana dzięki Nilfgaardowi (zamiast remisu)
+    const isMyNilfWin = data.nilfgaardDrawWin && (isPlayer1Local ? data.nilfgaardDrawWin.p1 : data.nilfgaardDrawWin.p2);
+    const isOppNilfWin = data.nilfgaardDrawWin && (isPlayer1Local ? data.nilfgaardDrawWin.p2 : data.nilfgaardDrawWin.p1);
+
+    const showRoundResultBanner = () => {
+        showPrzejscie(bannerCode, {
+            onFinish: () => {
+                playerLives = isPlayer1Local ? p1Lives : p2Lives;
+                opponentLives = isPlayer1Local ? p2Lives : p1Lives;
+                renderAll(currentNick);
+            }
+        });
+    };
+
+    if (isMyNilfWin || isOppNilfWin) {
+        showPrzejscie('t12', {
+            onFinish: () => {
+                showRoundResultBanner();
+            }
+        });
+    } else {
+        showRoundResultBanner();
+    }
 
     const myGYPos = { x: 3110, y: 1682 };
     const oppGYPos = { x: 3110, y: 168 };
 
     animateBoardToGraveyard(myBoardCards, myGYPos, () => {
         if (playerGraveyard) playerGraveyard.push(...myBoardCards.map(c => c.card));
+        if (!window.arrivedBoardCards) window.arrivedBoardCards = new Set();
         window.arrivedBoardCards.clear(); // Czyścimy po Round End
+        if (myKept) {
+            window.arrivedBoardCards.add(`${myKept.row}_0`);
+        }
+        if (oppKept) {
+            window.arrivedBoardCards.add(`${oppKept.row}_0`);
+        }
         renderAll(currentNick);
     });
     animateBoardToGraveyard(oppBoardCards, oppGYPos, () => {

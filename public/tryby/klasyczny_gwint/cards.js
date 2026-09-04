@@ -337,7 +337,7 @@ const cards = [
         ilosc: 1,
         numer: "101"
     },
-
+//Jan natalis
     {
         nazwa: "Jan Natalis",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/jan_natalis.webp",
@@ -350,7 +350,7 @@ const cards = [
         ilosc: 1,
         numer: "102"
     },
-
+//esterad thyssen   
     {
         nazwa: "Esterad Thyssen",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/esterad_thyssen.webp",
@@ -363,7 +363,7 @@ const cards = [
         ilosc: 1,
         numer: "103"
     },
-
+//philippa eilhard
     {
         nazwa: "Philippa Eilhart",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/philippa_eilhart.webp",
@@ -376,7 +376,7 @@ const cards = [
         ilosc: 1,
         numer: "104"
     },
-
+//katapulta
     {
         nazwa: "Katapulta",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/katapulta.webp",
@@ -390,7 +390,7 @@ const cards = [
         ilosc: 2,
         numer: "105"
     },
-
+//detmold
     {
         nazwa: "Detmold",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/detmold.webp",
@@ -403,7 +403,7 @@ const cards = [
         ilosc: 1,
         numer: "106"
     },
-
+//trebusz
     {
         nazwa: "Trebusz",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/trebusz2.webp",
@@ -416,7 +416,7 @@ const cards = [
         ilosc: 1,
         numer: "107"
     },
-
+//trebusz 2
     {
         nazwa: "Trebusz",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/trebusz1.webp",
@@ -429,7 +429,7 @@ const cards = [
         ilosc: 1,
         numer: "108"
     },
-
+//balista
     {
         nazwa: "Balista",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/balista1.webp",
@@ -442,7 +442,7 @@ const cards = [
         ilosc: 1,
         numer: "109"
     },
-
+//balista 2
     {
         nazwa: "Balista",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/balista.webp",
@@ -455,7 +455,7 @@ const cards = [
         ilosc: 1,
         numer: "110"
     },
-
+//wieża oblężnicza
     {
         nazwa: "Wieża oblężnicza",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/wieza_obleznicza.webp",
@@ -468,7 +468,7 @@ const cards = [
         ilosc: 1,
         numer: "111"
     },
-
+//ves
     {
         nazwa: "Ves",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/ves.webp",
@@ -481,7 +481,7 @@ const cards = [
         ilosc: 1,
         numer: "112"
     },
-
+//zygfryd z denesle
     {
         nazwa: "Zygfryd z Denesle",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/zygfryd_z_denesle.webp",
@@ -494,7 +494,7 @@ const cards = [
         ilosc: 1,
         numer: "113"
     },
-
+//keira metz
     {
         nazwa: "Keira Metz",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/keira_metz.webp",
@@ -507,7 +507,7 @@ const cards = [
         ilosc: 1,
         numer: "114"
     },
-
+//sheala de tancarville
     {
         nazwa: "Sheala de Tancarville",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sheale_de_tancarville.webp",
@@ -520,7 +520,7 @@ const cards = [
         ilosc: 1,
         numer: "115"
     },
-
+//książe stenis
     {
         nazwa: "Książe Stenis",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/ksiaze_stennis.webp",
@@ -534,7 +534,7 @@ const cards = [
         ilosc: 1,
         numer: "116"
     },
-
+//rębacze z crinfrid
     {
         nazwa: "Rębacze z Crinfrid",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/rebacze_z_crinfrid.webp",
@@ -548,7 +548,7 @@ const cards = [
         ilosc: 3,
         numer: "117"
     },
-
+//medyczka burej chorągwi
     {
         nazwa: "Medyczka Burej Chorągwi",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/medyczka_burej_choragwi.webp",
@@ -562,7 +562,7 @@ const cards = [
         ilosc: 1,
         numer: "118"
     },
-
+//sigismund dijkstra
     {
         nazwa: "Sigismund Dijkstra",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sigismund_dijkstra.webp",
@@ -576,7 +576,7 @@ const cards = [
         ilosc: 1,
         numer: "119"
     },
-
+//sabrina glebissig
     {
         nazwa: "Sabrina Glebissig",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sabrina_glevissig.webp",
@@ -589,7 +589,7 @@ const cards = [
         ilosc: 1,
         numer: "120"
     },
-
+//sheldon skaggs
     {
         nazwa: "Sheldon Skaggs",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sheldon_skaggs.webp",
@@ -602,7 +602,7 @@ const cards = [
         ilosc: 1,
         numer: "121"
     },
-
+//komandos niebieskich pasów
     {
         nazwa: "Komandos Niebieskich Pasów",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/komandos_niebieskich_pasow.webp",
@@ -616,7 +616,7 @@ const cards = [
         ilosc: 3,
         numer: "122"
     },
-
+//yarpen zigrin
     {
         nazwa: "Yarpen Zigrin",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/yarpen_zigrin.webp",
@@ -629,7 +629,7 @@ const cards = [
         ilosc: 1,
         numer: "123"
     },
-
+//talar
     {
         nazwa: "Talar",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/talar.webp",

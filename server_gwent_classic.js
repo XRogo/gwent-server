@@ -421,6 +421,7 @@ function registerClassicGwentEvents(socket, io, games) {
             // 1. Inicjalizacja pustego stanu gry (jeśli nie istnieje)
             if (!game.gameState) {
                 game.gameState = {
+                    roundNumber: 1,
                     p1Hand: [], p1Deck: [], p1Graveyard: [], p1MulliganRejects: [],
                     p1Faction: game.player1Faction,
                     p1Leader: game.player1Leader,
@@ -1502,6 +1503,7 @@ function registerClassicGwentEvents(socket, io, games) {
             calculateRowScore(state.board.p2R3, state.board.p2S3, deszczActive);
 
         let roundResult = 'draw';
+        let nilfgaardDrawWin = { p1: false, p2: false };
         if (p1Score > p2Score) {
             roundResult = 'p1';
             state.p2Lives -= 1;
@@ -1509,14 +1511,76 @@ function registerClassicGwentEvents(socket, io, games) {
             roundResult = 'p2';
             state.p1Lives -= 1;
         } else {
-            state.p1Lives -= 1;
-            state.p2Lives -= 1;
+            // Remis punktowy! Sprawdź zdolność Nilfgaardu:
+            const p1Nilf = state.p1Faction === '2';
+            const p2Nilf = state.p2Faction === '2';
+            if (p1Nilf && !p2Nilf) {
+                roundResult = 'p1';
+                state.p2Lives -= 1;
+                nilfgaardDrawWin.p1 = true;
+                console.log(`[GAME CLASSIC] [${gameCode}] Nilfgaard ability: P1 wins the draw.`);
+            } else if (p2Nilf && !p1Nilf) {
+                roundResult = 'p2';
+                state.p1Lives -= 1;
+                nilfgaardDrawWin.p2 = true;
+                console.log(`[GAME CLASSIC] [${gameCode}] Nilfgaard ability: P2 wins the draw.`);
+            } else {
+                state.p1Lives -= 1;
+                state.p2Lives -= 1;
+            }
         }
+
+        // Zdolność Potworów: zatrzymanie 1 losowej jednostki (nie-bohatera) na polu bitwy
+        function isEligibleMonsterUnit(cardNumer) {
+            const c = cards.find(x => String(x.numer) === String(cardNumer));
+            if (!c) return false;
+            if (c.bohater) return false;
+            if (typeof c.punkty !== 'number' || c.typ === 'specjalna') return false;
+            const EXCLUDED_NUMERS = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
+            if (EXCLUDED_NUMERS.includes(String(cardNumer))) return false;
+            if (['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo', 'rog', 'porz', 'manek'].includes(c.moc)) return false;
+            return true;
+        }
+
+        let p1MonsterKept = null;
+        if (state.p1Faction === '4') {
+            const p1Eligible = [];
+            ['p1R1', 'p1R2', 'p1R3'].forEach(r => {
+                (state.board[r] || []).forEach((cNum, idx) => {
+                    if (isEligibleMonsterUnit(cNum)) {
+                        p1Eligible.push({ row: r, index: idx, numer: cNum });
+                    }
+                });
+            });
+            if (p1Eligible.length > 0) {
+                p1MonsterKept = p1Eligible[Math.floor(Math.random() * p1Eligible.length)];
+                console.log(`[GAME CLASSIC] [${gameCode}] Monsters ability: P1 keeps card ${p1MonsterKept.numer} in ${p1MonsterKept.row}`);
+            }
+        }
+
+        let p2MonsterKept = null;
+        if (state.p2Faction === '4') {
+            const p2Eligible = [];
+            ['p2R1', 'p2R2', 'p2R3'].forEach(r => {
+                (state.board[r] || []).forEach((cNum, idx) => {
+                    if (isEligibleMonsterUnit(cNum)) {
+                        p2Eligible.push({ row: r, index: idx, numer: cNum });
+                    }
+                });
+            });
+            if (p2Eligible.length > 0) {
+                p2MonsterKept = p2Eligible[Math.floor(Math.random() * p2Eligible.length)];
+                console.log(`[GAME CLASSIC] [${gameCode}] Monsters ability: P2 keeps card ${p2MonsterKept.numer} in ${p2MonsterKept.row}`);
+            }
+        }
+        const monstersKept = { p1: p1MonsterKept, p2: p2MonsterKept };
 
         console.log(`[GAME CLASSIC] [${gameCode}] Round ended. P1: ${p1Score}, P2: ${p2Score}. Result: ${roundResult}`);
         io.to(gameCode).emit('round-ended', {
             p1Score, p2Score, roundResult, p1Lives: state.p1Lives, p2Lives: state.p2Lives,
-            p1Hand: state.p1Hand, p2Hand: state.p2Hand
+            p1Hand: state.p1Hand, p2Hand: state.p2Hand,
+            nilfgaardDrawWin,
+            monstersKept
         });
 
         // Let client know cards are about to be cleared (for klikZabranieSound)
@@ -1528,8 +1592,15 @@ function registerClassicGwentEvents(socket, io, games) {
         setTimeout(() => {
             if (state.p1Lives <= 0 || state.p2Lives <= 0) {
                 let gameResult = 'draw';
-                if (state.p1Lives > 0) gameResult = 'p1';
-                if (state.p2Lives > 0) gameResult = 'p2';
+                if (state.p1Lives > 0 && state.p2Lives <= 0) gameResult = 'p1';
+                else if (state.p2Lives > 0 && state.p1Lives <= 0) gameResult = 'p2';
+                else if (state.p1Lives <= 0 && state.p2Lives <= 0) {
+                    const p1Nilf = state.p1Faction === '2';
+                    const p2Nilf = state.p2Faction === '2';
+                    if (p1Nilf && !p2Nilf) gameResult = 'p1';
+                    else if (p2Nilf && !p1Nilf) gameResult = 'p2';
+                    else gameResult = 'draw';
+                }
                 io.to(gameCode).emit('game-over', { gameResult });
             } else {
                 // Before clearing, scan for wezwarniezza effects (Cow/Kambi)
@@ -1549,13 +1620,27 @@ function registerClassicGwentEvents(socket, io, games) {
                         }
                     });
 
-                    // Before clearing, move board cards to graveyard
-                    ['p1R1', 'p1R2', 'p1R3'].forEach(r => state.p1Graveyard.push(...(state.board[r] || [])));
+                    // Before clearing, move board cards to graveyard (omijając zatrzymane karty Potworów)
+                    ['p1R1', 'p1R2', 'p1R3'].forEach(r => {
+                        (state.board[r] || []).forEach((cNum, idx) => {
+                            if (p1MonsterKept && p1MonsterKept.row === r && p1MonsterKept.index === idx) {
+                                return;
+                            }
+                            state.p1Graveyard.push(cNum);
+                        });
+                    });
                     if (state.board.p1S1) state.p1Graveyard.push(state.board.p1S1);
                     if (state.board.p1S2) state.p1Graveyard.push(state.board.p1S2);
                     if (state.board.p1S3) state.p1Graveyard.push(state.board.p1S3);
 
-                    ['p2R1', 'p2R2', 'p2R3'].forEach(r => state.p2Graveyard.push(...(state.board[r] || [])));
+                    ['p2R1', 'p2R2', 'p2R3'].forEach(r => {
+                        (state.board[r] || []).forEach((cNum, idx) => {
+                            if (p2MonsterKept && p2MonsterKept.row === r && p2MonsterKept.index === idx) {
+                                return;
+                            }
+                            state.p2Graveyard.push(cNum);
+                        });
+                    });
                     if (state.board.p2S1) state.p2Graveyard.push(state.board.p2S1);
                     if (state.board.p2S2) state.p2Graveyard.push(state.board.p2S2);
                     if (state.board.p2S3) state.p2Graveyard.push(state.board.p2S3);
@@ -1567,12 +1652,84 @@ function registerClassicGwentEvents(socket, io, games) {
                     weather: []
                 };
 
+                // Zatrzymane karty Potworów
+                if (p1MonsterKept) {
+                    state.board[p1MonsterKept.row].push(p1MonsterKept.numer);
+                }
+                if (p2MonsterKept) {
+                    state.board[p2MonsterKept.row].push(p2MonsterKept.numer);
+                }
+
                 // Apply wezwarniezza summons to the fresh board
                 pendingSummons.forEach(s => {
                     if (state.board[s.row]) state.board[s.row].push(s.num);
                 });
                 state.p1Passed = false;
                 state.p2Passed = false;
+
+                // Numer nowej rundy
+                state.roundNumber = (state.roundNumber || 1) + 1;
+
+                // Zdolność Skellige (frakcja 5): W 3. rundzie przywraca 2 losowe jednostki z cmentarza
+                const skelligeResurrect = { p1: [], p2: [] };
+                function isEligibleSkelligeResurrect(cardNumer) {
+                    const c = cards.find(x => String(x.numer) === String(cardNumer));
+                    if (!c) return false;
+                    if (c.bohater) return false;
+                    if (typeof c.punkty !== 'number' || c.typ === 'specjalna') return false;
+                    const EXCLUDED_NUMERS = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
+                    if (EXCLUDED_NUMERS.includes(String(cardNumer))) return false;
+                    if (['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo', 'rog', 'porz', 'manek'].includes(c.moc)) return false;
+                    return true;
+                }
+
+                if (state.roundNumber === 3) {
+                    if (state.p1Faction === '5' && state.p1Graveyard && state.p1Graveyard.length > 0) {
+                        const eligibleIndices = [];
+                        state.p1Graveyard.forEach((cNum, idx) => {
+                            if (isEligibleSkelligeResurrect(cNum)) eligibleIndices.push(idx);
+                        });
+                        const countToRes = Math.min(2, eligibleIndices.length);
+                        for (let i = 0; i < countToRes; i++) {
+                            const randIdx = Math.floor(Math.random() * eligibleIndices.length);
+                            const graveIdx = eligibleIndices.splice(randIdx, 1)[0];
+                            const cardNum = state.p1Graveyard[graveIdx];
+                            const cObj = cards.find(x => String(x.numer) === String(cardNum));
+                            const pos = cObj ? (cObj.pozycja || 1) : 1;
+                            const targetRow = (pos === 2 ? 'p1R2' : (pos === 3 ? 'p1R3' : 'p1R1'));
+                            state.board[targetRow].push(cardNum);
+                            skelligeResurrect.p1.push({ numer: cardNum, row: targetRow });
+                            console.log(`[GAME CLASSIC] [${gameCode}] Skellige ability: P1 resurrected ${cardNum} to ${targetRow}`);
+                        }
+                        skelligeResurrect.p1.forEach(item => {
+                            const idx = state.p1Graveyard.indexOf(item.numer);
+                            if (idx !== -1) state.p1Graveyard.splice(idx, 1);
+                        });
+                    }
+
+                    if (state.p2Faction === '5' && state.p2Graveyard && state.p2Graveyard.length > 0) {
+                        const eligibleIndices = [];
+                        state.p2Graveyard.forEach((cNum, idx) => {
+                            if (isEligibleSkelligeResurrect(cNum)) eligibleIndices.push(idx);
+                        });
+                        const countToRes = Math.min(2, eligibleIndices.length);
+                        for (let i = 0; i < countToRes; i++) {
+                            const randIdx = Math.floor(Math.random() * eligibleIndices.length);
+                            const graveIdx = eligibleIndices.splice(randIdx, 1)[0];
+                            const cardNum = state.p2Graveyard[graveIdx];
+                            const cObj = cards.find(x => String(x.numer) === String(cardNum));
+                            const pos = cObj ? (cObj.pozycja || 1) : 1;
+                            const targetRow = (pos === 2 ? 'p2R2' : (pos === 3 ? 'p2R3' : 'p2R1'));
+                            state.board[targetRow].push(cardNum);
+                            skelligeResurrect.p2.push({ numer: cardNum, row: targetRow });
+                            console.log(`[GAME CLASSIC] [${gameCode}] Skellige ability: P2 resurrected ${cardNum} to ${targetRow}`);
+                        }
+                        skelligeResurrect.p2.forEach(item => {
+                            const idx = state.p2Graveyard.indexOf(item.numer);
+                            if (idx !== -1) state.p2Graveyard.splice(idx, 1);
+                        });
+                    }
+                }
 
                 // Loser goes first or random if draw
                 if (roundResult === 'p1') state.currentTurn = game.player2;
@@ -1608,7 +1765,10 @@ function registerClassicGwentEvents(socket, io, games) {
                     p1Hand: state.p1Hand,
                     p2Hand: state.p2Hand,
                     northernRealmsDraw: { p1: p1NrDraw, p2: p2NrDraw },
-                    cowTransformed: cowTransformed
+                    cowTransformed: cowTransformed,
+                    monstersKept: monstersKept,
+                    skelligeResurrect: skelligeResurrect,
+                    roundNumber: state.roundNumber
                 });
             }
         }, 5000);
@@ -1643,6 +1803,7 @@ function registerClassicGwentEvents(socket, io, games) {
             if (game.mulliganTimer) { clearInterval(game.mulliganTimer); game.mulliganTimer = null; }
 
             game.gameState = {
+                roundNumber: 1,
                 p1Hand: [], p1Deck: game.player1FullDeck ? [...game.player1FullDeck] : [],
                 p1Graveyard: [], p1MulliganRejects: [],
                 p1Faction: game.player1Faction,
