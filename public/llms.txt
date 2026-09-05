@@ -1,0 +1,28 @@
+# gwent-1vs1.uk
+
+> Fanowska strona z grą Gwint (Gwent) z Wiedźmina 3: Dziki Gon. Twórca stara się odtworzyć grę jak najwierniej 1:1 w stosunku do oryginału od CD Projekt RED.
+
+## Jak grać
+1. Wejdź na stronę i kliknij „Graj” / „Generuj kod”.q
+2. Otrzymasz unikalny kod pokoju.
+3. Wyślij ten kod znajomemu.
+4. Znajomy dołącza za pomocą kodu.
+5. Oboje klikacie „Graj” i rozgrywaszcie normalną partię Gwinta dokładnie tak, jak w Wiedźminie 3 – tylko online, w trybie 1 vs 1.
+
+Strona jest w fazie Beta – mogą występować błędy.
+Obsługuje obecnie 3 języki - Polski Angielski i Hiszpański (w menu działają wszystkie języki w samej grze tylko polski (w przyszłość będzie obsługa również w grze))
+
+## Dostępne warianty Gwinta
+- **Gwint klasyczny** – idealna kopia wersji z Wiedźmina 3: Dziki Gon (aktualnie działający tryb).
+- **Gwint Mix** – wszystkie karty z gry bez żadnych ograniczeń (faza koncepcyjna).
+- **Gwint czasowy** – jak szachy, z limitem czasu na ruchy (faza koncepcyjna).
+- **1vs1vs1vs1** – Gwint dla 4 graczy (faza koncepcyjna).
+- **Pełne talie** – wybierasz tylko dowódcę i frakcję (faza koncepcyjna).
+- **Imersyjny** – wersja bardziej spójna z uniwersum Wiedźmina (faza koncepcyjna).
+- **Cyberpunkowy** – Gwint w klimacie Night City (faza koncepcyjna).
+
+## Kontakt i zgłaszanie błędów
+Discord: https://discord.gg/TD7GWZBU9k
+
+## Linki
+- Strona główna: https://gwent-1vs1.uk/
