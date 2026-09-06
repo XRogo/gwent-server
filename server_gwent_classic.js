@@ -87,14 +87,17 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     });
 
     // Róg aktywny?
-    let hornActive = false;
+    let specialSlotHorn = false;
     if (specialCardNum) {
         const sCard = cards.find(c => String(c.numer) === String(specialCardNum));
-        if (sCard && sCard.moc === 'rog') hornActive = true;
+        if (sCard && sCard.moc === 'rog') specialSlotHorn = true;
     }
-    if (rowCards.some(n => { const c = cards.find(x => String(x.numer) === String(n)); return c && !c.bohater && c.moc === 'rog'; })) {
-        hornActive = true;
-    }
+    let unitHornCount = 0;
+    rowCards.forEach(n => {
+        const c = cards.find(x => String(x.numer) === String(n));
+        if (c && !c.bohater && c.moc === 'rog') unitHornCount++;
+    });
+    const receivesHorn = specialSlotHorn || (card.moc === 'rog' ? unitHornCount > 1 : unitHornCount > 0);
 
     // Morale Count
     const moraleCount = rowCards.reduce((acc, n) => {
@@ -139,7 +142,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     if (mBuff > 0) pts += mBuff;
 
     // Róg
-    if (hornActive) pts *= 2;
+    if (receivesHorn) pts *= 2;
 
     return pts;
 }
@@ -1246,13 +1249,19 @@ function registerClassicGwentEvents(socket, io, games) {
                         });
                     });
 
-                    // Jeśli iporz: sumę rzdędu efektywną musi lić >= 10
+                    // Jeśli iporz: sumę rzędu efektywną musi mieć >= 10 (w tym z bohaterami)
                     let proceedScorch = true;
                     if (cardObj.moc === 'iporz' && rowsToCheck.length === 1) {
                         let rowSum = 0;
                         (state.board[rowsToCheck[0]] || []).forEach(n => {
-                            const effPts = calculateEffectivePower(n, rowsToCheck[0], state.board, state);
-                            if (effPts >= 0) rowSum += effPts;
+                            const c = cards.find(x => String(x.numer) === String(n));
+                            if (!c) return;
+                            if (c.bohater) {
+                                rowSum += (typeof c.punkty === 'number' ? c.punkty : 0);
+                            } else {
+                                const effPts = calculateEffectivePower(n, rowsToCheck[0], state.board, state);
+                                if (effPts >= 0) rowSum += effPts;
+                            }
                         });
                         if (rowSum < 10) {
                             proceedScorch = false;
@@ -1443,11 +1452,12 @@ function registerClassicGwentEvents(socket, io, games) {
         const calculateRowScore = (rowCards, specialSlotVal, weatherActive) => {
             let rowDict = {};
             let moraleCount = 0;
-            let hornActive = false;
+            let specialSlotHorn = false;
+            let unitHornCount = 0;
 
             if (specialSlotVal) {
                 const sCard = cards.find(c => String(c.numer) === String(specialSlotVal));
-                if (sCard && sCard.moc === 'rog') hornActive = true;
+                if (sCard && sCard.moc === 'rog') specialSlotHorn = true;
             }
 
             if (!rowCards || rowCards.length === 0) return 0;
@@ -1458,7 +1468,7 @@ function registerClassicGwentEvents(socket, io, games) {
                     if (!rowDict[card.numer]) rowDict[card.numer] = { count: 0, card: card };
                     rowDict[card.numer].count++;
                     if (!card.bohater && card.moc === 'morale') moraleCount++;
-                    if (!card.bohater && card.moc === 'rog') hornActive = true;
+                    if (!card.bohater && card.moc === 'rog') unitHornCount++;
                 }
             });
 
@@ -1483,7 +1493,8 @@ function registerClassicGwentEvents(socket, io, games) {
                     let mBuff = (c.moc === 'morale') ? (moraleCount - 1) : moraleCount;
                     if (mBuff > 0) pts += mBuff;
 
-                    if (hornActive) pts *= 2;
+                    const receivesHorn = specialSlotHorn || (c.moc === 'rog' ? unitHornCount > 1 : unitHornCount > 0);
+                    if (receivesHorn) pts *= 2;
                     sum += pts * count;
                 }
             });

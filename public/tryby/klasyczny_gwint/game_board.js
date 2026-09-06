@@ -169,26 +169,48 @@ const handleCardAnimationSequence = async (data) => {
     const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
     const usedSlotsInSequence = new Set();
 
-    // Zapamiętujemy stan więzi sprzed tej sekwencji (do utrzymania płynności punktów)
+    // Zapamiętujemy stan kart obecnych na planszy sprzed tej sekwencji (do utrzymania płynności punktów więzi)
+    window.bondPreviousArrivedCards = new Set(window.arrivedBoardCards || []);
     window.bondPreviousCounts = {};
+    window.pendingBondGroups = new Set();
+
+    const freshNumers = new Set();
+    if (data.lastPlayedCard) freshNumers.add(String(data.lastPlayedCard));
+    if (data.musteredDetails) {
+        data.musteredDetails.forEach(m => freshNumers.add(String(m.numer)));
+    }
+
     Object.keys(data.board).forEach(rk => {
         const row = data.board[rk];
         if (Array.isArray(row)) {
-            const countedNumers = new Set(row.map(n => String(n)));
-            countedNumers.forEach(sNum => {
-                const bKey = `${rk}_${sNum}`;
-                let arrivedCount = 0;
-                row.forEach((n, i) => {
-                    if (String(n) === sNum && window.arrivedBoardCards.has(`${rk}_${i}`)) {
-                        arrivedCount++;
+            row.forEach(num => {
+                const sNum = String(num);
+                const c = cards.find(x => String(x.numer) === sNum);
+                if (c && c.moc === 'wiez') {
+                    const bondIds = new Set([String(c.numer)]);
+                    if (c.summon) {
+                        c.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
                     }
-                });
-                window.bondPreviousCounts[bKey] = arrivedCount;
+                    const bKey = `${rk}_bond_${[...bondIds].sort().join('_')}`;
+                    if (window.bondPreviousCounts[bKey] === undefined) {
+                        let prevArrivedCount = 0;
+                        row.forEach((n, idx) => {
+                            if (bondIds.has(String(n)) && window.bondPreviousArrivedCards.has(`${rk}_${idx}`)) {
+                                prevArrivedCount++;
+                            }
+                        });
+                        window.bondPreviousCounts[bKey] = prevArrivedCount;
+
+                        const totalInRow = row.filter(n => bondIds.has(String(n))).length;
+                        const hasFresh = row.some(n => bondIds.has(String(n)) && freshNumers.has(String(n)));
+                        if (hasFresh && totalInRow > 1) {
+                            window.pendingBondGroups.add(bKey);
+                        }
+                    }
+                }
             });
         }
     });
-
-    window.bondMultiplierActive = false;
 
     // Obsługa manekina: Zapamiętanie wizualnego placeholders przed animacją
     if (data.decoyDetails) {
@@ -504,50 +526,21 @@ const handleCardAnimationSequence = async (data) => {
     }
 
     // KROK 3: Sprawdzenie Więzi
-    const lpNum = lp ? String(lp) : null;
-    const freshNumers = new Set();
-    if (lpNum) freshNumers.add(lpNum);
-    if (data.musteredDetails) {
-        data.musteredDetails.forEach(m => freshNumers.add(String(m.numer)));
-    }
-
-    let bondCards = [];
-    Object.keys(data.board).forEach(rk => {
-        const row = data.board[rk];
-        if (Array.isArray(row)) {
-            row.forEach(num => {
-                const sNum = String(num);
-                // Interesują nas tylko rzędy, do których trafiła nowa karta z Więzią
-                if (!freshNumers.has(sNum)) return;
-
-                const c = cards.find(x => String(x.numer) === sNum);
-                if (c && c.moc === 'wiez') {
-                    const bondIds = new Set([String(c.numer)]);
-                    if (c.summon) {
-                        c.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
-                    }
-                    const bondCount = row.filter(n => bondIds.has(String(n))).length;
-                    if (bondCount > 1 && !bondCards.includes(sNum)) {
-                        bondCards.push(sNum);
-                    }
-                }
-            });
-        }
-    });
-
-    if (bondCards.length > 0 && window.playSound) {
-        // Czekamy na zakończenie dźwięku wejścia ostatniej karty (szacunkowo 1s po dolocie)
+    if (window.pendingBondGroups && window.pendingBondGroups.size > 0 && window.playSound) {
+        // Czekamy na zakończenie dźwięku wejścia ostatniej karty (szacunkowo 800ms po dolocie)
         await new Promise(r => setTimeout(r, 800));
 
         // Odtwarzamy dźwięk więzi
         window.playSound('wiezSound');
 
-        // W TYM SAMYM MOMENCIE (gdy zaczyna się dźwięk) aktywujemy mnożnik i aktualizujemy punkty na planszy
-        window.bondMultiplierActive = true;
+        // W TYM SAMYM MOMENCIE (gdy zaczyna się dźwięk) aktywujemy pełny mnożnik i aktualizujemy punkty na planszy
+        window.pendingBondGroups.clear();
         renderAll(currentNick);
 
         // Czekamy szacunkowo na koniec dźwięku przed zakończeniem całej sekwencji
         await new Promise(r => setTimeout(r, 1500));
+    } else if (window.pendingBondGroups) {
+        window.pendingBondGroups.clear();
     }
 };
 
@@ -775,7 +768,9 @@ window.playerGraveyardAnimatingCount = 0;
 window.opponentGraveyardAnimatingCount = 0;
 window.proposedCard = null; // Karta wybrana do potwierdzenia propozycji zagrania
 window.proposedTargetRow = null;
-window.bondMultiplierActive = false;
+window.pendingBondGroups = new Set();
+window.bondPreviousCounts = {};
+window.bondPreviousArrivedCards = new Set();
 window.activeDecoySequences = new Map(); // Klucz: "rowKey_index", Wartość: numer_zabieranej_karty
 
 function sortHand() {
@@ -1992,80 +1987,75 @@ function calculateScores() {
 
     const calculateRowScore = (rowKey, specialSlotVal, weatherActive) => {
         const rowCards = boardState[rowKey] || [];
-        let rowDict = {};
-        let moraleCount = 0;
-        let hornActive = false;
+        if (!rowCards || rowCards.length === 0) return 0;
 
-        // Róg dowódcy w slocie specjalnym
+        let specialSlotHorn = false;
         if (specialSlotVal) {
             const sCard = cards.find(c => String(c.numer) === String(specialSlotVal));
-            if (sCard && sCard.moc === 'rog') hornActive = true;
+            if (sCard && sCard.moc === 'rog') specialSlotHorn = true;
         }
 
-        if (!rowCards || rowCards.length === 0) return 0;
+        let moraleCount = 0;
+        let unitHornCount = 0;
 
         rowCards.forEach((cardNum, i) => {
             const key = `${rowKey}_${i}`;
-            // POMIJAJ KARTY KTÓRE JESZCZE NIE DOLECIAŁY
             if (!window.arrivedBoardCards.has(key)) return;
-
             const card = cards.find(c => String(c.numer) === String(cardNum));
-            if (card && typeof card.punkty === 'number') {
-                if (!rowDict[card.numer]) {
-                    rowDict[card.numer] = { count: 0, card: card };
-                }
-                rowDict[card.numer].count++;
-
-                // Morale buff (liczymy wszystkie jednostki z morale w rzędzie prócz bohaterów)
-                if (!card.bohater && card.moc === 'morale') moraleCount++;
-                // Róg jednostki w rzędzie
-                if (!card.bohater && card.moc === 'rog') hornActive = true;
+            if (card && !card.bohater && typeof card.punkty === 'number') {
+                if (card.moc === 'morale') moraleCount++;
+                if (card.moc === 'rog') unitHornCount++;
             }
         });
 
         let sum = 0;
-        Object.values(rowDict).forEach(group => {
-            const c = group.card;
-            const count = group.count;
+        rowCards.forEach((cardNum, i) => {
+            const key = `${rowKey}_${i}`;
+            if (!window.arrivedBoardCards.has(key)) return;
 
-            if (c.bohater) {
-                sum += c.punkty * count;
+            const card = cards.find(c => String(c.numer) === String(cardNum));
+            if (!card || typeof card.punkty !== 'number') return;
+
+            if (card.bohater) {
+                sum += card.punkty;
             } else {
-                let pts = weatherActive ? 1 : c.punkty;
+                let pts = weatherActive ? 1 : card.punkty;
 
                 // 1. Więź
-                if (c.moc === 'wiez') {
-                  const bondIds = new Set([String(c.numer)]);
-                  if (c.summon) {
-                 c.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
-                }
+                if (card.moc === 'wiez') {
+                    const bondIds = new Set([String(card.numer)]);
+                    if (card.summon) {
+                        card.summon.split(',').map(s => s.trim()).forEach(id => bondIds.add(String(id)));
+                    }
+                    let bondCount = 0;
+                    rowCards.forEach((cn, idx) => {
+                        if (window.arrivedBoardCards.has(`${rowKey}_${idx}`) && bondIds.has(String(cn))) {
+                            bondCount++;
+                        }
+                    });
 
-              // ile kart z tej grupy więzi jest w rzędzie
-                let bondCount = 0;
-                   rowCards.forEach((cardNum, i) => {
-                   const key = `${rowKey}_${i}`;
-                   if (!window.arrivedBoardCards.has(key)) return;
-                    if (bondIds.has(String(cardNum))) bondCount++;
-               });
-
-                const bKey = `${rowKey}_bond_${[...bondIds].sort().join('_')}`;
-                const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
-
-                const effectiveCount = (window.bondMultiplierActive || prevCount >= bondCount)
-                    ? bondCount
-                    : Math.max(1, prevCount);
+                    const bKey = `${rowKey}_bond_${[...bondIds].sort().join('_')}`;
+                    const isPending = window.pendingBondGroups && window.pendingBondGroups.has(bKey);
+                    let effectiveCount = bondCount;
+                    if (isPending) {
+                        const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 1;
+                        effectiveCount = (window.bondPreviousArrivedCards && window.bondPreviousArrivedCards.has(key))
+                            ? Math.max(1, prevCount)
+                            : 1;
+                    }
 
                     if (effectiveCount > 1) pts *= effectiveCount;
                 }
 
                 // 2. Morale (+1 do bazowej/pogodowej wartości za KAŻDĄ jednostkę morale w rzędzie EXCLUDING self)
-                let mBuff = (c.moc === 'morale') ? (moraleCount - 1) : moraleCount;
+                let mBuff = (card.moc === 'morale') ? (moraleCount - 1) : moraleCount;
                 if (mBuff > 0) pts += mBuff;
 
-                // 3. Róg (x2 całości po więzi i morale)
-                if (hornActive) pts *= 2;
+                // 3. Róg (jednostka z rogiem podwaja inne jednostki, ale nie samą siebie, chyba że jest inny róg)
+                const receivesHorn = specialSlotHorn || (card.moc === 'rog' ? unitHornCount > 1 : unitHornCount > 0);
+                if (receivesHorn) pts *= 2;
 
-                sum += pts * count;
+                sum += pts;
             }
         });
 
@@ -2882,14 +2872,13 @@ function renderRows(overlay) {
                 let cardScore = card.punkty;
                 if (!card.bohater && typeof card.punkty === 'number') {
                     const checkW = (t) => boardState.weather && boardState.weather.some(w => {
-                        const wc = cards.find(c => c.numer === w.split('-')[1]);
+                        const wc = cards.find(c => String(c.numer) === String(w.split('-')[1]));
                         return wc && (wc.moc === t || (wc.moc === 'sztorm' && (t === 'mgla' || t === 'deszcz')));
                     });
                     const rowNum = parseInt(rowKey.slice(-1));
                     if ((rowNum === 1 && checkW('mroz')) || (rowNum === 2 && checkW('mgla')) || (rowNum === 3 && checkW('deszcz'))) {
                         cardScore = 1;
                     }
-                    // Więź
                     // Więź: własny numer + partnerzy z summon
                     let bondCnt = 0;
                     if (card.moc === 'wiez') {
@@ -2900,26 +2889,32 @@ function renderRows(overlay) {
                         bondCnt = cardsInRowNumers.filter(n => bondIds.has(String(n))).length;
 
                         const bKey = `${rowKey}_bond_${[...bondIds].sort().join('_')}`;
-                        const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 0;
-                        const effectiveCount = (window.bondMultiplierActive || prevCount >= bondCnt)
-                            ? bondCnt
-                            : Math.max(1, prevCount);
+                        const isPending = window.pendingBondGroups && window.pendingBondGroups.has(bKey);
+                        let effectiveCount = bondCnt;
+                        if (isPending) {
+                            const prevCount = (window.bondPreviousCounts && window.bondPreviousCounts[bKey]) || 1;
+                            effectiveCount = (window.bondPreviousArrivedCards && window.bondPreviousArrivedCards.has(cardKey))
+                                ? Math.max(1, prevCount)
+                                : 1;
+                        }
 
                         if (effectiveCount > 1) cardScore *= effectiveCount;
                     }
                     // Morale i Rogi
                     let moraleCnt = 0;
-                    let rowHorn = false;
+                    let unitHornCount = 0;
                     cardsInRowNumers.forEach(cn => {
-                        const co = cards.find(c => c.numer === cn);
+                        const co = cards.find(c => String(c.numer) === String(cn));
                         if (co && !co.bohater) {
                             if (co.moc === 'morale') moraleCnt++;
-                            if (co.moc === 'rog') rowHorn = true;
+                            if (co.moc === 'rog') unitHornCount++;
                         }
                     });
                     cardScore += (card.moc === 'morale' ? moraleCnt - 1 : moraleCnt);
                     const sSlot = boardState[rowKey.substring(0, 2) + 'S' + rowKey.slice(-1)];
-                    if (rowHorn || (sSlot && cards.find(c => c.numer === sSlot).moc === 'rog')) {
+                    const specialSlotHorn = sSlot && cards.find(c => String(c.numer) === String(sSlot))?.moc === 'rog';
+                    const receivesHorn = specialSlotHorn || (card.moc === 'rog' ? unitHornCount > 1 : unitHornCount > 0);
+                    if (receivesHorn) {
                         cardScore *= 2;
                     }
                 }
@@ -3133,8 +3128,10 @@ function renderLeaders(overlay) {
 
         img.onclick = (e) => {
             e.stopPropagation();
-            if (isOpponent) return;
-            if (!canUse) return;
+            if (isOpponent || !canUse) {
+                if (window.showPowiek) window.showPowiek([leaderObj], 0, 'game');
+                return;
+            }
 
             if (window.proposedCard === leaderObj) {
                 window.proposedCard = null;
@@ -3308,6 +3305,9 @@ function handleRoundEnd(data) {
         if (playerGraveyard) playerGraveyard.push(...myBoardCards.map(c => c.card));
         if (!window.arrivedBoardCards) window.arrivedBoardCards = new Set();
         window.arrivedBoardCards.clear(); // Czyścimy po Round End
+        if (window.pendingBondGroups) window.pendingBondGroups.clear();
+        window.bondPreviousCounts = {};
+        window.bondPreviousArrivedCards = new Set();
         if (myKept) {
             window.arrivedBoardCards.add(`${myKept.row}_0`);
         }

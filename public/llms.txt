@@ -3,7 +3,7 @@
 > Fanowska strona z grą Gwint (Gwent) z Wiedźmina 3: Dziki Gon. Twórca stara się odtworzyć grę jak najwierniej 1:1 w stosunku do oryginału od CD Projekt RED.
 
 ## Jak grać
-1. Wejdź na stronę i kliknij „Graj” / „Generuj kod”.q
+1. Wejdź na stronę i kliknij „Graj” / „Generuj kod”.
 2. Otrzymasz unikalny kod pokoju.
 3. Wyślij ten kod znajomemu.
 4. Znajomy dołącza za pomocą kodu.

@@ -20,7 +20,7 @@ const ConnectionUI = {
             setTimeout(() => {
                 const b = document.createElement('div');
                 b.id = 'fs-restore-prompt';
-                b.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:20000;background:#c7a76e;border:2px solid #000;padding:10px 20px;color:#000;font-weight:bold;cursor:pointer;font-family:sans-serif;box-shadow:0 0 10px rgba(0,0,0,0.5);';
+                b.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:100002;background:#c7a76e;border:2px solid #000;padding:10px 20px;color:#000;font-weight:bold;cursor:pointer;font-family:sans-serif;box-shadow:0 0 10px rgba(0,0,0,0.5);';
                 b.textContent = 'KLIKNIJ BY PRZYWRÓCIĆ PEŁNY EKRAN';
                 b.onclick = () => { this.toggleFS(); b.remove(); };
                 document.body.appendChild(b);
@@ -61,7 +61,7 @@ const ConnectionUI = {
             display: flex;
             flex-direction: column;
             gap: 2px;
-            z-index: 10000;
+            z-index: 100001;
             font-family: 'PFDinTextCondPro-Bold', 'Cinzel', serif;
             color: #fff;
             pointer-events: none;

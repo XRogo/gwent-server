@@ -36,14 +36,17 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
         return wCard && (wCard.moc === weatherType || (wCard.moc === 'sztorm' && (weatherType === 'mgla' || weatherType === 'deszcz')));
     });
 
-    let hornActive = false;
+    let specialSlotHorn = false;
     if (specialCardNum) {
         const sCard = _cards.find(c => String(c.numer) === String(specialCardNum));
-        if (sCard && sCard.moc === 'rog') hornActive = true;
+        if (sCard && sCard.moc === 'rog') specialSlotHorn = true;
     }
-    if (rowCards.some(n => { const c = _cards.find(x => String(x.numer) === String(n)); return c && !c.bohater && c.moc === 'rog'; })) {
-        hornActive = true;
-    }
+    let unitHornCount = 0;
+    rowCards.forEach(n => {
+        const c = _cards.find(x => String(x.numer) === String(n));
+        if (c && !c.bohater && c.moc === 'rog') unitHornCount++;
+    });
+    const receivesHorn = specialSlotHorn || (card.moc === 'rog' ? unitHornCount > 1 : unitHornCount > 0);
 
     const moraleCount = rowCards.reduce((acc, n) => {
         const c = _cards.find(x => String(x.numer) === String(n));
@@ -77,7 +80,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     const mBuff = (card.moc === 'morale') ? (moraleCount - 1) : moraleCount;
     if (mBuff > 0) pts += mBuff;
 
-    if (hornActive) pts *= 2;
+    if (receivesHorn) pts *= 2;
 
     return pts;
 }

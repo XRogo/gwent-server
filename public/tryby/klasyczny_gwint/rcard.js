@@ -236,14 +236,15 @@ export function renderPowiek() {
         inner.className = 'inner-card-wrapper';
 
         const factionId = localStorage.getItem('faction') || window.selectedFaction || '1';
+        const isCardLeader = powiekMode === 'leaders' || Boolean(card.umiejetnosc) || (card.numer && parseInt(card.numer) >= 1000 && parseInt(card.numer) <= 6000);
         inner.innerHTML = renderCardHTML(card, {
             playerFaction: factionId,
             isLargeView: true,
-            isKing: powiekMode === 'leaders'
+            isKing: isCardLeader
         });
 
         // Override some styles for zoom view
-                const pointsDiv = inner.querySelector('.points');
+        const pointsDiv = inner.querySelector('.points');
         if (pointsDiv) {
             pointsDiv.style.fontSize = (pos.height * 0.10) + 'px';
             pointsDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
@@ -262,7 +263,7 @@ export function renderPowiek() {
             nameDiv.style.top = (pos.height * (768 / 992)) + 'px';
             nameDiv.style.height = 'auto';
 
-            if (powiekMode === 'leaders') {
+            if (isCardLeader) {
                 // 0 … 524
                 nameDiv.style.left = '0';
                 nameDiv.style.width = '100%';
@@ -294,8 +295,8 @@ export function renderPowiek() {
         overlay.appendChild(cardDiv);
     }
 
-        const card0 = powiekDeck[powiekIndex];
-    const isLeader = powiekMode === 'leaders';
+    const card0 = powiekDeck[powiekIndex];
+    const isLeader = powiekMode === 'leaders' || (card0 && Boolean(card0.umiejetnosc)) || (card0 && card0.numer && parseInt(card0.numer) >= 1000 && parseInt(card0.numer) <= 6000);
     // moc LUB dowódca LUB zręczność (pozycja 4 bez innej mocy)
     const hasZrecznoscOnly = !isLeader && Number(card0.pozycja) === 4 && !card0.moc;
     if (card0 && (card0.moc || (isLeader && card0.umiejetnosc) || hasZrecznoscOnly)) {
