@@ -153,17 +153,25 @@ export function renderPowiek() {
         const idx = powiekIndex + i;
         if (idx < 0 || idx >= powiekDeck.length) continue;
         const card = powiekDeck[idx];
+        const isCardLeader = powiekMode === 'leaders' || Boolean(card.umiejetnosc) || (card.numer && parseInt(card.numer) >= 1000 && parseInt(card.numer) <= 6000);
         const pos = positions[i + 2];
         const cardDiv = document.createElement('div');
         cardDiv.className = 'powiek-card' + (i === 0 ? ' powiek-central' : '');
         cardDiv.style.position = 'absolute';
 
-        if (i === 0) {
+        if (i === 0 && !isCardLeader) {
             cardDiv.style.left = (pos.left - pos.width * 0.2) + 'px';
             cardDiv.style.top = (pos.top - pos.height * 0.02) + 'px';
             cardDiv.style.width = (pos.width * 1.4) + 'px';
             cardDiv.style.height = (pos.height * 1.14) + 'px';
+        } else {
+            cardDiv.style.left = pos.left + 'px';
+            cardDiv.style.top = pos.top + 'px';
+            cardDiv.style.width = pos.width + 'px';
+            cardDiv.style.height = pos.height + 'px';
+        }
 
+        if (i === 0) {
             if (powiekMode === 'leaders') {
                 cardDiv.style.cursor = 'pointer';
                 cardDiv.onclick = (e) => {
@@ -184,18 +192,13 @@ export function renderPowiek() {
                     if (powiekOptions.onSelect) powiekOptions.onSelect(card);
                 };
             }
-        } else {
-            cardDiv.style.left = pos.left + 'px';
-            cardDiv.style.top = pos.top + 'px';
-            cardDiv.style.width = pos.width + 'px';
-            cardDiv.style.height = pos.height + 'px';
         }
 
         cardDiv.style.zIndex = i === 0 ? 100 : 50;
         cardDiv.style.transition = 'all 0.4s cubic-bezier(.77,0,.18,1)';
         cardDiv.style.overflow = 'visible';
 
-        if (i === 0) {
+        if (i === 0 && !isCardLeader) {
             const podsw = document.createElement('img');
             podsw.src = 'assets/dkarty/podsw.webp';
             podsw.className = 'poswiata powiek-podsw';
@@ -222,7 +225,7 @@ export function renderPowiek() {
 
         const inner = document.createElement('div');
         inner.style.position = 'absolute';
-        if (i === 0) {
+        if (i === 0 && !isCardLeader) {
             inner.style.left = (pos.width * 0.2) + 'px';
             inner.style.top = (pos.height * 0.02) + 'px';
             inner.style.width = pos.width + 'px';
@@ -236,7 +239,6 @@ export function renderPowiek() {
         inner.className = 'inner-card-wrapper';
 
         const factionId = localStorage.getItem('faction') || window.selectedFaction || '1';
-        const isCardLeader = powiekMode === 'leaders' || Boolean(card.umiejetnosc) || (card.numer && parseInt(card.numer) >= 1000 && parseInt(card.numer) <= 6000);
         inner.innerHTML = renderCardHTML(card, {
             playerFaction: factionId,
             isLargeView: true,

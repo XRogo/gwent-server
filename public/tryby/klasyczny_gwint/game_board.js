@@ -1,5 +1,6 @@
 import cards from './cards.js';
-import { renderCardHTML } from './bcard_render.js';
+import { renderCardHTML, getPowerImage } from './bcard_render.js';
+import * as moce from './moce.js';
 import { showPowiek, renderPowiek } from './rcard.js';
 import { krole } from './krole.js';
 import { isLeaderUsable } from './krol_code.js';
@@ -1854,9 +1855,11 @@ export function renderAll(nick) {
 
 function renderProposedCard(overlay) {
     let wrapper = overlay.querySelector('#proposed-card-preview');
+    let infoBoxWrapper = overlay.querySelector('#proposed-card-infobox');
     if (!window.proposedCard) {
         window._activeProposedId = null;
         if (wrapper) wrapper.style.display = 'none';
+        if (infoBoxWrapper) infoBoxWrapper.style.display = 'none';
         return;
     }
     if (wrapper) wrapper.style.display = 'block';
@@ -1866,8 +1869,11 @@ function renderProposedCard(overlay) {
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
     const card = window.proposedCard;
-    const dkartaW = 523 * scale;
-    const dkartaH = 992 * scale;
+    // 3082,456 do 1626 (wysokość 1170, proporcja 523/992)
+    const targetH = 1170 * scale;
+    const targetW = (1170 * (523 / 992)) * scale;
+    const targetLeft = 3082 * scale + boardLeft;
+    const targetTop = 456 * scale + boardTop;
 
     const isNew = (!wrapper || window._activeProposedId !== card._id);
 
@@ -1883,12 +1889,7 @@ function renderProposedCard(overlay) {
     }
     window._activeProposedId = card._id;
 
-    // Pozycja docelowa: ZA 3120, środek
-    const targetLeft = 3120 * scale + boardLeft;
-    const targetTop = 1080 * scale + boardTop; // Środek Y
-
     if (isNew && window.lastProposedStartRect) {
-        // Animacja startująca z miejsca kliknięcia w łapę
         wrapper.style.transition = 'none';
         wrapper.style.left = `${window.lastProposedStartRect.left}px`;
         wrapper.style.top = `${window.lastProposedStartRect.top}px`;
@@ -1902,32 +1903,153 @@ function renderProposedCard(overlay) {
         wrapper.style.transition = 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
         wrapper.style.left = `${targetLeft}px`;
         wrapper.style.top = `${targetTop}px`;
-        wrapper.style.width = `${dkartaW}px`;
-        wrapper.style.height = `${dkartaH}px`;
-        wrapper.style.transform = 'translateY(-50%)';
+        wrapper.style.width = `${targetW}px`;
+        wrapper.style.height = `${targetH}px`;
+        wrapper.style.transform = 'none';
         wrapper.style.opacity = '1';
     } else {
         wrapper.style.left = `${targetLeft}px`;
         wrapper.style.top = `${targetTop}px`;
-        wrapper.style.width = `${dkartaW}px`;
-        wrapper.style.height = `${dkartaH}px`;
-        wrapper.style.transform = 'translateY(-50%)';
+        wrapper.style.width = `${targetW}px`;
+        wrapper.style.height = `${targetH}px`;
+        wrapper.style.transform = 'none';
     }
 
-    wrapper.style.boxShadow = `0 0 ${40 * scale}px rgba(199, 167, 110, 0.8)`;
+    wrapper.style.boxShadow = 'none';
 
+    const isCardLeader = Boolean(card.umiejetnosc) || (card.numer && parseInt(card.numer) >= 1000 && parseInt(card.numer) <= 6000) || (window.proposedCard === playerLeaderObj);
     const factionId = window.playerFaction || '1';
-    wrapper.innerHTML = renderCardHTML(card, { playerFaction: factionId, isLargeView: true });
+    wrapper.innerHTML = renderCardHTML(card, { playerFaction: factionId, isLargeView: true, isKing: isCardLeader });
 
-    // Ręczne dopasowanie skali czcionek w dużym podglądzie
+    // Dopasowanie stylów podglądu karty
     const content = wrapper.querySelector('.card-content');
     if (content) {
         content.style.width = '100%';
         content.style.height = '100%';
+
         const points = content.querySelector('.points');
-        if (points) points.style.fontSize = (dkartaH * 0.1) + 'px';
+        if (points) {
+            points.style.fontSize = (targetH * 0.10) + 'px';
+            points.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+        }
+
         const name = content.querySelector('.name');
-        if (name) name.style.fontSize = (dkartaH * 0.044) + 'px';
+        if (name) {
+            name.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+            name.style.fontSize = (targetH * (36 / 992)) + 'px';
+            name.style.letterSpacing = (targetW * (0.6 / 523)) + 'px';
+            name.style.color = '#484848';
+            name.style.whiteSpace = 'pre-line';
+            name.style.wordBreak = 'normal';
+            name.style.textAlign = 'center';
+            name.style.top = (targetH * (768 / 992)) + 'px';
+            name.style.height = 'auto';
+
+            if (isCardLeader) {
+                name.style.left = '0';
+                name.style.width = '100%';
+            } else {
+                name.style.left = (targetW * (122 / 523)) + 'px';
+                name.style.width = (targetW * ((521 - 122) / 523)) + 'px';
+            }
+        }
+
+        const description = content.querySelector('.description');
+        if (description) {
+            description.style.display = 'block';
+            description.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+            description.style.fontSize = (targetH * (33 / 992)) + 'px';
+            description.style.letterSpacing = (targetW * (0.4 / 523)) + 'px';
+            description.style.color = '#030303';
+            description.style.whiteSpace = 'pre-line';
+            description.style.wordBreak = 'normal';
+            description.style.textAlign = 'center';
+            description.style.left = (targetW * (2 / 523)) + 'px';
+            description.style.top = (targetH * (891 / 992)) + 'px';
+            description.style.width = (targetW * ((523 - 2) / 523)) + 'px';
+            description.style.height = 'auto';
+        }
+    }
+
+    // Ramka z mocą / opisem zdolności (pozycja 2609, 1656 do 1959 -> H=303, W=303*(1123/305)≈1115.65)
+    const hasZrecznoscOnly = !isCardLeader && Number(card.pozycja) === 4 && !card.moc;
+    const hasAbility = Boolean(card.moc || (isCardLeader && card.umiejetnosc) || hasZrecznoscOnly);
+
+    if (hasAbility) {
+        const infoH = 303 * scale;
+        const infoW = (303 * (1123 / 305)) * scale;
+        const infoLeft = 2609 * scale + boardLeft;
+        const infoTop = 1656 * scale + boardTop;
+        const infoScale = infoH / 305;
+
+        if (!infoBoxWrapper) {
+            infoBoxWrapper = document.createElement('div');
+            infoBoxWrapper.id = 'proposed-card-infobox';
+            infoBoxWrapper.className = 'persistent';
+            infoBoxWrapper.style.position = 'absolute';
+            infoBoxWrapper.style.zIndex = '6000';
+            infoBoxWrapper.style.cursor = 'default';
+            overlay.appendChild(infoBoxWrapper);
+        }
+        infoBoxWrapper.style.display = 'block';
+        infoBoxWrapper.style.left = `${infoLeft}px`;
+        infoBoxWrapper.style.top = `${infoTop}px`;
+        infoBoxWrapper.style.width = `${infoW}px`;
+        infoBoxWrapper.style.height = `${infoH}px`;
+        infoBoxWrapper.style.overflow = 'visible';
+
+        const specialMocs = ['deszcz', 'grzybki', 'manek', 'mgla', 'mroz', 'niebo', 'porz', 'rog', 'sztorm'];
+        const isSpecialCard = !isCardLeader && specialMocs.includes(card.moc) && typeof card.punkty !== 'number';
+        let powerImage = !isCardLeader ? getPowerImage(card) : null;
+        if (!powerImage && hasZrecznoscOnly) {
+            powerImage = 'zrecznosci.webp';
+        }
+
+        let titleText = '';
+        let descText = '';
+        if (isCardLeader) {
+            titleText = 'Zdolność Dowódcy';
+            descText = card.umiejetnosc || '';
+        } else if (card.moc) {
+            const mocData = moce[card.moc];
+            let variant = null;
+            if (card.moc === 'wezwanie') {
+                const n = String(card.numer);
+                if (n === '009' || n === '010') variant = mocData?.plotka;
+                else if (n === '503') variant = mocData?.cerys;
+                else variant = mocData?.default;
+            } else if (card.moc === 'iporz') {
+                variant = mocData ? (mocData[card.pozycja] || mocData[1]) : null;
+            } else {
+                variant = mocData;
+            }
+            titleText = variant?.nazwa || '';
+            descText = variant?.opis || '';
+        } else if (Number(card.pozycja) === 4) {
+            titleText = moce.zrecznosc?.nazwa || 'Zręczność';
+            descText = moce.zrecznosc?.opis || '';
+        }
+
+        let powerIconHtml = '';
+        if (isSpecialCard) {
+            powerIconHtml = `
+                <img src="assets/dkarty/mocempty.webp" style="position: absolute; left: ${29 * infoScale}px; top: ${-221 * infoScale}px; height: ${594 * infoScale}px; width: auto; object-fit: contain; z-index: 2;">
+                ${powerImage ? `<img src="assets/dkarty/${powerImage}" style="position: absolute; left: ${30 * infoScale}px; top: ${33 * infoScale}px; height: ${564 * infoScale}px; width: auto; object-fit: contain; z-index: 3;">` : ''}
+            `;
+        } else if (powerImage) {
+            powerIconHtml = `
+                <img src="assets/dkarty/${powerImage}" style="position: absolute; left: ${29 * infoScale}px; top: ${-221 * infoScale}px; height: ${594 * infoScale}px; width: auto; object-fit: contain; z-index: 2;">
+            `;
+        }
+
+        infoBoxWrapper.innerHTML = `
+            <img src="assets/asety/infor.webp" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 1;">
+            ${powerIconHtml}
+            <div style="position: absolute; left: 0; top: ${54 * infoScale}px; width: 100%; height: ${45 * infoScale}px; line-height: ${45 * infoScale}px; text-align: center; font-family: PFDinTextCondPro-Bold, sans-serif; font-size: ${45 * infoScale}px; letter-spacing: ${-1.1 * infoScale}px; color: #be9c58; z-index: 4;">${titleText}</div>
+            <div style="position: absolute; left: 0; top: ${151 * infoScale}px; width: 100%; text-align: center; font-family: PFDinTextCondPro, sans-serif; font-size: ${43 * infoScale}px; letter-spacing: ${-1.5 * infoScale}px; color: #c29f5a; white-space: pre-line; z-index: 4;">${descText}</div>
+        `;
+    } else if (infoBoxWrapper) {
+        infoBoxWrapper.style.display = 'none';
     }
 
     // Pozwala odkliknąć wybór lub zagrać lidera
