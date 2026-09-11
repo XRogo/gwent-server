@@ -182,30 +182,47 @@
     color: #ff1a1a;
     margin: 0 4px;
 }
-/* Boki otwarte – poświata / bohater nieucięte z boków */
+/* Kontenery: miejsce na wystającą poświatę / bohatera (overflow-x:visible + overflow-y:auto
+   w przeglądarce i tak pada do auto/auto – dlatego dajemy padding bokami) */
 .card-area.collection,
 .card-area.deck {
-    overflow-x: visible;
+    overflow-x: auto;
     overflow-y: auto;
+    /* ~119px lewo i ~92px prawo w przestrzeni karty 523 → ~22.8% / ~17.6% szer. karty
+       ustawiane też z JS; tu bezpieczny zapas */
+    scrollbar-width: none;
+}
+.card-area.collection::-webkit-scrollbar,
+.card-area.deck::-webkit-scrollbar {
+    display: none;
 }
 
-/* Karta – poświata nie zmienia rozmiaru */
 .card-area .card {
     position: relative;
-    overflow: visible;
+    overflow: visible; /* nie tnij poświaty ani bohatera na karcie */
 }
 
-/* Poświata POD wszystkimi warstwami karty (jak w powiększeniu) */
+/*
+  Poświata względem karty (design karty 523×992):
+  offset (-104, -11), rozmiar 734×1015
+  left:  -104/523 = -19.8853%
+  top:     -11/992 =  -1.1089%
+  width:  734/523 = 140.3442%
+  height: 1015/992 = 102.3185%
+  Rysowane RAZEM z kartą, NIE zmienia width/height .card
+*/
 .card-area .card .selection-podsw,
 .card-area .card .selection-podsw2 {
     position: absolute;
-    left: 0.2%;
-    top: 1.2%;
-    width: 100.1%;
-    height: 89.5%;
+    left: -19.885277%;   /* -104/523 */
+    top: -1.108871%;     /* -11/992 */
+    width: 139.344168%;  /* 734/523 */
+    height: 102.318548%; /* 1015/992 */
+    max-width: none;
     pointer-events: none;
     opacity: 0;
-    z-index: 0; /* pod .card-content (z-index: 10) */
+    z-index: 0;          /* POD .card-content – widać tylko wystające fragmenty */
+    object-fit: fill;
 }
 
 .card-area .card .selection-podsw2 {
@@ -221,13 +238,12 @@
     animation: powiek-pulse 1.5s infinite;
 }
 
-/* Upewnij się, że zawartość karty jest nad poświatą */
+/* Zawartość karty nad poświatą (obraz, beton, ikony…) */
 .card-area .card .card-content {
     position: relative;
     z-index: 10;
 }
 
-/* Suwak */
 .selection-scrollbar {
     position: absolute;
     background: url('assets/wybor/suwak.webp') no-repeat center;
@@ -240,4 +256,10 @@
 }
 .selection-scrollbar:active {
     cursor: grabbing;
+}
+
+@keyframes powiek-pulse {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.1; }
+    100% { opacity: 1; }
 }

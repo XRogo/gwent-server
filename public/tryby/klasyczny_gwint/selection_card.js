@@ -412,28 +412,35 @@ export function updatePositionsAndScaling() {
         const padBottom = PAD_BOTTOM_4K * scaleH;
         const areaH = AREA_H_4K * scaleH;
 
-        const setupArea = (area, left4k, top4k, right4k) => {
+                const setupArea = (area, left4k, top4k, right4k) => {
             if (!area) return;
+
             const aLeft = backgroundLeft + left4k * scaleW;
             const aTop = backgroundTop + top4k * scaleH;
             const aW = (right4k - left4k) * scaleW;
 
-            area.style.left = `${aLeft}px`;
+            // Zapas na poświatę względem designu karty 523×992:
+            // lewo 119/523, prawo (734 - 523 - 119)/523 = 92/523
+            const padSideL = cardW * (119 / 523);
+            const padSideR = cardW * (92 / 523);
+
+            // Kontener szerszy o padding – poświata / bohater nieucięte z boków
+            area.style.left = `${aLeft - padSideL}px`;
             area.style.top = `${aTop}px`;
-            area.style.width = `${aW}px`;
+            area.style.width = `${aW + padSideL + padSideR}px`;
             area.style.height = `${areaH}px`;
             area.style.maxHeight = `${areaH}px`;
 
             area.style.overflowY = 'auto';
-            area.style.overflowX = 'visible';
+            area.style.overflowX = 'hidden';
             area.style.display = 'flex';
             area.style.flexWrap = 'wrap';
             area.style.alignContent = 'flex-start';
             area.style.justifyContent = 'flex-start';
             area.style.paddingTop = `${padTop}px`;
             area.style.paddingBottom = `${padBottom}px`;
-            area.style.paddingLeft = '0';
-            area.style.paddingRight = '0';
+            area.style.paddingLeft = `${padSideL}px`;
+            area.style.paddingRight = `${padSideR}px`;
             area.style.gap = `${gapY}px ${gapX}px`;
             area.style.boxSizing = 'border-box';
 
@@ -450,7 +457,7 @@ export function updatePositionsAndScaling() {
                 card.style.fontSize = `${cardW / 12}px`;
             });
 
-            // 1 tick kółka = 1 rząd (pkt 3 / 11)
+            // 1 tick kółka = 1 rząd
             if (!area._rowWheelBound) {
                 area._rowWheelBound = true;
                 area.addEventListener('wheel', (e) => {
