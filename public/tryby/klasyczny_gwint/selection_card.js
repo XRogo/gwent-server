@@ -212,6 +212,19 @@ function displayCards(filter = 'all', area, playerFaction, cardList, isLargeView
             availableCount
         });
 
+        // Poświata POD warstwami karty (pkt 6) – nie zmienia rozmiaru karty
+        const podsw = document.createElement('img');
+        podsw.src = 'assets/dkarty/podsw.webp';
+        podsw.className = 'selection-podsw';
+        podsw.alt = '';
+        cardElement.insertBefore(podsw, cardElement.firstChild);
+
+        const podsw2 = document.createElement('img');
+        podsw2.src = 'assets/dkarty/podsw2.webp';
+        podsw2.className = 'selection-podsw2';
+        podsw2.alt = '';
+        cardElement.insertBefore(podsw2, cardElement.firstChild);
+
         cardElement.onclick = () => {
             if (area.classList.contains('collection')) window.addCardToDeck(card.numer);
             else window.removeCardFromDeck(card.numer);
@@ -375,45 +388,98 @@ export function updatePositionsAndScaling() {
     const deckArea = document.querySelector('.card-area.deck');
 
     if (collectionArea || deckArea) {
-        const SCROLLBAR_BASE_4K = 25;
-        const PADDING_BASE_4K = 5;
-        const GAP_BASE_4K = 34;
-        const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
-        const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
-        const PADDING_TOP = (10 / GUI_HEIGHT) * backgroundHeight;
-        const PADDING_BOTTOM = (20 / GUI_HEIGHT) * backgroundHeight;
+        // --- pkt 5: obszary + karta 377x710 (4K), 2 rzędy widoczne ---
+        const CARD_W_4K = 377;
+        const CARD_H_4K = 710;
+        const GAP_4K = 30;
+        const PAD_TOP_4K = 15;
+        const PAD_BOTTOM_4K = 20; // ~20 px reszty
 
-        const cLeft = 366, cTop = 491, cRight = 1561;
-        const dLeft = 2290, dTop = 491, dRight = 3484;
+        // 15 + 710 + 30 + 710 + 20 = 1485 → dokładnie 2 rzędy
+        const AREA_H_4K = PAD_TOP_4K + CARD_H_4K + GAP_4K + CARD_H_4K + PAD_BOTTOM_4K;
 
-        const areaWidth = ((cRight - cLeft) / GUI_WIDTH) * backgroundWidth;
-        const effectiveWidth = areaWidth - ((SCROLLBAR_BASE_4K / GUI_WIDTH) * backgroundWidth) - ((PADDING_BASE_4K / GUI_WIDTH) * backgroundWidth);
-        const cardWidth = (effectiveWidth - (2 * GAP_X)) / 3;
-        const cardHeight = cardWidth / (523 / 992);
+        const cLeft = 365, cTop = 475, cRight = 1561;
+        const dLeft = 2288, dTop = 475, dRight = 3484;
 
-        const newAreaHeight = PADDING_TOP + (cardHeight * 2) + GAP_Y + PADDING_BOTTOM;
+        const scaleW = backgroundWidth / GUI_WIDTH;
+        const scaleH = backgroundHeight / GUI_HEIGHT;
 
-        if (collectionArea) {
-            const aLeft = backgroundLeft + (cLeft / GUI_WIDTH) * backgroundWidth;
-            const aTop = backgroundTop + (cTop / GUI_HEIGHT) * backgroundHeight;
-            collectionArea.style.left = `${aLeft}px`;
-            collectionArea.style.top = `${aTop}px`;
-            collectionArea.style.width = `${areaWidth}px`;
-            collectionArea.style.height = `${newAreaHeight}px`;
-            collectionArea.style.maxHeight = `${newAreaHeight}px`;
-            updateCardArea(collectionArea, areaWidth, newAreaHeight, backgroundWidth, backgroundHeight);
-        }
+        const cardW = CARD_W_4K * scaleW;
+        const cardH = CARD_H_4K * scaleH;
+        const gapX = GAP_4K * scaleW;
+        const gapY = GAP_4K * scaleH;
+        const padTop = PAD_TOP_4K * scaleH;
+        const padBottom = PAD_BOTTOM_4K * scaleH;
+        const areaH = AREA_H_4K * scaleH;
 
-        if (deckArea) {
-            const aLeft = backgroundLeft + (dLeft / GUI_WIDTH) * backgroundWidth;
-            const aTop = backgroundTop + (dTop / GUI_HEIGHT) * backgroundHeight;
-            deckArea.style.left = `${aLeft}px`;
-            deckArea.style.top = `${aTop}px`;
-            deckArea.style.width = `${areaWidth}px`;
-            deckArea.style.height = `${newAreaHeight}px`;
-            deckArea.style.maxHeight = `${newAreaHeight}px`;
-            updateCardArea(deckArea, areaWidth, newAreaHeight, backgroundWidth, backgroundHeight);
-        }
+        const setupArea = (area, left4k, top4k, right4k) => {
+            if (!area) return;
+            const aLeft = backgroundLeft + left4k * scaleW;
+            const aTop = backgroundTop + top4k * scaleH;
+            const aW = (right4k - left4k) * scaleW;
+
+            area.style.left = `${aLeft}px`;
+            area.style.top = `${aTop}px`;
+            area.style.width = `${aW}px`;
+            area.style.height = `${areaH}px`;
+            area.style.maxHeight = `${areaH}px`;
+
+            area.style.overflowY = 'auto';
+            area.style.overflowX = 'visible';
+            area.style.display = 'flex';
+            area.style.flexWrap = 'wrap';
+            area.style.alignContent = 'flex-start';
+            area.style.justifyContent = 'flex-start';
+            area.style.paddingTop = `${padTop}px`;
+            area.style.paddingBottom = `${padBottom}px`;
+            area.style.paddingLeft = '0';
+            area.style.paddingRight = '0';
+            area.style.gap = `${gapY}px ${gapX}px`;
+            area.style.boxSizing = 'border-box';
+
+            area.querySelectorAll('.card').forEach(card => {
+                card.style.width = `${cardW}px`;
+                card.style.height = `${cardH}px`;
+                card.style.margin = '0';
+                card.style.padding = '0';
+                card.style.boxSizing = 'border-box';
+                card.style.flex = `0 0 ${cardW}px`;
+                card.style.maxWidth = `${cardW}px`;
+                card.style.position = 'relative';
+                card.style.overflow = 'visible';
+                card.style.fontSize = `${cardW / 12}px`;
+            });
+
+            // 1 tick kółka = 1 rząd (pkt 3 / 11)
+            if (!area._rowWheelBound) {
+                area._rowWheelBound = true;
+                area.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const rowStep = cardH + gapY;
+                    area.scrollTop += (e.deltaY > 0 ? rowStep : -rowStep);
+                }, { passive: false });
+            }
+
+            if (area.dataset.savedScrollTop) {
+                area.scrollTop = parseFloat(area.dataset.savedScrollTop);
+                delete area.dataset.savedScrollTop;
+            }
+        };
+
+        setupArea(collectionArea, cLeft, cTop, cRight);
+        setupArea(deckArea, dLeft, dTop, dRight);
+
+        // --- pkt 3: suwaki ---
+        setupSelectionScrollbar(
+            collectionArea, 'scrollbar-collection',
+            1592, 482, 1641, 1954,
+            backgroundLeft, backgroundTop, scaleW, scaleH
+        );
+        setupSelectionScrollbar(
+            deckArea, 'scrollbar-deck',
+            3522, 482, 3570, 1953,
+            backgroundLeft, backgroundTop, scaleW, scaleH
+        );
     }
 
     const faction = factions[currentPage - 1];
@@ -715,47 +781,63 @@ export function updatePositionsAndScaling() {
     }
 }
 
-function updateCardArea(area, areaWidth, areaHeight, backgroundWidth, backgroundHeight) {
-    const COLS = 3;
-    const GAP_BASE_4K = 34;
-    const GAP_X = (GAP_BASE_4K / GUI_WIDTH) * backgroundWidth;
-    const GAP_Y = (30 / GUI_HEIGHT) * backgroundHeight;
-    const SCROLLBAR_BASE_4K = 25;
-    const SCROLLBAR_WIDTH = (SCROLLBAR_BASE_4K / GUI_WIDTH) * backgroundWidth;
-    const PADDING_BASE_4K = 5;
-    const PADDING_LEFT = (PADDING_BASE_4K / GUI_WIDTH) * backgroundWidth;
+/** Suwak przewijania (pkt 3) – zawsze widoczny, płynne przeciąganie */
+function setupSelectionScrollbar(area, id, trackL, trackT, trackR, trackB, bgLeft, bgTop, scaleW, scaleH) {
+    if (!area) return;
 
-    const effectiveWidth = areaWidth - SCROLLBAR_WIDTH - PADDING_LEFT;
-    let cardWidth = (effectiveWidth - (2 * GAP_X)) / COLS;
+    let bar = document.getElementById(id);
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = id;
+        bar.className = 'selection-scrollbar';
+        document.body.appendChild(bar);
+    }
 
-    area.style.overflowY = 'auto';
-    area.style.overflowX = 'hidden';
-    area.style.display = 'flex';
-    area.style.flexWrap = 'wrap';
-    area.style.alignContent = 'flex-start';
-    area.style.justifyContent = 'flex-start';
-    area.style.paddingLeft = `${PADDING_LEFT}px`;
-    area.style.paddingRight = `${SCROLLBAR_WIDTH}px`;
-    area.style.paddingTop = `${(10 / GUI_HEIGHT) * backgroundHeight}px`;
-    area.style.paddingBottom = `${(20 / GUI_HEIGHT) * backgroundHeight}px`;
-    area.style.gap = `${GAP_Y}px ${GAP_X}px`;
+    const barW = 49 * scaleW;
+    const barH = 114 * scaleH;
+    const trackX = bgLeft + trackL * scaleW;
+    const trackY = bgTop + trackT * scaleH;
+    const trackH = (trackB - trackT) * scaleH;
+    const maxTravel = Math.max(0, trackH - barH);
 
-    area.querySelectorAll('.card').forEach(card => {
-        card.style.width = `${cardWidth}px`;
-        const aspectRatio = 523 / 992;
-        const cardHeight = cardWidth / aspectRatio;
-        card.style.height = `${cardHeight}px`;
-        card.style.margin = '0';
-        card.style.padding = '0';
-        card.style.boxSizing = 'border-box';
-        card.style.flex = `0 0 ${cardWidth}px`;
-        card.style.maxWidth = `${cardWidth}px`;
-        card.style.fontSize = `${cardWidth / 12}px`;
-    });
+    bar.style.width = `${barW}px`;
+    bar.style.height = `${barH}px`;
+    bar.style.left = `${trackX}px`;
+    bar.style.display = 'block';
 
-    if (area.dataset.savedScrollTop) {
-        area.scrollTop = parseFloat(area.dataset.savedScrollTop);
-        delete area.dataset.savedScrollTop;
+    const syncBar = () => {
+        const maxScroll = area.scrollHeight - area.clientHeight;
+        const ratio = maxScroll > 0 ? (area.scrollTop / maxScroll) : 0;
+        bar.style.top = `${trackY + ratio * maxTravel}px`;
+    };
+
+    area.removeEventListener('scroll', area._sbScroll);
+    area._sbScroll = syncBar;
+    area.addEventListener('scroll', syncBar);
+    syncBar();
+
+    let dragging = false;
+    let startY = 0;
+    let startScroll = 0;
+
+    bar.onpointerdown = (e) => {
+        e.preventDefault();
+        dragging = true;
+        startY = e.clientY;
+        startScroll = area.scrollTop;
+        try { bar.setPointerCapture(e.pointerId); } catch (_) {}
+    };
+
+    if (!bar._sbMoveBound) {
+        bar._sbMoveBound = true;
+        window.addEventListener('pointermove', (e) => {
+            if (!dragging) return;
+            const maxScroll = area.scrollHeight - area.clientHeight;
+            if (maxScroll <= 0 || maxTravel <= 0) return;
+            const dy = e.clientY - startY;
+            area.scrollTop = Math.max(0, Math.min(maxScroll, startScroll + (dy / maxTravel) * maxScroll));
+        });
+        window.addEventListener('pointerup', () => { dragging = false; });
     }
 }
 
@@ -764,4 +846,3 @@ export function getSelectedLeader() { return selectedLeader; }
 export function getUnitCardCount() {
     return deck.filter(c => typeof c.punkty === 'number').length;
 }
-

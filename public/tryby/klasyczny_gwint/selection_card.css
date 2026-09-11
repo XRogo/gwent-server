@@ -182,3 +182,62 @@
     color: #ff1a1a;
     margin: 0 4px;
 }
+/* Boki otwarte – poświata / bohater nieucięte z boków */
+.card-area.collection,
+.card-area.deck {
+    overflow-x: visible;
+    overflow-y: auto;
+}
+
+/* Karta – poświata nie zmienia rozmiaru */
+.card-area .card {
+    position: relative;
+    overflow: visible;
+}
+
+/* Poświata POD wszystkimi warstwami karty (jak w powiększeniu) */
+.card-area .card .selection-podsw,
+.card-area .card .selection-podsw2 {
+    position: absolute;
+    left: 0.2%;
+    top: 1.2%;
+    width: 100.1%;
+    height: 89.5%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 0; /* pod .card-content (z-index: 10) */
+}
+
+.card-area .card .selection-podsw2 {
+    z-index: 1;
+}
+
+.card-area .card:hover .selection-podsw,
+.card-area .card:hover .selection-podsw2 {
+    opacity: 1;
+}
+
+.card-area .card:hover .selection-podsw2 {
+    animation: powiek-pulse 1.5s infinite;
+}
+
+/* Upewnij się, że zawartość karty jest nad poświatą */
+.card-area .card .card-content {
+    position: relative;
+    z-index: 10;
+}
+
+/* Suwak */
+.selection-scrollbar {
+    position: absolute;
+    background: url('assets/wybor/suwak.webp') no-repeat center;
+    background-size: contain;
+    cursor: grab;
+    z-index: 40;
+    pointer-events: auto;
+    user-select: none;
+    touch-action: none;
+}
+.selection-scrollbar:active {
+    cursor: grabbing;
+}
