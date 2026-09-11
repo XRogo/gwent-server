@@ -112,7 +112,7 @@ const cards = [
 
 
     //neutralne=============================================================================================================================================================
-//geralt z rivi
+//"Geralt z Rivi"
     {
         nazwa: "Geralt z Rivi",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/geralt_z_rivi.webp",
@@ -127,7 +127,7 @@ const cards = [
         ilosc: 1,
         numer: "009"
     },
-//Ciri
+//"Ciri"
     {
         nazwa: "Ciri",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/ciri.webp",
@@ -142,7 +142,7 @@ const cards = [
         ilosc: 1,
         numer: "010"
     },
-//yennefer z vengerbergu
+//"Yennefer z Vengerbergu"
     {
         nazwa: "Yennefer z Vengerbergu",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/yenneder_z_vengerbergu.webp",
@@ -156,7 +156,7 @@ const cards = [
         ilosc: 1,
         numer: "011"
     },
-//triss merigold
+//"Triss Merigold"
     {
         nazwa: "Triss Merigold",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/triss.webp",
@@ -169,7 +169,7 @@ const cards = [
         ilosc: 1,
         numer: "012"
     },
-//villentretenmerth
+//"Villentretenmerth"
     {
         nazwa: "Villentretenmerth",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/villentretenmerth.webp",
@@ -183,7 +183,7 @@ const cards = [
         ilosc: 1,
         numer: "013"
     },
-//vesemir
+//"Vesemir"
     {
         nazwa: "Vesemir",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/vesemir.webp",
@@ -196,7 +196,7 @@ const cards = [
         ilosc: 1,
         numer: "014"
     },
-//olgierd von everec
+//"Olgierd von Everec"
     {
         nazwa: "Olgierd von Everec",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/olgierd_von_everec.webp",
@@ -210,7 +210,7 @@ const cards = [
         ilosc: 1,
         numer: "015"
     },
-//zoltan chivay
+//"Zoltan Chivay"
     {
         nazwa: "Zoltan Chivay",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/zoltan_chivay.webp",
@@ -223,7 +223,7 @@ const cards = [
         ilosc: 1,
         numer: "016"
     },
-//emiel regis rohellec terzieff
+//"Emiel Regis Rohellec Terzieff"
     {
         nazwa: "Emiel Regis Rohellec Terzieff",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/emirl_regis_rohellec_terzieff.webp",
@@ -236,7 +236,7 @@ const cards = [
         ilosc: 1,
         numer: "017"
     },
-//guanter o'dim cień
+//"Guanter O'Dim: Cień"
     {
         nazwa: "Guanter O'Dim: Cień",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/gaunter_o'dim_cien.webp",
@@ -251,7 +251,7 @@ const cards = [
         ilosc: 3,
         numer: "018"
     },
-//guanter o'dim
+//"Guanter O'Dim"
     {
         nazwa: "Guanter O'Dim",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/gaunter_o'dim.webp",
@@ -266,7 +266,7 @@ const cards = [
         ilosc: 1,
         numer: "019"
     },
-//płotka
+//"Płotka"
     {
         nazwa: "Płotka",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/plotka.webp",
@@ -279,7 +279,7 @@ const cards = [
         ilosc: 1,
         numer: "020"
     },
-//jaskier
+//"Jaskier"
     {
         nazwa: "Jaskier",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/jaskier.webp",
@@ -293,7 +293,7 @@ const cards = [
         ilosc: 1,
         numer: "021"
     },
-//tajemniczy elf
+//"Tajemniczy elf"
     {
         nazwa: "Tajemniczy elf",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/tajemniczy_elf.webp",
@@ -307,7 +307,7 @@ const cards = [
         ilosc: 1,
         numer: "022"
     },
-//krowa
+//"Krowa"
     {
         nazwa: "Krowa",
         karta: "/tryby/klasyczny_gwint/assets/karty/niezalerzne/krowa.webp",
@@ -324,7 +324,7 @@ const cards = [
     },
 
     //polnoc==============================================================================================================================================================
-//vernon roche
+//"Vernon Roche"
     {
         nazwa: "Vernon Roche",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/vernon_rosh.webp",
@@ -337,7 +337,7 @@ const cards = [
         ilosc: 1,
         numer: "101"
     },
-//Jan natalis
+//"Jan Natalis"
     {
         nazwa: "Jan Natalis",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/jan_natalis.webp",
@@ -350,7 +350,7 @@ const cards = [
         ilosc: 1,
         numer: "102"
     },
-//esterad thyssen   
+//"Esterad Thyssen"
     {
         nazwa: "Esterad Thyssen",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/esterad_thyssen.webp",
@@ -363,7 +363,7 @@ const cards = [
         ilosc: 1,
         numer: "103"
     },
-//philippa eilhard
+//"Philippa Eilhart"
     {
         nazwa: "Philippa Eilhart",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/philippa_eilhart.webp",
@@ -376,7 +376,7 @@ const cards = [
         ilosc: 1,
         numer: "104"
     },
-//katapulta
+//"Katapulta"
     {
         nazwa: "Katapulta",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/katapulta.webp",
@@ -390,7 +390,7 @@ const cards = [
         ilosc: 2,
         numer: "105"
     },
-//detmold
+//"Detmold"
     {
         nazwa: "Detmold",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/detmold.webp",
@@ -403,7 +403,7 @@ const cards = [
         ilosc: 1,
         numer: "106"
     },
-//trebusz
+//"Trebusz"
     {
         nazwa: "Trebusz",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/trebusz2.webp",
@@ -416,7 +416,7 @@ const cards = [
         ilosc: 1,
         numer: "107"
     },
-//trebusz 2
+//"Trebusz"
     {
         nazwa: "Trebusz",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/trebusz1.webp",
@@ -429,7 +429,7 @@ const cards = [
         ilosc: 1,
         numer: "108"
     },
-//balista
+//"Balista"
     {
         nazwa: "Balista",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/balista1.webp",
@@ -442,7 +442,7 @@ const cards = [
         ilosc: 1,
         numer: "109"
     },
-//balista 2
+//"Balista"
     {
         nazwa: "Balista",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/balista.webp",
@@ -455,7 +455,7 @@ const cards = [
         ilosc: 1,
         numer: "110"
     },
-//wieża oblężnicza
+//"Wieża oblężnicza"
     {
         nazwa: "Wieża oblężnicza",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/wieza_obleznicza.webp",
@@ -468,7 +468,7 @@ const cards = [
         ilosc: 1,
         numer: "111"
     },
-//ves
+//"Ves"
     {
         nazwa: "Ves",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/ves.webp",
@@ -481,7 +481,7 @@ const cards = [
         ilosc: 1,
         numer: "112"
     },
-//zygfryd z denesle
+//"Zygfryd z Denesle"
     {
         nazwa: "Zygfryd z Denesle",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/zygfryd_z_denesle.webp",
@@ -494,7 +494,7 @@ const cards = [
         ilosc: 1,
         numer: "113"
     },
-//keira metz
+//"Keira Metz"
     {
         nazwa: "Keira Metz",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/keira_metz.webp",
@@ -507,7 +507,7 @@ const cards = [
         ilosc: 1,
         numer: "114"
     },
-//sheala de tancarville
+//"Sheala de Tancarville"
     {
         nazwa: "Sheala de Tancarville",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sheale_de_tancarville.webp",
@@ -520,7 +520,7 @@ const cards = [
         ilosc: 1,
         numer: "115"
     },
-//książe stenis
+//"Książe Stenis"
     {
         nazwa: "Książe Stenis",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/ksiaze_stennis.webp",
@@ -534,7 +534,7 @@ const cards = [
         ilosc: 1,
         numer: "116"
     },
-//rębacze z crinfrid
+//"Rębacze z Crinfrid"
     {
         nazwa: "Rębacze z Crinfrid",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/rebacze_z_crinfrid.webp",
@@ -548,7 +548,7 @@ const cards = [
         ilosc: 3,
         numer: "117"
     },
-//medyczka burej chorągwi
+//"Medyczka Burej Chorągwi"
     {
         nazwa: "Medyczka Burej Chorągwi",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/medyczka_burej_choragwi.webp",
@@ -562,7 +562,7 @@ const cards = [
         ilosc: 1,
         numer: "118"
     },
-//sigismund dijkstra
+//"Sigismund Dijkstra"
     {
         nazwa: "Sigismund Dijkstra",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sigismund_dijkstra.webp",
@@ -576,7 +576,7 @@ const cards = [
         ilosc: 1,
         numer: "119"
     },
-//sabrina glebissig
+//"Sabrina Glebissig"
     {
         nazwa: "Sabrina Glebissig",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sabrina_glevissig.webp",
@@ -589,7 +589,7 @@ const cards = [
         ilosc: 1,
         numer: "120"
     },
-//sheldon skaggs
+//"Sheldon Skaggs"
     {
         nazwa: "Sheldon Skaggs",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/sheldon_skaggs.webp",
@@ -602,7 +602,7 @@ const cards = [
         ilosc: 1,
         numer: "121"
     },
-//komandos niebieskich pasów
+//"Komandos Niebieskich Pasów"
     {
         nazwa: "Komandos Niebieskich Pasów",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/komandos_niebieskich_pasow.webp",
@@ -616,7 +616,7 @@ const cards = [
         ilosc: 3,
         numer: "122"
     },
-//yarpen zigrin
+//"Yarpen Zigrin"
     {
         nazwa: "Yarpen Zigrin",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/yarpen_zigrin.webp",
@@ -629,7 +629,7 @@ const cards = [
         ilosc: 1,
         numer: "123"
     },
-//talar
+//"Talar"
     {
         nazwa: "Talar",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/talar.webp",
@@ -643,7 +643,7 @@ const cards = [
         ilosc: 1,
         numer: "124"
     },
-
+//"Biedna Pierdolona Piechota"
     {
         nazwa: "Biedna Pierdolona Piechota",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/biedna_pierdolona_piechota.webp",
@@ -657,7 +657,7 @@ const cards = [
         ilosc: 4,
         numer: "125"
     },
-
+//"Redański piechur"
     {
         nazwa: "Redański piechur",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/redanski_piechur.webp",
@@ -670,7 +670,7 @@ const cards = [
         ilosc: 1,
         numer: "126"
     },
-
+//"Redański piechur"
     {
         nazwa: "Redański piechur",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/redanski_piechur2.webp",
@@ -683,7 +683,7 @@ const cards = [
         ilosc: 1,
         numer: "127"
     },
-
+//"Mistrz Oblężeń z Kaedwen"
     {
         nazwa: "Mistrz Oblężeń z Kaedwen",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/mistrz_oblezen_z_kaedwen.webp",
@@ -699,7 +699,7 @@ const cards = [
     },
 
     //nilfgard========================================================================================================================================================
-
+//"Letho z Gulety"
     {
         nazwa: "Letho z Gulety",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/letho_z_gulety.webp",
@@ -712,7 +712,7 @@ const cards = [
         ilosc: 1,
         numer: "201"
     },
-
+//"Menno Coehoorn"
     {
         nazwa: "Menno Coehoorn",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/menno_coehoorn.webp",
@@ -726,7 +726,7 @@ const cards = [
         ilosc: 1,
         numer: "202"
     },
-
+//"Morvran Voorhis"
     {
         nazwa: "Morvran Voorhis",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/morvran_voorhis.webp",
@@ -739,7 +739,7 @@ const cards = [
         ilosc: 1,
         numer: "203"
     },
-
+//"Tibor Eggebracht"
     {
         nazwa: "Tibor Eggebracht",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/tibor_eggebracht.webp",
@@ -752,10 +752,10 @@ const cards = [
         ilosc: 1,
         numer: "204"
     },
-
+//"Nilfgaardzki łucznik"
     {
         nazwa: "Nilfgaardzki łucznik",
-        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/error.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/nilfgaardzki_locznik_1.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/3/205.webp",
         opis: '"Zawsze celuję w kolano".',
         bohater: false,
@@ -765,10 +765,10 @@ const cards = [
         ilosc: 1,
         numer: "205"
     },
-
+//"Nilfgaardzki łucznik"
     {
         nazwa: "Nilfgaardzki łucznik",
-        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/nilfgaardzki-lucznik.webp",
+        karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/nilfgaardzki-lucznik_2.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/3/206.webp",
         opis: '"Zawsze celuję w kolano".',
         bohater: false,
@@ -778,7 +778,7 @@ const cards = [
         ilosc: 1,
         numer: "206"
     },
-
+//"Wielki Ognisty Skorpion"
     {
         nazwa: "Wielki Ognisty Skorpion",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/wielki_ognisty_skorpion.webp",
@@ -791,7 +791,7 @@ const cards = [
         ilosc: 1,
         numer: "207"
     },
-
+//"Stefan Skellen"
     {
         nazwa: "Stefan Skellen",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/stefan_skellen.webp",
@@ -805,7 +805,7 @@ const cards = [
         ilosc: 1,
         numer: "208"
     },
-
+//"Shilard Fitz-Oesterlen"
     {
         nazwa: "Shilard Fitz-Oesterlen",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/shilard_fitz-oesterlen.webp",
@@ -819,7 +819,7 @@ const cards = [
         ilosc: 1,
         numer: "209"
     },
-
+//"Assire var Anahid"
     {
         nazwa: "Assire var Anahid",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/assire_var_anachid.webp",
@@ -832,7 +832,7 @@ const cards = [
         ilosc: 1,
         numer: "210"
     },
-
+//"Fringilla Vigo"
     {
         nazwa: "Fringilla Vigo",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/fringilla_vigo.webp",
@@ -845,7 +845,7 @@ const cards = [
         ilosc: 1,
         numer: "211"
     },
-
+//"Cahir Mawr Dyffryn aep Ceallach"
     {
         nazwa: "Cahir Mawr Dyffryn aep Ceallach",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/cahir_mawr_dyffryn_aep_ceallach.webp",
@@ -858,7 +858,7 @@ const cards = [
         ilosc: 1,
         numer: "212"
     },
-
+//"Saper"
     {
         nazwa: "Saper",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/saper.webp",
@@ -871,7 +871,7 @@ const cards = [
         ilosc: 1,
         numer: "213"
     },
-
+//"Renuald aep Matsen"
     {
         nazwa: "Renuald aep Matsen",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/renuald_aep_matsen.webp",
@@ -884,7 +884,7 @@ const cards = [
         ilosc: 1,
         numer: "214"
     },
-
+//"Zerrikański Ognisty Skorpion"
     {
         nazwa: "Zerrikański Ognisty Skorpion",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/zerrikanski_ognisty_skorpion.webp",
@@ -897,7 +897,7 @@ const cards = [
         ilosc: 1,
         numer: "215"
     },
-
+//"Młody emisariusz"
     {
         nazwa: "Młody emisariusz",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/mlody_emisariusz.webp",
@@ -912,7 +912,7 @@ const cards = [
         ilosc: 1,
         numer: "216"
     },
-
+//"Młody emisariusz"
     {
         nazwa: "Młody emisariusz",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/mlody_emisariusz2.webp",
@@ -927,7 +927,7 @@ const cards = [
         ilosc: 1,
         numer: "217"
     },
-
+//"Cynthia"
     {
         nazwa: "Cynthia",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/cynthia.webp",
@@ -940,7 +940,7 @@ const cards = [
         ilosc: 1,
         numer: "218"
     },
-
+//"Rainfarn"
     {
         nazwa: "Rainfarn",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/rainfarn.webp",
@@ -953,7 +953,7 @@ const cards = [
         ilosc: 1,
         numer: "219"
     },
-
+//"Vanhemar"
     {
         nazwa: "Vanhemar",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/vanhemar.webp",
@@ -966,7 +966,7 @@ const cards = [
         ilosc: 1,
         numer: "220"
     },
-
+//"Vattier de Rideaux"
     {
         nazwa: "Vattier de Rideaux",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/vattier_de_rideaux.webp",
@@ -980,7 +980,7 @@ const cards = [
         ilosc: 1,
         numer: "221"
     },
-
+//"Moeteisen"
     {
         nazwa: "Moeteisen",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/mortiesen.webp",
@@ -993,7 +993,7 @@ const cards = [
         ilosc: 1,
         numer: "222"
     },
-
+//"Zdezelowana mangonela"
     {
         nazwa: "Zdezelowana mangonela",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/zdezelowana_mangonela.webp",
@@ -1006,7 +1006,7 @@ const cards = [
         ilosc: 1,
         numer: "223"
     },
-
+//"Puttkammer"
     {
         nazwa: "Puttkammer",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/puttkammer.webp",
@@ -1019,7 +1019,7 @@ const cards = [
         ilosc: 1,
         numer: "224"
     },
-
+//"Brygada Impera"
     {
         nazwa: "Brygada Impera",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/brygada_impera.webp",
@@ -1033,7 +1033,7 @@ const cards = [
         ilosc: 4,
         numer: "225"
     },
-
+//"Albrich"
     {
         nazwa: "Albrich",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/albrich.webp",
@@ -1046,7 +1046,7 @@ const cards = [
         ilosc: 1,
         numer: "226"
     },
-
+//"Sweers"
     {
         nazwa: "Sweers",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/sweers.webp",
@@ -1059,7 +1059,7 @@ const cards = [
         ilosc: 1,
         numer: "227"
     },
-
+//"Vreemde"
     {
         nazwa: "Vreemde",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/vreemde.webp",
@@ -1072,7 +1072,7 @@ const cards = [
         ilosc: 1,
         numer: "228"
     },
-
+//"Kawaleria Nauzicaa"
     {
         nazwa: "Kawaleria Nauzicaa",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/kawaleria_nauzicaa.webp",
@@ -1086,7 +1086,7 @@ const cards = [
         ilosc: 3,
         numer: "229"
     },
-
+//"Wsparcie łuczników"
     {
         nazwa: "Wsparcie łuczników",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/wsparcie_lucznikow2.webp",
@@ -1100,7 +1100,7 @@ const cards = [
         ilosc: 1,
         numer: "230"
     },
-
+//"Wsparcie łuczników"
     {
         nazwa: "Wsparcie łuczników",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/wsparcie_lucznikow.webp",
@@ -1114,7 +1114,7 @@ const cards = [
         ilosc: 1,
         numer: "231"
     },
-
+//"Wsparcie oblężnicze"
     {
         nazwa: "Wsparcie oblężnicze",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/wsparcie_obleznicze.webp",
@@ -1130,7 +1130,7 @@ const cards = [
     },
 
     //wiwwiury============================================================================================================================================================
-
+//"Eithné"
     {
         nazwa: "Eithné",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/eithne.webp",
@@ -1143,7 +1143,7 @@ const cards = [
         ilosc: 1,
         numer: "301"
     },
-
+//"Saesenthessis"
     {
         nazwa: "Saesenthessis",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/saesenthessis.webp",
@@ -1156,7 +1156,7 @@ const cards = [
         ilosc: 1,
         numer: "302"
     },
-
+//"Isengrim Faoiltiarna"
     {
         nazwa: "Isengrim Faoiltiarna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/isengrim_faoiltiarna.webp",
@@ -1170,7 +1170,7 @@ const cards = [
         ilosc: 1,
         numer: "303"
     },
-
+//"Iorveth"
     {
         nazwa: "Iorveth",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/iorwet.webp",
@@ -1183,7 +1183,7 @@ const cards = [
         ilosc: 1,
         numer: "304"
     },
-
+//"Milva"
     {
         nazwa: "Milva",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/milva.webp",
@@ -1197,7 +1197,7 @@ const cards = [
         ilosc: 1,
         numer: "305"
     },
-
+//"Schirrú"
     {
         nazwa: "Schirrú",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/schirru.webp",
@@ -1211,7 +1211,7 @@ const cards = [
         ilosc: 1,
         numer: "306"
     },
-
+//"Dennis Cranmer"
     {
         nazwa: "Dennis Cranmer",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/dennis_cranmer.webp",
@@ -1224,7 +1224,7 @@ const cards = [
         ilosc: 1,
         numer: "307"
     },
-
+//"Ida Emean aep Sivney"
     {
         nazwa: "Ida Emean aep Sivney",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/ida_emean_aep_sivney.webp",
@@ -1237,7 +1237,7 @@ const cards = [
         ilosc: 1,
         numer: "308"
     },
-
+//"Filavandrel aén Fidháil"
     {
         nazwa: "Filavandrel aén Fidháil",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/filavandrel_aen_fidhail.webp",
@@ -1250,7 +1250,7 @@ const cards = [
         ilosc: 1,
         numer: "309"
     },
-
+//"Yaevinn"
     {
         nazwa: "Yaevinn",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/yaevinn.webp",
@@ -1263,7 +1263,7 @@ const cards = [
         ilosc: 1,
         numer: "310"
     },
-
+//"Barcayl Els"
     {
         nazwa: "Barcayl Els",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/barclay_els.webp",
@@ -1276,7 +1276,7 @@ const cards = [
         ilosc: 1,
         numer: "311"
     },
-
+//"Zwiadowca z Dol Blathanna"
     {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/zwiadowca_z_dol_blathanna3.webp",
@@ -1289,7 +1289,7 @@ const cards = [
         ilosc: 1,
         numer: "312"
     },
-
+//"Zwiadowca z Dol Blathanna"
     {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/zwiadowca_z_dol_blathanna.webp",
@@ -1302,7 +1302,7 @@ const cards = [
         ilosc: 1,
         numer: "313"
     },
-
+//"Zwiadowca z Dol Blathanna"
     {
         nazwa: "Zwiadowca z Dol Blathanna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/zwiadowca_z_dol_blathanna2.webp",
@@ -1315,7 +1315,7 @@ const cards = [
         ilosc: 1,
         numer: "314"
     },
-
+//"Hevekarskie wsparcie"
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/havekarskie_wsparcie3.webp",
@@ -1330,7 +1330,7 @@ const cards = [
         ilosc: 1,
         numer: "315"
     },
-
+//"Hevekarskie wsparcie"
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/havekarskie_wsparcie.webp",
@@ -1345,7 +1345,7 @@ const cards = [
         ilosc: 1,
         numer: "316"
     },
-
+//"Hevekarskie wsparcie"
     {
         nazwa: "Hevekarskie wsparcie",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/havekarskie_wsparcie2.webp",
@@ -1360,7 +1360,7 @@ const cards = [
         ilosc: 1,
         numer: "317"
     },
-
+//"Bryada Vrihedd"
     {
         nazwa: "Bryada Vrihedd",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/brygada_vrihedd2.webp",
@@ -1373,7 +1373,7 @@ const cards = [
         ilosc: 1,
         numer: "318"
     },
-
+//"Bryada Vrihedd"
     {
         nazwa: "Bryada Vrihedd",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/brygada_vrihedd.webp",
@@ -1386,7 +1386,7 @@ const cards = [
         ilosc: 1,
         numer: "319"
     },
-
+//"Obrońcy Mahakamu"
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/obronca_mahakamu.webp",
@@ -1399,7 +1399,7 @@ const cards = [
         ilosc: 1,
         numer: "320"
     },
-
+//"Obrońcy Mahakamu"
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/obronca_mahakamu2.webp",
@@ -1412,7 +1412,7 @@ const cards = [
         ilosc: 1,
         numer: "321"
     },
-
+//"Obrońcy Mahakamu"
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/obronca_mahakamu3.webp",
@@ -1425,7 +1425,7 @@ const cards = [
         ilosc: 1,
         numer: "322"
     },
-
+//"Obrońcy Mahakamu"
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/obronca_mahakamu5.webp",
@@ -1438,7 +1438,7 @@ const cards = [
         ilosc: 1,
         numer: "323"
     },
-
+//"Obrońcy Mahakamu"
     {
         nazwa: "Obrońcy Mahakamu",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/obronca_mahakamu4.webp",
@@ -1451,7 +1451,7 @@ const cards = [
         ilosc: 1,
         numer: "324"
     },
-
+//"Kadet Vrihedd"
     {
         nazwa: "Kadet Vrihedd",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/kadet_vrihedd.webp",
@@ -1464,7 +1464,7 @@ const cards = [
         ilosc: 1,
         numer: "325"
     },
-
+//"Łucznik z Dol Blathanna"
     {
         nazwa: "Łucznik z Dol Blathanna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/lucznik_z_blathanna.webp",
@@ -1477,7 +1477,7 @@ const cards = [
         ilosc: 1,
         numer: "326"
     },
-
+//"Ciran aep Easnillien"
     {
         nazwa: "Ciran aep Easnillien",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/ciaran_aep_easnillien.webp",
@@ -1490,7 +1490,7 @@ const cards = [
         ilosc: 1,
         numer: "327"
     },
-
+//"Krasnolud Harcownik"
     {
         nazwa: "Krasnolud Harcownik",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/krasnolud_harcownik3.webp",
@@ -1505,7 +1505,7 @@ const cards = [
         ilosc: 1,
         numer: "328"
     },
-
+//"Krasnolud Harcownik"
     {
         nazwa: "Krasnolud Harcownik",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/krasnolud_harcownik2.webp",
@@ -1520,7 +1520,7 @@ const cards = [
         ilosc: 1,
         numer: "329"
     },
-
+//"Krasnolud Harcownik"
     {
         nazwa: "Krasnolud Harcownik",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/krasnolud_harcownik.webp",
@@ -1535,7 +1535,7 @@ const cards = [
         ilosc: 1,
         numer: "330"
     },
-
+//"Toruviel"
     {
         nazwa: "Toruviel",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/toruviel.webp",
@@ -1548,7 +1548,7 @@ const cards = [
         ilosc: 1,
         numer: "331"
     },
-
+//"Elfi harcownik"
     {
         nazwa: "Elfi harcownik",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/elfi_harcownik.webp",
@@ -1563,7 +1563,7 @@ const cards = [
         ilosc: 1,
         numer: "332"
     },
-
+//"Elfi harcownik"
     {
         nazwa: "Elfi harcownik",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/elfi_harcownik3.webp",
@@ -1578,7 +1578,7 @@ const cards = [
         ilosc: 1,
         numer: "333"
     },
-
+//"Elfi harcownik"
     {
         nazwa: "Elfi harcownik",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/elfi_harcownik2.webp",
@@ -1593,7 +1593,7 @@ const cards = [
         ilosc: 1,
         numer: "334"
     },
-
+//"Riordain"
     {
         nazwa: "Riordain",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/riordain.webp",
@@ -1606,7 +1606,7 @@ const cards = [
         ilosc: 1,
         numer: "335"
     },
-
+//"Havekarski medyk"
     {
         nazwa: "Havekarski medyk",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/havekarski_medyk3.webp",
@@ -1620,7 +1620,7 @@ const cards = [
         ilosc: 1,
         numer: "336"
     },
-
+//"Havekarski medyk"
     {
         nazwa: "Havekarski medyk",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/havekarski_medyk2.webp",
@@ -1634,7 +1634,7 @@ const cards = [
         ilosc: 1,
         numer: "337"
     },
-
+//"Havekarski medyk"
     {
         nazwa: "Havekarski medyk",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/havekarski_medyk.webp",
@@ -1650,7 +1650,7 @@ const cards = [
     },
 
     // powfory ==========================================================================================================================================================
-
+//"Draug"
     {
         nazwa: "Draug",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/draug.webp",
@@ -1663,7 +1663,7 @@ const cards = [
         ilosc: 1,
         numer: "401"
     },
-
+//"Imlerith"
     {
         nazwa: "Imlerith",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/imlerith.webp",
@@ -1676,7 +1676,7 @@ const cards = [
         ilosc: 1,
         numer: "402"
     },
-
+//"Leszy"
     {
         nazwa: "Leszy",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/leszy.webp",
@@ -1689,7 +1689,7 @@ const cards = [
         ilosc: 1,
         numer: "403"
     },
-
+//"Kejran"
     {
         nazwa: "Kejran",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/kejran.webp",
@@ -1703,7 +1703,7 @@ const cards = [
         ilosc: 1,
         numer: "404"
     },
-
+//"Królewicz ropuch"
     {
         nazwa: "Królewicz ropuch",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/krolewicz_ropuch.webp",
@@ -1717,7 +1717,7 @@ const cards = [
         ilosc: 1,
         numer: "405"
     },
-
+//"Żywiołak ziemi"
     {
         nazwa: "Żywiołak ziemi",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/zywiolak_ziemi.webp",
@@ -1730,7 +1730,7 @@ const cards = [
         ilosc: 1,
         numer: "406"
     },
-
+//"Bies"
     {
         nazwa: "Bies",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/bies.webp",
@@ -1743,7 +1743,7 @@ const cards = [
         ilosc: 1,
         numer: "407"
     },
-
+//"Żywiołak ognia"
     {
         nazwa: "Żywiołak ognia",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/zywiolak_ognia.webp",
@@ -1756,7 +1756,7 @@ const cards = [
         ilosc: 1,
         numer: "408"
     },
-
+//"Olbrzymi krabopająk"
     {
         nazwa: "Olbrzymi krabopająk",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/olbrzymi_krabopajak.webp",
@@ -1771,7 +1771,7 @@ const cards = [
         ilosc: 1,
         numer: "409"
     },
-
+//"Wiedzma: Kuchta"
     {
         nazwa: "Wiedzma: Kuchta",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wiedzma_kuchta.webp",
@@ -1786,7 +1786,7 @@ const cards = [
         ilosc: 1,
         numer: "410"
     },
-
+//"Wiedzma: Prządka"
     {
         nazwa: "Wiedzma: Prządka",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wiedzma_przadka.webp",
@@ -1801,7 +1801,7 @@ const cards = [
         ilosc: 1,
         numer: "411"
     },
-
+//"Wiedzma: Szepciucha"
     {
         nazwa: "Wiedzma: Szepciucha",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wiedzma_szepciucha.webp",
@@ -1816,7 +1816,7 @@ const cards = [
         ilosc: 1,
         numer: "412"
     },
-
+//"Widłogon"
     {
         nazwa: "Widłogon",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/widlogon.webp",
@@ -1829,7 +1829,7 @@ const cards = [
         ilosc: 1,
         numer: "413"
     },
-
+//"Morowa dziewica"
     {
         nazwa: "Morowa dziewica",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/morowa_dziewica.webp",
@@ -1842,7 +1842,7 @@ const cards = [
         ilosc: 1,
         numer: "414"
     },
-
+//"Gryf"
     {
         nazwa: "Gryf",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/gryf.webp",
@@ -1855,7 +1855,7 @@ const cards = [
         ilosc: 1,
         numer: "415"
     },
-
+//"Wilkołak"
     {
         nazwa: "Wilkołak",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wilkolak.webp",
@@ -1868,7 +1868,7 @@ const cards = [
         ilosc: 1,
         numer: "416"
     },
-
+//"Przeraza"
     {
         nazwa: "Przeraza",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/przeraza.webp",
@@ -1881,7 +1881,7 @@ const cards = [
         ilosc: 1,
         numer: "417"
     },
-
+//"Lodowy Gigant"
     {
         nazwa: "Lodowy Gigant",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/lodowt_gigant.webp",
@@ -1894,7 +1894,7 @@ const cards = [
         ilosc: 1,
         numer: "418"
     },
-
+//"Baba cmentarna"
     {
         nazwa: "Baba cmentarna",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/baba_cmentarna.webp",
@@ -1907,7 +1907,7 @@ const cards = [
         ilosc: 1,
         numer: "419"
     },
-
+//"Wampir: Katakan"
     {
         nazwa: "Wampir: Katakan",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wampir_katakan.webp",
@@ -1922,7 +1922,7 @@ const cards = [
         ilosc: 1,
         numer: "420"
     },
-
+//"Poroniec"
     {
         nazwa: "Poroniec",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/poroniec.webp",
@@ -1935,7 +1935,7 @@ const cards = [
         ilosc: 1,
         numer: "421"
     },
-
+//"Krabopająk"
     {
         nazwa: "Krabopająk",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/krabopajak3.webp",
@@ -1950,7 +1950,7 @@ const cards = [
         ilosc: 1,
         numer: "422"
     },
-
+//"Krabopająk"
     {
         nazwa: "Krabopająk",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/krabopajak2.webp",
@@ -1965,7 +1965,7 @@ const cards = [
         ilosc: 1,
         numer: "423"
     },
-
+//"Krabopająk"
     {
         nazwa: "Krabopająk",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/krabopajak1.webp",
@@ -1980,7 +1980,7 @@ const cards = [
         ilosc: 1,
         numer: "424"
     },
-
+//"Wampir: Ekimma"
     {
         nazwa: "Wampir: Ekimma",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wampir_ekimma.webp",
@@ -1995,7 +1995,7 @@ const cards = [
         ilosc: 1,
         numer: "425"
     },
-
+//"Wampir: Fleder"
     {
         nazwa: "Wampir: Fleder",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wampir_fleader.webp",
@@ -2010,7 +2010,7 @@ const cards = [
         ilosc: 1,
         numer: "426"
     },
-
+//"Wampir: Garkain"
     {
         nazwa: "Wampir: Garkain",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wampir_garkain.webp",
@@ -2025,7 +2025,7 @@ const cards = [
         ilosc: 1,
         numer: "427"
     },
-
+//"Wampir: Bruxa"
     {
         nazwa: "Wampir: Bruxa",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wampir_bruxa.webp",
@@ -2040,7 +2040,7 @@ const cards = [
         ilosc: 1,
         numer: "428"
     },
-
+//"Endriaga"
     {
         nazwa: "Endriaga",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/endriaga.webp",
@@ -2053,7 +2053,7 @@ const cards = [
         ilosc: 1,
         numer: "429"
     },
-
+//"Harpia"
     {
         nazwa: "Harpia",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/harpia.webp",
@@ -2066,7 +2066,7 @@ const cards = [
         ilosc: 1,
         numer: "430"
     },
-
+//"Kuroliszek"
     {
         nazwa: "Kuroliszek",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/kuroliszek.webp",
@@ -2079,7 +2079,7 @@ const cards = [
         ilosc: 1,
         numer: "431"
     },
-
+//"Gargulec"
     {
         nazwa: "Gargulec",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/gargulec.webp",
@@ -2092,7 +2092,7 @@ const cards = [
         ilosc: 1,
         numer: "432"
     },
-
+//"Harpia Celaeno"
     {
         nazwa: "Harpia Celaeno",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/harpia_celaeno.webp",
@@ -2105,7 +2105,7 @@ const cards = [
         ilosc: 1,
         numer: "433"
     },
-
+//"Mglak"
     {
         nazwa: "Mglak",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/mglak.webp",
@@ -2118,7 +2118,7 @@ const cards = [
         ilosc: 1,
         numer: "434"
     },
-
+//"Wiwerna"
     {
         nazwa: "Wiwerna",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/wiwerna.webp",
@@ -2131,8 +2131,7 @@ const cards = [
         ilosc: 1,
         numer: "435"
     },
-
-
+//"Nekker"
     {
         nazwa: "Nekker",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/nekker3.webp",
@@ -2147,7 +2146,7 @@ const cards = [
         ilosc: 1,
         numer: "436"
     },
-
+//"Nekker"
     {
         nazwa: "Nekker",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/nekker2.webp",
@@ -2162,7 +2161,7 @@ const cards = [
         ilosc: 1,
         numer: "437"
     },
-
+//"Nekker"
     {
         nazwa: "Nekker",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/nekker1.webp",
@@ -2177,7 +2176,7 @@ const cards = [
         ilosc: 1,
         numer: "438"
     },
-
+//"Ghul"
     {
         nazwa: "Ghul",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/ghul3.webp",
@@ -2192,7 +2191,7 @@ const cards = [
         ilosc: 1,
         numer: "439"
     },
-
+//"Ghul"
     {
         nazwa: "Ghul",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/ghul2.webp",
@@ -2207,7 +2206,7 @@ const cards = [
         ilosc: 1,
         numer: "440"
     },
-
+//"Ghul"
     {
         nazwa: "Ghul",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/ghul1.webp",
@@ -2224,9 +2223,7 @@ const cards = [
     },
 
     //skellige ==============================================
-    //skellige ==============================================
-    //skellige ==============================================
-
+//"Olaf"
     {
         nazwa: "Olaf",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/olaf.webp",
@@ -2240,7 +2237,7 @@ const cards = [
         ilosc: 1,
         numer: "501"
     },
-
+//"Hjalmar"
     {
         nazwa: "Hjalmar",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/hjalmar.webp",
@@ -2253,7 +2250,7 @@ const cards = [
         ilosc: 1,
         numer: "502"
     },
-
+//"Cerys"
     {
         nazwa: "Cerys",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/cerys.webp",
@@ -2268,7 +2265,7 @@ const cards = [
         ilosc: 1,
         numer: "503"
     },
-
+//"Myszowór"
     {
         nazwa: "Myszowór",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/myszowór.webp",
@@ -2282,7 +2279,7 @@ const cards = [
         ilosc: 1,
         numer: "504"
     },
-
+//"Lugos Szalony"
     {
         nazwa: "Lugos Szalony",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/lugos_szalony.webp",
@@ -2295,7 +2292,7 @@ const cards = [
         ilosc: 1,
         numer: "505"
     },
-
+//"Lugos Siny"
     {
         nazwa: "Lugos Siny",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/lugos_siny.webp",
@@ -2308,7 +2305,7 @@ const cards = [
         ilosc: 1,
         numer: "506"
     },
-
+//"Wojownik klanu Craite"
     {
         nazwa: "Wojownik klanu Craite",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/wojownik_klanu_craite.webp",
@@ -2322,7 +2319,7 @@ const cards = [
         ilosc: 3,
         numer: "507"
     },
-
+//"Drakkar wojenny"
     {
         nazwa: "Drakkar wojenny",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/drakkar_wojenny.webp",
@@ -2336,7 +2333,7 @@ const cards = [
         ilosc: 3,
         numer: "508"
     },
-
+//"Łucznik klanu Brokvar"
     {
         nazwa: "Łucznik klanu Brokvar",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/lucznik_klanu_brokvar.webp",
@@ -2349,7 +2346,7 @@ const cards = [
         ilosc: 3,
         numer: "509"
     },
-
+//"Purat klanu Dimun"
     {
         nazwa: "Purat klanu Dimun",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/pirat_z_klanu_dimun.webp",
@@ -2363,7 +2360,7 @@ const cards = [
         ilosc: 1,
         numer: "510"
     },
-
+//"Holger Czarna Ręka"
     {
         nazwa: "Holger Czarna Ręka",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/holger_czarna_reka.webp",
@@ -2376,7 +2373,7 @@ const cards = [
         ilosc: 1,
         numer: "511"
     },
-
+//"Donar an Hindar"
     {
         nazwa: "Donar an Hindar",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/donar_an_hindar.webp",
@@ -2389,7 +2386,7 @@ const cards = [
         ilosc: 1,
         numer: "512"
     },
-
+//"Udarlyk"
     {
         nazwa: "Udarlyk",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/udarlyk.webp",
@@ -2402,7 +2399,7 @@ const cards = [
         ilosc: 1,
         numer: "513"
     },
-
+//"Svanrige"
     {
         nazwa: "Svanrige",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/svanrige.webp",
@@ -2415,7 +2412,7 @@ const cards = [
         ilosc: 1,
         numer: "514"
     },
-
+//"Berserker"
     {
         nazwa: "Berserker",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/berserk.webp",
@@ -2430,7 +2427,7 @@ const cards = [
         ilosc: 1,
         numer: "515"
     },
-
+//"Płatnerz klanu Torrdaroch"
     {
         nazwa: "Płatnerz klanu Torrdaroch",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/platnerz_klanu_tordarroch.webp",
@@ -2443,7 +2440,7 @@ const cards = [
         ilosc: 1,
         numer: "516"
     },
-
+//"Sklad klanu Heymaey"
     {
         nazwa: "Sklad klanu Heymaey",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/skald_klanu_heymaey.webp",
@@ -2456,7 +2453,7 @@ const cards = [
         ilosc: 1,
         numer: "517"
     },
-
+//"Lekki Drakkar"
     {
         nazwa: "Lekki Drakkar",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/lekki_drakkar.webp",
@@ -2471,7 +2468,7 @@ const cards = [
         summon: "518",
         numer: "518"
     },
-
+//"Tarczowniczka klanu Drummond"
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/tarczowniczka_klanu_drummond1.webp",
@@ -2486,7 +2483,7 @@ const cards = [
         summon: "520, 521",
         numer: "519"
     },
-
+//"Tarczowniczka klanu Drummond"
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/tarczowniczka_klanu_drummond2.webp",
@@ -2501,7 +2498,7 @@ const cards = [
         summon: "521, 519",
         numer: "520"
     },
-
+//"Tarczowniczka klanu Drummond"
     {
         nazwa: "Tarczowniczka klanu Drummond",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/tarczowniczka_klanu_drummond3.webp",
@@ -2516,7 +2513,7 @@ const cards = [
         summon: "519, 520",
         numer: "521"
     },
-
+//"Draig Bon-Dhu"
     {
         nazwa: "Draig Bon-Dhu",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/draig_bon_dhu.webp",
@@ -2530,7 +2527,7 @@ const cards = [
         ilosc: 1,
         numer: "522"
     },
-
+//"Birna Bran"
     {
         nazwa: "Birna Bran",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/birna_bran.webp",
@@ -2544,7 +2541,7 @@ const cards = [
         ilosc: 1,
         numer: "523"
     },
-
+//"Młody berserk"
     {
         nazwa: "Młody berserk",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/mlody_berserker.webp",
@@ -2559,7 +2556,7 @@ const cards = [
         ilosc: 3,
         numer: "524"
     },
-
+//"Kambi"
     {
         nazwa: "Kambi",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/kambi.webp",
@@ -2576,7 +2573,7 @@ const cards = [
     },
 
     //inne===============================================================================================================================================================
-
+//"Hemdal"
     {
         nazwa: "Hemdal",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/hemdal.webp",
@@ -2587,7 +2584,7 @@ const cards = [
         pozycja: 1,
         numer: "526"
     },
-
+//"Przemieniony Vildkaarl"
     {
         nazwa: "Przemieniony Vildkaarl",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/kambi.webp",
@@ -2599,7 +2596,7 @@ const cards = [
         pozycja: 1,
         numer: "527"
     },
-
+//"Przemieniony Młody Vildkaarl"
     {
         nazwa: "Przemieniony Młody Vildkaarl",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/kambi.webp",
