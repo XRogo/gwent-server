@@ -198,6 +198,57 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
             state.board[finalRow].push(cardNumer);
         }
 
+        // Iporz po revive medykiem - ta sama logika co przy zagraniu z reki
+        let scorchDestroyed = [];
+        if (revivedCardObj && revivedCardObj.moc === 'iporz') {
+            const oppSideKey = isPlayer1 ? 'p2' : 'p1';
+            const rowPos = revivedCardObj.pozycja || parseInt(String(finalRow).slice(-1), 10);
+            const oppRow = `${oppSideKey}R${rowPos}`;
+            const rowsToCheck = state.board[oppRow] ? [oppRow] : [];
+
+            let maxVal = -1;
+            let targets = [];
+            rowsToCheck.forEach(rKey => {
+                (state.board[rKey] || []).forEach((cNum, idx) => {
+                    const effPts = calculateEffectivePower(cNum, rKey, state.board, state);
+                    if (effPts < 0) return;
+                    if (effPts > maxVal) {
+                        maxVal = effPts;
+                        targets = [{ row: rKey, index: idx, num: cNum }];
+                    } else if (effPts === maxVal) {
+                        targets.push({ row: rKey, index: idx, num: cNum });
+                    }
+                });
+            });
+
+            let proceedScorch = true;
+            if (rowsToCheck.length === 1) {
+                let rowSum = 0;
+                (state.board[rowsToCheck[0]] || []).forEach(n => {
+                    const c = cards.find(x => String(x.numer) === String(n));
+                    if (!c) return;
+                    if (c.bohater) rowSum += (typeof c.punkty === 'number' ? c.punkty : 0);
+                    else {
+                        const effPts = calculateEffectivePower(n, rowsToCheck[0], state.board, state);
+                        if (effPts >= 0) rowSum += effPts;
+                    }
+                });
+                if (rowSum < 10) {
+                    proceedScorch = false;
+                    console.log(`[GAME CLASSIC] iporz (medic): opp row sum ${rowSum} < 10`);
+                }
+            }
+
+            if (proceedScorch && maxVal >= 0) {
+                targets.sort((a, b) => b.index - a.index).forEach(t => {
+                    state.board[t.row].splice(t.index, 1);
+                    if (t.row.startsWith('p1')) state.p1Graveyard.push(t.num);
+                    else state.p2Graveyard.push(t.num);
+                    scorchDestroyed.push(t.num);
+                });
+            }
+        }
+
         let chainMedic = false;
         if (revivedCardObj && revivedCardObj.moc === 'medyk') {
             const EXCLUDED_NUMERS = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
@@ -232,6 +283,8 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
                         isFromGraveyard: true,
                         isMedicChain: true,
+                        scorchDestroyed: scorchDestroyed,
+                        porzogaDestroyed: scorchDestroyed,
                         targetSlot: {
                             row: finalRow,
                             index: state.board[finalRow].length - 1
@@ -265,6 +318,8 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
                         isFromGraveyard: true,
                         isMedicChain: true,
+                        scorchDestroyed: scorchDestroyed,
+                        porzogaDestroyed: scorchDestroyed,
                         targetSlot: {
                             row: finalRow,
                             index: state.board[finalRow].length - 1
@@ -304,6 +359,8 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                 lastPlayedCard: cardNumer,
                 lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
                 isFromGraveyard: true,
+                scorchDestroyed: scorchDestroyed,
+                porzogaDestroyed: scorchDestroyed,
                 targetSlot: {
                     row: finalRow,
                     index: state.board[finalRow].length - 1

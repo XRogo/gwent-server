@@ -11,6 +11,7 @@ const ConnectionUI = {
         this.injectUI();
         this.setupListeners();
         this.restoreFS();
+        this.setupBeforeUnload();
 
         console.log('ConnectionUI zainicjalizowane');
     },
@@ -166,6 +167,12 @@ const ConnectionUI = {
             if (this.nickname) {
                 this.socket.emit('set-nickname', { gameCode: this.gameCode, isPlayer1: this.isPlayer1, nickname: this.nickname });
             }
+            if (this.gameCode && window._gameBoardInitialized) {
+                this.socket.emit('get-game-state', {
+                    gameCode: this.gameCode,
+                    isPlayer1: this.isPlayer1
+                });
+            }
         });
 
         this.socket.on('opponent-status', (data) => {
@@ -222,6 +229,23 @@ const ConnectionUI = {
                 setTimeout(() => { window.location.href = '/'; }, 15000);
                 break;
         }
+        this.setupBeforeUnload();
+    },
+
+    setupBeforeUnload() {
+        if (this._beforeUnloadHandler) {
+            window.removeEventListener('beforeunload', this._beforeUnloadHandler);
+        }
+        this._beforeUnloadHandler = (e) => {
+            if (this.status === 'connected') {
+                e.preventDefault();
+                // Nowoczesne przeglądarki ignorują własny tekst beforeunload.
+                // Pusta wartość uruchamia ich standardowe ostrzeżenie o utracie zmian.
+                e.returnValue = '';
+                return '';
+            }
+        };
+        window.addEventListener('beforeunload', this._beforeUnloadHandler);
     }
 };
 

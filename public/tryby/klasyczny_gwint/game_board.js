@@ -365,10 +365,12 @@ const handleCardAnimationSequence = async (data) => {
                     hdEl.style.left = `${3120 * scale + bL}px`;
                     hdEl.style.top = `${(1080 - 992 / 2) * scale + bT}px`;
                     document.body.appendChild(hdEl);
+                    const infoClone = showOpponentPlayInfo(lpc, scale, bL, bT);
 
                     setTimeout(() => {
                         // FAZA 3: Zip do slotu (zmaleje z powrotem do rozmiaru rzędu)
                         if (hdEl.parentNode) hdEl.parentNode.removeChild(hdEl);
+                        if (infoClone && infoClone.parentNode) infoClone.parentNode.removeChild(infoClone);
 
                         if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
                             const finalSound = getBaseSound(lpc, data);
@@ -740,6 +742,25 @@ function updateLeaderCache() {
     }
 }
 
+function tryAutoPass() {
+    if (!window.socket || !gameCodeLocal) return;
+    if (playerPassed || isProcessingMove || isMulliganActive) return;
+    if (currentTurn !== window.socket.id) return;
+    if (!window.gameStarted || !window.mulliganFinished) return;
+
+    const handEmpty = !playerHand || playerHand.length === 0;
+    const leaderUnavailable = !playerLeaderObj || playerLeaderUsed || playerLeaderBlocked || !window.cachedLeaderCanUse;
+
+    if (handEmpty && leaderUnavailable) {
+        console.log('[BOARD] Auto-pass: pusta ręka + brak ruchu dowódcy');
+        isProcessingMove = true;
+        window.socket.emit('pass-turn', {
+            gameCode: gameCodeLocal,
+            isPlayer1: isPlayer1Local
+        });
+    }
+}
+
 const factionInfo = {
     "1": { name: "Królestwa Północy", logo: "tpolnoc.webp", reverse: "polnoc_rewers.webp" },
     "2": { name: "Cesarstwo Nilfgaardu", logo: "tnilfgaard.webp", reverse: "nilftgard_rewers.webp" },
@@ -802,9 +823,11 @@ function sortHand() {
 }
 
 export function initGameBoard(socket, gameCode, isPlayer1, nick) {
+    isProcessingMove = false;
+
     // Guard: zapobiegaj wielokrotnemu rejestrowaniu listenerów
     if (window._gameBoardInitialized) {
-        console.warn('[BOARD] initGameBoard already called, skipping listener setup.');
+        console.warn('[BOARD] initGameBoard already called, requesting state only.');
         socket.emit('get-game-state', { gameCode, isPlayer1 });
         return;
     }
@@ -862,10 +885,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
 
             if (data.currentTurn) currentTurn = data.currentTurn;
+            else currentTurn = null;
+            isProcessingMove = false;
             if (data.board) boardState = data.board;
 
             updateLeaderCache();
             sortHand();
+            tryAutoPass();
             console.log(`[BOARD] Game state initialized. Local: ${nick}, Opponent: ${window.opponentNickname}, Status: ${data.status}`);
             // Czy to powrót do TRWAJĄCEJ gry (nie start od zera)?
             const boardHasCards = data.board && (
@@ -1356,7 +1382,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             opponentGraveyard = mapToObjects(isPlayer1Local ? data.p2Graveyard : data.p1Graveyard);
         }
 
-        if (prevTurn !== currentTurn && !playerPassed && !opponentPassed) {
+        if (data.p1Passed !== undefined || data.p2Passed !== undefined) {
             playerLives = isPlayer1Local ? data.p1Lives : data.p2Lives;
             opponentLives = isPlayer1Local ? data.p2Lives : data.p1Lives;
             playerPassed = isPlayer1Local ? data.p1Passed : data.p2Passed;
@@ -1483,6 +1509,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             } finally {
                 // ZAWSZE odblokuj ruch po zakończeniu całej sekwencji
                 isProcessingMove = false;
+                tryAutoPass();
             }
         };
 
@@ -1602,6 +1629,8 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
 
         renderAll(currentNick);
+        updateLeaderCache();
+        tryAutoPass();
 
         // Faza startowa rundy - t05, potem ew. Skellige (t15), Potwory (t14), Północ (t11), a na końcu t07/t08
         showPrzejscie('t05', {
@@ -1851,6 +1880,53 @@ export function renderAll(nick) {
     renderLeaders(overlay);
     renderRows(overlay);
     renderWeather(overlay); // Dodajemy renderowanie pogody
+}
+
+function showOpponentPlayInfo(card, scale, boardLeft, boardTop) {
+    if (!card) return null;
+    const hasAbility = !!(card.moc || card.umiejetnosc || Number(card.pozycja) === 4);
+    if (!hasAbility) return null;
+
+    const infoH = 303 * scale;
+    const infoW = (303 * (1123 / 305)) * scale;
+    const infoLeft = 2609 * scale + boardLeft;
+    const infoTop = 1656 * scale + boardTop;
+    const infoScale = infoH / 305;
+
+    let titleText = '';
+    let descText = '';
+    if (card.moc) {
+        const mocData = moce[card.moc];
+        let variant = null;
+        if (card.moc === 'wezwanie') {
+            const n = String(card.numer);
+            if (n === '009' || n === '010') variant = mocData?.plotka;
+            else if (n === '503') variant = mocData?.cerys;
+            else variant = mocData?.default;
+        } else if (card.moc === 'iporz') {
+            variant = mocData ? (mocData[card.pozycja] || mocData[1]) : null;
+        } else {
+            variant = mocData;
+        }
+        titleText = variant?.nazwa || '';
+        descText = variant?.opis || '';
+    } else if (Number(card.pozycja) === 4) {
+        titleText = moce.zrecznosc?.nazwa || 'Zręczność';
+        descText = moce.zrecznosc?.opis || '';
+    }
+
+    const powerImage = getPowerImage(card);
+    const box = document.createElement('div');
+    box.id = 'opponent-play-infobox';
+    box.style.cssText = `position:fixed;z-index:5001;left:${infoLeft}px;top:${infoTop}px;width:${infoW}px;height:${infoH}px;pointer-events:none;`;
+    box.innerHTML = `
+        <img src="assets/asety/infor.webp" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;">
+        ${powerImage ? `<img src="assets/dkarty/${powerImage}" style="position:absolute;left:${29 * infoScale}px;top:${-221 * infoScale}px;height:${594 * infoScale}px;width:auto;z-index:2;">` : ''}
+        <div style="position:absolute;left:0;top:${54 * infoScale}px;width:100%;text-align:center;font-family:PFDinTextCondPro-Bold,sans-serif;font-size:${45 * infoScale}px;color:#be9c58;z-index:4;">${titleText}</div>
+        <div style="position:absolute;left:0;top:${151 * infoScale}px;width:100%;text-align:center;font-family:PFDinTextCondPro,sans-serif;font-size:${43 * infoScale}px;color:#c29f5a;white-space:pre-line;z-index:4;">${descText}</div>
+    `;
+    document.body.appendChild(box);
+    return box;
 }
 
 function renderProposedCard(overlay) {

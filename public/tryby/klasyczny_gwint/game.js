@@ -211,6 +211,10 @@ if (socket && gameCode) {
         playSound('joinSound');
         cardSelectionScreen.style.display = 'none';
         gameScreen.style.display = 'block';
+        ['scrollbar-collection', 'scrollbar-deck'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
         initGameBoard(socket, gameCode, isP1, nick);
         renderAll(nick);
     }
