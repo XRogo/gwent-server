@@ -2037,12 +2037,12 @@ function renderProposedCard(overlay) {
             description.style.fontSize = (targetH * (33 / 992)) + 'px';
             description.style.letterSpacing = (targetW * (0.4 / 523)) + 'px';
             description.style.color = '#030303';
-            description.style.whiteSpace = 'pre-line';
+            description.style.whiteSpace = 'pre';
             description.style.wordBreak = 'normal';
             description.style.textAlign = 'center';
-            description.style.left = (targetW * (2 / 523)) + 'px';
-            description.style.top = (targetH * (891 / 992)) + 'px';
-            description.style.width = (targetW * ((523 - 2) / 523)) + 'px';
+            description.style.left = (targetW * (-8 / 523)) + 'px';
+            description.style.top = (targetH * (878 / 992)) + 'px';
+            description.style.width = (targetW * (539 / 523)) + 'px';
             description.style.height = 'auto';
         }
     }

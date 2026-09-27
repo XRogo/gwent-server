@@ -174,14 +174,6 @@ function handlePowiekCardTap(idx) {
         }
         return;
     }
-
-    // Kolekcja / talia: pojedynczy L = dodaj / usuń
-    if (window.powiekSourceArea === 'collection' || window.powiekSourceArea === 'deck') {
-        handleCardActionInsideZoom();
-        return;
-    }
-
-    // Wolny podgląd w grze: nic
 }
 
 export function showPowiek(deck, index, mode = 'cards', options = {}) {
@@ -590,8 +582,19 @@ function attachPointerHandlers(overlay) {
     overlay.onpointercancel = handlePointerEnd;
 }
 
+const klikAudio = new Audio('assets/sound/klik.mp3');
+function playPowiekClickSound() {
+    try {
+        klikAudio.currentTime = 0;
+        klikAudio.play().catch(() => {});
+    } catch (_) {}
+}
+
 function startAnimationTo(targetIdx) {
     targetIdx = Math.max(0, Math.min(powiekDeck.length - 1, targetIdx));
+    if (targetIdx !== targetAnimIndex) {
+        playPowiekClickSound();
+    }
     targetAnimIndex = targetIdx;
     powiekIndex = targetIdx;
     window.currentPowiekIndex = targetIdx;
@@ -612,6 +615,9 @@ function queueDelta(delta) {
     const newTarget = Math.max(0, Math.min(powiekDeck.length - 1, targetAnimIndex + delta));
     if (newTarget === targetAnimIndex && Math.abs(currentAnimPos - targetAnimIndex) < 0.001) return;
 
+    if (newTarget !== targetAnimIndex) {
+        playPowiekClickSound();
+    }
     targetAnimIndex = newTarget;
     powiekIndex = newTarget;
     window.currentPowiekIndex = newTarget;

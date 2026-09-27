@@ -99,17 +99,17 @@
 
 .card-content .description {
     position: absolute;
-    /* 2,891 → 523 */
-    left: 0.3824%;            /* 2/523 */
-    top: 89.8185%;            /* 891/992 */
-    width: 99.6176%;          /* (523-2)/523 */
+    /* -8,875 → 539 (poszerzone o 10px w obie strony: left -8/523, podniesione o 16px: top 875/992) */
+    left: -1.5296%;           /* -8/523 */
+    top: 88.5081%;            /* 878/992 */
+    width: 103.0593%;         /* 539/523 */
     text-align: center;
     font-family: 'PFDinTextCondPro', sans-serif;
     color: #030303;
     /* 33px przy 992 */
     font-size: 3.327%;
     letter-spacing: 0.01212em; /* 0.4 / 33 */
-    white-space: pre-line;    /* \n = nowa linia */
+    white-space: pre;         /* \n = nowa linia, brak automatycznego łamania wierszy */
     word-break: normal;
     overflow-wrap: normal;
     line-height: 1.1;
