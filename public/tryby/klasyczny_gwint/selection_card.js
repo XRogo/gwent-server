@@ -807,6 +807,11 @@ function setupSelectionScrollbar(area, id, trackL, trackT, trackR, trackB, bgLef
     const trackH = (trackB - trackT) * scaleH;
     const maxTravel = Math.max(0, trackH - barH);
 
+    // Zapisz aktualne parametry na barze, aby handlery mogły je odczytać na bieżąco
+    bar._sbArea = area;
+    bar._sbTrackY = trackY;
+    bar._sbMaxTravel = maxTravel;
+
     bar.style.width = `${barW}px`;
     bar.style.height = `${barH}px`;
     bar.style.left = `${trackX}px`;
@@ -815,7 +820,7 @@ function setupSelectionScrollbar(area, id, trackL, trackT, trackR, trackB, bgLef
     const syncBar = () => {
         const maxScroll = area.scrollHeight - area.clientHeight;
         const ratio = maxScroll > 0 ? (area.scrollTop / maxScroll) : 0;
-        bar.style.top = `${trackY + ratio * maxTravel}px`;
+        bar.style.top = `${bar._sbTrackY + ratio * bar._sbMaxTravel}px`;
     };
 
     area.removeEventListener('scroll', area._sbScroll);
@@ -835,17 +840,27 @@ function setupSelectionScrollbar(area, id, trackL, trackT, trackR, trackB, bgLef
         try { bar.setPointerCapture(e.pointerId); } catch (_) {}
     };
 
-    if (!bar._sbMoveBound) {
-        bar._sbMoveBound = true;
-        window.addEventListener('pointermove', (e) => {
-            if (!dragging) return;
-            const maxScroll = area.scrollHeight - area.clientHeight;
-            if (maxScroll <= 0 || maxTravel <= 0) return;
-            const dy = e.clientY - startY;
-            area.scrollTop = Math.max(0, Math.min(maxScroll, startScroll + (dy / maxTravel) * maxScroll));
-        });
-        window.addEventListener('pointerup', () => { dragging = false; });
+    // Usuwamy stary handler, jeśli istnieje, i podpinamy nowy
+    if (bar._sbMoveHandler) {
+        window.removeEventListener('pointermove', bar._sbMoveHandler);
     }
+    if (bar._sbUpHandler) {
+        window.removeEventListener('pointerup', bar._sbUpHandler);
+    }
+
+    bar._sbMoveHandler = (e) => {
+        if (!dragging) return;
+        // Oblicz maxScroll i maxTravel na bieżąco z aktualnych wartości
+        const currentMaxScroll = bar._sbArea.scrollHeight - bar._sbArea.clientHeight;
+        const currentMaxTravel = bar._sbMaxTravel;
+        if (currentMaxScroll <= 0 || currentMaxTravel <= 0) return;
+        const dy = e.clientY - startY;
+        bar._sbArea.scrollTop = Math.max(0, Math.min(currentMaxScroll, startScroll + (dy / currentMaxTravel) * currentMaxScroll));
+    };
+    bar._sbUpHandler = () => { dragging = false; };
+
+    window.addEventListener('pointermove', bar._sbMoveHandler);
+    window.addEventListener('pointerup', bar._sbUpHandler);
 }
 
 export function getSelectedDeck() { return deck; }
