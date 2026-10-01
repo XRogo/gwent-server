@@ -1,4 +1,5 @@
 import cards from './cards.js';
+import { getDCardImage } from './cardImages.js';
 import { krole } from './krole.js';
 import { showPowiek } from './rcard.js';
 import { renderCardHTML } from './bcard_render.js';
@@ -714,7 +715,7 @@ export function updatePositionsAndScaling() {
         leaderCard.appendChild(beton);
 
         const img = document.createElement('img');
-        img.src = selectedLeader.dkarta;
+        img.src = getDCardImage(selectedLeader);
         img.style.position = 'absolute';
         img.style.left = '0';
         img.style.top = '0';

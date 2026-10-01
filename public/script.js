@@ -363,6 +363,48 @@ function updateNicknameFading() {
     }
 }
 
+// ========== ALTERNATYWNE KARTY ==========
+const ALTER_KEY = 'gwent_alter_cards';
+
+function isAlterCardsOn() {
+    try {
+        return localStorage.getItem(ALTER_KEY) === 'true';
+    } catch (e) {
+        return false;
+    }
+}
+
+function setAlterCardsOn(on) {
+    try {
+        localStorage.setItem(ALTER_KEY, on ? 'true' : 'false');
+    } catch (e) {}
+}
+
+function updateAlterCardsButtonUI() {
+    const btn = document.getElementById('alterCardsBtn');
+    if (!btn) return;
+    const on = isAlterCardsOn();
+    btn.classList.toggle('alter-on', on);
+    btn.classList.toggle('alter-off', !on);
+    btn.title = on
+        ? 'Alternatywne karty: WŁĄCZONE (kliknij, by wyłączyć)'
+        : 'Alternatywne karty: WYŁĄCZONE (kliknij, by włączyć)';
+}
+
+function initAlterCardsButton() {
+    const btn = document.getElementById('alterCardsBtn');
+    if (!btn) return;
+    updateAlterCardsButtonUI();
+    btn.onclick = () => {
+        const next = !isAlterCardsOn();
+        setAlterCardsOn(next);
+        updateAlterCardsButtonUI();
+        if (typeof showToast === 'function') {
+            showToast(next ? 'Alternatywne karty: ON' : 'Alternatywne karty: OFF');
+        }
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     addHoverSound('.menu-button, .carousel-kafelek, .side-back-button, .game-btn');
 
@@ -409,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    initAlterCardsButton();
 });
 
 function checkMobileOrientation() {

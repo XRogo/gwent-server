@@ -1,4 +1,5 @@
 import cards from './cards.js';
+import { getCardImage } from './cardImages.js';
 import { renderCardHTML, getPowerImage } from './bcard_render.js';
 import * as moce from './moce.js';
 import { showPowiek, renderPowiek } from './rcard.js';
@@ -11,9 +12,10 @@ import { animateLeaderFromDeck, animateOpponentLeaderFromDeck, animateDeckToHand
 function preloadCardImages() {
     console.log("[BOARD] Preloading card assets...");
     cards.forEach(card => {
-        if (card.karta) {
+        const src = getCardImage(card);
+        if (src) {
             const img = new Image();
-            img.src = card.karta;
+            img.src = src;
         }
     });
 
@@ -1412,9 +1414,9 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 if (data.spyDrawn && data.spyDrawn.length > 0) {
                     const mappedDrawn = data.spyDrawn.map(num => cards.find(c => c.numer === String(num))).filter(Boolean);
                     mappedDrawn.forEach(c => {
-                        if (c && c.karta) {
+                        if (c && getCardImage(c)) {
                             const img = new Image();
-                            img.src = c.karta;
+                            img.src = getCardImage(c);
                         }
                     });
                 }
@@ -2465,7 +2467,7 @@ function renderHand() {
             wrapper.style.transition = 'transform 0.2s ease-out, top 0.2s ease-out';
 
             const img = document.createElement('img');
-            img.src = card.karta;
+            img.src = getCardImage(card);
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.display = 'block';
@@ -2692,7 +2694,7 @@ function renderGraveyards(overlay) {
             wrapper.style.zIndex = 5 + i;
 
             const img = document.createElement('img');
-            img.src = cardObj.karta;
+            img.src = getCardImage(cardObj);
             img.style.width = '100%';
             img.style.height = '100%';
             wrapper.appendChild(img);
@@ -2917,7 +2919,7 @@ function renderWeather(overlay) {
             wrapper.style.zIndex = i + 1;
 
             const img = document.createElement('img');
-            img.src = card.karta;
+            img.src = getCardImage(card);
             img.style.height = '100%';
             img.style.width = '100%';
             wrapper.appendChild(img);
@@ -3061,7 +3063,7 @@ function renderRows(overlay) {
                 wrapper.dataset.row = rowKey;
 
                 const img = document.createElement('img');
-                img.src = card.karta;
+                img.src = getCardImage(card);
                 img.style.height = '100%';
                 img.style.width = '100%';
                 wrapper.appendChild(img);
@@ -3190,7 +3192,7 @@ function renderRows(overlay) {
             const card = cards.find(c => c.numer === num);
             if (card) {
                 const img = document.createElement('img');
-                img.src = card.karta;
+                img.src = getCardImage(card);
                 img.style.width = '100%';
                 img.style.height = '100%';
                 slot.appendChild(img);
@@ -3295,7 +3297,7 @@ function renderLeaders(overlay) {
     const createLeader = (leaderObj, x, y, isOpponent) => {
         if (!leaderObj || (!isOpponent && !window.leaderAnimated) || (isOpponent && !window.opponentLeaderAnimated)) return;
         const img = document.createElement('img');
-        img.src = leaderObj.karta;
+        img.src = getCardImage(leaderObj);
         img.style.position = 'absolute';
         img.style.left = `${x * scale + boardLeft}px`;
         img.style.top = `${y * scale + boardTop}px`;
@@ -3568,7 +3570,7 @@ function createAnimationCardElement(card, w4K, h4K, isLarge = false, isOpponent 
         }
     } else {
         const img = document.createElement('img');
-        img.src = card.karta;
+        img.src = getCardImage(card);
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.display = 'block';

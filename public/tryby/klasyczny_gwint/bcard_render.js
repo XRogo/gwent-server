@@ -1,3 +1,5 @@
+import { getDCardImage } from './cardImages.js';
+
 /**
  * getPowerImage - returns the filename of the power icon for a given card.
  */
@@ -66,7 +68,7 @@ export function renderCardHTML(card, options = {}) {
 
     let html = `
         <div class="card-content">
-            <div class="card-image" style="background-image: url('${card.dkarta}');"></div>
+            <div class="card-image" style="background-image: url('${getDCardImage(card)}');"></div>
             <div class="beton" style="background-image: url('assets/dkarty/${card.bohater ? 'bbeton.webp' : 'beton.webp'}');"></div>
             ${!actualIsKing ? `<div class="faction-banner" style="background-image: url('assets/dkarty/${bannerImg}');"></div>` : ''}
             <div class="name${actualIsKing ? ' name-leader' : ''}">${card.nazwa}</div>

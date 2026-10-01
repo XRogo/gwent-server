@@ -1,3 +1,5 @@
+import { getCardImage } from './cardImages.js';
+
 /**
  * Moduł animacji kart.
  * Prędkość: 3480px/s w 4K (3840x2160).
@@ -119,13 +121,13 @@ export function animateCard(imgSrc, from4K, to4K, w4K, h4K, onDone) {
 
 /**
  * Animuje kartę dowódcy z kupki na pozycję dowódcy.
- * @param {object} leaderObj - obiekt dowódcy (z polem .karta)
+ * @param {object} leaderObj - obiekt dowódcy
  * @param {function} [onDone] - callback
  */
 export function animateLeaderFromDeck(leaderObj, onDone) {
     if (!leaderObj) { if (onDone) onDone(); return; }
     animateCard(
-        leaderObj.karta,
+        getCardImage(leaderObj),
         PILE_PLAYER,
         LEADER_PLAYER,
         180, 240,
@@ -136,7 +138,7 @@ export function animateLeaderFromDeck(leaderObj, onDone) {
 export function animateOpponentLeaderFromDeck(leaderObj, onDone) {
     if (!leaderObj) { if (onDone) onDone(); return; }
     animateCard(
-        leaderObj.karta,
+        getCardImage(leaderObj),
         PILE_OPPONENT,
         LEADER_OPPONENT,
         180, 240,
@@ -155,7 +157,7 @@ function createCardElement(card, w4K, h4K) {
     wrapper.style.position = 'relative';
 
     const img = document.createElement('img');
-    img.src = card.karta;
+    img.src = getCardImage(card);
     img.style.width = '100%';
     img.style.height = '100%';
     img.style.display = 'block';
