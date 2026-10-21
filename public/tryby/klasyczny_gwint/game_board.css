@@ -32,3 +32,123 @@
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
     will-change: transform;
 }
+
+/* ===== EFEKTY KART (POŻOGA, BOHATER, WEZWANIE) ===== */
+.board-card-wrapper {
+    position: absolute;
+    overflow: visible;
+}
+
+.ap-fx-layer {
+    position: absolute;
+    inset: -10%;
+    pointer-events: none;
+    z-index: 20;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* ===== POŻOGA ===== */
+.ap-porz-fire {
+    position: absolute;
+    pointer-events: none;
+    z-index: 25;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    opacity: 1;
+}
+
+.ap-porz-fire.fading {
+    transition: opacity 0.4s ease-in;
+    opacity: 0;
+}
+
+.ap-smoke-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 24;
+    overflow: visible;
+}
+
+.ap-smoke {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+    background: url('assets/asety/effekty/dymek.webp') center / contain no-repeat;
+}
+
+.ap-smoke.ap-smoke-dark {
+    filter: brightness(0.5);
+}
+
+/* ===== BOHATER ===== */
+.ap-hero-cover {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 22;
+}
+
+.ap-hero-dym {
+    position: absolute;
+    pointer-events: none;
+    z-index: 23;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.ap-hero-dymek-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 24;
+    overflow: visible;
+}
+
+.ap-hero-ember-canvas {
+    pointer-events: none;
+}
+
+/* ===== WEZWANIE – clip do karty ===== */
+.ap-wezwanie-clip {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 28;
+}
+
+/* ===== LĄDOWANIE KARTY (KURZ) ===== */
+.ap-land-dust-layer {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 27;
+}
+
+.board-card-wrapper {
+    overflow: visible; /* ważne – dymki i efekty wychodzą poza kartę */
+}
+
+/* ===== IKONA MOCY ===== */
+.ap-power-icon-layer {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 30;
+}
+
+.ap-power-icon-shadow {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+}
+

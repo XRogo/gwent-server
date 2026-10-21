@@ -6,11 +6,30 @@ import { showPowiek, renderPowiek } from './rcard.js';
 import { krole } from './krole.js';
 import { isLeaderUsable } from './krol_code.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
-import { animateLeaderFromDeck, animateOpponentLeaderFromDeck, animateDeckToHand, animateBoardToGraveyard, animateCardToDeck, animateElement, getElement4KPos } from './animacje.js';
+import {
+    animateLeaderFromDeck,
+    animateOpponentLeaderFromDeck,
+    animateDeckToHand,
+    animateBoardToGraveyard,
+    animateCardToDeck,
+    animateElement,
+    getElement4KPos
+} from './animacje.js';
+import {
+    runPorzogaOnCardElement,
+    playHeroCardEffect,
+    playWezwanieOnCards,
+    playCardLandDustOnElement,
+    playPowerIconOnElement,
+    playCardLandWithPower,
+    powerHasIconAnim,
+    preloadAnimEffects
+} from './anim_effects.js';
 
 // Preload card images to avoid flickering when they appear in hand/board
 function preloadCardImages() {
     console.log("[BOARD] Preloading card assets...");
+    preloadAnimEffects();
     cards.forEach(card => {
         const src = getCardImage(card);
         if (src) {
@@ -320,6 +339,14 @@ const handleCardAnimationSequence = async (data) => {
                     }
 
                     markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
+                    const slotEl = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
+                    if (slotEl) {
+                        if (lpc.bohater) {
+                            await playHeroCardEffect(slotEl);
+                        } else {
+                            await playCardLandWithPower(slotEl, lpc.moc);
+                        }
+                    }
 
                     if (data.decoyDetails) {
                         if (window.playSound) window.playSound('manekinSound');
@@ -369,7 +396,7 @@ const handleCardAnimationSequence = async (data) => {
                     document.body.appendChild(hdEl);
                     const infoClone = showOpponentPlayInfo(lpc, scale, bL, bT);
 
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         // FAZA 3: Zip do slotu (zmaleje z powrotem do rozmiaru rzędu)
                         if (hdEl.parentNode) hdEl.parentNode.removeChild(hdEl);
                         if (infoClone && infoClone.parentNode) infoClone.parentNode.removeChild(infoClone);
@@ -379,22 +406,17 @@ const handleCardAnimationSequence = async (data) => {
                             if (window.playSound) window.playSound(finalSound);
 
                             if (window.lastDestroyedCardsDOM && window.lastDestroyedCardsDOM.length > 0) {
-                                window.lastDestroyedCardsDOM.forEach(item => {
-                                    const graveyard4K = item.side === 'p1' ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
-                                    const del = createAnimationCardElement(item.card, 180, 239);
-                                    animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => { });
-                                    requestAnimationFrame(() => requestAnimationFrame(() => {
-                                        const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
-                                        const bL = (window.innerWidth - 3840 * scale) / 2;
-                                        const bT = (window.innerHeight - 2160 * scale) / 2;
-                                        del.style.left = `${item.currentPos4K.x * scale + bL}px`;
-                                        del.style.top = `${item.currentPos4K.y * scale + bT}px`;
-                                    }));
-                                });
+                                await Promise.all(window.lastDestroyedCardsDOM.map(async item => {
+                                    const el = (item.elementId ? document.getElementById(item.elementId) : null) || item.el;
+                                    if (el) {
+                                        await runPorzogaOnCardElement(el, item.card, item.side === 'p1');
+                                    }
+                                }));
+                                window.lastDestroyedCardsDOM = [];
+                                boardState = data.board;
+                                renderAll(currentNick);
                             }
-                            setTimeout(() => {
-                                executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
-                            }, 800);
+                            executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
                         } else {
                             executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
                         }
@@ -418,30 +440,25 @@ const handleCardAnimationSequence = async (data) => {
             });
         } else {
             // Animacja gracza: Podgląd -> Cel
-            await new Promise(resolve => {
+            await new Promise(async resolve => {
                 const proposedPreview = document.getElementById('proposed-card-preview');
                 if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
                     const finalSound = getBaseSound(lpc, data);
                     if (window.playSound) window.playSound(finalSound);
 
                     if (window.lastDestroyedCardsDOM && window.lastDestroyedCardsDOM.length > 0) {
-                        window.lastDestroyedCardsDOM.forEach(item => {
-                            const graveyard4K = item.side === 'p1' ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
-                            const del = createAnimationCardElement(item.card, 180, 239);
-                            animateElement(del, item.currentPos4K, graveyard4K, 180, 239, () => { });
-                            requestAnimationFrame(() => requestAnimationFrame(() => {
-                                const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
-                                const bL = (window.innerWidth - 3840 * scale) / 2;
-                                const bT = (window.innerHeight - 2160 * scale) / 2;
-                                del.style.left = `${item.currentPos4K.x * scale + bL}px`;
-                                del.style.top = `${item.currentPos4K.y * scale + bT}px`;
-                            }));
-                        });
+                        await Promise.all(window.lastDestroyedCardsDOM.map(async item => {
+                            const el = (item.elementId ? document.getElementById(item.elementId) : null) || item.el;
+                            if (el) {
+                                await runPorzogaOnCardElement(el, item.card, item.side === 'p1');
+                            }
+                        }));
+                        window.lastDestroyedCardsDOM = [];
+                        boardState = data.board;
+                        renderAll(currentNick);
                     }
-                    setTimeout(() => {
-                        if (proposedPreview) proposedPreview.style.display = 'none';
-                        executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
-                    }, 800);
+                    if (proposedPreview) proposedPreview.style.display = 'none';
+                    executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
                 } else {
                     if (proposedPreview) proposedPreview.style.display = 'none';
                     executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
@@ -453,11 +470,8 @@ const handleCardAnimationSequence = async (data) => {
     // 2. KARTY WEZWANE (musteredDetails - np. Muster / Medyk)
     // Z pominięciem dużego podglądu i SEKWENCYJNIE!
     if (data.musteredDetails && data.musteredDetails.length > 0) {
-        // Po zagraniu pierwszej karty (i jej dźwięku), puszczamy dźwięk wezwania
-        await new Promise(resolve => {
-            if (window.playSound) window.playSound('wezwanieSound', resolve);
-            else resolve();
-        });
+        // Po zagraniu pierwszej karty (i jej dźwięku), puszczamy dźwięk wezwania natychmiast
+        if (window.playSound) window.playSound('wezwanieSound');
 
         const musterList = data.musteredDetails || [];
         const musterAnimations = musterList.map((m) => {
@@ -512,8 +526,8 @@ const handleCardAnimationSequence = async (data) => {
                 animateElement(el, from4K, to4K, 180, 239, () => {
                     markArrivedInState(m.numer, data.lastPlayedBy, data.board);
                     const surfaceSound = getBaseSound(cardObj, data);
-                    if (window.playSound) window.playSound(surfaceSound, resolveMuster);
-                    else resolveMuster();
+                    if (window.playSound) window.playSound(surfaceSound);
+                    resolveMuster();
                 });
 
                 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -528,6 +542,27 @@ const handleCardAnimationSequence = async (data) => {
 
         // Aktywujemy wszystkie animacje na raz (równolegle) po dźwięku 'wezwanieSound'
         await Promise.all(musterAnimations);
+
+        // Efekt wezwania na przyzwanych kartach
+        const musteredEls = [];
+        musterList.forEach(m => {
+            Object.keys(data.board).forEach(rk => {
+                const row = data.board[rk];
+                if (Array.isArray(row)) {
+                    row.forEach((num, idx) => {
+                        if (String(num) === String(m.numer)) {
+                            const el = document.getElementById(`slot-placeholder-${rk}_${idx}`);
+                            if (el && !musteredEls.includes(el)) {
+                                musteredEls.push(el);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        if (musteredEls.length > 0) {
+            await playWezwanieOnCards(musteredEls);
+        }
     }
 
     // KROK 3: Sprawdzenie Więzi
@@ -657,6 +692,14 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
             renderAll(currentNick);
         } else {
             markArrivedInState(data.lastPlayedCard, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
+            const slotEl = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
+            if (slotEl) {
+                if (lpc.bohater) {
+                    await playHeroCardEffect(slotEl);
+                } else {
+                    await playCardLandWithPower(slotEl, lpc.moc);
+                }
+            }
         }
 
         if (data.decoyDetails) {
@@ -665,7 +708,7 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
         }
 
         const finalSound = getBaseSound(lpc, data);
-        if (finalSound !== 'manekinSound' && lpc.moc !== 'porz' && lpc.moc !== 'iporz') {
+        if (finalSound !== 'manekinSound' && lpc.moc !== 'porz' && lpc.moc !== 'iporz' && !lpc.bohater) {
             if (window.playSound) window.playSound(finalSound, resolve);
             else resolve();
         } else {
@@ -1294,7 +1337,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         window.oldWeatherList = [...(boardState.weather || [])];
 
         const prevTurn = currentTurn;
-        boardState = data.board;
+        const savedPrevBoard = boardState;
         currentTurn = data.currentTurn;
         // Cache musi być odświeżony po zmianie tury (lider dostępny tylko w swojej turze)
         updateLeaderCache();
@@ -1316,6 +1359,20 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 }
             }
         });
+
+        if (window.lastDestroyedCardsDOM.length > 0) {
+            boardState = {
+                ...data.board,
+                p1R1: [...(savedPrevBoard.p1R1 || [])],
+                p1R2: [...(savedPrevBoard.p1R2 || [])],
+                p1R3: [...(savedPrevBoard.p1R3 || [])],
+                p2R1: [...(savedPrevBoard.p2R1 || [])],
+                p2R2: [...(savedPrevBoard.p2R2 || [])],
+                p2R3: [...(savedPrevBoard.p2R3 || [])]
+            };
+        } else {
+            boardState = data.board;
+        }
 
         // --- SYNCHRONIZACJA WIDOCZNOŚCI ---
         // Wyłączamy z natychmiastowej widoczności tylko te karty, które właśnie "lądują" (animacja).
@@ -3415,6 +3472,9 @@ function collectCardsOnBoardDOM(isOpponent, keptCard) {
             if (cardObj) {
                 boardCards.push({
                     card: cardObj,
+                    elementId: w.id,
+                    el: w,
+                    row: cardRow,
                     currentPos4K: {
                         x: (rect.left - boardLeft) / scale,
                         y: (rect.top - boardTop) / scale
@@ -3539,7 +3599,7 @@ function syncHand(serverHandNums) {
     playerHand = newHand;
     playerHand.forEach(c => window.arrivedCards.add(c));
     sortHand();
-    renderAll(currentNick);
+    renderHand();
 }
 
 /**

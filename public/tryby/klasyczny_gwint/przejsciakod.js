@@ -85,7 +85,7 @@ function displayBanner(item) {
     banner.style.display = 'flex';
     banner.style.alignItems = 'center';
     banner.style.justifyContent = 'center';
-    banner.style.zIndex = '9999';
+    banner.style.zIndex = '100000';
     banner.style.opacity = '0';
     banner.style.transition = 'opacity 0.4s ease-in-out';
     banner.style.pointerEvents = 'none';

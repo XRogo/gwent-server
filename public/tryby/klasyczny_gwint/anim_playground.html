@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poligon Animacji – Gwent (pełna plansza)</title>
+  <link rel="stylesheet" href="bcard_render.css">
+  <link rel="stylesheet" href="game_board.css">
+  <link rel="stylesheet" href="game.css">
+  <link rel="stylesheet" href="anim_playground.css">
+</head>
+<body>
+  <div id="fadeScreen"></div>
+  <div class="background"></div>
+
+  <div id="gameScreen" style="display:block;">
+    <div class="overlay"></div>
+  </div>
+
+  <aside id="anim-panel">
+    <h2>Poligon Animacji</h2>
+    <p class="hint">
+      Plansza 1:1 z grą. Efekty w <code>anim_effects.js</code>.
+      Grafiki: <code>assets/asety/…</code>
+    </p>
+
+    <section>
+      <h3>Plansza</h3>
+      <button id="btn-reset">Reset + sample karty</button>
+      <button id="btn-clear">Wyczyść planszę</button>
+      <button id="btn-add-random">Dodaj losową jednostkę (p1R1)</button>
+    </section>
+
+    <section>
+      <h3>Bohater</h3>
+      <button id="btn-hero">Animacja bohatera (z ręki)</button>
+    </section>
+
+    <section>
+      <h3>Wezwanie</h3>
+      <button id="btn-wezwanie">Wezwanie (zaznaczona)</button>
+      <button id="btn-wezwanie-row">Wezwanie (cały rząd zaznaczonej)</button>
+    </section>
+
+    <section>
+      <h3>Pożoga / spalanie</h3>
+      <button class="danger" id="btn-porzoga">Pożoga (najsilniejsze)</button>
+      <button class="danger" id="btn-burn-selected">Spal zaznaczoną</button>
+    </section>
+
+    <section>
+      <h3>Pogoda</h3>
+      <button class="weather" data-w="mroz">Mróz</button>
+      <button class="weather" data-w="mgla">Mgła</button>
+      <button class="weather" data-w="deszcz">Deszcz</button>
+      <button class="weather" data-w="sztorm">Sztorm</button>
+      <button class="weather" data-w="niebo">Czyste Niebo</button>
+    </section>
+
+    <section>
+      <h3>Moce</h3>
+      <button data-power="rog">Róg (rząd zaznaczonej)</button>
+      <button data-power="wiez">Więź (podświetlenie)</button>
+      <button data-power="medyk">Medyk (placeholder)</button>
+      <button data-power="szpieg">Szpieg (placeholder)</button>
+      <button data-power="manek">Manekin (placeholder)</button>
+      <h3>Wezwanie (pełna sekwencja)</h3>
+      <button id="btn-wezwanie-cerys">Cerys → tarczowniczki</button>
+      <button id="btn-wezwanie-wampir">Wampir → reszta wampirów</button>
+      <button id="btn-wezwanie-random">Losowe wezwanie</button>
+    </section>
+
+    <section>
+      <h3>Animacje bazowe</h3>
+      <button id="btn-to-grave">Lot zaznaczonej → cmentarz (spal)</button>
+      <section>
+        <h3>Lądowanie</h3>
+        <button id="btn-land-dust">Kurz lądowania (zaznaczona)</button>
+        <button id="btn-land-play">Zagrać jednostkę + kurz</button>
+      </section>
+          <section>
+      <h3>Ikona mocy</h3>
+      <button data-power-icon="szpieg">Szpieg</button>
+      <button data-power-icon="wezwanie">Wezwanie</button>
+      <button data-power-icon="wiez">Więź</button>
+      <button data-power-icon="rog">Róg</button>
+      <button data-power-icon="morale">Morale (+ strzałki)</button>
+      <button id="btn-land-power">Zaznaczona: kurz + moc (z karty)</button>
+    </section>
+    </section>
+
+    <div id="anim-log"></div>
+  </aside>
+
+  <audio id="porzogaSound" src="assets/sound/porzoga.mp3"></audio>
+  <audio id="mrozSound" src="assets/sound/mroz.mp3"></audio>
+  <audio id="mglaSound" src="assets/sound/mgla.mp3"></audio>
+  <audio id="deszczSound" src="assets/sound/deszcz.mp3"></audio>
+  <audio id="sztormSound" src="assets/sound/sztorm.mp3"></audio>
+  <audio id="czystenieboSound" src="assets/sound/czysteniebo.mp3"></audio>
+  <audio id="zagranieBohateraSound" src="assets/sound/zagranieBohatera.mp3"></audio>
+  <audio id="zagranieKartySound" src="assets/sound/zagranie.mp3"></audio>
+  <audio id="zagranieBohateraSound" src="assets/sound/zagranie_bohatera.mp3"></audio>
+
+  <script type="module" src="anim_playground.js"></script>
+</body>
+</html>

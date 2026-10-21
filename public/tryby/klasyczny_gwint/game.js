@@ -24,6 +24,8 @@ function saveGameToken(code, token) {
     } catch (e) {}
 }
 
+let updateCountdownNotification = () => {};
+
 if (socket && gameCode) {
     if (window.ConnectionUI) {
         window.ConnectionUI.init(socket, gameCode, isP1, nick);
@@ -67,7 +69,7 @@ if (socket && gameCode) {
             return `<span class="${colorClass}">${seconds}s</span>`;
         }
 
-        function updateCountdownNotification() {
+        updateCountdownNotification = function() {
             const notifArea = document.getElementById('selectionNotificationArea');
             if (!notifArea) return;
 
