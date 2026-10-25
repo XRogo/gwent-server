@@ -187,11 +187,122 @@ function reconcileArrivedWeatherCards(weather, excludeWeatherStr = null) {
     });
 }
 
+/**
+ * Liczy pozycję 4K slotu w rzędzie wprost z layoutu (tak samo jak renderRowCards),
+ * dla rzędu z `count` kartami. Używane awaryjnie, gdy placeholder nie istnieje w DOM.
+ */
+function computeRowSlot4K(rowKey, index, count) {
+    const isP1 = isPlayer1Local;
+    const side = rowKey && rowKey.startsWith(isP1 ? 'p1' : 'p2') ? 'self' : 'opp';
+    const n = parseInt(String(rowKey || '').slice(-1), 10);
+    const coords = rowCoords[`${side}${n}`];
+    if (!coords) return { x: 1412, y: 1000 }; // tylko gdy rowKey jest nieprawidłowy
+    const cardH = coords.h;
+    const cardW = cardH * (180 / 240);
+    let cardStep = cardW + 5;
+    if (count * cardStep > coords.w && count > 1) {
+        cardStep = (coords.w - cardW) / (count - 1);
+    }
+    const occupied = count > 0 ? (count - 1) * cardStep + cardW : 0;
+    const startX = (coords.w - occupied) / 2;
+    return {
+        x: coords.x + startX + Math.max(0, index | 0) * cardStep,
+        y: coords.y
+    };
+}
+
+const resolveBoardTarget4K = (rowKey, cardIdx, isMe, data, lpc) => {
+    // Preferuj realny slot w DOM – unikamy lotu na „środek planszy”
+    const placeholder = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
+    if (placeholder) return getElement4KPos(placeholder);
+
+    if (lpc && lpc.moc === 'porz') {
+        return isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
+    }
+
+    if (lpc && isSpecialSlotCard(lpc)) {
+        let foundSide = null, foundRow = null;
+        ['p1', 'p2'].forEach(side => {
+            [1, 2, 3].forEach(r => {
+                if (String(data.board[`${side}S${r}`]) === String(lpc.numer)) {
+                    foundSide = side;
+                    foundRow = r;
+                }
+            });
+        });
+        if (foundSide && foundRow) {
+            const sSlotEl = document.getElementById(`special-slot-${foundSide}-${foundRow}`);
+            if (sSlotEl) return getElement4KPos(sSlotEl);
+        }
+    }
+
+    if (lpc && (lpc.typ === 'pogoda' || ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(lpc.moc))) {
+        const weatherEl = document.getElementById('weather-container');
+        if (weatherEl) {
+            const weatherList = boardState.weather || [];
+            if (lpc.moc === 'niebo') {
+                const p = getElement4KPos(weatherEl);
+                p.x += (549 / 2) - 90;
+                return p;
+            }
+            const last3 = weatherList.slice(-3);
+            let foundIndex = last3.findIndex(wStr => wStr.split('-')[1] === String(lpc.numer));
+            if (foundIndex === -1) foundIndex = Math.max(0, last3.length - 1);
+            const count = Math.min(weatherList.length, 3);
+            const wW = 549;
+            const cW = 239 * (180 / 240);
+            let cStep = cW + 5;
+            if (count * cStep > wW) cStep = (wW - cW) / Math.max(1, count - 1);
+            const startX = (wW - (count > 0 ? (count - 1) * cStep + cW : 0)) / 2;
+            const containerPos = getElement4KPos(weatherEl);
+            return {
+                x: containerPos.x + startX + foundIndex * cStep,
+                y: containerPos.y
+            };
+        }
+    }
+
+    // Fallback: policz slot z layoutu rzędu (z uwzględnieniem rozsunięcia kart po sortowaniu)
+    const rowCount = ((data && data.board && data.board[rowKey]) || (boardState && boardState[rowKey]) || []).length;
+    return computeRowSlot4K(rowKey, cardIdx, rowCount);
+};
+
+const playLandFxAndSound = async (slotEl, lpc, data, resolveAfterSound = false) => {
+    const baseSound = getBaseSound(lpc, data);
+
+    const landPromise = (async () => {
+        if (!slotEl) return;
+        if (lpc.bohater) {
+            await playHeroCardEffect(slotEl); // sam odpala zagranieBohateraSound
+        } else {
+            await playCardLandWithPower(slotEl, lpc.moc);
+        }
+    })();
+
+    const soundPromise = new Promise(r => {
+        // bohater / manekin / pożoga – dźwięk już gdzie indziej albo w FX
+        if (lpc.bohater || baseSound === 'manekinSound' || lpc.moc === 'porz' || lpc.moc === 'iporz') {
+            r();
+            return;
+        }
+        if (window.playSound) {
+            if (resolveAfterSound) window.playSound(baseSound, r);
+            else {
+                window.playSound(baseSound);
+                r();
+            }
+        } else {
+            r();
+        }
+    });
+
+    await Promise.all([landPromise, soundPromise]);
+};
+
 const handleCardAnimationSequence = async (data) => {
     const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
     const usedSlotsInSequence = new Set();
 
-    // Zapamiętujemy stan kart obecnych na planszy sprzed tej sekwencji (do utrzymania płynności punktów więzi)
     window.bondPreviousArrivedCards = new Set(window.arrivedBoardCards || []);
     window.bondPreviousCounts = {};
     window.pendingBondGroups = new Set();
@@ -234,22 +345,21 @@ const handleCardAnimationSequence = async (data) => {
         }
     });
 
-    // Obsługa manekina: Zapamiętanie wizualnego placeholders przed animacją
     if (data.decoyDetails) {
         const d = data.decoyDetails;
         window.activeDecoySequences.set(`${d.row}_${d.index}`, String(d.replacedNumer));
         renderAll(currentNick);
     }
 
-
-    // 1. ZAGRANA KARTA (lastPlayedCard)
+    // 1. ZAGRANA KARTA
     const lp = data.lastPlayedCard;
     const lpc = cards.find(c => String(c.numer) === String(lp));
 
     if (lpc) {
-        let rowKey = "";
+        let rowKey = '';
         let cardIdx = -1;
-        if (data.targetSlot) {
+        // Preferuj slot z serwera (indeks PO posortowaniu rzędu)
+        if (data.targetSlot && data.targetSlot.row != null && data.targetSlot.index >= 0) {
             rowKey = data.targetSlot.row;
             cardIdx = data.targetSlot.index;
             usedSlotsInSequence.add(`${rowKey}_${cardIdx}`);
@@ -258,6 +368,7 @@ const handleCardAnimationSequence = async (data) => {
             cardIdx = data.decoyDetails.index;
             usedSlotsInSequence.add(`${rowKey}_${cardIdx}`);
         } else {
+            // fallback: szukaj numeru wśród NIE-arrived
             Object.keys(data.board).forEach(rk => {
                 if (cardIdx !== -1) return;
                 const row = data.board[rk];
@@ -274,65 +385,22 @@ const handleCardAnimationSequence = async (data) => {
             });
         }
 
-        // Wyszukaj placeholder
-        const placeholder = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
-        let to4K = { x: 1412 + 1609 / 2, y: 1000 }; // Fallback
-        if (lpc.moc === 'porz') {
-            to4K = isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
-        } else if (isSpecialSlotCard(lpc)) {
-            let foundSide = null, foundRow = null;
-            ['p1', 'p2'].forEach(side => {
-                [1, 2, 3].forEach(r => {
-                    if (String(data.board[`${side}S${r}`]) === String(lp)) {
-                        foundSide = side; foundRow = r;
-                    }
-                });
-            });
-            if (foundSide && foundRow) {
-                const sSlotEl = document.getElementById(`special-slot-${foundSide}-${foundRow}`);
-                if (sSlotEl) to4K = getElement4KPos(sSlotEl);
-            }
-        } else if (placeholder) {
-            to4K = getElement4KPos(placeholder);
-        } else if (lpc.typ === 'pogoda' || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(lpc.moc)) {
-            const weatherEl = document.getElementById('weather-container');
-            if (weatherEl) {
-                const weatherList = boardState.weather || [];
-                if (lpc.moc === 'niebo') {
-                    to4K = getElement4KPos(weatherEl);
-                    to4K.x += (549 / 2) - 90; // Center (width 549, card width ~180)
-                } else {
-                    const last3 = weatherList.slice(-3);
-                    let foundIndex = last3.findIndex(wStr => wStr.split('-')[1] === String(lpc.numer));
-                    if (foundIndex === -1) {
-                        foundIndex = Math.max(0, last3.length - 1);
-                    }
-                    const count = Math.min(weatherList.length, 3);
-                    const wW = 549;
-                    const cW = 239 * (180 / 240);
-                    let cStep = cW + 5;
-                    if (count * cStep > wW) {
-                        cStep = (wW - cW) / Math.max(1, count - 1);
-                    }
-                    const startX = (wW - (count > 0 ? (count - 1) * cStep + cW : 0)) / 2;
-                    const containerPos = getElement4KPos(weatherEl);
-                    to4K = {
-                        x: containerPos.x + startX + foundIndex * cStep,
-                        y: containerPos.y
-                    };
-                }
-            }
+        // Przed liczeniem celu: ustaw finalny stan planszy i zrenderuj, żeby placeholdery
+        // były już rozsunięte (ukryte). Pomijamy, gdy trwa animacja zniszczenia (pożoga) –
+        // wtedy boardState celowo trzyma stare rzędy do czasu jej zakończenia.
+        const hasPendingDestroyed = window.lastDestroyedCardsDOM && window.lastDestroyedCardsDOM.length > 0;
+        if (rowKey && cardIdx >= 0 && !hasPendingDestroyed) {
+            boardState = data.board;
+            renderAll(currentNick);
         }
 
+        const to4K = resolveBoardTarget4K(rowKey, cardIdx, isMe, data, lpc);
+
         if (data.isFromGraveyard) {
-            // Animacja wskrzeszenia prosto z cmentarza (medyk)
-            // isOpponentGraveyard = true jeśli karta NIE pochodzi z mojego cmentarza
             await new Promise(resolve => {
                 const from4K = data.isOpponentGraveyard ? { x: 3110, y: 168 } : { x: 3110, y: 1682 };
                 const el = createAnimationCardElement(lpc, 180, 239);
                 animateElement(el, from4K, to4K, 180, 239, async () => {
-                    const baseSound = getBaseSound(lpc, data);
-
                     if (data.decoyDetails) {
                         const d = data.decoyDetails;
                         window.activeDecoySequences.delete(`${d.row}_${d.index}`);
@@ -340,26 +408,14 @@ const handleCardAnimationSequence = async (data) => {
 
                     markArrivedInState(lp, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
                     const slotEl = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
-                    if (slotEl) {
-                        if (lpc.bohater) {
-                            await playHeroCardEffect(slotEl);
-                        } else {
-                            await playCardLandWithPower(slotEl, lpc.moc);
-                        }
-                    }
+
+                    await playLandFxAndSound(slotEl, lpc, data, true);
 
                     if (data.decoyDetails) {
                         if (window.playSound) window.playSound('manekinSound');
                         await runDecoyFlyBack(data.decoyDetails, to4K);
                     }
-
-                    // Jeśli to manekin, dźwięk już puściliśmy wcześniej
-                    if (baseSound !== 'manekinSound') {
-                        if (window.playSound) window.playSound(baseSound, resolve);
-                        else resolve();
-                    } else {
-                        resolve();
-                    }
+                    resolve();
                 }, 180, 239);
 
                 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -373,15 +429,12 @@ const handleCardAnimationSequence = async (data) => {
                 }));
             });
         } else if (!isMe) {
-            // Animacja przeciwnika: Start (Środek góry) -> Podgląd (Prawa strona HD) -> Cel (Slot)
             await new Promise(resolve => {
                 const preview4K = { x: 3120, y: 1080 - 992 / 2 };
-                const start4K = { x: 1920, y: -300 }; // Środek góry (ręka przeciwnika)
+                const start4K = { x: 1920, y: -300 };
 
-                // FAZA 1: Dolot i płynny wzrost do podglądu (używamy animateElement)
                 const flyEl = createAnimationCardElement(lpc, 523, 992, true, true);
                 animateElement(flyEl, start4K, preview4K, 523, 992, () => {
-                    // FAZA 2: Podmiana na statyczny podgląd HD (dla ostrości) na 2s
                     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                     const bL = (window.innerWidth - 3840 * scale) / 2;
                     const bT = (window.innerHeight - 2160 * scale) / 2;
@@ -397,9 +450,10 @@ const handleCardAnimationSequence = async (data) => {
                     const infoClone = showOpponentPlayInfo(lpc, scale, bL, bT);
 
                     setTimeout(async () => {
-                        // FAZA 3: Zip do slotu (zmaleje z powrotem do rozmiaru rzędu)
                         if (hdEl.parentNode) hdEl.parentNode.removeChild(hdEl);
                         if (infoClone && infoClone.parentNode) infoClone.parentNode.removeChild(infoClone);
+
+                        const zipFrom = { ...preview4K };
 
                         if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
                             const finalSound = getBaseSound(lpc, data);
@@ -416,19 +470,17 @@ const handleCardAnimationSequence = async (data) => {
                                 boardState = data.board;
                                 renderAll(currentNick);
                             }
-                            executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
-                        } else {
-                            executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
                         }
-
+                        // Cel liczymy świeżo – layout rzędu mógł się zmienić w trakcie podglądu
+                        const freshTo = resolveBoardTarget4K(rowKey, cardIdx, isMe, data, lpc);
+                        executeZip(freshTo, lpc, data, rowKey, cardIdx, resolve, zipFrom);
                     }, 2000);
-                }, 523, 992); // Docelowa wielkość fazy 1
+                }, 523, 992);
 
                 flyEl.style.transformOrigin = 'top left';
                 flyEl.style.transform = `scale(${180 / 523}, ${240 / 992})`;
                 flyEl.style.transition += `, transform ${flyEl._duration}s ease-in-out`;
 
-                // TRIGGER DOLOT I WZROST
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
                     const bL = (window.innerWidth - 3840 * scale) / 2;
@@ -439,9 +491,14 @@ const handleCardAnimationSequence = async (data) => {
                 }));
             });
         } else {
-            // Animacja gracza: Podgląd -> Cel
+            // Gracz: start z realnej pozycji powiększenia
             await new Promise(async resolve => {
                 const proposedPreview = document.getElementById('proposed-card-preview');
+                let zipFrom = { x: 3120, y: 1080 - 992 / 2 };
+                if (proposedPreview && proposedPreview.offsetParent !== null && proposedPreview.style.display !== 'none') {
+                    zipFrom = getElement4KPos(proposedPreview);
+                }
+
                 if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
                     const finalSound = getBaseSound(lpc, data);
                     if (window.playSound) window.playSound(finalSound);
@@ -458,20 +515,26 @@ const handleCardAnimationSequence = async (data) => {
                         renderAll(currentNick);
                     }
                     if (proposedPreview) proposedPreview.style.display = 'none';
-                    executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
+                    // po renderze odśwież cel (slot mógł się pojawić)
+                    const freshTo = resolveBoardTarget4K(rowKey, cardIdx, isMe, data, lpc);
+                    executeZip(freshTo, lpc, data, rowKey, cardIdx, resolve, zipFrom);
                 } else {
                     if (proposedPreview) proposedPreview.style.display = 'none';
-                    executeZip(to4K, lpc, data, rowKey, cardIdx, resolve);
+                    const freshTo = resolveBoardTarget4K(rowKey, cardIdx, isMe, data, lpc);
+                    executeZip(freshTo, lpc, data, rowKey, cardIdx, resolve, zipFrom);
                 }
             });
         }
     }
 
-    // 2. KARTY WEZWANE (musteredDetails - np. Muster / Medyk)
-    // Z pominięciem dużego podglądu i SEKWENCYJNIE!
+    // 2. KARTY WEZWANE
     if (data.musteredDetails && data.musteredDetails.length > 0) {
-        // Po zagraniu pierwszej karty (i jej dźwięku), puszczamy dźwięk wezwania natychmiast
         if (window.playSound) window.playSound('wezwanieSound');
+
+        // Wszystkie placeholdery (ukryte) mają już stać na finalnych X (po sortowaniu),
+        // dzięki temu 3–4 karty lecą na RÓŻNE sloty w tym samym rzędzie.
+        boardState = data.board;
+        renderAll(currentNick);
 
         const musterList = data.musteredDetails || [];
         const musterAnimations = musterList.map((m) => {
@@ -479,10 +542,12 @@ const handleCardAnimationSequence = async (data) => {
                 const cardObj = cards.find(c => String(c.numer) === String(m.numer));
                 if (!cardObj) return resolveMuster();
 
-                let rowKey = m.row || "";
-                let cardIdx = (m.index !== undefined) ? m.index : -1;
+                let rowKey = m.row || '';
+                let cardIdx = (m.index !== undefined && m.index >= 0) ? m.index : -1;
 
-                if (cardIdx === -1) {
+                if (cardIdx === -1 || !rowKey) {
+                    // stary fallback szukania
+                    cardIdx = -1;
                     Object.keys(data.board).forEach(rk => {
                         if (cardIdx !== -1) return;
                         const row = data.board[rk];
@@ -502,13 +567,10 @@ const handleCardAnimationSequence = async (data) => {
                     usedSlotsInSequence.add(`${rowKey}_${cardIdx}`);
                 }
 
-                const placeholder = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
-                let to4K = { x: 1412 + 1609 / 2, y: 1000 };
-                if (placeholder) {
-                    to4K = getElement4KPos(placeholder);
-                }
+                // Placeholder w DOM (już rozsunięty) albo awaryjnie policzony z layoutu
+                const to4K = resolveBoardTarget4K(rowKey, cardIdx, isMe, data, cardObj);
 
-                let from4K = { x: 2090, y: isMe ? 1811 : -240 }; // default hand
+                let from4K = { x: 2090, y: isMe ? 1811 : -240 };
                 if (m.source === 'deck') {
                     from4K = isMe ? { x: 3459, y: 1656 } : { x: 3459, y: 132 };
                 } else if (m.source === 'graveyard') {
@@ -524,7 +586,12 @@ const handleCardAnimationSequence = async (data) => {
 
                 const el = createAnimationCardElement(cardObj, 180, 239);
                 animateElement(el, from4K, to4K, 180, 239, () => {
-                    markArrivedInState(m.numer, data.lastPlayedBy, data.board);
+                    // Po dolocie: zamień ukryty placeholder na prawdziwą kartę (konkretny slot po sortcie)
+                    if (rowKey && cardIdx >= 0) {
+                        markArrivedInState(m.numer, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
+                    } else {
+                        markArrivedInState(m.numer, data.lastPlayedBy, data.board);
+                    }
                     const surfaceSound = getBaseSound(cardObj, data);
                     if (window.playSound) window.playSound(surfaceSound);
                     resolveMuster();
@@ -540,12 +607,18 @@ const handleCardAnimationSequence = async (data) => {
             });
         });
 
-        // Aktywujemy wszystkie animacje na raz (równolegle) po dźwięku 'wezwanieSound'
         await Promise.all(musterAnimations);
 
-        // Efekt wezwania na przyzwanych kartach
         const musteredEls = [];
         musterList.forEach(m => {
+            // Preferuj dokładny slot z serwera
+            if (m.row && m.index !== undefined && m.index >= 0) {
+                const exact = document.getElementById(`slot-placeholder-${m.row}_${m.index}`);
+                if (exact && !musteredEls.includes(exact)) {
+                    musteredEls.push(exact);
+                    return;
+                }
+            }
             Object.keys(data.board).forEach(rk => {
                 const row = data.board[rk];
                 if (Array.isArray(row)) {
@@ -565,28 +638,22 @@ const handleCardAnimationSequence = async (data) => {
         }
     }
 
-    // KROK 3: Sprawdzenie Więzi
+    // 3. Więź
     if (window.pendingBondGroups && window.pendingBondGroups.size > 0 && window.playSound) {
-        // Czekamy na zakończenie dźwięku wejścia ostatniej karty (szacunkowo 800ms po dolocie)
         await new Promise(r => setTimeout(r, 800));
-
-        // Odtwarzamy dźwięk więzi
         window.playSound('wiezSound');
-
-        // W TYM SAMYM MOMENCIE (gdy zaczyna się dźwięk) aktywujemy pełny mnożnik i aktualizujemy punkty na planszy
         window.pendingBondGroups.clear();
         renderAll(currentNick);
-
-        // Czekamy szacunkowo na koniec dźwięku przed zakończeniem całej sekwencji
         await new Promise(r => setTimeout(r, 1500));
     } else if (window.pendingBondGroups) {
         window.pendingBondGroups.clear();
     }
 };
 
-const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
+const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) => {
     const zipEl = createAnimationCardElement(lpc, 180, 239);
-    const zipStart4K = { x: 3315, y: 875 };
+    // Start z podglądu / HD – nie ze sztywnego „prawie środka”
+    const zipStart4K = from4K || { x: 3120, y: 1080 - 992 / 2 };
 
     animateElement(zipEl, zipStart4K, to4K, 180, 239, async () => {
         if (data.decoyDetails) {
@@ -595,34 +662,28 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
         }
 
         const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
-        const isWeather = lpc.typ === 'pogoda' || ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(lpc.moc);
+        const isWeather = lpc.typ === 'pogoda' || ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(lpc.moc);
 
         if (isWeather) {
-            // Check if it was duplicate weather card
             const isDuplicateWeather = lpc.moc !== 'niebo' && window.oldWeatherList && window.oldWeatherList.some(wStr => {
                 const wNum = wStr.split('-')[1];
                 const existingCard = cards.find(c => String(c.numer) === String(wNum));
                 return existingCard && existingCard.moc === lpc.moc;
             });
 
-            // 1. Hide animating weather cards from slots, clear sky clears all
             if (lpc.moc === 'niebo') {
                 window.arrivedWeatherCards.clear();
             }
             window.animatingWeatherCards.clear();
 
-            // 2. Animate removed weather cards to graveyard
             const removedWeatherCards = [];
             if (window.oldWeatherCards && window.oldWeatherCards.length > 0) {
                 window.oldWeatherCards.forEach(item => {
                     const stillActive = boardState.weather && boardState.weather.includes(item.wstr);
-                    if (!stillActive) {
-                        removedWeatherCards.push(item);
-                    }
+                    if (!stillActive) removedWeatherCards.push(item);
                 });
             }
 
-            // Calculate graveyard animating counts
             let myGyCount = 0;
             let oppGyCount = 0;
             if (lpc.moc === 'niebo' || isDuplicateWeather) {
@@ -660,9 +721,8 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
                     }));
                 });
             }
-            window.oldWeatherCards = []; // ALWAYS clear!
+            window.oldWeatherCards = [];
 
-            // 3. Handle played weather card arrival or graveyard fly if duplicate or clear sky
             if (lpc.moc === 'niebo' || isDuplicateWeather) {
                 const activeGraveyard4K = isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
                 const clearSkyEl = createAnimationCardElement(lpc, 180, 239);
@@ -693,13 +753,7 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
         } else {
             markArrivedInState(data.lastPlayedCard, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
             const slotEl = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
-            if (slotEl) {
-                if (lpc.bohater) {
-                    await playHeroCardEffect(slotEl);
-                } else {
-                    await playCardLandWithPower(slotEl, lpc.moc);
-                }
-            }
+            await playLandFxAndSound(slotEl, lpc, data, true);
         }
 
         if (data.decoyDetails) {
@@ -707,13 +761,7 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve) => {
             await runDecoyFlyBack(data.decoyDetails, to4K);
         }
 
-        const finalSound = getBaseSound(lpc, data);
-        if (finalSound !== 'manekinSound' && lpc.moc !== 'porz' && lpc.moc !== 'iporz' && !lpc.bohater) {
-            if (window.playSound) window.playSound(finalSound, resolve);
-            else resolve();
-        } else {
-            resolve();
-        }
+        resolve();
     }, 180, 239);
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -953,7 +1001,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             const handAlreadyDealt = Array.isArray(data.hand) && data.hand.length > 0;
             const midGame = data.status === 'playing' && (boardHasCards || handAlreadyDealt);
 
-                        if (midGame) {
+            if (midGame) {
                 // --- WZNOWIENIE PARTII (F5 / rejoin) ---
                 window.gameStarted = true;
                 window.leaderAnimated = true;
@@ -1376,12 +1424,34 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
         // --- SYNCHRONIZACJA WIDOCZNOŚCI ---
         // Wyłączamy z natychmiastowej widoczności tylko te karty, które właśnie "lądują" (animacja).
+        // Serwer sortuje rzędy po bazowych punktach, więc indeksy slotów po wstawieniu karty
+        // się przesuwają – dokładne sloty "lądujących" kart bierzemy z targetSlot / musteredDetails.
+        const freshSlotKeys = [];
+        if (data.targetSlot && data.targetSlot.row != null && data.targetSlot.index >= 0) {
+            freshSlotKeys.push(`${data.targetSlot.row}_${data.targetSlot.index}`);
+        }
+        if (data.musteredDetails) {
+            data.musteredDetails.forEach(m => {
+                if (m.row && m.index !== undefined && m.index >= 0) {
+                    freshSlotKeys.push(`${m.row}_${m.index}`);
+                }
+            });
+        }
+
         const excludeList = [];
         if (data.lastPlayedCard) excludeList.push(String(data.lastPlayedCard));
         if (data.musteredDetails) {
             data.musteredDetails.forEach(m => excludeList.push(String(m.numer)));
         }
-        reconcileArrivedCards(data.board, excludeList);
+
+        if (freshSlotKeys.length > 0) {
+            // Dokładne sloty znane: oznacz wszystko jako "dotarło", poza slotami lądujących kart.
+            // (stare klucze po indeksach mogły się przesunąć przez sortowanie)
+            reconcileArrivedCards(data.board, []);
+            freshSlotKeys.forEach(k => window.arrivedBoardCards.delete(k));
+        } else {
+            reconcileArrivedCards(data.board, excludeList);
+        }
 
         // NEW: Reconcile weather cards
         const weatherList = data.board.weather || [];
@@ -2941,7 +3011,7 @@ function renderWeather(overlay) {
         container.onclick = null;
     }
 
-    const weatherList = boardState.weather || [];
+    let weatherList = boardState.weather || [];
     let count = Math.min(weatherList.length, 3);
 
     // NEW: If weather cards are animating (removing), keep rendering the old list!

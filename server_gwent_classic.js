@@ -58,6 +58,75 @@ function sortHandForPlayer(hand) {
     });
 }
 
+/** Sort rzędu: rosnąco po BAZOWYCH punktach (bez rogu/więzi/morale/pogody). */
+function sortRowByBasePower(rowArr) {
+    if (!Array.isArray(rowArr) || rowArr.length < 2) return rowArr;
+    rowArr.sort((aNum, bNum) => {
+        const a = cards.find(c => String(c.numer) === String(aNum));
+        const b = cards.find(c => String(c.numer) === String(bNum));
+        if (!a || !b) return 0;
+        const pa = typeof a.punkty === 'number' ? a.punkty : 9999;
+        const pb = typeof b.punkty === 'number' ? b.punkty : 9999;
+        if (pa !== pb) return pa - pb;
+        return cards.findIndex(c => c.numer === a.numer) - cards.findIndex(c => c.numer === b.numer);
+    });
+    return rowArr;
+}
+
+/** Sortuje wszystkie 6 rzędów jednostek planszy. */
+function sortAllRows(board) {
+    ['p1R1', 'p1R2', 'p1R3', 'p2R1', 'p2R2', 'p2R3'].forEach(rk => {
+        if (board && Array.isArray(board[rk])) sortRowByBasePower(board[rk]);
+    });
+}
+
+/** Po sortcie: indeksy musteredDetails (obsługa duplikatów). */
+function reindexMusteredDetails(musteredDetails, board) {
+    if (!musteredDetails || !musteredDetails.length) return musteredDetails || [];
+    const used = new Set();
+    return musteredDetails.map(m => {
+        const row = board[m.row] || [];
+        let idx = -1;
+        for (let i = 0; i < row.length; i++) {
+            const key = `${m.row}_${i}`;
+            if (String(row[i]) === String(m.numer) && !used.has(key)) {
+                used.add(key);
+                idx = i;
+                break;
+            }
+        }
+        return { numer: String(m.numer), source: m.source, row: m.row, index: idx };
+    });
+}
+
+function findCardIndexInRow(row, cardNumer, preferLast = false) {
+    if (!Array.isArray(row)) return -1;
+    if (preferLast) {
+        for (let i = row.length - 1; i >= 0; i--) {
+            if (String(row[i]) === String(cardNumer)) return i;
+        }
+        return -1;
+    }
+    return row.findIndex(n => String(n) === String(cardNumer));
+}
+
+/**
+ * Indeks zagranej karty w rzędzie, z pominięciem slotów zajętych przez karty wezwane
+ * (przy duplikatach numeru zagrana karta i wezwane kopie muszą mieć RÓŻNE sloty).
+ */
+function findPlayedCardIndex(row, cardNumer, musteredDetails, rowKey) {
+    if (!Array.isArray(row)) return -1;
+    const taken = new Set(
+        (musteredDetails || [])
+            .filter(m => m.row === rowKey && m.index >= 0)
+            .map(m => m.index)
+    );
+    for (let i = 0; i < row.length; i++) {
+        if (String(row[i]) === String(cardNumer) && !taken.has(i)) return i;
+    }
+    return findCardIndexInRow(row, cardNumer);
+}
+
 /**
  * Oblicza efektywną siłę karty uwzględniając buffy (róg, więź, morale, pogoda).
  * @param {string} cardNum - numer karty
@@ -196,6 +265,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
 
         if (state.board[finalRow]) {
             state.board[finalRow].push(cardNumer);
+            sortRowByBasePower(state.board[finalRow]);
         }
 
         // Iporz po revive medykiem - ta sama logika co przy zagraniu z reki
@@ -249,6 +319,9 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
             }
         }
 
+        // Indeks wskrzeszonej karty PO sortowaniu (i ewentualnej pożodze)
+        const revivedIndex = findCardIndexInRow(state.board[finalRow], cardNumer);
+
         let chainMedic = false;
         if (revivedCardObj && revivedCardObj.moc === 'medyk') {
             const EXCLUDED_NUMERS = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
@@ -287,7 +360,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         porzogaDestroyed: scorchDestroyed,
                         targetSlot: {
                             row: finalRow,
-                            index: state.board[finalRow].length - 1
+                            index: revivedIndex
                         }
                     });
 
@@ -322,7 +395,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         porzogaDestroyed: scorchDestroyed,
                         targetSlot: {
                             row: finalRow,
-                            index: state.board[finalRow].length - 1
+                            index: revivedIndex
                         }
                     });
 
@@ -363,7 +436,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                 porzogaDestroyed: scorchDestroyed,
                 targetSlot: {
                     row: finalRow,
-                    index: state.board[finalRow].length - 1
+                    index: revivedIndex
                 }
             });
         }
@@ -810,7 +883,7 @@ function registerClassicGwentEvents(socket, io, games) {
         }
     });
 
-        socket.on('get-game-state', (data) => {
+    socket.on('get-game-state', (data) => {
         const { gameCode, isPlayer1 } = data;
         if (!games[gameCode] || !games[gameCode].gameState) return;
 
@@ -1023,7 +1096,7 @@ function registerClassicGwentEvents(socket, io, games) {
             let scorchDestroyed = [];
             let spyDrawn = [];
             let grzybkiApplied = null; // null = nie dotyczy, true = aktywowany, false = pusty
-            let musteredDetails = []; // [{numer, source}]
+            let musteredDetails = []; // [{numer, source, row, index}]
 
             if (state.currentTurn !== socket.id) {
                 console.log(`[GAME CLASSIC] Blocked play: Not ${socket.id}'s turn.`);
@@ -1150,7 +1223,7 @@ function registerClassicGwentEvents(socket, io, games) {
                         if (rowArray) {
                             const idx = rowArray.indexOf(tNum);
                             if (idx !== -1) {
-                                // Podmień kartę na planszy na 001 (Manekin)
+                                // Podmień kartę na planszy na 001 (Manekin) - w miejscu, bez sortowania
                                 rowArray.splice(idx, 1, "001");
                                 // Dodaj zabraną jednostkę do ręki
                                 hand.push(tNum);
@@ -1184,11 +1257,13 @@ function registerClassicGwentEvents(socket, io, games) {
                         state.board[targetRow].push(cardNumer);
                     } else {
                         console.error(`[GAME CLASSIC] Target row ${targetRow} does not exist in board state!`);
-                        state.board[`${targetSide}R1`].push(cardNumer);
+                        targetRow = `${targetSide}R1`;
+                        state.board[targetRow].push(cardNumer);
                     }
+                    sortRowByBasePower(state.board[targetRow]);
                     hand.splice(cardIdx, 1);
 
-                    // Wezwanie (Muster) logic
+                    // Wezwanie (Muster) - po każdym push sortujemy rząd, indeksy liczymy na końcu
                     if (cardObj.summon && cardObj.moc === 'wezwanie') {
                         const summonIds = cardObj.summon.split(',').map(s => s.trim());
                         const deck = isPlayer1 ? state.p1Deck : state.p2Deck;
@@ -1202,13 +1277,14 @@ function registerClassicGwentEvents(socket, io, games) {
                                 const sTargetRow = `${targetSide}R${sPos}`;
                                 if (!state.board[sTargetRow]) state.board[sTargetRow] = [];
                                 state.board[sTargetRow].push(cNum);
+                                sortRowByBasePower(state.board[sTargetRow]);
                                 hand.splice(i, 1);
                                 musteredCount++;
                                 musteredDetails.push({
                                     numer: String(cNum),
                                     source: 'hand',
                                     row: sTargetRow,
-                                    index: state.board[sTargetRow].length - 1
+                                    index: -1
                                 });
                             }
                         }
@@ -1221,17 +1297,21 @@ function registerClassicGwentEvents(socket, io, games) {
                                 const sTargetRow = `${targetSide}R${sPos}`;
                                 if (!state.board[sTargetRow]) state.board[sTargetRow] = [];
                                 state.board[sTargetRow].push(cNum);
+                                sortRowByBasePower(state.board[sTargetRow]);
                                 deck.splice(i, 1);
                                 musteredCount++;
                                 musteredDetails.push({
                                     numer: String(cNum),
                                     source: 'deck',
                                     row: sTargetRow,
-                                    index: state.board[sTargetRow].length - 1
+                                    index: -1
                                 });
                             }
                         }
+                        // Indeksy z aktualnego (posortowanego) stanu rzędów
+                        musteredDetails = reindexMusteredDetails(musteredDetails, state.board);
                     }
+
                     // Berserk played into Grzybki check
                     if (cardObj.moc === 'berserk') {
                         const sSlot = `${targetSide}S${finalPos}`;
@@ -1365,6 +1445,20 @@ function registerClassicGwentEvents(socket, io, games) {
 
                 console.log(`[GAME CLASSIC] [${gameCode}] ${isPlayer1 ? 'P1' : 'P2'} played ${cardNumer} at ${targetRow}. Next turn: ${state.currentTurn}`);
 
+                // po pożodze (splice przesuwa indeksy) – rzędy zostają posortowane, więc
+                // wystarczy ponownie przeliczyć indeksy kart wezwanych
+                if (scorchDestroyed && scorchDestroyed.length) {
+                    sortAllRows(state.board);
+                    if (musteredDetails.length) {
+                        musteredDetails = reindexMusteredDetails(musteredDetails, state.board);
+                    }
+                }
+
+                // Indeks zagranej karty PO sortowaniu (z pominięciem slotów kart wezwanych)
+                const playedIndex = (targetRow && targetRow !== 'weather' && Array.isArray(state.board[targetRow]))
+                    ? findPlayedCardIndex(state.board[targetRow], cardNumer, musteredDetails, targetRow)
+                    : -1;
+
                 // Synchronize all clients
                 io.to(gameCode).emit('board-updated', {
                     board: state.board,
@@ -1390,9 +1484,9 @@ function registerClassicGwentEvents(socket, io, games) {
                     porzogaDestroyed: scorchDestroyed || [],
                     decoyDetails: state.decoyDetails || null,
                     weatherReplaced: state.weatherReplaced || [],
-                    targetSlot: (targetRow && state.board[targetRow]) ? {
+                    targetSlot: (targetRow && playedIndex >= 0) ? {
                         row: targetRow,
-                        index: Array.isArray(state.board[targetRow]) ? state.board[targetRow].lastIndexOf(cardNumer) : -1
+                        index: playedIndex
                     } : null
                 });
 
@@ -1799,6 +1893,17 @@ function registerClassicGwentEvents(socket, io, games) {
                     }
                 }
 
+                // Po wszystkich pushach na świeżą planszę (zatrzymane potwory, wezwania krowy,
+                // wskrzeszenia Skellige) – posortuj rzędy po bazowych punktach
+                sortAllRows(state.board);
+
+                // Sloty zatrzymanych potworów PO sortowaniu (indeks mógł się przesunąć)
+                const keptSlot = (kept) => {
+                    if (!kept) return null;
+                    return { row: kept.row, index: findCardIndexInRow(state.board[kept.row], kept.numer) };
+                };
+                const monstersKeptSlots = { p1: keptSlot(p1MonsterKept), p2: keptSlot(p2MonsterKept) };
+
                 // Loser goes first or random if draw
                 if (roundResult === 'p1') state.currentTurn = game.player2;
                 else if (roundResult === 'p2') state.currentTurn = game.player1;
@@ -1835,6 +1940,7 @@ function registerClassicGwentEvents(socket, io, games) {
                     northernRealmsDraw: { p1: p1NrDraw, p2: p2NrDraw },
                     cowTransformed: cowTransformed,
                     monstersKept: monstersKept,
+                    monstersKeptSlots: monstersKeptSlots,
                     skelligeResurrect: skelligeResurrect,
                     roundNumber: state.roundNumber
                 });

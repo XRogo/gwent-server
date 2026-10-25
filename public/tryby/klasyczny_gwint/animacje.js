@@ -724,15 +724,20 @@ export function playHeroSparksOnElement(cardEl) {
         canvas.width = Math.ceil(cardW + pad * 2);
         canvas.height = Math.ceil(cardH + pad * 2);
         canvas.style.cssText = `
-            position:fixed;
-            left:${rect.left - pad}px;
-            top:${rect.top - pad}px;
+            position:absolute;
+            left:${-pad}px;
+            top:${-pad}px;
             width:${canvas.width}px;
             height:${canvas.height}px;
             pointer-events:none;
-            z-index:6000;
-        `;
-        document.body.appendChild(canvas);
+            z-index:40;
+            `;
+        // upewnij się, że karta jest relative i overflow:visible
+        if (getComputedStyle(cardEl).position === 'static') {
+            cardEl.style.position = 'relative';
+        }
+        cardEl.style.overflow = 'visible';
+        cardEl.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
         const CFG = HERO_EMBER_CFG;
