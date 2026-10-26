@@ -1,22 +1,16 @@
 /**
- * anim_playground.js – plansza testowa + UI.
- * Efekty w anim_effects.js
+ * anim_playground.js – mini-plansza + UI testów.
+ * Wszystkie FX wyłącznie z anim_effects.js (jak w game_board.js).
  */
 import cards from './cards.js';
 import { getCardImage } from './cardImages.js';
 import { getElement4KPos } from './animacje.js';
 import {
   runPorzogaOnCardElement,
-  playHeroCardEffect,
   animateHeroPlayFromHand,
+  playHeroCardEffect,
   playWezwanieOnCards,
-  playCardLandDustOnElement,
-  playPowerIconOnElement,
-  playCardLandWithPower,
-  powerHasIconAnim,
-  HERO_EMBER_CFG,
-  LAND_CFG,
-  POWER_ICON_CFG
+  playCardLandWithPower
 } from './anim_effects.js';
 
 const GUI_W = 3840;
@@ -47,18 +41,10 @@ const WEATHER_CARD_NUM = {
 };
 
 let boardState = {
-  p1R1: [],
-  p1R2: [],
-  p1R3: [],
-  p2R1: [],
-  p2R2: [],
-  p2R3: [],
-  p1S1: null,
-  p1S2: null,
-  p1S3: null,
-  p2S1: null,
-  p2S2: null,
-  p2S3: null,
+  p1R1: [], p1R2: [], p1R3: [],
+  p2R1: [], p2R2: [], p2R3: [],
+  p1S1: null, p1S2: null, p1S3: null,
+  p2S1: null, p2S2: null, p2S3: null,
   weather: []
 };
 let selectedKey = null;
@@ -99,28 +85,17 @@ function pickUnits(n = 10) {
   return [...units].sort(() => Math.random() - 0.5).slice(0, n);
 }
 
-function pickHero() {
-  const heroes = cards.filter(c => c.bohater);
-  if (!heroes.length) return null;
-  return heroes[Math.floor(Math.random() * heroes.length)];
-}
-
 function findCardByNumer(numer) {
   return cards.find(c => String(c.numer) === String(numer));
 }
 
 function rowKeyFromPozycja(pos, side = 'p1') {
   const p = Number(pos) || 1;
-  if (side === 'p1') {
-    if (p === 2) return 'p1R2';
-    if (p === 3) return 'p1R3';
-    if (p === 4) return Math.random() < 0.5 ? 'p1R1' : 'p1R2';
-    return 'p1R1';
-  }
-  if (p === 2) return 'p2R2';
-  if (p === 3) return 'p2R3';
-  if (p === 4) return Math.random() < 0.5 ? 'p2R1' : 'p2R2';
-  return 'p2R1';
+  const prefix = side === 'p1' ? 'p1' : 'p2';
+  if (p === 2) return `${prefix}R2`;
+  if (p === 3) return `${prefix}R3`;
+  if (p === 4) return Math.random() < 0.5 ? `${prefix}R1` : `${prefix}R2`;
+  return `${prefix}R1`;
 }
 
 function parseSummonList(summonField) {
@@ -152,12 +127,8 @@ function resetBoard() {
     p2R1: s.slice(5, 7).map(c => c.numer),
     p2R2: s.slice(7, 9).map(c => c.numer),
     p2R3: s.slice(9, 10).map(c => c.numer),
-    p1S1: null,
-    p1S2: null,
-    p1S3: null,
-    p2S1: null,
-    p2S2: null,
-    p2S3: null,
+    p1S1: null, p1S2: null, p1S3: null,
+    p2S1: null, p2S2: null, p2S3: null,
     weather: []
   };
   selectedKey = null;
@@ -410,7 +381,7 @@ function applyWeatherFilters() {
   }
 }
 
-// ---------- handlery UI ----------
+// ---------- efekty (tylko orkiestracja + wywołania anim_effects) ----------
 
 async function effectPorzoga() {
   playSound('porzogaSound');
@@ -490,50 +461,40 @@ async function effectBurnSelected() {
   selectedKey = null;
   rebuildArrived();
   renderAll();
-  log('Karta spalona + lot na trupy');
+  log('Karta spalona');
 }
 
-async function effectHeroFromHand() {
-  const hero = pickHero();
-  if (!hero) {
-    log('Brak kart bohatera w cards.js');
+async function effectWezwanieSelected() {
+  if (!selectedKey) {
+    log('Zaznacz kartę');
     return;
   }
-
-  const rowKey = rowKeyFromPozycja(hero.pozycja, 'p1');
-  log(`Bohater z ręki → ${rowKey}: ${hero.nazwa || hero.numer}`);
-
-  boardState[rowKey].push(hero.numer);
-  const newIndex = boardState[rowKey].length - 1;
-  const cardKey = `${rowKey}_${newIndex}`;
-  renderAll();
-
-  const placeholder = document.getElementById(`slot-placeholder-${cardKey}`);
-  let to4K = {
-    x: rowCoords.self1.x + rowCoords.self1.w / 2 - 90,
-    y: rowCoords.self1.y
-  };
-  if (placeholder) to4K = getElement4KPos(placeholder);
-
-  await animateHeroPlayFromHand({
-    card: hero,
-    from4K: HAND_CENTER_4K,
-    to4K,
-    onLanded: () => {
-      window.arrivedBoardCards.add(cardKey);
-      renderAll();
-    }
-  });
-
-  const el = document.getElementById(`slot-placeholder-${cardKey}`);
-  if (el) await playHeroCardEffect(el);
-
-  log('Bohater: lot z ręki + FX OK');
+  const el = document.getElementById(`slot-placeholder-${selectedKey}`);
+  if (!el) return;
+  log(`Wezwanie FX: ${selectedKey}`);
+  await playWezwanieOnCards([el]);
+  log('Wezwanie FX OK');
 }
 
-/**
- * Pełne wezwanie: lider (lot + FX bohatera) → przyzwane (lot + dźwięk) → FX wezwania
- */
+async function effectWezwanieRow() {
+  if (!selectedKey) {
+    log('Zaznacz kartę');
+    return;
+  }
+  const rowKey = selectedKey.split('_')[0];
+  const els = [...document.querySelectorAll(
+    `.board-card-wrapper[data-row="${rowKey}"]`
+  )];
+  if (!els.length) {
+    log('Pusty rząd');
+    return;
+  }
+  log(`Wezwanie FX rząd ${rowKey} × ${els.length}`);
+  await playWezwanieOnCards(els);
+  log('Wezwanie FX rząd OK');
+}
+
+/** Pełna sekwencja: lot + FX z anim_effects (jak w grze) */
 async function runWezwanieSequence(leaderCard) {
   if (!leaderCard) {
     log('Brak karty wezwania');
@@ -551,7 +512,6 @@ async function runWezwanieSequence(leaderCard) {
     `Wezwanie: ${leaderCard.nazwa || leaderCard.numer} → ${rowKey} + [${summonNums.join(', ')}]`
   );
 
-  // 1) lider
   boardState[rowKey].push(leaderCard.numer);
   const leaderIndex = boardState[rowKey].length - 1;
   const leaderKey = `${rowKey}_${leaderIndex}`;
@@ -585,9 +545,6 @@ async function runWezwanieSequence(leaderCard) {
     await playCardLandWithPower(leaderEl, leaderCard.moc);
   }
 
-  log(`Zagrano: ${leaderCard.nazwa || leaderCard.numer}`);
-
-  // 2) przyzwane – wlot + dźwięk
   const pending = [];
   for (const num of summonNums) {
     const sc = findCardByNumer(num);
@@ -599,7 +556,7 @@ async function runWezwanieSequence(leaderCard) {
     boardState[sRow].push(sc.numer);
     const idx = boardState[sRow].length - 1;
     const key = `${sRow}_${idx}`;
-    pending.push({ key, card: sc, row: sRow });
+    pending.push({ key, card: sc });
   }
 
   renderAll();
@@ -616,7 +573,6 @@ async function runWezwanieSequence(leaderCard) {
     playSound(
       item.card.bohater ? 'zagranieBohateraSound' : 'zagranieKartySound'
     );
-    log(`Wlot przyzwanej: ${item.card.nazwa || item.card.numer}`);
 
     await animateHeroPlayFromHand({
       card: item.card,
@@ -658,16 +614,16 @@ function pickVampireLeader() {
       /wampir/i.test(c.nazwa) &&
       c.summon
   );
-  if (!vamps.length) return null;
-  return vamps[Math.floor(Math.random() * vamps.length)];
+  return vamps.length
+    ? vamps[Math.floor(Math.random() * vamps.length)]
+    : null;
 }
 
 function pickRandomWezwanie() {
   const list = cards.filter(
     c => (c.moc === 'wezwanie' || c.moc === 'wezwarniezza') && c.summon
   );
-  if (!list.length) return null;
-  return list[Math.floor(Math.random() * list.length)];
+  return list.length ? list[Math.floor(Math.random() * list.length)] : null;
 }
 
 function effectWeather(type) {
@@ -715,149 +671,6 @@ function effectPower(power) {
   }
 }
 
-/** Tylko kurz lądowania na zaznaczonej */
-async function effectLandDustSelected() {
-  if (!selectedKey) {
-    log('Zaznacz kartę na planszy');
-    return;
-  }
-  const el = document.getElementById(`slot-placeholder-${selectedKey}`);
-  if (!el) {
-    log('Brak elementu karty');
-    return;
-  }
-  log(`Lądowanie FX: ${selectedKey}`);
-  await playCardLandDustOnElement(el);
-  log('Lądowanie FX OK');
-}
-
-/** Lot zwykłej jednostki + kurz (bez mocy / cicha) */
-async function effectLandPlayUnit() {
-  const quiet = cards.filter(
-    c =>
-      typeof c.punkty === 'number' &&
-      !c.bohater &&
-      (!c.moc || !powerHasIconAnim(c.moc))
-  );
-  const card = quiet.length
-    ? quiet[Math.floor(Math.random() * quiet.length)]
-    : pickUnits(1)[0];
-
-  if (!card) {
-    log('Brak jednostki');
-    return;
-  }
-
-  const rowKey = rowKeyFromPozycja(card.pozycja, 'p1');
-  log(`Zagranie + kurz: ${card.nazwa || card.numer} → ${rowKey}`);
-
-  boardState[rowKey].push(card.numer);
-  const newIndex = boardState[rowKey].length - 1;
-  const cardKey = `${rowKey}_${newIndex}`;
-  renderAll();
-
-  const placeholder = document.getElementById(`slot-placeholder-${cardKey}`);
-  let to4K = {
-    x: rowCoords.self1.x + rowCoords.self1.w / 2 - 90,
-    y: rowCoords.self1.y
-  };
-  if (placeholder) to4K = getElement4KPos(placeholder);
-
-  playSound('zagranieKartySound');
-
-  await animateHeroPlayFromHand({
-    card,
-    from4K: HAND_CENTER_4K,
-    to4K,
-    onLanded: () => {
-      window.arrivedBoardCards.add(cardKey);
-      renderAll();
-    }
-  });
-
-  const el = document.getElementById(`slot-placeholder-${cardKey}`);
-  if (el) await playCardLandDustOnElement(el);
-
-  log('Zagranie + kurz OK');
-}
-
-/** Ikona mocy (opcjonalnie + kurz) na zaznaczonej */
-async function effectPowerIcon(moc, withLand = true) {
-  if (!selectedKey) {
-    log('Zaznacz kartę');
-    return;
-  }
-  const el = document.getElementById(`slot-placeholder-${selectedKey}`);
-  if (!el) return;
-  log(`Ikona mocy: ${moc}${withLand ? ' + kurz' : ''}`);
-  if (withLand) {
-    await playCardLandWithPower(el, moc);
-  } else {
-    await playPowerIconOnElement(el, moc);
-  }
-  log('Ikona mocy OK');
-}
-
-/** Kurz + moc z danych zaznaczonej karty */
-async function effectLandPowerFromCard() {
-  if (!selectedKey) {
-    log('Zaznacz kartę');
-    return;
-  }
-  const el = document.getElementById(`slot-placeholder-${selectedKey}`);
-  const numer = el?.dataset?.numer;
-  const card = findCardByNumer(numer);
-  const moc = card?.moc || null;
-  log(`Kurz + moc z karty: ${moc || '(brak / cicha)'}`);
-  await playCardLandWithPower(el, moc);
-}
-
-/** Zagrać kartę z mocą z listy (lot + kurz + ikona) */
-async function effectPlayWithPower(moc) {
-  const list = cards.filter(
-    c => c.moc === moc && typeof c.punkty === 'number' && !c.bohater
-  );
-  const card = list.length
-    ? list[Math.floor(Math.random() * list.length)]
-    : null;
-  if (!card) {
-    log(`Brak karty z moc=${moc}`);
-    return;
-  }
-
-  const rowKey = rowKeyFromPozycja(card.pozycja, 'p1');
-  log(`Zagranie z mocą ${moc}: ${card.nazwa || card.numer}`);
-
-  boardState[rowKey].push(card.numer);
-  const newIndex = boardState[rowKey].length - 1;
-  const cardKey = `${rowKey}_${newIndex}`;
-  renderAll();
-
-  const placeholder = document.getElementById(`slot-placeholder-${cardKey}`);
-  let to4K = {
-    x: rowCoords.self1.x + rowCoords.self1.w / 2 - 90,
-    y: rowCoords.self1.y
-  };
-  if (placeholder) to4K = getElement4KPos(placeholder);
-
-  playSound('zagranieKartySound');
-
-  await animateHeroPlayFromHand({
-    card,
-    from4K: HAND_CENTER_4K,
-    to4K,
-    onLanded: () => {
-      window.arrivedBoardCards.add(cardKey);
-      renderAll();
-    }
-  });
-
-  const el = document.getElementById(`slot-placeholder-${cardKey}`);
-  if (el) await playCardLandWithPower(el, moc);
-
-  log(`Zagranie ${moc} OK`);
-}
-
 function bindUI() {
   document.getElementById('btn-reset')?.addEventListener('click', resetBoard);
   document.getElementById('btn-clear')?.addEventListener('click', clearBoard);
@@ -878,11 +691,13 @@ function bindUI() {
     effectBurnSelected()
   );
 
-  document.getElementById('btn-hero')?.addEventListener('click', () =>
-    effectHeroFromHand()
+  document.getElementById('btn-wezwanie')?.addEventListener('click', () =>
+    effectWezwanieSelected()
+  );
+  document.getElementById('btn-wezwanie-row')?.addEventListener('click', () =>
+    effectWezwanieRow()
   );
 
-  // Wezwanie – pełne sekwencje
   document.getElementById('btn-wezwanie-cerys')?.addEventListener('click', () => {
     const c = pickCerys();
     if (!c) {
@@ -908,31 +723,6 @@ function bindUI() {
     runWezwanieSequence(c);
   });
 
-  // Lądowanie
-  document.getElementById('btn-land-dust')?.addEventListener('click', () =>
-    effectLandDustSelected()
-  );
-  document.getElementById('btn-land-play')?.addEventListener('click', () =>
-    effectLandPlayUnit()
-  );
-  document.getElementById('btn-land-power')?.addEventListener('click', () =>
-    effectLandPowerFromCard()
-  );
-
-  // Ikony mocy (na zaznaczonej + kurz)
-  document.querySelectorAll('[data-power-icon]').forEach(btn => {
-    btn.addEventListener('click', () =>
-      effectPowerIcon(btn.dataset.powerIcon, true)
-    );
-  });
-
-  // Zagranie karty z konkretną mocą
-  document.querySelectorAll('[data-play-power]').forEach(btn => {
-    btn.addEventListener('click', () =>
-      effectPlayWithPower(btn.dataset.playPower)
-    );
-  });
-
   document.querySelectorAll('[data-w]').forEach(btn => {
     btn.addEventListener('click', () => effectWeather(btn.dataset.w));
   });
@@ -940,16 +730,9 @@ function bindUI() {
     btn.addEventListener('click', () => effectPower(btn.dataset.power));
   });
 
-  document.getElementById('btn-to-grave')?.addEventListener('click', () =>
-    effectBurnSelected()
-  );
-
   window.addEventListener('resize', () => renderAll());
 }
 
 bindUI();
 resetBoard();
-log('Poligon gotowy (effects w anim_effects.js)');
-log(
-  `Tune: ember dens=${HERO_EMBER_CFG?.density ?? '?'} | land size=${LAND_CFG?.dymekSize ?? '?'} | power base=${POWER_ICON_CFG?.baseSize ?? '?'}`
-);
+log('Poligon gotowy – FX tylko z anim_effects.js');

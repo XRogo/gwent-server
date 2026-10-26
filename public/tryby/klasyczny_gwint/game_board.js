@@ -6,6 +6,7 @@ import { showPowiek, renderPowiek } from './rcard.js';
 import { krole } from './krole.js';
 import { isLeaderUsable } from './krol_code.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
+import { playFrostFx, syncFrostFx } from './frost_fx.js';
 import {
     animateLeaderFromDeck,
     animateOpponentLeaderFromDeck,
@@ -741,13 +742,17 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
                     clearSkyEl.style.left = `${activeGraveyard4K.x * scale + bL}px`;
                     clearSkyEl.style.top = `${activeGraveyard4K.y * scale + bT}px`;
                 }));
-            } else {
-                const weatherList = boardState.weather || [];
-                const newWeatherStr = weatherList[weatherList.length - 1];
-                if (newWeatherStr) {
-                    window.arrivedWeatherCards.add(newWeatherStr);
-                }
-            }
+           } else {
+                   if (lpc.moc === 'mroz' && !isDuplicateWeather) {
+                       if (window.playSound) window.playSound('mrozSound');
+                       playFrostFx();
+                   }
+                   const weatherList = boardState.weather || [];
+                   const newWeatherStr = weatherList[weatherList.length - 1];
+                   if (newWeatherStr) {
+                       window.arrivedWeatherCards.add(newWeatherStr);
+                   }
+               }
 
             renderAll(currentNick);
         } else {
@@ -1491,17 +1496,6 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 // Serwer jawnie mówi że karta wskrzeszona z cmentarza (medyk)
                 const isMe = data.lastPlayedBy === (isPlayer1Local ? 'p1' : 'p2');
                 data.isOpponentGraveyard = !isMe; // Karta wskrzeszona ze SWOJEGO cmentarza = nie-opponent
-            } else {
-                let cameFromGy = false;
-                let oppGy = false;
-                // Sprawdzamy stan zanim go nadpiszemy z serwera
-                if (playerGraveyard.some(c => c.numer === String(data.lastPlayedCard))) {
-                    cameFromGy = true; oppGy = false;
-                } else if (opponentGraveyard.some(c => c.numer === String(data.lastPlayedCard))) {
-                    cameFromGy = true; oppGy = true;
-                }
-                data.isFromGraveyard = cameFromGy;
-                data.isOpponentGraveyard = oppGy;
             }
         }
 
@@ -3053,6 +3047,13 @@ function renderWeather(overlay) {
             container.appendChild(wrapper);
         }
     });
+
+           const frostActive = (boardState.weather || []).some(w => {
+           const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
+           return c && c.moc === 'mroz' && window.arrivedWeatherCards.has(w);
+       });
+       syncFrostFx(frostActive);
+
 }
 
 function renderRows(overlay) {
