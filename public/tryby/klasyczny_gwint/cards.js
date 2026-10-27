@@ -2367,7 +2367,7 @@ const cards = [
     },
 //"Purat klanu Dimun"
     {
-        nazwa: "Purat klanu Dimun",
+        nazwa: "Pirat klanu Dimun",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/pirat_z_klanu_dimun.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/6/510.webp",
         opis: '"W ich oczach widzę starch. Boją sie... Za\nmną! Za klan Dimun!"',
@@ -2445,6 +2445,18 @@ const cards = [
         summon: "527",
         ilosc: 1,
         numer: "515"
+    },
+
+    {
+        nazwa: "Przemieniony Vildkaarl",
+        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/przemieniony_vildkaarl.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/6/berserk.webp",
+        opis: "Raz w życiu widziałem jak walczą... I\nwięcej nie chce.",
+        bohater: false,
+        moc: "morale",
+        punkty: 14,
+        pozycja: 1,
+        numer: "527"
     },
 //"Płatnerz klanu Torrdaroch"
     {
@@ -2575,6 +2587,18 @@ const cards = [
         ilosc: 3,
         numer: "524"
     },
+
+    {
+        nazwa: "Przemieniony Młody Vildkaarl",
+        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/przemieniony_mlody_vildkaarl.webp",
+        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/6/berserk2.webp",
+        opis: "Arrrgh!",
+        bohater: false,
+        moc: "wiez",
+        punkty: 8,
+        pozycja: 2,
+        numer: "528"
+    },
 //"Kambi"
     {
         nazwa: "Kambi",
@@ -2590,8 +2614,6 @@ const cards = [
         ilosc: 1,
         numer: "525"
     },
-
-    //inne===============================================================================================================================================================
 //"Hemdal"
     {
         nazwa: "Hemdal",
@@ -2602,30 +2624,6 @@ const cards = [
         punkty: 11,
         pozycja: 1,
         numer: "526"
-    },
-//"Przemieniony Vildkaarl"
-    {
-        nazwa: "Przemieniony Vildkaarl",
-        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/kambi.webp",
-        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/6/berserk.webp",
-        opis: "Raz w życiu widziałem jak walczą... I\nwięcej nie chce.",
-        bohater: false,
-        moc: "morale",
-        punkty: 14,
-        pozycja: 1,
-        numer: "527"
-    },
-//"Przemieniony Młody Vildkaarl"
-    {
-        nazwa: "Przemieniony Młody Vildkaarl",
-        karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/kambi.webp",
-        dkarta: "/tryby/klasyczny_gwint/assets/dkarty/6/berserk2.webp",
-        opis: "Arrrgh!",
-        bohater: false,
-        moc: "wiez",
-        punkty: 8,
-        pozycja: 2,
-        numer: "528"
     },
 ];
 export default cards;

@@ -59,12 +59,13 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     }).length;
 
     const leaderForSide = rowSide === 'p1' ? state.p1Leader : state.p2Leader;
-    const hasBran = String(leaderForSide) === '5001';
+    const leaderBlocked = rowSide === 'p1' ? state.p1LeaderBlocked : state.p2LeaderBlocked;
+    const hasBran = String(leaderForSide) === '5001' && !leaderBlocked;
 
     let pts = card.punkty;
     if (weatherActive) {
         if (hasBran) {
-            pts = Math.ceil(card.punkty / 2);
+            pts = Math.max(1, Math.floor(card.punkty / 2));
         } else {
             pts = 1;
         }

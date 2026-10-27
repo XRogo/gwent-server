@@ -240,7 +240,7 @@ const krole = [
         nazwa: "Król Bran",
         karta: "/tryby/klasyczny_gwint/assets/karty/Skellige/bran.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/5001.webp",
-        opis: '"Nikt nie zastąpi Brana. Moge jedynie próbować."',
+        opis: '"Nikt nie zastąpi Brana. Moge jedynie\npróbować."',
         frakcja: "5",
         numer: "5001",
         umiejetnosc: "Pod wpływem złych warunków atmosferycznych, jednostki tracą tylko połowę\nswojej siły bojowej"

@@ -63,22 +63,10 @@ const getBaseSound = (card, data) => {
     if (card.moc === 'sztorm') return 'sztormSound';
     if (card.pozycja === 3) return 'zagranie3Sound';
     if (card.numer === '000') {
-        let activated = false;
-        let foundSide = null, foundRow = null;
-        ['p1', 'p2'].forEach(side => {
-            [1, 2, 3].forEach(r => {
-                if (data && data.board && String(data.board[`${side}S${r}`]) === '000') {
-                    foundSide = side; foundRow = r;
-                }
-            });
-        });
-        if (foundSide && foundRow) {
-            const rowCards = data.board[`${foundSide}R${foundRow}`] || [];
-            if (rowCards.includes(26) || rowCards.includes('026') || rowCards.includes(27) || rowCards.includes('027')) {
-                activated = true;
-            }
-        }
-        return activated ? 'grzybkiSound' : 'pusteGrzybkiSound';
+        return (data && data.grzybkiApplied) ? 'grzybkiSound' : 'pusteGrzybkiSound';
+    }
+    if (card.moc === 'berserk' && data && data.grzybkiApplied) {
+        return 'grzybkiSound';
     }
     if (card.pozycja === 2 && !card.bohater && card.moc !== 'manek') return 'zagranie2Sound';
     return 'zagranie1Sound';
@@ -217,7 +205,7 @@ const resolveBoardTarget4K = (rowKey, cardIdx, isMe, data, lpc) => {
     const placeholder = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
     if (placeholder) return getElement4KPos(placeholder);
 
-    if (lpc && lpc.moc === 'porz') {
+    if (lpc && lpc.moc === 'porz' && typeof lpc.punkty !== 'number') {
         return isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
     }
 
@@ -456,7 +444,7 @@ const handleCardAnimationSequence = async (data) => {
 
                         const zipFrom = { ...preview4K };
 
-                        if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
+                        if ((lpc.moc === 'porz' && typeof lpc.punkty !== 'number') || lpc.moc === 'iporz') {
                             const finalSound = getBaseSound(lpc, data);
                             if (window.playSound) window.playSound(finalSound);
 
@@ -500,7 +488,7 @@ const handleCardAnimationSequence = async (data) => {
                     zipFrom = getElement4KPos(proposedPreview);
                 }
 
-                if (lpc.moc === 'porz' || lpc.moc === 'iporz') {
+                if ((lpc.moc === 'porz' && typeof lpc.punkty !== 'number') || lpc.moc === 'iporz') {
                     const finalSound = getBaseSound(lpc, data);
                     if (window.playSound) window.playSound(finalSound);
 
@@ -759,6 +747,32 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
             markArrivedInState(data.lastPlayedCard, data.lastPlayedBy, data.board, `${rowKey}_${cardIdx}`);
             const slotEl = document.getElementById(`slot-placeholder-${rowKey}_${cardIdx}`);
             await playLandFxAndSound(slotEl, lpc, data, true);
+
+            // Jeśli to jednostka z pożogą (np. Pirat 510), odpalamy pożogę po wylądowaniu
+            if (lpc.moc === 'porz' && typeof lpc.punkty === 'number') {
+                const finalSound = getBaseSound(lpc, data);
+                if (window.playSound) window.playSound(finalSound);
+
+                const allToDestroy = [...(window.lastDestroyedCardsDOM || [])];
+                if (data.scorchDestroyed && data.scorchDestroyed.includes(String(lpc.numer))) {
+                    allToDestroy.push({
+                        card: lpc,
+                        el: slotEl,
+                        side: data.lastPlayedBy
+                    });
+                }
+                if (allToDestroy.length > 0) {
+                    await Promise.all(allToDestroy.map(async item => {
+                        const el = (item.elementId ? document.getElementById(item.elementId) : null) || item.el;
+                        if (el) {
+                            await runPorzogaOnCardElement(el, item.card, item.side === 'p1');
+                        }
+                    }));
+                    window.lastDestroyedCardsDOM = [];
+                    boardState = data.board;
+                    renderAll(currentNick);
+                }
+            }
         }
 
         if (data.decoyDetails) {
@@ -1407,13 +1421,14 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             if (newBoardCounts[item.card.numer] > 0) {
                 newBoardCounts[item.card.numer]--;
             } else {
-                if (!data.decoyDetails || String(data.decoyDetails.replacedNumer) !== String(item.card.numer)) {
+                const isTransformed = data.berserkTransformed && data.berserkTransformed.some(t => String(t.from) === String(item.card.numer) && t.row === item.row);
+                if (!isTransformed && (!data.decoyDetails || String(data.decoyDetails.replacedNumer) !== String(item.card.numer))) {
                     window.lastDestroyedCardsDOM.push(item);
                 }
             }
         });
 
-        if (window.lastDestroyedCardsDOM.length > 0) {
+        if (window.lastDestroyedCardsDOM.length > 0 || (data.scorchDestroyed && data.scorchDestroyed.includes(String(data.lastPlayedCard)))) {
             boardState = {
                 ...data.board,
                 p1R1: [...(savedPrevBoard.p1R1 || [])],
@@ -1423,6 +1438,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 p2R2: [...(savedPrevBoard.p2R2 || [])],
                 p2R3: [...(savedPrevBoard.p2R3 || [])]
             };
+            // Jeśli zagrana jednostka z pożogą spaliła samą siebie, tymczasowo wstawiamy ją do rzędu na planszy,
+            // aby slot w DOM fizycznie istniał i karta mogła do niego dolecieć przed spaleniem
+            if (data.targetSlot && data.targetSlot.row && data.targetSlot.index >= 0 && data.scorchDestroyed && data.scorchDestroyed.includes(String(data.lastPlayedCard))) {
+                const rCards = boardState[data.targetSlot.row] ? [...boardState[data.targetSlot.row]] : [];
+                rCards.splice(data.targetSlot.index, 0, String(data.lastPlayedCard));
+                boardState[data.targetSlot.row] = rCards;
+            }
         } else {
             boardState = data.board;
         }
@@ -2323,11 +2345,16 @@ function calculateScores() {
             const key = `${rowKey}_${i}`;
             if (!window.arrivedBoardCards.has(key)) return;
             const card = cards.find(c => String(c.numer) === String(cardNum));
-            if (card && !card.bohater && typeof card.punkty === 'number') {
+            if (card && typeof card.punkty === 'number') {
                 if (card.moc === 'morale') moraleCount++;
-                if (card.moc === 'rog') unitHornCount++;
+                if (!card.bohater && card.moc === 'rog') unitHornCount++;
             }
         });
+
+        const isMyRow = rowKey.startsWith(isPlayer1Local ? 'p1' : 'p2');
+        const leaderObj = isMyRow ? playerLeaderObj : opponentLeaderObj;
+        const leaderBlocked = isMyRow ? playerLeaderBlocked : opponentLeaderBlocked;
+        const hasBran = leaderObj && String(leaderObj.numer) === '5001' && !leaderBlocked;
 
         let sum = 0;
         rowCards.forEach((cardNum, i) => {
@@ -2340,7 +2367,7 @@ function calculateScores() {
             if (card.bohater) {
                 sum += card.punkty;
             } else {
-                let pts = weatherActive ? 1 : card.punkty;
+                let pts = weatherActive ? (hasBran ? Math.max(1, Math.floor(card.punkty / 2)) : 1) : card.punkty;
 
                 // 1. Więź
                 if (card.moc === 'wiez') {
@@ -2935,7 +2962,7 @@ function confirmPlayProposed(targetData = {}) {
 
     const card = window.proposedCard;
     let finalPos = targetData.rowIdx || (card.pozycja === 4 ? 1 : card.pozycja);
-    const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo", "manek", "porz"].includes(card.moc);
+    const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo", "manek"].includes(card.moc) || (card.moc === "porz" && typeof card.punkty !== 'number');
 
 
 
@@ -3102,7 +3129,7 @@ function renderRows(overlay) {
             // Logika walidacji rzędu
             const isWeather = ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(pCard.moc);
             const isHornSpecial = (pCard.typ === 'specjalna' && pCard.moc === 'rog') || isSpecialSlotCard(pCard);
-            const isPorz = (pCard.moc === 'porz');      // Porzoga ogólna
+            const isPorz = (pCard.moc === 'porz' && typeof pCard.punkty !== 'number');      // Porzoga ogólna (specjalna)
             const isIporz = (pCard.moc === 'iporz');     // Porzoga rzędowa
 
             let isValidRow = false;
@@ -3137,7 +3164,7 @@ function renderRows(overlay) {
 
             const isMyTurn = (currentTurn === window.socket.id);
             if (isMyTurn && isValidRow) {
-                rowDiv.style.backgroundColor = (isPorz || isIporz)
+                rowDiv.style.backgroundColor = (isPorz || isIporz || pCard.moc === 'porz')
                     ? 'rgba(180, 60, 30, 0.25)'
                     : 'rgba(199, 167, 110, 0.2)';
                 rowDiv.style.cursor = 'pointer';
@@ -3204,8 +3231,13 @@ function renderRows(overlay) {
                         return wc && (wc.moc === t || (wc.moc === 'sztorm' && (t === 'mgla' || t === 'deszcz')));
                     });
                     const rowNum = parseInt(rowKey.slice(-1));
+                    const isMyRow = rowKey.startsWith(isP1 ? 'p1' : 'p2');
+                    const leaderObj = isMyRow ? playerLeaderObj : opponentLeaderObj;
+                    const leaderBlocked = isMyRow ? playerLeaderBlocked : opponentLeaderBlocked;
+                    const hasBran = leaderObj && String(leaderObj.numer) === '5001' && !leaderBlocked;
+
                     if ((rowNum === 1 && checkW('mroz')) || (rowNum === 2 && checkW('mgla')) || (rowNum === 3 && checkW('deszcz'))) {
-                        cardScore = 1;
+                        cardScore = hasBran ? Math.max(1, Math.floor(card.punkty / 2)) : 1;
                     }
                     // Więź: własny numer + partnerzy z summon
                     let bondCnt = 0;
@@ -3233,12 +3265,13 @@ function renderRows(overlay) {
                     let unitHornCount = 0;
                     cardsInRowNumers.forEach(cn => {
                         const co = cards.find(c => String(c.numer) === String(cn));
-                        if (co && !co.bohater) {
+                        if (co) {
                             if (co.moc === 'morale') moraleCnt++;
-                            if (co.moc === 'rog') unitHornCount++;
+                            if (!co.bohater && co.moc === 'rog') unitHornCount++;
                         }
                     });
-                    cardScore += (card.moc === 'morale' ? moraleCnt - 1 : moraleCnt);
+                    const mBuff = (card.moc === 'morale') ? (moraleCnt - 1) : moraleCnt;
+                    if (mBuff > 0) cardScore += mBuff;
                     const sSlot = boardState[rowKey.substring(0, 2) + 'S' + rowKey.slice(-1)];
                     const specialSlotHorn = sSlot && cards.find(c => String(c.numer) === String(sSlot))?.moc === 'rog';
                     const receivesHorn = specialSlotHorn || (card.moc === 'rog' ? unitHornCount > 1 : unitHornCount > 0);

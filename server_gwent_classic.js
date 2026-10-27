@@ -128,6 +128,54 @@ function findPlayedCardIndex(row, cardNumer, musteredDetails, rowKey) {
 }
 
 /**
+ * Sprawdza linie planszy pod kątem obecności Grzybków (karta 000 w slocie S lub karta 504 w rzędzie)
+ * i przekształca obecne w tej linii karty berserka w ich odpowiedniki z summon w miejscu (bez ponownego sortowania).
+ */
+function checkAndApplyBerserkTransformations(board) {
+    const transformed = [];
+    if (!board) return transformed;
+    const sides = ['p1', 'p2'];
+    const rows = [1, 2, 3];
+
+    sides.forEach(side => {
+        rows.forEach(r => {
+            const rowKey = `${side}R${r}`;
+            const sSlotKey = `${side}S${r}`;
+            const rowCards = board[rowKey];
+            if (!Array.isArray(rowCards) || rowCards.length === 0) return;
+
+            const sCardNum = board[sSlotKey];
+            const sCard = sCardNum ? cards.find(x => String(x.numer) === String(sCardNum)) : null;
+            const hasSlotGrzybki = sCard && sCard.moc === 'grzybki';
+
+            const hasUnitGrzybki = rowCards.some(cNum => {
+                const c = cards.find(x => String(x.numer) === String(cNum));
+                return c && c.moc === 'grzybki';
+            });
+
+            if (hasSlotGrzybki || hasUnitGrzybki) {
+                for (let i = 0; i < rowCards.length; i++) {
+                    const cNum = rowCards[i];
+                    const c = cards.find(x => String(x.numer) === String(cNum));
+                    if (c && c.moc === 'berserk' && c.summon) {
+                        rowCards[i] = String(c.summon);
+                        transformed.push({
+                            row: rowKey,
+                            index: i,
+                            from: String(c.numer),
+                            to: String(c.summon)
+                        });
+                        console.log(`[GAME CLASSIC] Berserk transformed in-place: ${c.numer} -> ${c.summon} at ${rowKey}[${i}]`);
+                    }
+                }
+            }
+        });
+    });
+
+    return transformed;
+}
+
+/**
  * Oblicza efektywną siłę karty uwzględniając buffy (róg, więź, morale, pogoda).
  * @param {string} cardNum - numer karty
  * @param {string} rowKey - klucz rzędu np. 'p1R1'
@@ -171,7 +219,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     // Morale Count
     const moraleCount = rowCards.reduce((acc, n) => {
         const c = cards.find(x => String(x.numer) === String(n));
-        return (c && !c.bohater && c.moc === 'morale') ? acc + 1 : acc;
+        return (c && c.moc === 'morale') ? acc + 1 : acc;
     }, 0);
 
     // Więź: ten sam numer ALBO partner z pola summon
@@ -186,12 +234,13 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
 
     // King Bran 5001 check
     const leaderForSide = rowSide === 'p1' ? state.p1Leader : state.p2Leader;
-    const hasBran = String(leaderForSide) === '5001';
+    const leaderBlocked = rowSide === 'p1' ? state.p1LeaderBlocked : state.p2LeaderBlocked;
+    const hasBran = String(leaderForSide) === '5001' && !leaderBlocked;
 
     let pts = card.punkty;
     if (weatherActive) {
         if (hasBran) {
-            pts = Math.ceil(card.punkty / 2);
+            pts = Math.max(1, Math.floor(card.punkty / 2));
         } else {
             pts = 1;
         }
@@ -267,6 +316,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
             state.board[finalRow].push(cardNumer);
             sortRowByBasePower(state.board[finalRow]);
         }
+        const berserkTransformed = checkAndApplyBerserkTransformations(state.board);
 
         // Iporz po revive medykiem - ta sama logika co przy zagraniu z reki
         let scorchDestroyed = [];
@@ -319,8 +369,13 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
             }
         }
 
-        // Indeks wskrzeszonej karty PO sortowaniu (i ewentualnej pożodze)
-        const revivedIndex = findCardIndexInRow(state.board[finalRow], cardNumer);
+        // Indeks wskrzeszonej karty PO sortowaniu (i ewentualnej pożodze / przemianie)
+        let searchCardNumer = cardNumer;
+        if (revivedCardObj && revivedCardObj.moc === 'berserk' && revivedCardObj.summon) {
+            const wasTransformed = berserkTransformed.some(t => String(t.from) === String(cardNumer) && t.row === finalRow);
+            if (wasTransformed) searchCardNumer = revivedCardObj.summon;
+        }
+        const revivedIndex = findCardIndexInRow(state.board[finalRow], searchCardNumer);
 
         let chainMedic = false;
         if (revivedCardObj && revivedCardObj.moc === 'medyk') {
@@ -358,6 +413,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         isMedicChain: true,
                         scorchDestroyed: scorchDestroyed,
                         porzogaDestroyed: scorchDestroyed,
+                        berserkTransformed: berserkTransformed,
                         targetSlot: {
                             row: finalRow,
                             index: revivedIndex
@@ -393,6 +449,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         isMedicChain: true,
                         scorchDestroyed: scorchDestroyed,
                         porzogaDestroyed: scorchDestroyed,
+                        berserkTransformed: berserkTransformed,
                         targetSlot: {
                             row: finalRow,
                             index: revivedIndex
@@ -434,6 +491,7 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                 isFromGraveyard: true,
                 scorchDestroyed: scorchDestroyed,
                 porzogaDestroyed: scorchDestroyed,
+                berserkTransformed: berserkTransformed,
                 targetSlot: {
                     row: finalRow,
                     index: revivedIndex
@@ -1096,7 +1154,9 @@ function registerClassicGwentEvents(socket, io, games) {
             let scorchDestroyed = [];
             let spyDrawn = [];
             let grzybkiApplied = null; // null = nie dotyczy, true = aktywowany, false = pusty
+            let berserkTransformed = [];
             let musteredDetails = []; // [{numer, source, row, index}]
+            let landingSlot = null; // { row, index } dla jednostki z pożogą
 
             if (state.currentTurn !== socket.id) {
                 console.log(`[GAME CLASSIC] Blocked play: Not ${socket.id}'s turn.`);
@@ -1204,8 +1264,8 @@ function registerClassicGwentEvents(socket, io, games) {
                             }
                         }, 2000); // 2 sekundy na wybrzmienie dźwięku nieba
                     }
-                } else if (cardObj.moc === 'porz') {
-                    // Porzoga ogólna: specjalna karta która NIE zostaje na planszy
+                } else if (cardObj.moc === 'porz' && typeof cardObj.punkty !== 'number') {
+                    // Porzoga ogólna: specjalna karta (np. 001) która NIE zostaje na planszy
                     // Trafia od razu do cmentarza po zagraniu (animacja z player preview -> cmentarz)
                     targetRow = 'graveyard_direct'; // nie trafia do żadnego rzędu planszy
                     if (isPlayer1) state.p1Graveyard.push(cardNumer);
@@ -1236,19 +1296,8 @@ function registerClassicGwentEvents(socket, io, games) {
                             }
                         }
                     } else {
-                        // Inne karty specjalne (róg, iporz) zostają w slocie S
+                        // Inne karty specjalne (róg, iporz, grzybki) zostają w slocie S
                         state.board[targetRow] = cardNumer;
-
-                        // Grzybki (Mardroeme) logic
-                        if (cardObj.moc === 'grzybki') {
-                            const rowToCheck = `${targetSide}R${finalPos}`;
-                            const rArray = state.board[rowToCheck] || [];
-                            const hasBerserk = rArray.some(cNum => {
-                                const c = cards.find(x => String(x.numer) === String(cNum));
-                                return c && c.moc === 'berserk';
-                            });
-                            grzybkiApplied = hasBerserk;
-                        }
                     }
                     hand.splice(cardIdx, 1);
                 } else {
@@ -1261,6 +1310,12 @@ function registerClassicGwentEvents(socket, io, games) {
                         state.board[targetRow].push(cardNumer);
                     }
                     sortRowByBasePower(state.board[targetRow]);
+                    if (cardObj.moc === 'porz' && typeof cardObj.punkty === 'number') {
+                        landingSlot = {
+                            row: targetRow,
+                            index: state.board[targetRow].lastIndexOf(cardNumer)
+                        };
+                    }
                     hand.splice(cardIdx, 1);
 
                     // Wezwanie (Muster) - po każdym push sortujemy rząd, indeksy liczymy na końcu
@@ -1312,15 +1367,7 @@ function registerClassicGwentEvents(socket, io, games) {
                         musteredDetails = reindexMusteredDetails(musteredDetails, state.board);
                     }
 
-                    // Berserk played into Grzybki check
-                    if (cardObj.moc === 'berserk') {
-                        const sSlot = `${targetSide}S${finalPos}`;
-                        const sCardNum = state.board[sSlot];
-                        const sCard = sCardNum ? cards.find(x => String(x.numer) === String(sCardNum)) : null;
-                        if (sCard && sCard.moc === 'grzybki') {
-                            grzybkiApplied = true;
-                        }
-                    }
+                    // Berserk played into Grzybki check (handled below)
                     // Medic logic (Medyk)
                     if (cardObj.moc === 'medyk') {
                         const grave = isPlayer1 ? state.p1Graveyard : state.p2Graveyard;
@@ -1347,6 +1394,14 @@ function registerClassicGwentEvents(socket, io, games) {
                             }
                         }
                     }
+                }
+
+                // Transformacja Berserkerów pod wpływem Grzybków (000 lub 504)
+                berserkTransformed = checkAndApplyBerserkTransformations(state.board);
+                if (cardObj.moc === 'grzybki') {
+                    grzybkiApplied = berserkTransformed.length > 0;
+                } else if (berserkTransformed.length > 0) {
+                    grzybkiApplied = true;
                 }
 
                 // Scorch logic (Pożoga ogólna i rzędowa) - Oblicza EFEKTYWNE punkty (z bufami)
@@ -1455,9 +1510,20 @@ function registerClassicGwentEvents(socket, io, games) {
                 }
 
                 // Indeks zagranej karty PO sortowaniu (z pominięciem slotów kart wezwanych)
-                const playedIndex = (targetRow && targetRow !== 'weather' && Array.isArray(state.board[targetRow]))
-                    ? findPlayedCardIndex(state.board[targetRow], cardNumer, musteredDetails, targetRow)
+                let searchCardNumer = cardNumer;
+                if (cardObj.moc === 'berserk' && cardObj.summon) {
+                    const wasTransformed = berserkTransformed.some(t => String(t.from) === String(cardNumer) && t.row === targetRow);
+                    if (wasTransformed) {
+                        searchCardNumer = cardObj.summon;
+                    }
+                }
+                let playedIndex = (targetRow && targetRow !== 'weather' && Array.isArray(state.board[targetRow]))
+                    ? findPlayedCardIndex(state.board[targetRow], searchCardNumer, musteredDetails, targetRow)
                     : -1;
+
+                if (playedIndex === -1 && landingSlot && scorchDestroyed && scorchDestroyed.includes(cardNumer)) {
+                    playedIndex = landingSlot.index;
+                }
 
                 // Synchronize all clients
                 io.to(gameCode).emit('board-updated', {
@@ -1478,6 +1544,7 @@ function registerClassicGwentEvents(socket, io, games) {
                     spyDrawn: spyDrawn,
                     spyPlayer: isPlayer1 ? 'p1' : 'p2',
                     grzybkiApplied: grzybkiApplied,
+                    berserkTransformed: berserkTransformed,
                     scorchDestroyed: scorchDestroyed || [],
                     lastPlayedCard: cardNumer,
                     lastPlayedBy: isPlayer1 ? 'p1' : 'p2',
@@ -1600,7 +1667,7 @@ function registerClassicGwentEvents(socket, io, games) {
             });
         };
 
-        const calculateRowScore = (rowCards, specialSlotVal, weatherActive) => {
+        const calculateRowScore = (rowCards, specialSlotVal, weatherActive, rowSide) => {
             let rowDict = {};
             let moraleCount = 0;
             let specialSlotHorn = false;
@@ -1613,12 +1680,16 @@ function registerClassicGwentEvents(socket, io, games) {
 
             if (!rowCards || rowCards.length === 0) return 0;
 
+            const leaderForSide = rowSide === 'p1' ? state.p1Leader : state.p2Leader;
+            const leaderBlocked = rowSide === 'p1' ? state.p1LeaderBlocked : state.p2LeaderBlocked;
+            const hasBran = String(leaderForSide) === '5001' && !leaderBlocked;
+
             rowCards.forEach(cardNum => {
                 const card = cards.find(c => String(c.numer) === String(cardNum));
                 if (card && typeof card.punkty === 'number') {
                     if (!rowDict[card.numer]) rowDict[card.numer] = { count: 0, card: card };
                     rowDict[card.numer].count++;
-                    if (!card.bohater && card.moc === 'morale') moraleCount++;
+                    if (card.moc === 'morale') moraleCount++;
                     if (!card.bohater && card.moc === 'rog') unitHornCount++;
                 }
             });
@@ -1631,7 +1702,7 @@ function registerClassicGwentEvents(socket, io, games) {
                 if (c.bohater) {
                     sum += c.punkty * count;
                 } else {
-                    let pts = weatherActive ? 1 : c.punkty;
+                    let pts = weatherActive ? (hasBran ? Math.max(1, Math.floor(c.punkty / 2)) : 1) : c.punkty;
                     if (c.moc === 'wiez') {
                         const bondIds = new Set([String(c.numer)]);
                         if (c.summon) {
@@ -1656,13 +1727,13 @@ function registerClassicGwentEvents(socket, io, games) {
         const mglaActive = checkWeather('mgla');
         const deszczActive = checkWeather('deszcz');
 
-        const p1Score = calculateRowScore(state.board.p1R1, state.board.p1S1, mrozActive) +
-            calculateRowScore(state.board.p1R2, state.board.p1S2, mglaActive) +
-            calculateRowScore(state.board.p1R3, state.board.p1S3, deszczActive);
+        const p1Score = calculateRowScore(state.board.p1R1, state.board.p1S1, mrozActive, 'p1') +
+            calculateRowScore(state.board.p1R2, state.board.p1S2, mglaActive, 'p1') +
+            calculateRowScore(state.board.p1R3, state.board.p1S3, deszczActive, 'p1');
 
-        const p2Score = calculateRowScore(state.board.p2R1, state.board.p2S1, mrozActive) +
-            calculateRowScore(state.board.p2R2, state.board.p2S2, mglaActive) +
-            calculateRowScore(state.board.p2R3, state.board.p2S3, deszczActive);
+        const p2Score = calculateRowScore(state.board.p2R1, state.board.p2S1, mrozActive, 'p2') +
+            calculateRowScore(state.board.p2R2, state.board.p2S2, mglaActive, 'p2') +
+            calculateRowScore(state.board.p2R3, state.board.p2S3, deszczActive, 'p2');
 
         let roundResult = 'draw';
         let nilfgaardDrawWin = { p1: false, p2: false };
@@ -1896,6 +1967,7 @@ function registerClassicGwentEvents(socket, io, games) {
                 // Po wszystkich pushach na świeżą planszę (zatrzymane potwory, wezwania krowy,
                 // wskrzeszenia Skellige) – posortuj rzędy po bazowych punktach
                 sortAllRows(state.board);
+                checkAndApplyBerserkTransformations(state.board);
 
                 // Sloty zatrzymanych potworów PO sortowaniu (indeks mógł się przesunąć)
                 const keptSlot = (kept) => {
