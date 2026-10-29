@@ -816,6 +816,7 @@ let opponentLeaderUsed = false;
 let playerLeaderBlocked = false;
 let opponentLeaderBlocked = false;
 let currentTurn = null;
+let isMedicPending = false;
 let selectedHandIndex = -1;
 let currentNick = '';
 let isPlayer1Local = false;
@@ -835,6 +836,8 @@ function updateLeaderCache() {
     }
     try {
         const localState = {
+            p1Leader: isPlayer1Local ? (playerLeaderObj ? playerLeaderObj.numer : null) : (opponentLeaderObj ? opponentLeaderObj.numer : null),
+            p2Leader: isPlayer1Local ? (opponentLeaderObj ? opponentLeaderObj.numer : null) : (playerLeaderObj ? playerLeaderObj.numer : null),
             p1LeaderUsed: playerLeaderUsed,
             p2LeaderUsed: opponentLeaderUsed,
             p1LeaderBlocked: playerLeaderBlocked,
@@ -850,6 +853,7 @@ function updateLeaderCache() {
         };
         window.cachedLeaderCanUse = isLeaderUsable(playerLeaderObj.numer, localState, isPlayer1Local);
     } catch (e) {
+        console.error('[BOARD] updateLeaderCache error:', e);
         window.cachedLeaderCanUse = false;
     }
 }
@@ -859,12 +863,14 @@ function tryAutoPass() {
     if (playerPassed || isProcessingMove || isMulliganActive) return;
     if (currentTurn !== window.socket.id) return;
     if (!window.gameStarted || !window.mulliganFinished) return;
+    if (isMedicPending || (typeof window.isPowiekOpen !== 'undefined' && window.isPowiekOpen)) return;
 
     const handEmpty = !playerHand || playerHand.length === 0;
-    const leaderUnavailable = !playerLeaderObj || playerLeaderUsed || playerLeaderBlocked || !window.cachedLeaderCanUse;
+    // Gracz ma jeszcze do zagrania kartę dowódcy tylko jeśli dowódca może być realnie w tym momencie użyty
+    const hasLeaderToPlay = !!(playerLeaderObj && !playerLeaderUsed && !playerLeaderBlocked && window.cachedLeaderCanUse === true);
 
-    if (handEmpty && leaderUnavailable) {
-        console.log('[BOARD] Auto-pass: pusta ręka + brak ruchu dowódcy');
+    if (handEmpty && !hasLeaderToPlay) {
+        console.log('[BOARD] Auto-pass: pusta ręka + brak możliwości ruchu');
         isProcessingMove = true;
         window.socket.emit('pass-turn', {
             gameCode: gameCodeLocal,
@@ -1534,13 +1540,17 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             opponentPassed = isPlayer1Local ? data.p2Passed : data.p1Passed;
         }
 
-        if (data.p1LeaderUsed !== undefined) {
+        if (data.p1LeaderUsed !== undefined || data.p2LeaderUsed !== undefined) {
             playerLeaderUsed = isPlayer1Local ? data.p1LeaderUsed : data.p2LeaderUsed;
             opponentLeaderUsed = isPlayer1Local ? data.p2LeaderUsed : data.p1LeaderUsed;
             playerLeaderBlocked = isPlayer1Local ? data.p1LeaderBlocked : data.p2LeaderBlocked;
             opponentLeaderBlocked = isPlayer1Local ? data.p2LeaderBlocked : data.p1LeaderBlocked;
-            updateLeaderCache();
         }
+
+        if (data.medicPending !== undefined) {
+            isMedicPending = data.medicPending;
+        }
+        updateLeaderCache();
 
         const performUpdateSequence = async () => {
             try {
@@ -1638,6 +1648,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                     }
                 }
 
+                updateLeaderCache();
                 renderAll(currentNick);
 
                 if (currentTurn && window.gameStarted && window.mulliganFinished && !data.isMedicChain) {
@@ -1654,6 +1665,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             } finally {
                 // ZAWSZE odblokuj ruch po zakończeniu całej sekwencji
                 isProcessingMove = false;
+                updateLeaderCache();
                 tryAutoPass();
             }
         };
@@ -1666,8 +1678,12 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
     socket.on('medic-revive-prompt', (data) => {
         console.log("[BOARD] Received medic-revive-prompt", data);
-        if (!data.graveyard || data.graveyard.length === 0) return;
+        if (!data.graveyard || data.graveyard.length === 0) {
+            isMedicPending = false;
+            return;
+        }
 
+        isMedicPending = true;
         const graveObjs = data.graveyard.map(num => {
             const c = cards.find(card => String(card.numer) === String(num));
             return c ? { ...c, _id: Math.random() } : null;
@@ -1678,6 +1694,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 isMedic: true,
                 onSelect: (selectedCard) => {
                     console.log(`[BOARD] Medic revived card ${selectedCard.numer}`);
+                    isMedicPending = false;
                     // Dźwięk wybrania karty przez medyka
                     if (window.playSound) window.playSound('medykSound');
 
@@ -1699,6 +1716,8 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                     if (window.hidePowiek) window.hidePowiek();
                 }
             });
+        } else {
+            isMedicPending = false;
         }
     });
 
@@ -1760,6 +1779,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
         playerPassed = false;
         opponentPassed = false;
+        isMedicPending = false;
 
         // Sync local hand if provided
         const serverHand = isPlayer1Local ? data.p1Hand : data.p2Hand;
@@ -1768,9 +1788,14 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
 
         if (!window.arrivedBoardCards) window.arrivedBoardCards = new Set();
-        if (data.monstersKept) {
-            if (data.monstersKept.p1) window.arrivedBoardCards.add(`${data.monstersKept.p1.row}_0`);
-            if (data.monstersKept.p2) window.arrivedBoardCards.add(`${data.monstersKept.p2.row}_0`);
+        // Add ALL cards already on the board (summons, kept monsters, Skellige resurrects, etc.)
+        // so they are visible immediately without waiting for the next board-updated event.
+        if (board) {
+            ['p1R1','p1R2','p1R3','p2R1','p2R2','p2R3'].forEach(rk => {
+                (board[rk] || []).forEach((_cNum, idx) => {
+                    window.arrivedBoardCards.add(`${rk}_${idx}`);
+                });
+            });
         }
 
         renderAll(currentNick);
@@ -1870,6 +1895,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         opponentLives = 2;
         playerPassed = false;
         opponentPassed = false;
+        isMedicPending = false;
         currentTurn = null;
         window.gameStarted = false;
         window._gameBoardInitialized = false;
@@ -2721,6 +2747,15 @@ function playCardAtIndex(index) {
 
     // Proste zagranie bez potwierdzenia (np. z klawiatury)
     isProcessingMove = true;
+    if (card.moc === 'medyk') {
+        const EXCLUDED_NUMERS = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
+        const hasReviveable = playerGraveyard && playerGraveyard.some(c => {
+            return c && !c.bohater && !EXCLUDED_NUMERS.includes(String(c.numer)) && !['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc) && c.typ !== 'specjalna' && c.moc !== 'rog';
+        });
+        if (hasReviveable) {
+            isMedicPending = true;
+        }
+    }
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo", "manek", "porz"].includes(card.moc);
     let posToPlay = card.pozycja || 1;
 
@@ -2961,6 +2996,15 @@ function confirmPlayProposed(targetData = {}) {
     }
 
     const card = window.proposedCard;
+    if (card && card.moc === 'medyk') {
+        const EXCLUDED_NUMERS = ['000', '001', '002', '003', '004', '005', '006', '007', '008'];
+        const hasReviveable = playerGraveyard && playerGraveyard.some(c => {
+            return c && !c.bohater && !EXCLUDED_NUMERS.includes(String(c.numer)) && !['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc) && c.typ !== 'specjalna' && c.moc !== 'rog';
+        });
+        if (hasReviveable) {
+            isMedicPending = true;
+        }
+    }
     let finalPos = targetData.rowIdx || (card.pozycja === 4 ? 1 : card.pozycja);
     const isSpecial = card.numer === "002" || card.numer === "000" || ["mroz", "mgla", "deszcz", "sztorm", "niebo", "manek"].includes(card.moc) || (card.moc === "porz" && typeof card.punkty !== 'number');
 
@@ -3634,9 +3678,14 @@ function handleRoundEnd(data) {
     const myBoardCards = collectCardsOnBoardDOM(false, myKept);
     const oppBoardCards = collectCardsOnBoardDOM(true, oppKept);
 
-    let bannerCode = 't24';
-    if (winner === (isPlayer1Local ? 'p1' : 'p2')) bannerCode = 't23';
-    else if (winner) bannerCode = 't22';
+    let bannerCode = 't24'; // remis
+        if (roundResult === 'draw') {
+           bannerCode = 't24';
+        } else if (roundResult === (isPlayer1Local ? 'p1' : 'p2')) {
+            bannerCode = 't23'; // wygrana
+        } else {
+            bannerCode = 't22'; // przegrana
+        }
 
     // Jeśli to wygrana dzięki Nilfgaardowi (zamiast remisu)
     const isMyNilfWin = data.nilfgaardDrawWin && (isPlayer1Local ? data.nilfgaardDrawWin.p1 : data.nilfgaardDrawWin.p2);

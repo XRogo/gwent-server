@@ -900,3 +900,27 @@ body {
     filter: none;
     opacity: 1;
 }
+
+/* Link do nowej strony wejściowej (beta) */
+.beta-entry-link {
+    position: fixed;
+    bottom: 90px;          /* nad flagami języków */
+    left: 20px;
+    z-index: 9999;
+    color: #c7a76e;
+    font-family: 'PFDinTextCondPro-Bold', sans-serif;
+    font-size: 0.95rem;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(199, 167, 110, 0.4);
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.beta-entry-link:hover {
+    color: #e8d5a3;
+    border-color: #c7a76e;
+    background: rgba(0, 0, 0, 0.6);
+}

@@ -401,6 +401,11 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         p2Lives: state.p2Lives,
                         p1Passed: state.p1Passed,
                         p2Passed: state.p2Passed,
+                        p1LeaderUsed: state.p1LeaderUsed,
+                        p2LeaderUsed: state.p2LeaderUsed,
+                        p1LeaderBlocked: state.p1LeaderBlocked,
+                        p2LeaderBlocked: state.p2LeaderBlocked,
+                        medicPending: !!state.medicPending,
                         p1Graveyard: state.p1Graveyard,
                         p2Graveyard: state.p2Graveyard,
                         spyDrawn: spyDrawn,
@@ -437,6 +442,11 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                         p2Lives: state.p2Lives,
                         p1Passed: state.p1Passed,
                         p2Passed: state.p2Passed,
+                        p1LeaderUsed: state.p1LeaderUsed,
+                        p2LeaderUsed: state.p2LeaderUsed,
+                        p1LeaderBlocked: state.p1LeaderBlocked,
+                        p2LeaderBlocked: state.p2LeaderBlocked,
+                        medicPending: !!state.medicPending,
                         p1Graveyard: state.p1Graveyard,
                         p2Graveyard: state.p2Graveyard,
                         spyDrawn: spyDrawn,
@@ -480,6 +490,11 @@ function executeMedicResurrection(game, gameCode, socket, io, isPlayer1, cardNum
                 p2Lives: state.p2Lives,
                 p1Passed: state.p1Passed,
                 p2Passed: state.p2Passed,
+                p1LeaderUsed: state.p1LeaderUsed,
+                p2LeaderUsed: state.p2LeaderUsed,
+                p1LeaderBlocked: state.p1LeaderBlocked,
+                p2LeaderBlocked: state.p2LeaderBlocked,
+                medicPending: !!state.medicPending,
                 p1Graveyard: state.p1Graveyard,
                 p2Graveyard: state.p2Graveyard,
                 spyDrawn: spyDrawn,
@@ -814,7 +829,9 @@ function registerClassicGwentEvents(socket, io, games) {
                 p2Hand: state.p2Hand,
                 p1Lives: state.p1Lives,
                 p2Lives: state.p2Lives,
+                p1Passed: state.p1Passed,
                 p2Passed: state.p2Passed,
+                medicPending: !!state.medicPending,
                 p1Graveyard: state.p1Graveyard,
                 p2Graveyard: state.p2Graveyard,
                 p1LeaderUsed: state.p1LeaderUsed,
@@ -925,7 +942,9 @@ function registerClassicGwentEvents(socket, io, games) {
                 p2Hand: state.p2Hand,
                 p1Lives: state.p1Lives,
                 p2Lives: state.p2Lives,
+                p1Passed: state.p1Passed,
                 p2Passed: state.p2Passed,
+                medicPending: !!state.medicPending,
                 p1Graveyard: state.p1Graveyard,
                 p2Graveyard: state.p2Graveyard,
                 p1LeaderUsed: state.p1LeaderUsed,
@@ -1536,7 +1555,13 @@ function registerClassicGwentEvents(socket, io, games) {
                     p2Hand: state.p2Hand,
                     p1Lives: state.p1Lives,
                     p2Lives: state.p2Lives,
+                    p1Passed: state.p1Passed,
                     p2Passed: state.p2Passed,
+                    p1LeaderUsed: state.p1LeaderUsed,
+                    p2LeaderUsed: state.p2LeaderUsed,
+                    p1LeaderBlocked: state.p1LeaderBlocked,
+                    p2LeaderBlocked: state.p2LeaderBlocked,
+                    medicPending: !!state.medicPending,
                     p1Graveyard: state.p1Graveyard,
                     p2Graveyard: state.p2Graveyard,
                     musteredCount: musteredCount || 0,
@@ -1616,6 +1641,11 @@ function registerClassicGwentEvents(socket, io, games) {
                 p2Lives: state.p2Lives,
                 p1Passed: state.p1Passed,
                 p2Passed: state.p2Passed,
+                p1LeaderUsed: state.p1LeaderUsed,
+                p2LeaderUsed: state.p2LeaderUsed,
+                p1LeaderBlocked: state.p1LeaderBlocked,
+                p2LeaderBlocked: state.p2LeaderBlocked,
+                medicPending: !!state.medicPending,
                 p1Graveyard: state.p1Graveyard,
                 p2Graveyard: state.p2Graveyard,
                 p1Hand: state.p1Hand,
@@ -1631,6 +1661,10 @@ function registerClassicGwentEvents(socket, io, games) {
             const state = game.gameState;
             const mySide = isPlayer1 ? 'p1' : 'p2';
             if (state[mySide + 'Passed']) return; // Debounce server-side
+            if (state.medicPending) {
+                console.log(`[GAME CLASSIC] Blocked pass: Medic resurrection pending.`);
+                return;
+            }
 
             state[mySide + 'Passed'] = true;
 
@@ -1652,6 +1686,11 @@ function registerClassicGwentEvents(socket, io, games) {
                     p2Lives: state.p2Lives,
                     p1Passed: state.p1Passed,
                     p2Passed: state.p2Passed,
+                    p1LeaderUsed: state.p1LeaderUsed,
+                    p2LeaderUsed: state.p2LeaderUsed,
+                    p1LeaderBlocked: state.p1LeaderBlocked,
+                    p2LeaderBlocked: state.p2LeaderBlocked,
+                    medicPending: !!state.medicPending,
                     grzybkiApplied: null // Reset for turn
                 });
             }
@@ -1846,7 +1885,14 @@ function registerClassicGwentEvents(socket, io, games) {
                             rArray.forEach(cNum => {
                                 const c = cards.find(x => String(x.numer) === String(cNum));
                                 if (c && c.moc === 'wezwarniezza' && c.summon) {
-                                    pendingSummons.push({ side: rKey.startsWith('p1') ? 'p1' : 'p2', num: c.summon, row: rKey });
+                                    const summonedCard = cards.find(x => String(x.numer) === String(c.summon));
+                                    let targetPos = 1;
+                                    if (summonedCard && summonedCard.pozycja) {
+                                        targetPos = (summonedCard.pozycja === 4) ? 1 : summonedCard.pozycja;
+                                    }
+                                    const targetSide = rKey.startsWith('p1') ? 'p1' : 'p2';
+                                    const targetRow = `${targetSide}R${targetPos}`;
+                                    pendingSummons.push({ side: targetSide, num: c.summon, row: targetRow });
                                     if (c.numer === '023') cowTransformed = true;
                                 }
                             });

@@ -1,0 +1,70 @@
+{
+ "com1": "storna główna =============================================================================================================",
+
+    "play": "Graj",
+        "bplay": "GRAJ",
+
+    "setings": "Ustawienia",
+        "bsetings": "USTAWIENIA",
+
+    "info": "Info",
+        "binfo": "INFO",
+
+
+
+ "com2": "dół opisy =================================================================================================================",
+    "discord": "Discord",
+    "Update": "Zmiany",
+    "report_bug": "Zgłoś błąd",
+    "lang": "Język",
+        "lang_pl": "Polski",
+        "lang_en": "Angielski",
+        "lang_es": "Hiszpański",
+
+
+
+"com4": "uniwersalne ================================================================================================================",
+    "kopiuj": "Kopiuj",
+    "wklej": "Wklej",
+    "akceptuj": "Akceptuj",
+    "code": "Kod",
+    "anuluj": "Cofnij",
+
+"com3": "ustawienia =================================================================================================================",
+
+    "sound": "Dzwięki:",
+    "music": "Muzyka:",
+    "cookies": "Ciasteczka",
+
+
+"com5": "tryby gry opisy ===========================================================================================================",
+
+    "tryb.klasyczny": "Klasyczny",
+    "opis.klasyczny": "Klasyczna wersja Gwinta\nidentyczna jak w Wiedźminie 3.",
+
+    "tryb.mix": "Mix",
+    "opis.mix": "Nie ma wybierania kart grasz\nwszystkimi dostępny kartami w tali",
+
+    "tryb.1v1v1v1": "1v1v1v1",
+    "opis.1v1v1v1":"Zwykły gwint, ale gra 4 graczy na raz",
+
+    "tryb.czasowy": "Czasowy",
+    "opis.czasowy": "Ograniczony czas na ruchy",
+
+    "tryb.cyberpunkowy": "Cyberpunkowy",
+    "opis.cyberpunkowy": "Gwint ale w uniwersum cyberpunka",
+
+    "tryb.pelna_talia": "Pełna talia",
+    "opis.pelna_talia": "Wybierasz tylko frakcje",
+
+    "tryb.imersywny": "Imersywny",
+    "opis.imersywny": "Bardziej imersywny gwint",
+
+
+
+"com6": "pliki cookies =============================================================================================================",
+
+    "cookies.text": "Ta strona używa plików Cookies wyłącznie w celu zapisania Twoich talii kart oraz nicku gracza."
+
+
+}
