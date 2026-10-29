@@ -15,17 +15,24 @@
 //    }, <- jeśli coś jest usunięte to ignoruj i nie pisz np czego dotyczy (bo najprawdopodobniej wszystkeigo) 
     
 const wersja = [
+        {
+        version0: "3.1",
+        data: "30.10.2026",
+        zmiany: {
+            line1: 'Wprowadziłem wstępną obsługe changeloga',
+        }
+    }, 
     {
         version0: "3.0",
         version1: "10.7",
-        data: ".10.2026",
+        data: "29.10.2026",
         zmiany: {
             line1: 'Naprawiłem zagrywanie medyków pod gdy ręka była już pusta',
             line2: 'Naprawiłem błąd przez który automatycznie pasowało runde gdy nie było nic w ręce ale dowódca ciągle był możliwy do zagrania',
             line3: 'Wstępnie wprowadzam podwaliny pod nową wersje lobby',
             line4: 'Bies pojawia się w prawidłowej lini po krowie',
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1564463348051869696/image.png?ex=6ae15b88&is=6ae00a08&hm=c1443c8fe3a38ca492f51b9adbe2b92324e9ddc5a98868fb590698931de6b06f&animated=true"
+        image: "/asset/aktualizacja_grafiki/10.7.webp"
     }, 
     {
         version1: "10.6",
@@ -36,18 +43,7 @@ const wersja = [
             line3: 'Karta "Pirat klanu Dimun" poprawnie działa i ma poprawną nazwe',
             line4: 'Berserki od teraz poprawnie przemieniają sie w Vildkaarl\'y'
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1564463348051869696/image.png?ex=6ae15b88&is=6ae00a08&hm=c1443c8fe3a38ca492f51b9adbe2b92324e9ddc5a98868fb590698931de6b06f&animated=true"
-    },
-    {
-        version1: "10.6",
-        data: "27.10.2026",
-        zmiany: {
-            line1: "Karty z mocą morale i bohater od teraz poprawnie zwiększają pk innym kartom ",
-            line2: 'Dowódca "Król Bran" działa poprawnie i jego opis jest poprawny',
-            line3: 'Karta "Pirat klanu Dimun" poprawnie działa i ma poprawną nazwe',
-            line4: 'Berserki od teraz poprawnie przemieniają sie w Vildkaarl\'y'
-        },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1564463348051869696/image.png?ex=6ae15b88&is=6ae00a08&hm=c1443c8fe3a38ca492f51b9adbe2b92324e9ddc5a98868fb590698931de6b06f&animated=true"
+        image: "/asset/aktualizacja_grafiki/10.6.webp"
     },
     {
         version1: "10.5",
@@ -56,7 +52,7 @@ const wersja = [
             line1: "Karty na planszy są ułożone w poprawnej kolejności a nie losowo",
             line2: "Effekt mrozu działa wizualnie"
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1564073472710156481/image.png?ex=6adff06e&is=6ade9eee&hm=210456346b8c938ed732469f4faf34e1b7cf68649468ef33493f72093e4169ed&animated=true"
+        image: "/asset/aktualizacja_grafiki/10.5.webp"
     },
     {
         version1: "10.4",
@@ -84,7 +80,7 @@ const wersja = [
         zmiany: {
             line1: "Zostały dodane alternatywne karty (dlc8) (możliwe do włączenia w menu w prawym dolnym rogu ikonka karty)",
         },
-        image: "https://media.discordapp.net/attachments/1366510061383450674/1555039903006593134/image.png?backend=b2&ex=6adf6004&is=6ade0e84&hm=29817935dfaa6f02904a8b4bc911008bc0f3e433c9413e1962e53952585dd81c&animated=true&width=2066&height=1162"
+        image: "/asset/aktualizacja_grafiki/10.0.webp"
     },
     {
         version1: "9.8.3",
@@ -130,7 +126,7 @@ const wersja = [
             line5: "Karta z Pożogą liniową działa po przywróceniu medykiem",
             line6: "Przypadkowe wyjście ze strony podczas gry i powrót już nie powinien błednie przypisywac ruchu"
         },
-        image: "https://media.discordapp.net/attachments/1366510061383450674/1548177143165354034/image.png?ex=6adf7512&is=6ade2392&hm=633e6a5ec20508c32ba012affa3970ad93a88ef10fe1c801e6e495c1790ed30d&animated=true&width=2066&height=1162"
+        image: "/asset/aktualizacja_grafiki/9.8.webp"
     },
     {
         version1: "9.7.3",
@@ -164,7 +160,7 @@ const wersja = [
             line1: "Zagranie karty pokazuje poprawnie swój opis i moc",
             line2: "Dowódca w powiększeniu nie ma już poświaty",
         },
-        image: "https://media.discordapp.net/attachments/1366510061383450674/1546000122146725951/image.png?ex=6adf7290&is=6ade2110&hm=d1ee09a904770aa818e3acd343dea2cf11c8326a80850c39d311e2c018dd4d44&animated=true"
+        image: "/asset/aktualizacja_grafiki/9.7.webp"
     },
     {
         version1: "9.6.1",
@@ -201,7 +197,7 @@ const wersja = [
             line1: "Poprawiłem teksture dymu w tle wybotu, na taką bezszwową",
             line2: "Dodałem wyswietlanie jej również w osi Z",
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1543831594102554745/image.png?ex=6adf77f7&is=6ade2677&hm=3b988330323e29f03de4701c175468d574fcc7085c04b283895fb99f1344d25a&animated=true"
+        image: "/asset/aktualizacja_grafiki/9.5.webp"
     },
     {
         version1: "9.4.1",
@@ -219,7 +215,7 @@ const wersja = [
             line1: "Poprawiłem wielkość napisów informujących o ilości kart itp (widoczne na obrazku)",
             line2: "Poprawiłem pozycje herbu aby była identycznie jak w Wiedźminie 3",
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1543454298187239614/image.png?ex=6adf6a14&is=6ade1894&hm=d63edc2760f8b0c3a738e0e898b9e938a1dd5883265b617f60b3f17c8cabfa90&animated=true"
+        image: "/asset/aktualizacja_grafiki/9.4.webp"
     },
     {
         version1: "9.3.5",
@@ -268,7 +264,7 @@ const wersja = [
             line2: "Można od teraz akceptować kod Enterem",
             line3: "Dodałem / Naprawiłem - od teraz poprawnie wyświetlają sie opisy umiętnosci kart"
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1541182649559941191/image.png?ex=6adfb831&is=6ade66b1&hm=3d8b606454f1d13ec6b617cc8c70ee34f54745aa2cae7eb62d26ffba86bf5214&animated=true"
+        image: "/asset/aktualizacja_grafiki/9.2.webp"
     },
     {
         version1: "9.1.1",
@@ -288,7 +284,7 @@ const wersja = [
             line2: "Kilka innych błędów poprawiłem",
             line3: "Pewnie jeszcze więcej dodałem xD"
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1538323728704864296/image.png?ex=6adfdd9d&is=6ade8c1d&hm=645a775383cf1b154c7764c8236def42e68e839c5870fd8b2952fb04c65d3004&animated=true"
+        image: "/asset/aktualizacja_grafiki/9.1.webp"
     },
     {
         version0: "2.1",
@@ -296,6 +292,7 @@ const wersja = [
         zmiany: {
             line1: "Dodałem obsługę języków (angielski i hiszpański) w menu"
         },
-        image: "https://cdn.discordapp.com/attachments/1366510061383450674/1537809911428292779/image.png?ex=6adf5096&is=6addff16&hm=600aac4b14600b7fb297fb811afb0ce070a3639804abd3b269638f020ec3ab44&animated=true"
-    },
+        image: "/asset/aktualizacja_grafiki/2.1.webp"
+    }
 ];
+window.wersja = wersja;

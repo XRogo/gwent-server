@@ -4,25 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gwint Online – Nowa strona wejściowa (Beta)</title>
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: #111;
-            color: #c7a76e;
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-        a { color: #c7a76e; }
-    </style>
+    <link rel="stylesheet" href="wejsciowa.css">
+    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
 </head>
 <body>
-    <h1>Nowa strona wejściowa – testy</h1>
-    <p>Tu będzie nowy wygląd menu (na razie placeholder).</p>
-    <a href="index.html">← Powrót do starej strony</a>
+    <div class="bg-layer" aria-hidden="true"></div>
+
+    <!-- Wrapper: 35% od lewej i prawej → środek = 30% viewportu -->
+    <div class="panel-stage">
+        <div class="side-panel" id="sidePanel">
+            <img id="gwentLogo" class="gwent-logo" src="asset/gwint_en.webp" alt="Gwint">
+
+            <nav class="menu-buttons">
+                <button type="button" class="menu-btn" id="btnPlay">Graj</button>
+                <button type="button" class="menu-btn" id="btnSettings">Ustawienia</button>
+                <button type="button" class="menu-btn" id="btnInfo">Info</button>
+            </nav>
+        </div>
+    </div>
+
+    <button type="button" id="versionBadge" class="version-badge" title="Changelog">
+        <span id="versionDate">—</span>
+        <span class="version-sep">·</span>
+        <span id="versionNum">—</span>
+    </button>
+
+    <div id="changelogModal" class="modal-overlay" hidden>
+        <div class="modal-panel">
+            <button type="button" class="modal-close" id="changelogClose" aria-label="Zamknij">×</button>
+            <h2 class="modal-title">Changelog</h2>
+            <div id="changelogBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="changelog.js"></script>
+    <script src="wejsciowa.js"></script>
 </body>
 </html>
