@@ -3,23 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gwint Online – Nowa strona wejściowa (Beta)</title>
+    <title>Gwint – wejście</title>
     <link rel="stylesheet" href="wejsciowa.css">
     <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
 </head>
 <body>
+
     <div class="bg-layer" aria-hidden="true"></div>
 
-    <!-- Wrapper: 35% od lewej i prawej → środek = 30% viewportu -->
-    <div class="panel-stage">
-        <div class="side-panel" id="sidePanel">
-            <img id="gwentLogo" class="gwent-logo" src="asset/gwint_en.webp" alt="Gwint">
+    <div class="stage" id="stage">
+        <div class="container" id="mainContainer">
 
-            <nav class="menu-buttons">
-                <button type="button" class="menu-btn" id="btnPlay">Graj</button>
-                <button type="button" class="menu-btn" id="btnSettings">Ustawienia</button>
-                <button type="button" class="menu-btn" id="btnInfo">Info</button>
-            </nav>
+            <div class="black-bar" id="blackBar"></div>
+
+            <img class="side-left"  src="asset/side.webp" alt="">
+            <img class="side-right" src="asset/side.webp" alt="">
+
+            <!-- Logo + menu pod spodem (nie na logo) -->
+            <div class="top-stack">
+                <img id="gwentLogo" class="logo" src="asset/gwint_en.webp" alt="Gwint">
+                <nav class="menu">
+                    <button type="button" class="menu-btn" id="btnPlay">GRAJ</button>
+                    <button type="button" class="menu-btn" id="btnSettings">USTAWIENIA</button>
+                    <button type="button" class="menu-btn" id="btnInfo">INFO</button>
+                </nav>
+            </div>
+
+            <!-- Ikony: 2% od dołu, 20% od krawędzi kontenera, gap 5% -->
+            <div class="icons">
+                <button type="button" class="icon-btn" id="iconDiscord">
+                    <img src="asset/discord.webp" alt="Discord">
+                </button>
+                <button type="button" class="icon-btn" id="iconFix">
+                    <img src="asset/fix.webp" alt="Fix">
+                </button>
+                <button type="button" class="icon-btn" id="iconBug">
+                    <img src="asset/bug.webp" alt="Bug">
+                </button>
+                <button type="button" class="icon-btn" id="iconLang">
+                    <img src="asset/lang.webp" alt="Lang">
+                </button>
+            </div>
+
         </div>
     </div>
 

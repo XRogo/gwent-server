@@ -20,6 +20,9 @@ const wersja = [
         data: "30.10.2026",
         zmiany: {
             line1: 'Wprowadziłem wstępną obsługe changeloga',
+            line2: "Menu wstępnie wprowadzone, wyświetlanie skalowanie i przyciki",
+            line3: "Dodałem do assetów flagi do wielu obsługi wielu języków",
+            line4: "Dodałem muzyke do assetów",
         }
     }, 
     {

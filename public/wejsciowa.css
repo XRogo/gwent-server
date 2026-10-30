@@ -1,6 +1,11 @@
-/* ============================================================
-   RESET / BAZA
-   ============================================================ */
+@font-face {
+    font-family: 'GWENT-ExtraBold';
+    src: url('fonts/hinted-GWENT-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
@@ -10,13 +15,9 @@ html, body {
     height: 100%;
     overflow: hidden;
     background: #000;
-    font-family: 'PFDinTextCondPro-Bold', 'Segoe UI', sans-serif;
-    color: #c7a76e;
 }
 
-/* ============================================================
-   TŁO – cover jak na starej stronie
-   ============================================================ */
+/* ---------- TŁO ---------- */
 .bg-layer {
     position: fixed;
     inset: 0;
@@ -28,103 +29,135 @@ html, body {
     background-repeat: no-repeat;
 }
 
-/* ============================================================
-   STAGE – strefa 35% | 30% | 35%
-   Środkowe 30% viewportu; w środku stoi panel projektowy 640×1080
-   ============================================================ */
-.panel-stage {
+/* ---------- STAGE (jak content-container na index) ---------- */
+.stage {
     position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 35%;          /* odsunięcie od lewej */
-    right: 35%;         /* odsunięcie od prawej → szerokość = 30vw */
+    inset: 0;
     z-index: 10;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    overflow: visible;  /* logo może wystawać */
-    pointer-events: none; /* klik tylko na dzieciach z pointer-events: auto */
+    pointer-events: none;
+    overflow: visible;
 }
 
-/* ============================================================
-   PANEL – design 640 × 1080 px
-   Skalowany w JS (transform: scale) tak, by zawsze mieścił się
-   w szerokości stage (30vw) i w wysokości ekranu.
-   Wszystkie elementy wewnątrz skalują się RAZEM z panelem.
-   ============================================================ */
-.side-panel {
-    pointer-events: auto;
-    width: 640px;
+/* ---------- KONTENER 768×1080 – skala w JS ---------- */
+.container {
+    position: relative;
+    width: 768px;
     height: 1080px;
+    flex-shrink: 0;
     transform-origin: top center;
-    /* scale ustawia JS – domyślnie 1 na start */
     transform: scale(1);
+    pointer-events: auto;
+    overflow: visible;
+}
 
+/* Czarny pas: 12% od krawędzi kontenera */
+.black-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 12%;
+    right: 12%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.363) 0%, rgba(0, 0, 0, 0.76) 100%);
+    z-index: 1;
+    backdrop-filter: blur(1.5px)
+}
+
+/* side.webp: 13% → 15% od krawędzi, wysokość 1080, nad pasem, pod UI */
+.side-left,
+.side-right {
+    position: absolute;
+    top: 0;
+    height: 1080px;
+    width: 2%;
+    object-fit: fill;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+}
+.side-left  { left: 13%; }
+.side-right { right: 13%; }
+
+/* Logo + menu w kolumnie – menu ZAWSZE pod logo */
+.top-stack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 48px 40px 40px; /* ~ w skali designu 640 */
-
-    /* Gradient: góra ~10% krycia → dół mocniej (~70%) */
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.10) 0%,
-        rgba(0, 0, 0, 0.35) 35%,
-        rgba(0, 0, 0, 0.55) 70%,
-        rgba(0, 0, 0, 0.70) 100%
-    );
-    backdrop-filter: blur(1.5px);
 }
 
-/* ============================================================
-   LOGO GWINT – większe, lekko wystaje poza panel
-   ============================================================ */
-.gwent-logo {
+.logo {
     display: block;
-    /* >100% szerokości panelu → wystaje na boki */
-    width: 118%;
-    max-width: none;
+    width: 100%;
     height: auto;
-    margin: -24px auto 40px; /* ujemny margin = lekko ponad górą / bliżej krawędzi */
     object-fit: contain;
-    user-select: none;
+    object-position: top center;
     pointer-events: none;
+    user-select: none;
 }
 
-/* ============================================================
-   PRZYCISKI MENU
-   ============================================================ */
-.menu-buttons {
+.menu {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 28px;
-    width: 70%;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    width: 76%; /* w obrębie czarnego pasa */
 }
 
 .menu-btn {
-    background: transparent;
-    border: 1px solid rgba(199, 167, 110, 0.55);
-    color: #c7a76e;
-    font-family: inherit;
-    font-size: 36px;           /* w skali 640×1080 */
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 18px 20px;
+    background: none;
+    border: none;
+    padding: 0.35em 0.5em;
+    margin: 0;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    font-family: 'GWENT-ExtraBold', sans-serif;
+    font-size: 50px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #c39745;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+.menu-btn:hover { color: #e0c070; }
+
+/* Ikony: 2% od dołu, 20% od krawędzi KONTENERA, gap 5% */
+.icons {
+    position: absolute;
+    bottom: 2%;
+    left: 20%;
+    right: 20%;
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5%;
 }
 
-.menu-btn:hover {
-    background: rgba(199, 167, 110, 0.12);
-    border-color: #c7a76e;
-    color: #e8d5a3;
+.icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    line-height: 0;
+    flex: 0 0 auto;
 }
+.icon-btn img {
+    display: block;
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+}
+.icon-btn:hover { opacity: 0.85; }
 
-/* ============================================================
-   BADGE WERSJI – lewy dolny róg, 1% od krawędzi
-   Jedna linia, BEZ ramki / tła
-   ============================================================ */
+/* ---------- BADGE WERSJI ---------- */
 .version-badge {
     position: fixed;
     bottom: 1%;
@@ -135,29 +168,22 @@ html, body {
     padding: 0;
     margin: 0;
     color: #c7a76e;
-    font-family: inherit;
+    font-family: 'PFDinTextCondPro-Bold', 'Segoe UI', sans-serif;
     font-size: clamp(0.85rem, 1.4vw, 1.05rem);
     cursor: pointer;
     display: inline-flex;
-    flex-direction: row;
     align-items: baseline;
     gap: 0.35em;
     opacity: 0.9;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
-
 .version-badge:hover {
     opacity: 1;
     color: #e8d5a3;
 }
+.version-sep { opacity: 0.6; }
 
-.version-sep {
-    opacity: 0.6;
-}
-
-/* ============================================================
-   MODAL CHANGELOG – tło + panel w stylu paska
-   ============================================================ */
+/* ---------- MODAL CHANGELOG ---------- */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -168,12 +194,8 @@ html, body {
     justify-content: center;
     padding: 2rem;
 }
+.modal-overlay[hidden] { display: none !important; }
 
-.modal-overlay[hidden] {
-    display: none !important;
-}
-
-/* Panel okna – gradient jak side-panel */
 .modal-panel {
     position: relative;
     width: min(560px, 92vw);
@@ -191,9 +213,9 @@ html, body {
     backdrop-filter: blur(6px);
     color: #c7a76e;
     padding: 1.25rem 1.5rem 1.5rem;
+    font-family: 'PFDinTextCondPro-Bold', 'Segoe UI', sans-serif;
 }
 
-/* Przycisk zamknięcia (×) */
 .modal-close {
     position: absolute;
     top: 8px;
@@ -208,16 +230,14 @@ html, body {
 }
 .modal-close:hover { opacity: 1; }
 
-/* ----- Tytuł „Changelog” – większy + pogrubiony ----- */
 .modal-title {
     margin: 0 2.5rem 1rem 0;
-    font-size: 1.85rem;       /* ← wielkość tytułu okna */
-    font-weight: 700;         /* ← pogrubienie */
+    font-size: 1.85rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
 
-/* Scrollowana treść listy */
 .modal-body {
     overflow-y: auto;
     flex: 1;
@@ -226,71 +246,42 @@ html, body {
     line-height: 1.45;
 }
 
-/* ============================================================
-   WPIS CHANGELOGU (jeden „blok” aktualizacji)
-   ============================================================ */
-
-/* Cały wiersz listy – klikalny (rozwija obraz) */
 .changelog-entry {
     margin-bottom: 1.25rem;
     padding-bottom: 1.1rem;
     border-bottom: 1px solid rgba(199, 167, 110, 0.2);
-    cursor: default;
 }
-.changelog-entry:last-child {
-    border-bottom: none;
-}
+.changelog-entry:last-child { border-bottom: none; }
 
-/* Linia z datą (np. 27.10.2026) */
 .changelog-date {
-    font-size: 0.8rem;        /* ← wielkość daty */
+    font-size: 0.8rem;
     opacity: 0.75;
     margin-bottom: 0.2rem;
 }
-
-/* „Czego dotyczy” – Lobby / Gwint klasyczny + numer wersji
-   To jest GŁÓWNY napis wpisu (większy) */
 .changelog-scope {
-    font-size: 1.05rem;       /* ← wielkość „czego dotyczy” */
+    font-size: 1.05rem;
     font-weight: 600;
     color: #e8d5a3;
     margin-bottom: 0.45rem;
 }
-
-/* Lista zmian – MNIEJSZA czcionka pod scope */
 .changelog-list {
     margin: 0;
     padding-left: 1.1rem;
-    font-size: 0.88rem;       /* ← wielkość opisów zmian */
-    opacity: 0.95;
+    font-size: 0.88rem;
 }
+.changelog-list > li { margin-bottom: 0.3rem; }
 
-.changelog-list > li {
-    margin-bottom: 0.3rem;
-}
-
-/* Tytuł linii gdy zmiany są obiektem { title, subtitle… } */
-.changelog-line-title {
-    /* dziedziczy rozmiar z .changelog-list */
-}
-
-/* Subtitle – ZNACZNIE mniejszy niż zwykła zmiana */
 .changelog-list .sub,
 .changelog-list ul.sub-list {
     margin: 0.15rem 0 0.15rem 0.4rem;
     padding-left: 0.55rem;
     border-left: 2px solid rgba(199, 167, 110, 0.3);
     list-style: none;
-    font-size: 0.72rem;       /* ← subtitle: mocno mniejszy */
+    font-size: 0.72rem;
     opacity: 0.8;
     line-height: 1.35;
 }
 
-.changelog-list .sub {
-    margin-left: 0;
-}
-
-/* Przycisk / link „pokaż obraz” – obraz ładuje się dopiero po kliknięciu */
 .changelog-img-trigger {
     display: inline-block;
     margin-top: 0.5rem;
@@ -306,12 +297,7 @@ html, body {
     border-color: #c7a76e;
     color: #e8d5a3;
 }
-
-/* Kontener obrazka (pusty aż do kliknięcia) */
-.changelog-img-slot {
-    margin-top: 0.5rem;
-}
-
+.changelog-img-slot { margin-top: 0.5rem; }
 .changelog-img {
     display: block;
     max-width: 100%;
