@@ -16,7 +16,7 @@
     
 const wersja = [
         {
-        version0: "3.1",
+        version0: "3.01",
         data: "30.10.2026",
         zmiany: {
             line1: 'Wprowadziłem wstępną obsługe changeloga',
