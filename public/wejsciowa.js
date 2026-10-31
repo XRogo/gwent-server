@@ -1,5 +1,5 @@
 (function () {
-    const DESIGN_W = 768;
+    const DESIGN_W = 730;
     const DESIGN_H = 1080;
 
     function detectLang() {

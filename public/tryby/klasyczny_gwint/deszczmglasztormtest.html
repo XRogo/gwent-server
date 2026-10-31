@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather FX Test</title>
+  <link rel="stylesheet" href="weather_fx_test.css" />
+</head>
+<body>
+<div id="app">
+  <aside id="panel">
+    <h2>Weather FX Test</h2>
+    <div class="scroll">
+
+      <section>
+        <h3>Sterowanie</h3>
+        <div class="btn-row">
+          <button id="btn-rain" class="primary">Start deszcz</button>
+          <button id="btn-fog" class="primary">Start mgła</button>
+          <button id="btn-storm" class="primary">Start sztorm</button>
+        </div>
+        <div class="btn-row">
+          <button id="btn-restart">Restart</button>
+          <button id="btn-stop" class="danger">Stop</button>
+        </div>
+        <p class="hint">Deszcz = rząd 3 (oblężenie). Mgła = rząd 2 (dystans). Sztorm = oba + extra. Strona przeciwnika = kopia CSS.</p>
+      </section>
+
+      <section>
+        <h3>Obszary (z gry)</h3>
+        <div class="row"><label>Row X</label><input type="range" data-k="rowX" min="0" max="3000" step="1"><input type="number" data-k="rowX"><span class="val"></span></div>
+        <div class="row"><label>Row W</label><input type="range" data-k="rowW" min="200" max="3000" step="1"><input type="number" data-k="rowW"><span class="val"></span></div>
+        <div class="row"><label>Row H</label><input type="range" data-k="rowH" min="50" max="600" step="1"><input type="number" data-k="rowH"><span class="val"></span></div>
+        <div class="row"><label>Rain self Y</label><input type="range" data-k="rainSelfY" min="0" max="2000" step="1"><input type="number" data-k="rainSelfY"><span class="val"></span></div>
+        <div class="row"><label>Rain opp Y</label><input type="range" data-k="rainOppY" min="0" max="2000" step="1"><input type="number" data-k="rainOppY"><span class="val"></span></div>
+        <div class="row"><label>Fog self Y</label><input type="range" data-k="fogSelfY" min="0" max="2000" step="1"><input type="number" data-k="fogSelfY"><span class="val"></span></div>
+        <div class="row"><label>Fog opp Y</label><input type="range" data-k="fogOppY" min="0" max="2000" step="1"><input type="number" data-k="fogOppY"><span class="val"></span></div>
+        <div class="row"><label>Guides</label><input type="checkbox" id="show-guide" checked></div>
+      </section>
+
+      <section>
+        <h3>Deszcz – warstwy</h3>
+        <div class="row"><label>Ilość kropel / warstwa</label><input type="range" data-k="rainCount" min="20" max="400" step="1"><input type="number" data-k="rainCount"><span class="val"></span></div>
+        <div class="row"><label>Warstwy (4)</label><input type="range" data-k="rainLayers" min="2" max="6" step="1"><input type="number" data-k="rainLayers"><span class="val"></span></div>
+        <div class="row"><label>Czas cyklu (s)</label><input type="range" data-k="rainCycle" min="0.15" max="2" step="0.01"><input type="number" data-k="rainCycle" step="0.01"><span class="val"></span></div>
+        <div class="row"><label>Wys. kropli</label><input type="range" data-k="dropH" min="4" max="80" step="0.5"><input type="number" data-k="dropH" step="0.5"><span class="val"></span></div>
+        <div class="row"><label>Szer. kropli</label><input type="range" data-k="dropW" min="0.5" max="12" step="0.1"><input type="number" data-k="dropW" step="0.1"><span class="val"></span></div>
+        <div class="row"><label>Opac.</label><input type="range" data-k="dropOp" min="0" max="1" step="0.01"><input type="number" data-k="dropOp" step="0.01"><span class="val"></span></div>
+        <div class="row"><label>Jasność</label><input type="range" data-k="dropBri" min="0.2" max="2" step="0.01"><input type="number" data-k="dropBri" step="0.01"><span class="val"></span></div>
+        <div class="row"><label>Y end offset</label><input type="range" data-k="dropYEnd" min="-40" max="120" step="1"><input type="number" data-k="dropYEnd"><span class="val"></span></div>
+        <p class="hint">4 warstwy pregenerowanych kropel, offset 50% cyklu – bez spawnów co klatkę.</p>
+      </section>
+
+      <section>
+        <h3>Deszcz – splash + dymki</h3>
+        <div class="row"><label>Splash szansa</label><input type="range" data-k="splashChance" min="0" max="1" step="0.01"><input type="number" data-k="splashChance" step="0.01"><span class="val"></span></div>
+        <div class="row"><label>Splash size</label><input type="range" data-k="splashSize" min="8" max="80" step="1"><input type="number" data-k="splashSize"><span class="val"></span></div>
+        <div class="row"><label>Splash SX/SY</label><input type="range" data-k="splashSX" min="0.3" max="3" step="0.05"><input type="number" data-k="splashSX" step="0.05">
+          <input type="range" data-k="splashSY" min="0.2" max="2" step="0.05"><input type="number" data-k="splashSY" step="0.05"></div>
+        <div class="row"><label>Dymki start</label><input type="range" data-k="rainFogCount" min="0" max="40" step="1"><input type="number" data-k="rainFogCount"><span class="val"></span></div>
+        <div class="row"><label>Dymki size min/max</label><input type="range" data-k="rainFogSmin" min="20" max="400" step="1"><input type="number" data-k="rainFogSmin">
+          <input type="range" data-k="rainFogSmax" min="40" max="600" step="1"><input type="number" data-k="rainFogSmax"></div>
+      </section>
+
+      <section>
+        <h3>Deszcz – gradient</h3>
+        <div class="row"><label>Kolor bok</label><input type="color" data-k="rgC0"></div>
+        <div class="row"><label>Kolor środek</label><input type="color" data-k="rgC1"></div>
+        <div class="row"><label>Kolor krawędź</label><input type="color" data-k="rgCE"></div>
+        <div class="row"><label>Intens. bok / śr.</label><input type="range" data-k="rgSide" min="0" max="1" step="0.01"><input type="number" data-k="rgSide" step="0.01">
+          <input type="range" data-k="rgMid" min="0" max="1" step="0.01"><input type="number" data-k="rgMid" step="0.01"></div>
+        <div class="row"><label>Peak % / wys %</label><input type="range" data-k="rgPeak" min="2" max="35" step="0.5"><input type="number" data-k="rgPeak" step="0.5">
+          <input type="range" data-k="rgH" min="10" max="100" step="1"><input type="number" data-k="rgH"></div>
+        <div class="row"><label>Jasność krawędzi</label><input type="range" data-k="rgEdge" min="0" max="1" step="0.01"><input type="number" data-k="rgEdge" step="0.01"><span class="val"></span></div>
+      </section>
+
+      <section>
+        <h3>Mgła</h3>
+        <div class="row"><label>Kolor gradient</label><input type="color" data-k="fgC"></div>
+        <div class="row"><label>Moc dołu</label><input type="range" data-k="fgBot" min="0" max="1" step="0.01"><input type="number" data-k="fgBot" step="0.01"><span class="val"></span></div>
+        <div class="row"><label>Elipsa H/W %</label><input type="range" data-k="fgEH" min="20" max="200" step="1"><input type="number" data-k="fgEH">
+          <input type="range" data-k="fgEW" min="40" max="200" step="1"><input type="number" data-k="fgEW"></div>
+        <div class="row"><label>Dymki ilość</label><input type="range" data-k="fogCount" min="4" max="60" step="1"><input type="number" data-k="fogCount"><span class="val"></span></div>
+        <div class="row"><label>Size min/max</label><input type="range" data-k="fogSmin" min="40" max="600" step="1"><input type="number" data-k="fogSmin">
+          <input type="range" data-k="fogSmax" min="80" max="900" step="1"><input type="number" data-k="fogSmax"></div>
+        <div class="row"><label>Opac min/max</label><input type="range" data-k="fogOpMin" min="0" max="1" step="0.01"><input type="number" data-k="fogOpMin" step="0.01">
+          <input type="range" data-k="fogOpMax" min="0" max="1" step="0.01"><input type="number" data-k="fogOpMax" step="0.01"></div>
+        <div class="row"><label>Prędkość drift</label><input type="range" data-k="fogSpd" min="5" max="120" step="1"><input type="number" data-k="fogSpd"><span class="val"></span></div>
+        <div class="row"><label>Obrót °/s</label><input type="range" data-k="fogSpin" min="0" max="90" step="1"><input type="number" data-k="fogSpin"><span class="val"></span></div>
+        <p class="hint">Dymki: płynny drift + rotacja (bez odbijania jak DVD).</p>
+      </section>
+
+      <section>
+        <h3>Sztorm – poświata / kropelka</h3>
+        <div class="row"><label>Poświata czas</label><input type="range" data-k="glowT" min="0.5" max="12" step="0.1"><input type="number" data-k="glowT" step="0.1"><span class="val"></span></div>
+        <div class="row"><label>Moc róg / śr.</label><input type="range" data-k="glowC" min="0" max="1" step="0.01"><input type="number" data-k="glowC" step="0.01">
+          <input type="range" data-k="glowM" min="0" max="1" step="0.01"><input type="number" data-k="glowM" step="0.01"></div>
+        <div class="row"><label>Kolor poświaty</label><input type="color" data-k="glowCol"></div>
+        <div class="row"><label>Kropelki max</label><input type="range" data-k="kdMax" min="4" max="40" step="1"><input type="number" data-k="kdMax"><span class="val"></span></div>
+        <div class="row"><label>Spawn /s</label><input type="range" data-k="kdRate" min="0.5" max="20" step="0.1"><input type="number" data-k="kdRate" step="0.1"><span class="val"></span></div>
+        <div class="row"><label>Bazowy rozmiar</label><input type="range" data-k="kdBase" min="12" max="100" step="1"><input type="number" data-k="kdBase"><span class="val"></span></div>
+        <div class="row"><label>Skal min/max</label><input type="range" data-k="kdSmin" min="0.3" max="2" step="0.05"><input type="number" data-k="kdSmin" step="0.05">
+          <input type="range" data-k="kdSmax" min="0.5" max="4" step="0.05"><input type="number" data-k="kdSmax" step="0.05"></div>
+        <div class="row"><label>Stretch Y max</label><input type="range" data-k="kdStretch" min="1" max="4" step="0.05"><input type="number" data-k="kdStretch" step="0.05"><span class="val"></span></div>
+        <div class="row"><label>Życie / zjazd</label><input type="range" data-k="kdLife" min="0.2" max="2" step="0.05"><input type="number" data-k="kdLife" step="0.05">
+          <input type="range" data-k="kdDy" min="0" max="200" step="1"><input type="number" data-k="kdDy"></div>
+      </section>
+
+      <section>
+        <h3>Pioruny – pozycje</h3>
+        <p class="hint">Kliknij na obszarze deszczu (self), żeby dodać punkt. Grupa 1 = lewa para, Grupa 2 = prawa. Max 2 punkty na grupę (4 pioruny).</p>
+        <div class="row">
+          <label>Edycja grupy</label>
+          <select id="lt-group">
+            <option value="1">Grupa 1 (lewa)</option>
+            <option value="2">Grupa 2 (prawa)</option>
+          </select>
+        </div>
+        <div class="row">
+          <button id="btn-lt-clear">Wyczyść grupę</button>
+          <button id="btn-lt-clear-all">Wyczyść wszystkie</button>
+        </div>
+        <div class="row"><label>Czas 1 / 2 (s)</label><input type="range" data-k="ltD1" min="0.05" max="0.5" step="0.01"><input type="number" data-k="ltD1" step="0.01">
+          <input type="range" data-k="ltD2" min="0.05" max="0.5" step="0.01"><input type="number" data-k="ltD2" step="0.01"></div>
+        <div class="row"><label>Gap L→P / cykl</label><input type="range" data-k="ltGap" min="0.3" max="4" step="0.05"><input type="number" data-k="ltGap" step="0.05">
+          <input type="range" data-k="ltCycle" min="1" max="12" step="0.1"><input type="number" data-k="ltCycle" step="0.1"></div>
+        <div class="row"><label>Flash / opac</label><input type="range" data-k="ltFlash" min="0.1" max="1" step="0.01"><input type="number" data-k="ltFlash" step="0.01">
+          <input type="range" data-k="ltFop" min="0" max="1" step="0.01"><input type="number" data-k="ltFop" step="0.01"></div>
+        <div class="row"><label>Szer. pioruna %</label><input type="range" data-k="ltW" min="10" max="60" step="1"><input type="number" data-k="ltW"><span class="val"></span></div>
+        <button id="btn-lightning">Wymuś piorun</button>
+        <pre id="lt-list" class="lt-list"></pre>
+      </section>
+
+      <section>
+        <h3>Eksport</h3>
+        <div class="btn-row">
+          <button id="btn-export" class="primary">Export JSON</button>
+          <button id="btn-import">Import JSON</button>
+          <input type="file" id="file-import" accept="application/json,.json" hidden />
+        </div>
+      </section>
+
+      <section>
+        <h3>Widok</h3>
+        <div class="row"><label>Zoom</label><input type="range" id="zoom" min="0.12" max="1.2" step="0.01" value="0.42"><span class="val" id="zoom-v">0.42</span></div>
+        <button id="btn-fit">Dopasuj</button>
+      </section>
+    </div>
+  </aside>
+
+  <div id="stage-wrap">
+    <div id="toolbar"><span id="mode-label">— stop —</span></div>
+    <div id="stage-outer">
+      <div id="stage">
+        <div id="board-bg"></div>
+        <div id="guides"></div>
+        <div id="fx-root"></div>
+        <div id="lt-markers"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="weather_fx_test.js"></script>
+</body>
+</html>

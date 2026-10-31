@@ -2051,6 +2051,8 @@ export function renderAll(nick) {
     renderLeaders(overlay);
     renderRows(overlay);
     renderWeather(overlay); // Dodajemy renderowanie pogody
+    renderPassButton(overlay);
+    renderPassIndicators(overlay);
 }
 
 function showOpponentPlayInfo(card, scale, boardLeft, boardTop) {
@@ -3563,41 +3565,191 @@ function renderLeaders(overlay) {
     };
     createLeader(playerLeaderObj, 286, 1679, false);
     createLeader(opponentLeaderObj, 286, 174, true);
-
-    // PASS button
-    if (window.gameStarted && !playerPassed) {
-        const passBtn = document.createElement('button');
-        passBtn.className = 'game-pass-btn';
-        passBtn.style.position = 'absolute';
-        passBtn.style.left = `${490 * scale + boardLeft}px`;
-        passBtn.style.top = `${1779 * scale + boardTop}px`;
-        passBtn.style.width = `${120 * scale}px`;
-        passBtn.style.height = `${50 * scale}px`;
-        passBtn.style.backgroundColor = '#1a1a1a';
-        passBtn.style.border = `${2 * scale}px solid #b28a41`;
-        passBtn.style.borderRadius = `${4 * scale}px`;
-        passBtn.style.color = '#b28a41';
-        passBtn.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-        passBtn.style.fontSize = `${28 * scale}px`;
-        passBtn.textContent = 'PASS';
-        passBtn.style.cursor = 'pointer';
-
-        if (currentTurn !== window.socket.id) {
-            passBtn.style.opacity = '0.5';
-            passBtn.style.cursor = 'not-allowed';
-        }
-
-        passBtn.onclick = () => {
-            if (currentTurn !== window.socket.id) return;
-            if (passBtn.dataset.sending === '1') return; // debounce double-click
-            passBtn.dataset.sending = '1';
-            passBtn.disabled = true;
-            passBtn.style.opacity = '0.5';
-            window.socket.emit('pass-turn', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
-        };
-        overlay.appendChild(passBtn);
-    }
 }
+
+// ========================================
+// PRZYCISK PASOWANIA + NAPIS "Pas"
+// ========================================
+const PASS_HOLD_MS = 1000; // Zmniejszono czas trzymania spacji do 1 sekundy (1000 ms)
+const PASS_BTN = { x: 243, y: 1219, w: 869 - 243, h: 1302 - 1219 };
+// pozycje sum punktów (z renderScores) i parametry napisu "Pas"
+const PASS_IND = { x: 907, oppTotalY: 663, myTotalY: 1467, totalHalfH: 35, gap: 58, textH: 68 };
+
+let passHoldStart = null;
+let passHoldRaf = null;
+let passSending = false;
+
+function canPassNow() {
+    return !!(window.socket && window.gameStarted && window.mulliganFinished &&
+        !playerPassed && currentTurn === window.socket.id &&
+        !window.isPowiekOpen && !isMulliganActive);
+}
+
+function ensurePassStyles() {
+    if (document.getElementById('pass-ui-styles')) return;
+    const st = document.createElement('style');
+    st.id = 'pass-ui-styles';
+    st.textContent = `
+        #pass-button { position:absolute; z-index:1200; box-sizing:border-box; cursor:pointer;
+            background:transparent; user-select:none; }
+        #pass-button .pass-btn-inner { position:relative; width:100%; height:100%;
+            background:#000009; overflow:hidden; }
+        #pass-button .pass-btn-fill { position:absolute; left:0; top:0; height:100%; width:0%;
+            background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.18));
+            pointer-events:none; }
+        #pass-button .pass-btn-text { position:absolute; inset:0; display:flex; align-items:center;
+            justify-content:center; white-space:nowrap; font-family:'PFDinTextCondPro', sans-serif;
+            pointer-events:none; }
+        .pass-indicator { position:absolute; z-index:900; display:none; align-items:center;
+            justify-content:center; pointer-events:none; transform:translate(-50%,-50%); }
+        .pass-indicator .pass-glow { position:absolute; inset:0;
+            background:radial-gradient(ellipse closest-side, rgba(207, 182, 132, 0.43) 0%, rgba(207,182,132,0) 100%);
+            animation:pas-pulse 3s linear infinite; }
+        .pass-indicator .pass-text { position:relative; color:#cfb684; line-height:1;
+            font-family:'PFDinTextCondPro-Bold', sans-serif; white-space:nowrap; }
+        /* 0.5s pojawienie, 1s trwa, 0.5s zanik, 2s przerwy = 4s */
+        @keyframes pas-pulse {
+            0%     { opacity:0; }
+            12.5%  { opacity:1; }
+            37.5%  { opacity:1; }
+            50%    { opacity:0; }
+            100%   { opacity:0; }
+        }`;
+    document.head.appendChild(st);
+}
+
+function setPassFill(p) {
+    const f = document.querySelector('#pass-button .pass-btn-fill');
+    if (f) f.style.width = `${Math.max(0, Math.min(1, p)) * 100}%`;
+}
+
+function cancelPassHold() {
+    passHoldStart = null;
+    if (passHoldRaf) { cancelAnimationFrame(passHoldRaf); passHoldRaf = null; }
+    setPassFill(0);
+}
+
+function doPass() {
+    if (!canPassNow() || passSending) return;
+    passSending = true;
+    setTimeout(() => { passSending = false; }, 1500);
+    window.proposedCard = null;
+    window.socket.emit('pass-turn', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+    renderAll(currentNick);
+}
+
+function startPassHold() {
+    if (passHoldStart !== null) return;
+    passHoldStart = performance.now();
+    const tick = (now) => {
+        if (passHoldStart === null) return;
+        if (!canPassNow()) { cancelPassHold(); return; }
+        const p = Math.min(1, (now - passHoldStart) / PASS_HOLD_MS);
+        setPassFill(p);
+        if (p >= 1) {
+            cancelPassHold();
+            doPass();
+            return;
+        }
+        passHoldRaf = requestAnimationFrame(tick);
+    };
+    passHoldRaf = requestAnimationFrame(tick);
+}
+
+window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    if (!canPassNow() || getIsShowing()) return;   // przy banerze spacja je pomija
+    e.preventDefault();
+    if (!e.repeat) startPassHold();
+});
+window.addEventListener('keyup', (e) => { if (e.code === 'Space') cancelPassHold(); });
+window.addEventListener('blur', cancelPassHold);
+
+function renderPassButton(overlay) {
+    ensurePassStyles();
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    let btn = overlay.querySelector('#pass-button');
+    if (!btn) {
+        btn = document.createElement('div');
+        btn.id = 'pass-button';
+        btn.className = 'persistent';
+        btn.innerHTML = `
+            <div class="pass-btn-inner">
+                <div class="pass-btn-fill"></div>
+                <div class="pass-btn-text">
+                    <span style="color:#beab89">[SPACJA]</span>&nbsp;
+                    <span style="color:#ffffff">[PRZYTRZYMAJ]</span>&nbsp;
+                    <span style="color:#b4753d">Spasuj</span>
+                </div>
+            </div>`;
+        btn.onclick = (e) => { e.stopPropagation(); doPass(); };   // myszka = od razu
+        overlay.appendChild(btn);
+    }
+
+    const show = canPassNow();
+    btn.style.display = show ? 'block' : 'none';
+    if (!show) { cancelPassHold(); return; }
+
+    const border = Math.max(1, 2 * scale);
+    const gap = 4 * scale;
+    btn.style.left = `${PASS_BTN.x * scale + boardLeft}px`;
+    btn.style.top = `${PASS_BTN.y * scale + boardTop}px`;
+    btn.style.width = `${PASS_BTN.w * scale}px`;
+    btn.style.height = `${PASS_BTN.h * scale}px`;
+    btn.style.border = `${border}px solid #000009`;   // ramka = kolor wypełnienia
+    btn.style.padding = `${gap}px`;                    // 4px przezroczystej przerwy
+
+    const text = btn.querySelector('.pass-btn-text');
+    text.style.fontSize = `${45 * scale}px`;
+    text.style.letterSpacing = `${0.2 * scale}px`;
+}
+
+function renderPassIndicators(overlay) {
+    ensurePassStyles();
+    const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const boardLeft = (window.innerWidth - 3840 * scale) / 2;
+    const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+    const make = (id, show, centerY) => {
+        let el = overlay.querySelector('#' + id);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = id;
+            el.className = 'persistent pass-indicator';
+            el.innerHTML = '<div class="pass-glow"></div><div class="pass-text">Pas</div>';
+            overlay.appendChild(el);
+        }
+        el.style.display = show ? 'flex' : 'none';
+        el.style.left = `${PASS_IND.x * scale + boardLeft}px`;
+        el.style.top = `${centerY * scale + boardTop}px`;
+        el.style.width = `${480 * scale}px`;     // promień 240 px
+        el.style.height = `${100 * scale}px`;    // promień 50 px
+        const t = el.querySelector('.pass-text');
+        const sh = Math.max(1, scale);
+        t.style.fontSize = `${68 * scale}px`;
+        t.style.letterSpacing = `${0.2 * scale}px`;
+        t.style.textShadow = `${sh}px ${sh}px 0 #000`;
+    };
+
+    // Gracz (my): napis "Pas" nad sumą pk
+    //   dolna krawędź napisu = górna krawędź sumy pk − gap
+    //   górna krawędź sumy pk = myTotalY − totalHalfH
+    //   środek napisu (element z transform:-50%) = myTotalY − totalHalfH − gap − textH/2
+    const myY = PASS_IND.myTotalY - PASS_IND.totalHalfH - PASS_IND.gap - PASS_IND.textH / 2;
+
+    // Przeciwnik (opp): napis "Pas" pod sumą pk
+    //   górna krawędź napisu = dolna krawędź sumy pk + gap
+    //   dolna krawędź sumy pk = oppTotalY + totalHalfH
+    //   środek napisu = oppTotalY + totalHalfH + gap + textH/2
+    const oppY = PASS_IND.oppTotalY + PASS_IND.totalHalfH + PASS_IND.gap + PASS_IND.textH / 2;
+
+    make('pass-indicator-me', playerPassed, myY);
+    make('pass-indicator-opp', opponentPassed, oppY);
+}
+
 
 function collectCardsOnBoardDOM(isOpponent, keptCard) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);

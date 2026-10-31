@@ -11,7 +11,7 @@ const krole = [
         nazwa: "Foltest Król Temerii",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest1.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1001.webp",
-        opis: "Przecież to naturalne, że brat darzy miłością swoją siostrę.",
+        opis: "Przecież to naturalne, że brat darzy\nmiłością swoją siostrę.",
         frakcja: "1",
         numer: "1001",
         umiejetnosc: "Znajdź kartę Gęsta mgła w swojej talii i natychmiast ją zagraj."
@@ -22,7 +22,7 @@ const krole = [
         nazwa: "Foltest Dowódca Północyi",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest2.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1002.webp",
-        opis: '"Pieprzeni doradcy i ich polityczne układanki. Na polu bitwy ufam sobie i swoim zbrojnym".',
+        opis: '"Pieprzeni doradcy i ich polityczne\nukładanki. Na polu bitwy ufam sobie i\nswoim zbrojnym".',
         frakcja: "1",
         numer: "1002",
         umiejetnosc: '"Usuń aktywne efekty pogodowe wynikające z kart Trzaskający Mróz, Ulewny deszcz i Gęsta mgła".'
@@ -33,7 +33,7 @@ const krole = [
         nazwa: "Foltest Zdobywca",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest3.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1003.webp",
-        opis: '"Dobrze wymierzony strzał z balisty druzgocze nie tylko umocnienia, ale też morale wroga".',
+        opis: '"Dobrze wymierzony strzał z balisty\ndruzgocze nie tylko umocnienia, ale też\nmorale wroga".',
         frakcja: "1",
         numer: "1003",
         umiejetnosc: "Podwaja siłę wszystkich twoich jednostek oblężniczych (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
@@ -55,7 +55,7 @@ const krole = [
         nazwa: "Foltest Syn Medella",
         karta: "/tryby/klasyczny_gwint/assets/karty/polnoc/foltest5.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/1005.webp",
-        opis: '"Ja tu rządę i nie będę się krył po kątach".',
+        opis: '"Ja tu rządę i nie będę się krył po\nkątach".',
         frakcja: "1",
         numer: "1005",
         umiejetnosc: "Niszczy najsilniejszą jednostke/i dalekiego zasięgu twojego przeciwnika, jeśli suma siły jego jednostek dalekiego zasięgu wynosi 10 lub więcej."
@@ -68,7 +68,7 @@ const krole = [
         nazwa: "Emhyr var Emreis Jeż z Erlenwaldu",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr1.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2001.webp",
-        opis: '"Niebo nie płakało, gdy zabrali mi Pawette".',
+        opis: '"Niebo nie płakało, gdy zabrali mi\nPawette".',
         frakcja: "2",
         numer: "2001",
         umiejetnosc: "Znajdź w swojej talii kartę Deszcz i natychmiast ją zagraj."
@@ -79,7 +79,7 @@ const krole = [
         nazwa: "Emhyr var Emreis Cesarz Nilfgaardu",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr2.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2002.webp",
-        opis: '"Nie interesują mnie twoje przesłaniki. Oczekikję wyników".',
+        opis: '"Nie interesują mnie twoje przesłaniki.\nOczekikję wyników".',
         frakcja: "2",
         numer: "2002",
         umiejetnosc: "Obejrzyj trzy losowe karty z ręki przeciwnika"
@@ -90,7 +90,7 @@ const krole = [
         nazwa: "Emhyr var Emreis Biały Płomień Tańczący na Kurhanach Wrogów",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr3.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2003.webp",
-        opis: '"Miecz jest raptem jednym z narzędzi w dyspozycji cesarza".',
+        opis: '"Miecz jest raptem jednym z narzędzi w\ndyspozycji cesarza".',
         frakcja: "2",
         numer: "2003",
         umiejetnosc: "Blokuję umiejętności dowódcy twojego przeciwnika."
@@ -101,7 +101,7 @@ const krole = [
         nazwa: "Emhyr var Emreis Pan Południa",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr4.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2004.webp",
-        opis: '"Nie jestem znany ze swojej cierpliwości. Poczyń, prosze, kroki , abym nie być znanym z braku głowy na karku".',
+        opis: '"Nie jestem znany ze swojej cierpliwości.\nPoczyń, prosze, kroki , abym nie być znanym\nz braku głowy na karku".',
         frakcja: "2",
         numer: "2004",
         umiejetnosc: "Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika."
@@ -112,7 +112,7 @@ const krole = [
         nazwa: "Emhyr var Emreis Najeźca Północy",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr5.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2005.webp",
-        opis: '"Cesarze władają imperium, ale dwiem rzeczami rządzić nie mogą swojim sercem i swojim czasie".',
+        opis: '"Cesarze władają imperium, ale dwiem\nrzeczami rządzić nie mogą swojim\nsercem i swojim czasie".',
         frakcja: "2",
         numer: "2005",
         umiejetnosc: "Gdy gracz przywraca jednostkę na pole bitwy, przywrócona zostaje losowa jednostka. Dotyczy obu graczy."
@@ -125,7 +125,7 @@ const krole = [
         nazwa: "Francesca Findabair Elfka czystej krwi",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair1.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3001.webp",
-        opis: '"Znowu jesteśmy Ludem, aie wygnańcami. A popiół użyźnia".',
+        opis: '"Znowu jesteśmy Ludem, nie\nwygnańcami. A popiół użyźnia".',
         frakcja: "3",
         numer: "3001",
         umiejetnosc: "Znajdź w swojej talii kartę Trzaskający Mróz i natychmiast ją zagraj."
@@ -136,7 +136,7 @@ const krole = [
         nazwa: "Francesca Findabair Stokrotka z Dolin",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair2.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3002.webp",
-        opis: '"Powszechnei uważa się ją za najpiękniejszą kobietę świata".',
+        opis: '"Powszechnei uważa się ją za\nnajpiękniejszą kobietę świata".',
         frakcja: "3",
         numer: "3002",
         umiejetnosc: "Weź o jedną kartę więcej na początku bitwy."
@@ -147,7 +147,7 @@ const krole = [
         nazwa: "Francesca Findabair Najpiękniejsza kobieta na świecie",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair3.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3003.webp",
-        opis: '"Komanda muszą nadal prowadzić walkę".',
+        opis: '"Komanda muszą nadal prowadzić\nwalkę".',
         frakcja: "3",
         numer: "3003",
         umiejetnosc: "Podwaja siłę twoich jednostek dalekiego zasięgu (o ile w ich rzędzie nie ma już Rogu Dowódcy)."
@@ -158,7 +158,7 @@ const krole = [
         nazwa: "Francesca Findabair Królowa Dol Blathanna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair4.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3004.webp",
-        opis: '"Wszystko ma swoją cenę. Wojna wymaga ofiar. Pokój, jak się okazuje, również".',
+        opis: '"Wszystko ma swoją cenę. Wojna\nwymaga ofiar. Pokój, jak się okazuje,\nrównież".',
         frakcja: "3",
         numer: "3004",
         umiejetnosc: "Zniszcz najsilniejszą jednostkę/ki bliskiego starcia twojego przeciwnika, jeśli suma siły jego jednostek bliskiego starcia wynosi 10 lub więcej."
@@ -169,7 +169,7 @@ const krole = [
         nazwa: "Francesca Findabair Nadzieja Dol Blathanna",
         karta: "/tryby/klasyczny_gwint/assets/karty/scio'tel/francesca_findabair5.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/3005.webp",
-        opis: '"Daede sian caente, Aen Seidhe en\'allane ael coeden...".',
+        opis: '"Daede sian caente, Aen Seidhe en\'allane\nael coeden...".',
         frakcja: "3",
         numer: "3005",
         umiejetnosc: "Przesuwa jednostki ze zdolnością Zręczności do rzędóow, które maksymalizują ich siłę. (jednostki w optymalnych miejscach nie zostaną przesunięte)."
@@ -215,7 +215,7 @@ const krole = [
         nazwa: "Eredin Bréacc Glas Zabujca Auberona",
         karta: "/tryby/klasyczny_gwint/assets/karty/potwory/eredin4.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/4004.webp",
-        opis: '"Czerwpni Jeźdżcy zdołają doścignąć cię nawet w odchłani czasów i  miejsc".',
+        opis: '"Czerwpni Jeźdżcy zdołają doścignąć cięn\nawet w odchłani czasów i  miejsc".',
         frakcja: "4",
         numer: "4004",
         umiejetnosc: 'Weź karte ze stosu kart odrzuconych.'

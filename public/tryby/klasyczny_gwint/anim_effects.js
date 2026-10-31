@@ -238,21 +238,38 @@ export function playPorzFireOnElement(cardEl) {
     fire.style.width = `${PORZ_4K.w * sx}px`;
     fire.style.height = `${PORZ_4K.h * sy}px`;
 
+    // Użyj preloadowanych obrazków aby uniknąć opóźnienia przy ładowaniu
     const setFrame = index => {
-      fire.style.backgroundImage = `url('${FX.porzFrames[index]}')`;
+      const preloaded = porzPreloaded[index];
+      fire.style.backgroundImage = preloaded && preloaded.complete
+        ? `url('${preloaded.src}')`
+        : `url('${FX.porzFrames[index]}')`;
     };
 
     setFrame(0);
     cardEl.appendChild(fire);
 
+    // Animacja oparta na requestAnimationFrame z bezwzględnym pomiarem czasu
+    // eliminuje dryft setTimeout przy wielu równoczesnych animacjach spalania
     const stepMs = PORZ_FRAMES_TOTAL_MS / PORZ_FRAME_COUNT;
-    let frame = 0;
+    let lastFrame = -1;
+    const startTime = performance.now();
 
-    const tick = () => {
-      frame++;
-      if (frame < PORZ_FRAME_COUNT) {
+    const tick = (now) => {
+      if (!fire.isConnected) {
+        resolve();
+        return;
+      }
+      const elapsed = now - startTime;
+      const frame = Math.min(Math.floor(elapsed / stepMs), PORZ_FRAME_COUNT - 1);
+
+      if (frame !== lastFrame) {
+        lastFrame = frame;
         setFrame(frame);
-        setTimeout(tick, stepMs);
+      }
+
+      if (elapsed < PORZ_FRAMES_TOTAL_MS) {
+        requestAnimationFrame(tick);
       } else {
         fire.offsetHeight;
         fire.classList.add('fading');
@@ -263,7 +280,7 @@ export function playPorzFireOnElement(cardEl) {
       }
     };
 
-    setTimeout(tick, stepMs);
+    requestAnimationFrame(tick);
   });
 }
 

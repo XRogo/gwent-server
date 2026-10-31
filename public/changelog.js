@@ -15,7 +15,17 @@
 //    }, <- jeśli coś jest usunięte to ignoruj i nie pisz np czego dotyczy (bo najprawdopodobniej wszystkeigo) 
     
 const wersja = [
-        {
+    {
+        version0: "10.8",
+        data: "31.10.2026",
+        zmiany: {
+            line1: 'Opisy dowódców nie wychodzą już poza obszar karty',
+            line2: "Pożoga nie powinna już mrygać",
+            line3: "Pas jest od teraz jak w wiedźminie",
+        },
+        image: "/asset/aktualizacja_grafiki/10.8.webp"
+    }, 
+    {
         version0: "3.01",
         data: "30.10.2026",
         zmiany: {

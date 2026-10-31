@@ -1,0 +1,147 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #1a1a1e; color: #e8e8ec; font-family: system-ui, sans-serif; overflow: hidden; }
+#app { display: flex; height: 100%; }
+
+#panel {
+  width: 380px; min-width: 300px; background: #25252b; border-right: 1px solid #3a3a44;
+  display: flex; flex-direction: column; overflow: hidden; z-index: 10;
+}
+#panel h2 { padding: 12px 14px; font-size: 15px; background: #1e1e24; border-bottom: 1px solid #3a3a44; }
+#panel .scroll { flex: 1; overflow-y: auto; padding: 10px 12px; }
+section { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #333; }
+section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #9a9aaa; margin-bottom: 8px; }
+.row { display: flex; gap: 5px; align-items: center; margin-bottom: 5px; flex-wrap: wrap; }
+label { font-size: 11px; color: #b0b0bc; min-width: 110px; }
+input[type="number"] {
+  background: #1a1a1e; border: 1px solid #444; color: #eee; border-radius: 4px;
+  padding: 2px 4px; font-size: 11px; width: 58px;
+}
+input[type="range"] { flex: 1; min-width: 50px; }
+input[type="color"] { width: 28px; height: 20px; border: none; background: none; cursor: pointer; }
+select {
+  background: #1a1a1e; border: 1px solid #444; color: #eee; border-radius: 4px; padding: 4px 6px; font-size: 12px;
+}
+button {
+  background: #3a3a50; border: 1px solid #555; color: #eee; border-radius: 5px;
+  padding: 6px 10px; font-size: 12px; cursor: pointer;
+}
+button:hover { background: #4a4a65; }
+button.primary { background: #2a4a6a; border-color: #468; }
+button.danger { background: #5a2a2a; border-color: #833; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.val { font-size: 10px; color: #8af; min-width: 32px; text-align: right; }
+.hint { font-size: 10px; color: #777; margin-top: 4px; line-height: 1.35; }
+.lt-list { font-size: 10px; color: #9ab; margin-top: 6px; white-space: pre-wrap; }
+
+#stage-wrap {
+  flex: 1; position: relative; overflow: auto; background: #0d0d10;
+  display: flex; align-items: center; justify-content: center;
+}
+#stage-outer { position: relative; flex-shrink: 0; }
+#stage {
+  position: absolute; left: 0; top: 0;
+  width: 3840px; height: 2160px;
+  transform-origin: 0 0;
+  background: #000;
+  box-shadow: 0 0 40px rgba(0,0,0,.6);
+}
+#board-bg {
+  position: absolute; inset: 0;
+  background: url('assets/asety/plansza.webp') no-repeat center / contain;
+  pointer-events: none;
+}
+#fx-root, #guides, #lt-markers {
+  position: absolute; inset: 0; pointer-events: none; overflow: visible;
+}
+#lt-markers { z-index: 50; pointer-events: none; }
+#stage.lt-edit { cursor: crosshair; }
+#stage.lt-edit #fx-root { pointer-events: none; }
+
+.area-guide {
+  position: absolute;
+  border: 1px dashed rgba(100,180,255,.4);
+  pointer-events: none;
+}
+.lt-marker {
+  position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px;
+  border-radius: 50%; border: 2px solid #fff; background: rgba(80,160,255,.7);
+  font-size: 9px; color: #fff; display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 60;
+}
+.lt-marker.g2 { background: rgba(255,140,60,.75); }
+
+/* ===== FX areas ===== */
+.fx-pair { position: absolute; left: 0; top: 0; width: 3840px; height: 2160px; pointer-events: none; }
+.fx-self {
+  position: absolute; overflow: visible; pointer-events: none;
+}
+.fx-opp {
+  position: absolute; overflow: visible; pointer-events: none;
+  /* kopia – tylko przesunięcie, zero drugiego renderu grafiki w JS */
+}
+
+.fx-inner { position: absolute; inset: 0; overflow: hidden; }
+.fx-spill { position: absolute; left: 0; right: 0; bottom: -40px; height: 90px; overflow: visible; }
+
+.rain-layer {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+  overflow: hidden; will-change: transform;
+}
+.rain-drop {
+  position: absolute;
+  border-radius: 0 0 45% 45%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.85));
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes rain-fall {
+  0%   { transform: translate3d(0, var(--y0), 0); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translate3d(0, var(--y1), 0); opacity: 0; }
+}
+
+.rain-grad, .fog-grad, .storm-glow {
+  position: absolute; inset: 0; pointer-events: none;
+}
+.storm-glow { opacity: 0; }
+
+.fog-puff {
+  position: absolute;
+  background: url('assets/asety/effekty/dymek.webp') center / contain no-repeat;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.storm-drop {
+  position: absolute;
+  background: url('assets/asety/effekty/kropelka.webp') center / contain no-repeat;
+  transform-origin: center top;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.lightning {
+  position: absolute;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top right;
+  transform-origin: top right;
+  pointer-events: none;
+  filter: drop-shadow(0 0 12px rgba(100,180,255,.9));
+}
+.lightning.mirror {
+  transform-origin: top left;
+  background-position: top left;
+}
+
+.flash {
+  position: absolute; border-radius: 50%; opacity: 0; pointer-events: none;
+}
+
+#toolbar {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  z-index: 20; background: rgba(20,20,28,.85); padding: 6px 12px;
+  border-radius: 8px; border: 1px solid #444; font-size: 12px; color: #ccc;
+}
