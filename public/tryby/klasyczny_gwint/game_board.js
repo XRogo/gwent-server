@@ -7,6 +7,7 @@ import { krole } from './krole.js';
 import { isLeaderUsable } from './krol_code.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
 import { playFrostFx, syncFrostFx } from './frost_fx.js';
+import { playFogFx, syncFogFx } from './fog_fx.js';
 import {
     animateLeaderFromDeck,
     animateOpponentLeaderFromDeck,
@@ -734,6 +735,10 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
                    if (lpc.moc === 'mroz' && !isDuplicateWeather) {
                        if (window.playSound) window.playSound('mrozSound');
                        playFrostFx();
+                   }
+                   if (lpc.moc === 'mgla' && !isDuplicateWeather) {
+                       if (window.playSound) window.playSound('mglaSound');
+                       playFogFx();
                    }
                    const weatherList = boardState.weather || [];
                    const newWeatherStr = weatherList[weatherList.length - 1];
@@ -3126,8 +3131,12 @@ function renderWeather(overlay) {
            return c && c.moc === 'mroz' && window.arrivedWeatherCards.has(w);
        });
        syncFrostFx(frostActive);
-
-}
+           const fogActive = (boardState.weather || []).some(w => {
+           const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
+           return c && c.moc === 'mgla' && window.arrivedWeatherCards.has(w);
+       });
+syncFogFx(fogActive);
+}   
 
 function renderRows(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
