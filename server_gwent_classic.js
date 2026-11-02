@@ -238,7 +238,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     const hasBran = String(leaderForSide) === '5001' && !leaderBlocked;
 
     let pts = card.punkty;
-    if (weatherActive) {
+        if (weatherActive && card.punkty > 0) {
         if (hasBran) {
             pts = Math.max(1, Math.floor(card.punkty / 2));
         } else {
@@ -1741,7 +1741,7 @@ function registerClassicGwentEvents(socket, io, games) {
                 if (c.bohater) {
                     sum += c.punkty * count;
                 } else {
-                    let pts = weatherActive ? (hasBran ? Math.max(1, Math.floor(c.punkty / 2)) : 1) : c.punkty;
+                    let pts = (weatherActive && c.punkty > 0) ? (hasBran ? Math.max(1, Math.floor(c.punkty / 2)) : 1) : c.punkty;
                     if (c.moc === 'wiez') {
                         const bondIds = new Set([String(c.numer)]);
                         if (c.summon) {

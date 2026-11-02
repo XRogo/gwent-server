@@ -8,6 +8,7 @@ import { isLeaderUsable } from './krol_code.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
 import { playFrostFx, syncFrostFx } from './frost_fx.js';
 import { playFogFx, syncFogFx } from './fog_fx.js';
+import { playRainFx, syncRainFx } from './rain_fx.js';
 import {
     animateLeaderFromDeck,
     animateOpponentLeaderFromDeck,
@@ -739,6 +740,10 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
                    if (lpc.moc === 'mgla' && !isDuplicateWeather) {
                        if (window.playSound) window.playSound('mglaSound');
                        playFogFx();
+                   }
+                   if (lpc.moc === 'deszcz' && !isDuplicateWeather) {
+                       if (window.playSound) window.playSound('deszczSound');
+                       playRainFx();
                    }
                    const weatherList = boardState.weather || [];
                    const newWeatherStr = weatherList[weatherList.length - 1];
@@ -2400,7 +2405,7 @@ function calculateScores() {
             if (card.bohater) {
                 sum += card.punkty;
             } else {
-                let pts = weatherActive ? (hasBran ? Math.max(1, Math.floor(card.punkty / 2)) : 1) : card.punkty;
+                let pts = (weatherActive && card.punkty > 0) ? (hasBran ? Math.max(1, Math.floor(card.punkty / 2)) : 1) : card.punkty;
 
                 // 1. Więź
                 if (card.moc === 'wiez') {
@@ -3130,12 +3135,17 @@ function renderWeather(overlay) {
            const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
            return c && c.moc === 'mroz' && window.arrivedWeatherCards.has(w);
        });
-       syncFrostFx(frostActive);
+    syncFrostFx(frostActive);
            const fogActive = (boardState.weather || []).some(w => {
            const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
            return c && c.moc === 'mgla' && window.arrivedWeatherCards.has(w);
        });
-syncFogFx(fogActive);
+    syncFogFx(fogActive);
+           const rainActive = (boardState.weather || []).some(w => {
+           const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
+           return c && c.moc === 'deszcz' && window.arrivedWeatherCards.has(w);
+       });
+    syncRainFx(rainActive);
 }   
 
 function renderRows(overlay) {
@@ -3292,7 +3302,7 @@ function renderRows(overlay) {
                     const hasBran = leaderObj && String(leaderObj.numer) === '5001' && !leaderBlocked;
 
                     if ((rowNum === 1 && checkW('mroz')) || (rowNum === 2 && checkW('mgla')) || (rowNum === 3 && checkW('deszcz'))) {
-                        cardScore = hasBran ? Math.max(1, Math.floor(card.punkty / 2)) : 1;
+                        if (card.punkty > 0) cardScore = hasBran ? Math.max(1, Math.floor(card.punkty / 2)) : 1;
                     }
                     // Więź: własny numer + partnerzy z summon
                     let bondCnt = 0;

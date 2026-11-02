@@ -15,12 +15,21 @@
 //    }, <- jeśli coś jest usunięte to ignoruj i nie pisz np czego dotyczy (bo najprawdopodobniej wszystkeigo) 
     
 const wersja = [
+       {
+        version0: "10.9",
+        data: "02.11.2026",
+        zmiany: {
+            line1: 'Dodałem animacje mgły i deszczu',
+            line2: 'Naprawiłem działanie dowódcy "Emhyr var Emreis Pan Południa", działa w 1 rundzie oraz poprawiłem błąd w opise',
+            line3: "Naprawiłem działanie kart z pk = 0 podczas działania effektów pogodowych (nie dostają gratisowego pk)",
+        },
+        image: "/asset/aktualizacja_grafiki/10.9.webp"
+    }, 
     {
         version0: "10.8",
         data: "31.10.2026",
         zmiany: {
             line1: 'Opisy dowódców nie wychodzą już poza obszar karty',
-            line2: "Pożoga nie powinna już mrygać",
             line3: "Pas jest od teraz jak w wiedźminie",
         },
         image: "/asset/aktualizacja_grafiki/10.8.webp"
@@ -32,7 +41,7 @@ const wersja = [
             line1: 'Wprowadziłem wstępną obsługe changeloga',
             line2: "Menu wstępnie wprowadzone, wyświetlanie skalowanie i przyciki",
             line3: "Dodałem do assetów flagi do wielu obsługi wielu języków",
-            line4: "Dodałem muzyke do assetów",
+            line4: "Dodałem muzyke do assetów (po wprowadzeniu nowego lobby zostanie dodana muzyka również do samej gry)",
         }
     }, 
     {

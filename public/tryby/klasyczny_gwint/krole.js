@@ -101,7 +101,7 @@ const krole = [
         nazwa: "Emhyr var Emreis Pan Południa",
         karta: "/tryby/klasyczny_gwint/assets/karty/nilftgard/emhyr4.webp",
         dkarta: "/tryby/klasyczny_gwint/assets/dkarty/kure/2004.webp",
-        opis: '"Nie jestem znany ze swojej cierpliwości.\nPoczyń, prosze, kroki , abym nie być znanym\nz braku głowy na karku".',
+        opis: '"Nie jestem znany ze swojej cierpliwości.\nPoczyń, prosze, kroki, abym nie być znanym\nz braku głowy na karku".',
         frakcja: "2",
         numer: "2004",
         umiejetnosc: "Wybierz kartę ze stosu kart odrzuconych twojego przeciwnika."

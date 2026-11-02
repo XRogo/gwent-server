@@ -63,7 +63,7 @@ function calculateEffectivePower(cardNum, rowKey, board, state) {
     const hasBran = String(leaderForSide) === '5001' && !leaderBlocked;
 
     let pts = card.punkty;
-    if (weatherActive) {
+        if (weatherActive && card.punkty > 0) {
         if (hasBran) {
             pts = Math.max(1, Math.floor(card.punkty / 2));
         } else {
@@ -114,7 +114,7 @@ function isLeaderUsable(leaderNum, state, isPlayer1) {
     const oppHand = isPlayer1 ? state.p2Hand : state.p1Hand;
 
     const isWeather = (c) => c && ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc);
-    const isNormalUnit = (c) => c && !c.bohater && c.typ !== 'specjalna' && c.moc !== 'rog' && !['000','001','002','003','004','005','006','007','008'].includes(String(c.numer)) && !isWeather(c);
+    const isNormalUnit = (c) => c && typeof c.punkty === 'number' && !c.bohater && !['000','001','002','003','004','005','006','007','008'].includes(String(c.numer)) && !isWeather(c);
     const _c = _cards;
 
     switch (String(leaderNum)) {
@@ -211,7 +211,7 @@ function executeLeaderEffect(leaderNum, state, isPlayer1, io, gameCode, addition
     state[`${side}LeaderUsed`] = true;
 
     const isWeather = (c) => c && ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(c.moc);
-    const isNormalUnit = (c) => c && !c.bohater && c.typ !== 'specjalna' && c.moc !== 'rog' && !['000','001','002','003','004','005','006','007','008'].includes(String(c.numer)) && !isWeather(c);
+    const isNormalUnit = (c) => c && typeof c.punkty === 'number' && !c.bohater && !['000','001','002','003','004','005','006','007','008'].includes(String(c.numer)) && !isWeather(c);
 
     const playWeatherFromDeck = (weatherMoc) => {
         const idx = deck.findIndex(num => {
