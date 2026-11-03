@@ -55,7 +55,7 @@ export function initSelection(socket, gameCode, isPlayer1) {
         const leader = krole.find(k => k.numer === numer);
         if (leader) {
             selectedLeader = leader;
-            if (window.playSound) window.playSound('hoverSound');
+            if (window.playSound) window.playSound('dowodcaZmianaSound');
             updateSelectionUI();
         }
     };

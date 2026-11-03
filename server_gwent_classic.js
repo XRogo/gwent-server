@@ -1209,80 +1209,56 @@ function registerClassicGwentEvents(socket, io, games) {
                 const targetSide = isSpy ? (isPlayer1 ? 'p2' : 'p1') : side;
                 const isWeather = ['mroz', 'mgla', 'deszcz', 'sztorm', 'niebo'].includes(cardObj.moc);
 
-                if (isWeather) {
-                    if (!state.board.weather) state.board.weather = [];
+               if (isWeather) {
+    if (!state.board.weather) state.board.weather = [];
 
-                    let weatherReplaced = [];
-                    const newMoc = cardObj.moc;
+    const newMoc = cardObj.moc;
+    const myGrave = isPlayer1 ? state.p1Graveyard : state.p2Graveyard;
+    const mocOf = (wStr) => {
+        const c = cards.find(x => String(x.numer) === String(wStr.split('-')[1]));
+        return c ? c.moc : null;
+    };
+    const toGrave = (wStr) => {
+        const [owner, num] = wStr.split('-');
+        (owner === 'p1' ? state.p1Graveyard : state.p2Graveyard).push(num);
+    };
 
-                    if (newMoc === 'sztorm') {
-                        // Sztorm zastępuje deszcz i mgłę (i samego siebie jeśli był)
-                        for (let i = state.board.weather.length - 1; i >= 0; i--) {
-                            const wStr = state.board.weather[i];
-                            const wNum = wStr.split('-')[1];
-                            const wCard = cards.find(c => String(c.numer) === String(wNum));
-                            if (wCard && (wCard.moc === 'deszcz' || wCard.moc === 'mgla' || wCard.moc === 'sztorm')) {
-                                weatherReplaced.push(wStr);
-                                state.board.weather.splice(i, 1);
-                                const parts = wStr.split('-');
-                                if (parts[0] === 'p1') state.p1Graveyard.push(parts[1]);
-                                else state.p2Graveyard.push(parts[1]);
-                            }
-                        }
-                    } else if (newMoc !== 'niebo') {
-                        // Inne (mroz, deszcz, mgla) zastępują same siebie
-                        for (let i = state.board.weather.length - 1; i >= 0; i--) {
-                            const wStr = state.board.weather[i];
-                            const wNum = wStr.split('-')[1];
-                            const wCard = cards.find(c => String(c.numer) === String(wNum));
-                            if (wCard && wCard.moc === newMoc) {
-                                weatherReplaced.push(wStr);
-                                state.board.weather.splice(i, 1);
-                                const parts = wStr.split('-');
-                                if (parts[0] === 'p1') state.p1Graveyard.push(parts[1]);
-                                else state.p2Graveyard.push(parts[1]);
-                            }
-                        }
-                    }
+    let weatherReplaced = [];
+    state.weatherToGraveyard = false;
+    const stormActive = state.board.weather.some(w => mocOf(w) === 'sztorm');
 
-                    // Trzymamy z side, aby wiedzieć czyj cmentarz
-                    state.board.weather.push(`${side}-${cardNumer}`);
-                    hand.splice(cardIdx, 1);
-                    state.weatherReplaced = weatherReplaced; // Przekazujemy do animacji
+    if (newMoc === 'niebo') {
+        // Czyste Niebo: cała pogoda + sama karta od razu na cmentarze
+        weatherReplaced = [...state.board.weather];
+        weatherReplaced.forEach(toGrave);
+        state.board.weather = [];
+        myGrave.push(cardNumer);
+        state.weatherToGraveyard = true;
+    } else if (stormActive && (newMoc === 'deszcz' || newMoc === 'mgla')) {
+        // Sztorm jest aktywny: deszcz / mgła idą prosto na cmentarz
+        myGrave.push(cardNumer);
+        state.weatherToGraveyard = true;
+    } else {
+        // Sztorm zastępuje deszcz, mgłę i sztorm; reszta zastępuje same siebie
+        for (let i = state.board.weather.length - 1; i >= 0; i--) {
+            const wStr = state.board.weather[i];
+            const m = mocOf(wStr);
+            const replace = newMoc === 'sztorm'
+                ? (m === 'deszcz' || m === 'mgla' || m === 'sztorm')
+                : m === newMoc;
+            if (replace) {
+                weatherReplaced.push(wStr);
+                state.board.weather.splice(i, 1);
+                toGrave(wStr);
+            }
+        }
+        state.board.weather.push(`${side}-${cardNumer}`);
+    }
 
-                    targetRow = 'weather';
+    hand.splice(cardIdx, 1);
+    state.weatherReplaced = weatherReplaced;
+    targetRow = 'weather';
 
-                    if (cardObj.moc === 'niebo') {
-                        setTimeout(() => {
-                            const gInfo = games[gameCode];
-                            if (gInfo && gInfo.gameState && gInfo.gameState.board.weather) {
-                                const gs = gInfo.gameState;
-                                let weatherCleared = [...gs.board.weather];
-                                gs.board.weather.forEach(wStr => {
-                                    const parts = wStr.split('-');
-                                    const wOwner = parts[0];
-                                    const wNum = parts[1];
-                                    if (wOwner === 'p1') gs.p1Graveyard.push(wNum);
-                                    else gs.p2Graveyard.push(wNum);
-                                });
-                                gs.board.weather = [];
-
-                                io.to(gameCode).emit('board-updated', {
-                                    board: gs.board,
-                                    currentTurn: gs.currentTurn,
-                                    p1HandCount: gs.p1Hand.length,
-                                    p2HandCount: gs.p2Hand.length,
-                                    p1Lives: gs.p1Lives,
-                                    p2Lives: gs.p2Lives,
-                                    p1Passed: gs.p1Passed,
-                                    p2Passed: gs.p2Passed,
-                                    p1Graveyard: gs.p1Graveyard,
-                                    p2Graveyard: gs.p2Graveyard,
-                                    weatherCleared: weatherCleared, // Informacja dla klienta co zniknęło
-                                });
-                            }
-                        }, 2000); // 2 sekundy na wybrzmienie dźwięku nieba
-                    }
                 } else if (cardObj.moc === 'porz' && typeof cardObj.punkty !== 'number') {
                     // Porzoga ogólna: specjalna karta (np. 001) która NIE zostaje na planszy
                     // Trafia od razu do cmentarza po zagraniu (animacja z player preview -> cmentarz)
@@ -1576,6 +1552,7 @@ function registerClassicGwentEvents(socket, io, games) {
                     porzogaDestroyed: scorchDestroyed || [],
                     decoyDetails: state.decoyDetails || null,
                     weatherReplaced: state.weatherReplaced || [],
+                    weatherToGraveyard: !!state.weatherToGraveyard,
                     targetSlot: (targetRow && playedIndex >= 0) ? {
                         row: targetRow,
                         index: playedIndex
@@ -1585,6 +1562,7 @@ function registerClassicGwentEvents(socket, io, games) {
                 // Reset temporary states
                 state.decoyDetails = null;
                 state.weatherReplaced = null;
+                state.weatherToGraveyard = false;
 
                 // Also emit to opponent explicitly if needed (though io.to(gameCode) covers it)
                 const targetId = isPlayer1 ? game.player2 : game.player1;

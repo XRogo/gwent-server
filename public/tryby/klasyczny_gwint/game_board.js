@@ -9,6 +9,7 @@ import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
 import { playFrostFx, syncFrostFx } from './frost_fx.js';
 import { playFogFx, syncFogFx } from './fog_fx.js';
 import { playRainFx, syncRainFx } from './rain_fx.js';
+import { playStormFx } from './storm_fx.js';
 import {
     animateLeaderFromDeck,
     animateOpponentLeaderFromDeck,
@@ -677,7 +678,7 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
 
             let myGyCount = 0;
             let oppGyCount = 0;
-            if (lpc.moc === 'niebo' || isDuplicateWeather) {
+            if (lpc.moc === 'niebo' || isDuplicateWeather || data.weatherToGraveyard) {
                 if (isMe) myGyCount++; else oppGyCount++;
             }
             removedWeatherCards.forEach(item => {
@@ -714,7 +715,7 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
             }
             window.oldWeatherCards = [];
 
-            if (lpc.moc === 'niebo' || isDuplicateWeather) {
+            if (lpc.moc === 'niebo' || isDuplicateWeather || data.weatherToGraveyard) {
                 const activeGraveyard4K = isMe ? { x: 3110, y: 1682 } : { x: 3110, y: 168 };
                 const clearSkyEl = createAnimationCardElement(lpc, 180, 239);
                 animateElement(clearSkyEl, to4K, activeGraveyard4K, 180, 239, () => {
@@ -723,6 +724,7 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
                     } else {
                         window.opponentGraveyardAnimatingCount = Math.max(0, window.opponentGraveyardAnimatingCount - 1);
                     }
+                    if (lpc.moc === 'niebo' && window.playSound) window.playSound('czystenieboSound');
                     renderAll(currentNick);
                 });
                 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -744,6 +746,12 @@ const executeZip = (to4K, lpc, data, rowKey, cardIdx, resolve, from4K = null) =>
                    if (lpc.moc === 'deszcz' && !isDuplicateWeather) {
                        if (window.playSound) window.playSound('deszczSound');
                        playRainFx();
+                   }
+                   if (lpc.moc === 'sztorm' && !isDuplicateWeather) {
+                       if (window.playSound) window.playSound('sztormSound'); // tylko dźwięk sztormu
+                       playFogFx();
+                       playRainFx();
+                       playStormFx();
                    }
                    const weatherList = boardState.weather || [];
                    const newWeatherStr = weatherList[weatherList.length - 1];
@@ -1179,6 +1187,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             });
         }
 
+        updateLeaderCache();
         // Natychmiast otwórz mulligan (animacje lecą "pod" nim)
         playerHand = handObjects;
         sortHand();
@@ -1404,6 +1413,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         if (data.deck) {
             const mapToObjects = (numerArray) => (numerArray || []).map(num => cards.find(c => c.numer === num)).filter(Boolean);
             drawPile = mapToObjects(data.deck);
+            updateLeaderCache();
             renderAll(nick);
         }
     });
@@ -1571,6 +1581,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
                 if (data.leaderPlayed) {
                     await animateLeaderPlay(data.leaderPlayed);
+                    await playLeaderAction(data.leaderPlayed, data);
                 }
 
                 // Przygotuj (preload) obrazki dobieranych kart w trakcie poprzedzającej animacji
@@ -2932,7 +2943,7 @@ async function animateLeaderPlay(leaderPlayed) {
     const start4K = isMe ? { x: 286, y: 1679 } : { x: 286, y: 174 };
     const preview4K = { x: 3120, y: 1080 - 992 / 2 };
 
-    if (window.playSound) window.playSound('wezwanieSound');
+        if (window.playSound) window.playSound(String(leaderPlayed.leader) === '5002' ? 'dowodca5002Sound' : 'dowodcaSound');
 
     await new Promise(resolve => {
         const flyEl = createAnimationCardElement(leaderObj, 523, 992, true, true);
@@ -2987,6 +2998,66 @@ async function animateLeaderPlay(leaderPlayed) {
             flyEl.style.transform = `scale(1, 1)`;
         }));
     });
+}
+
+// Lot pojedynczej karty z punktu A do B (4K)
+function flyCardSimple(card, from4K, to4K) {
+    return new Promise(resolve => {
+        const el = createAnimationCardElement(card, 180, 239);
+        animateElement(el, from4K, to4K, 180, 239, resolve);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (el._targetPos) {
+                el.style.left = `${el._targetPos.x}px`;
+                el.style.top = `${el._targetPos.y}px`;
+            }
+        }));
+    });
+}
+
+// Animacja + dźwięk efektu użytego dowódcy
+async function playLeaderAction(lp, data) {
+    const res = lp.result || {};
+    const isMe = lp.playedBy === (isPlayer1Local ? 'p1' : 'p2');
+    const leaderPos = isMe ? { x: 286, y: 1679 } : { x: 286, y: 174 };
+    const pilePos = isMe ? { x: 3459, y: 1656 } : { x: 3459, y: 132 };
+
+    if (res.action === 'horn') {
+        // róg dowódcy pojawia się niezależnie od talii – leci z karty dowódcy
+        const hornCard = cards.find(c => String(c.numer) === '002');
+        const slot = document.getElementById(`special-slot-${lp.playedBy}-${res.row}`);
+        if (hornCard && slot) await flyCardSimple(hornCard, leaderPos, getElement4KPos(slot));
+        if (window.playSound) window.playSound('rogDowodcySound');
+        renderAll(currentNick);
+
+    } else if (res.action === 'weather' && res.card) {
+        // pogoda z talii – leci z kupki
+        const wCard = cards.find(c => String(c.numer) === String(res.card));
+        if (wCard) {
+            const to4K = resolveBoardTarget4K('weather', 0, isMe, data, wCard);
+            await flyCardSimple(wCard, pilePos, to4K);
+            const sounds = { mroz: 'mrozSound', mgla: 'mglaSound', deszcz: 'deszczSound', sztorm: 'sztormSound' };
+            if (window.playSound && sounds[wCard.moc]) window.playSound(sounds[wCard.moc]);
+            if (wCard.moc === 'mroz') playFrostFx();
+            else if (wCard.moc === 'mgla') playFogFx();
+            else if (wCard.moc === 'deszcz') playRainFx();
+            renderAll(currentNick);
+        }
+
+    } else if (res.action === 'clear_weather') {
+        if (window.playSound) window.playSound('czystenieboSound');
+
+    } else if (res.action === 'scorch') {
+        if (window.playSound) window.playSound('porzogaSound');
+        if (window.lastDestroyedCardsDOM && window.lastDestroyedCardsDOM.length > 0) {
+            await Promise.all(window.lastDestroyedCardsDOM.map(async item => {
+                const el = (item.elementId ? document.getElementById(item.elementId) : null) || item.el;
+                if (el) await runPorzogaOnCardElement(el, item.card, item.side === 'p1');
+            }));
+            window.lastDestroyedCardsDOM = [];
+            boardState = data.board;
+            renderAll(currentNick);
+        }
+    }
 }
 
 function confirmPlayProposed(targetData = {}) {
@@ -3138,12 +3209,12 @@ function renderWeather(overlay) {
     syncFrostFx(frostActive);
            const fogActive = (boardState.weather || []).some(w => {
            const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
-           return c && c.moc === 'mgla' && window.arrivedWeatherCards.has(w);
+           return c && (c.moc === 'mgla' || c.moc === 'sztorm') && window.arrivedWeatherCards.has(w);
        });
     syncFogFx(fogActive);
            const rainActive = (boardState.weather || []).some(w => {
            const c = cards.find(x => String(x.numer) === String(w.split('-')[1]));
-           return c && c.moc === 'deszcz' && window.arrivedWeatherCards.has(w);
+           return c && (c.moc === 'deszcz' || c.moc === 'sztorm') && window.arrivedWeatherCards.has(w);
        });
     syncRainFx(rainActive);
 }   
@@ -3534,17 +3605,25 @@ function renderLeaders(overlay) {
         const used = isOpponent ? opponentLeaderUsed : playerLeaderUsed;
         const blocked = isOpponent ? opponentLeaderBlocked : playerLeaderBlocked;
         const isMyTurn = (currentTurn === window.socket.id);
-        // canUse is cached in window.cachedLeaderCanUse, updated after each state change
-        const canUse = !isOpponent && isMyTurn && !used && !blocked && (window.cachedLeaderCanUse === true);
+        const noLeader = !!(used || blocked);
+        const canUse = !isOpponent && isMyTurn && !noLeader && (window.cachedLeaderCanUse === true);
 
-        if (!canUse) {
-            img.style.filter = 'grayscale(50%)';
-            img.style.boxShadow = `0 0 ${15 * scale}px #0a0b0a`;
-            img.style.border = `${2 * scale}px solid #0a0b0a`;
-        } else {
-            img.style.filter = 'none';
-            img.style.boxShadow = `0 0 ${15 * scale}px #232423`;
-            img.style.border = `${2 * scale}px solid #b28a41`;
+        // brak karty (użyty / zablokowany) = wyszarzenie, bez korony
+        img.style.filter = noLeader ? 'grayscale(100%) brightness(0.7)' : 'none';
+
+        // korona: brak = tura przeciwnika, rkorona = mam, ale nie mogę użyć, bkorona = mogę użyć
+        const turnOfOwner = isOpponent ? (!!currentTurn && !isMyTurn) : isMyTurn;
+        if (!noLeader && turnOfOwner && window.gameStarted && window.mulliganFinished) {
+            const crownPos = isOpponent ? { x: 506, y: 250 } : { x: 506, y: 1755 };
+            const crown = document.createElement('img');
+            const isBlue = isOpponent ? true : canUse; // u przeciwnika nie znamy szczegółów, więc niebieska
+            crown.src = `assets/asety/${isBlue ? 'bkorona' : 'rkorona'}.webp`;
+            crown.style.position = 'absolute';
+            crown.style.left = `${crownPos.x * scale + boardLeft}px`;
+            crown.style.top = `${crownPos.y * scale + boardTop}px`;
+            crown.style.pointerEvents = 'none';
+            crown.onload = () => { crown.style.width = `${crown.naturalWidth * scale}px`; };
+            overlay.appendChild(crown);
         }
 
         img.oncontextmenu = (e) => {
@@ -3558,7 +3637,6 @@ function renderLeaders(overlay) {
                 if (window.showPowiek) window.showPowiek([leaderObj], 0, 'game');
                 return;
             }
-
             if (window.proposedCard === leaderObj) {
                 window.proposedCard = null;
                 window.lastProposedStartRect = null;
