@@ -2132,6 +2132,7 @@ function renderProposedCard(overlay) {
         if (infoBoxWrapper) infoBoxWrapper.style.display = 'none';
         return;
     }
+    if (window.proposedCancelling) return;
     if (wrapper) wrapper.style.display = 'block';
 
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
@@ -2323,15 +2324,19 @@ function renderProposedCard(overlay) {
     }
 
     // Pozwala odkliknąć wybór lub zagrać lidera
-    overlay.onmousedown = (e) => {
+       overlay.onmousedown = (e) => {
+        if (window.proposedCancelling) return;
         if (window.proposedCard && window.proposedCard === playerLeaderObj) {
+            if (e.button !== 0) return;
+            const s = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+            const y4 = (e.clientY - (window.innerHeight - 2160 * s) / 2) / s;
+            if (y4 >= 1650) return;   // dolna strefa = anulowanie (obsługuje je 'click')
             e.stopPropagation();
             confirmPlayLeader();
             return;
         }
         if (e.target === overlay && window.proposedCard) {
-            window.proposedCard = null;
-            renderAll(currentNick);
+            cancelProposedCard();
         }
     };
 }
@@ -3060,8 +3065,60 @@ async function playLeaderAction(lp, data) {
     }
 }
 
+// Anulowanie zagrania: karta wraca animacją do ręki / na miejsce dowódcy
+function cancelProposedCard() {
+    if (!window.proposedCard || window.proposedCancelling) return;
+    const wrapper = document.getElementById('proposed-card-preview');
+    const info = document.getElementById('proposed-card-infobox');
+    if (info) info.style.display = 'none';
+    const r = window.lastProposedStartRect;
+    if (!wrapper || !r) {
+        window.proposedCard = null;
+        renderAll(currentNick);
+        return;
+    }
+    window.proposedCancelling = true;
+    wrapper.style.transition = 'all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)';
+    wrapper.style.left = `${r.left}px`;
+    wrapper.style.top = `${r.top}px`;
+    wrapper.style.width = `${r.width}px`;
+    wrapper.style.height = `${r.height}px`;
+    wrapper.style.opacity = '0.6';
+    setTimeout(() => {
+        window.proposedCard = null;
+        window.lastProposedStartRect = null;
+        window.proposedCancelling = false;
+        wrapper.style.opacity = '1';
+        renderAll(currentNick);
+    }, 320);
+}
+
+// Prawy klik = anuluj
+window.addEventListener('contextmenu', (e) => {
+    if (window.proposedCard && !window.isPowiekOpen && !window.proposedCancelling) {
+        e.preventDefault();
+        e.stopPropagation();
+        cancelProposedCard();
+    }
+}, true);
+
+// Esc = anuluj
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && window.proposedCard && !window.isPowiekOpen) cancelProposedCard();
+});
+
+// Telefon / mysz: kliknięcie w dolną strefę (ręka, dowódca) = anuluj
+window.addEventListener('click', (e) => {
+    if (!window.proposedCard || window.isPowiekOpen || window.proposedCancelling) return;
+    if (e.target.closest && e.target.closest('#proposed-card-preview, #proposed-card-infobox')) return;
+    const s = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+    const y4 = (e.clientY - (window.innerHeight - 2160 * s) / 2) / s;
+    if (y4 >= 1650) cancelProposedCard();
+});
+
 function confirmPlayProposed(targetData = {}) {
     if (!window.proposedCard) return;
+    if (window.proposedCancelling) return;
 
     // Zablokuj natychmiast — zapobiega podwójnym wywołaniom przy szybkich kliknięciach
     if (isProcessingMove) {
@@ -3586,6 +3643,14 @@ function renderPiles(overlay) {
     renderPileGroup(3459, 132, opponentDeckCount, window.opponentFaction, true);
 }
 
+const crownImgs = {};
+['bkorona', 'rkorona'].forEach(n => {
+    const i = new Image();
+    i.src = `assets/asety/${n}.webp`;
+    i.onload = () => { renderAll(currentNick); };
+    crownImgs[n] = i;
+});
+
 function renderLeaders(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
@@ -3608,22 +3673,26 @@ function renderLeaders(overlay) {
         const noLeader = !!(used || blocked);
         const canUse = !isOpponent && isMyTurn && !noLeader && (window.cachedLeaderCanUse === true);
 
-        // brak karty (użyty / zablokowany) = wyszarzenie, bez korony
-        img.style.filter = noLeader ? 'grayscale(100%) brightness(0.7)' : 'none';
+        // brak karty (użyty / zablokowany) = wyszarzenie, bez korony szary król tu je
+        img.style.filter = noLeader ? 'grayscale(60%) brightness(0.7)' : 'none';
 
         // korona: brak = tura przeciwnika, rkorona = mam, ale nie mogę użyć, bkorona = mogę użyć
         const turnOfOwner = isOpponent ? (!!currentTurn && !isMyTurn) : isMyTurn;
-        if (!noLeader && turnOfOwner && window.gameStarted && window.mulliganFinished) {
+                if (!noLeader && turnOfOwner && window.gameStarted && window.mulliganFinished) {
             const crownPos = isOpponent ? { x: 506, y: 250 } : { x: 506, y: 1755 };
-            const crown = document.createElement('img');
-            const isBlue = isOpponent ? true : canUse; // u przeciwnika nie znamy szczegółów, więc niebieska
-            crown.src = `assets/asety/${isBlue ? 'bkorona' : 'rkorona'}.webp`;
-            crown.style.position = 'absolute';
-            crown.style.left = `${crownPos.x * scale + boardLeft}px`;
-            crown.style.top = `${crownPos.y * scale + boardTop}px`;
-            crown.style.pointerEvents = 'none';
-            crown.onload = () => { crown.style.width = `${crown.naturalWidth * scale}px`; };
-            overlay.appendChild(crown);
+            const isBlue = isOpponent ? true : canUse;
+            const ci = crownImgs[isBlue ? 'bkorona' : 'rkorona'];
+            if (ci.complete && ci.naturalWidth > 0) {
+                const crown = document.createElement('img');
+                crown.src = ci.src;
+                crown.style.position = 'absolute';
+                crown.style.left = `${crownPos.x * scale + boardLeft}px`;
+                crown.style.top = `${crownPos.y * scale + boardTop}px`;
+                crown.style.width = `${(ci.naturalWidth / 0.5) * scale}px`;
+                crown.style.height = `${(ci.naturalHeight / 0.5) * scale}px`;
+                crown.style.pointerEvents = 'none';
+                overlay.appendChild(crown);
+            }
         }
 
         img.oncontextmenu = (e) => {
@@ -4028,7 +4097,10 @@ function createAnimationCardElement(card, w4K, h4K, isLarge = false, isOpponent 
             const name = content.querySelector('.name');
             if (name) name.style.fontSize = (h4K * scale * 0.044) + 'px';
             const desc = content.querySelector('.description');
-            if (desc) desc.style.fontSize = (h4K * scale * 0.035) + 'px';
+            if (desc) {
+                desc.style.display = 'block';
+                desc.style.fontSize = (h4K * scale * 0.0363) + 'px';
+            }
         }
     } else {
         const img = document.createElement('img');

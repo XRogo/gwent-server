@@ -740,6 +740,7 @@ function updatePowiekFrame() {
         cardDiv.style.width = geom.width + 'px';
         cardDiv.style.height = geom.height + 'px';
         cardDiv.style.zIndex = geom.zIndex;
+        cardDiv.style.boxShadow = isCardLeader ? 'none' : '';
 
         let glow1 = cardDiv.querySelector('.powiek-podsw');
         let glow2 = cardDiv.querySelector('.powiek-podsw2');
