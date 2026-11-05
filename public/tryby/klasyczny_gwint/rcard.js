@@ -150,6 +150,7 @@ function handlePowiekCardTap(idx) {
     }
 
     if (powiekOptions && powiekOptions.isMulligan) {
+        if (powiekOptions.isSwapPending) return;
         const now = performance.now();
         if (lastCentralClickIndex === idx && (now - lastCentralClickTime) <= 750) {
             lastCentralClickTime = 0;
@@ -178,7 +179,7 @@ function handlePowiekCardTap(idx) {
 
 export function showPowiek(deck, index, mode = 'cards', options = {}) {
     powiekOptions = options;
-    if (mode === 'hand' || mode === 'game') {
+    if (mode === 'hand' || mode === 'game' || mode === 'row') {
         powiekDeck = deck;
     } else {
         const uniqueDeck = [];
@@ -410,43 +411,60 @@ function buildPowiekDOM() {
     overlay.appendChild(infoContainer);
 
     if (powiekOptions && powiekOptions.isMulligan) {
+        const mulliganBar = document.createElement('div');
+        mulliganBar.id = 'powiek-mulligan-bar';
+        mulliganBar.style.position = 'absolute';
+        mulliganBar.style.left = `${-geo.backgroundLeft}px`;
+        mulliganBar.style.top = geo.relH(275) + 'px';
+        mulliganBar.style.width = `${window.innerWidth}px`;
+        mulliganBar.style.height = geo.relH(140) + 'px';
+        mulliganBar.style.backgroundColor = '#000000';
+        mulliganBar.style.zIndex = '250';
+        mulliganBar.style.pointerEvents = 'none';
+        overlay.appendChild(mulliganBar);
+
+        const completed = (powiekOptions.swapsCount !== undefined)
+            ? powiekOptions.swapsCount
+            : (powiekOptions.swapsLeft !== undefined ? (2 - powiekOptions.swapsLeft) : 0);
+
         const swapInfo = document.createElement('div');
         swapInfo.id = 'powiek-swap-info';
         swapInfo.style.position = 'absolute';
-        swapInfo.style.bottom = '5%';
+        swapInfo.style.top = geo.relH(313) + 'px';
         swapInfo.style.left = '50%';
         swapInfo.style.transform = 'translateX(-50%)';
-        swapInfo.style.color = '#c7a76e';
-        swapInfo.style.fontFamily = 'PFDinTextCondPro-Bold';
-        swapInfo.style.fontSize = geo.relW(48) + 'px';
-        swapInfo.style.textShadow = '2px 2px 4px #000';
+        swapInfo.style.color = '#c29f5a';
+        swapInfo.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        swapInfo.style.fontSize = geo.relH(70) + 'px';
+        swapInfo.style.letterSpacing = geo.relW(-2) + 'px';
+        swapInfo.style.textAlign = 'center';
+        swapInfo.style.whiteSpace = 'nowrap';
+        swapInfo.style.lineHeight = '1';
         swapInfo.style.zIndex = '300';
-        swapInfo.textContent = `Pozostałe wymiany: ${powiekOptions.swapsLeft}`;
+        swapInfo.textContent = `Wybierz kartę, którą chcesz wymienić, ${completed}/2`;
         overlay.appendChild(swapInfo);
-
-        const helpInfo = document.createElement('div');
-        helpInfo.style.position = 'absolute';
-        helpInfo.style.bottom = '2%';
-        helpInfo.style.left = '50%';
-        helpInfo.style.transform = 'translateX(-50%)';
-        helpInfo.style.color = '#fff';
-        helpInfo.style.fontFamily = 'PFDinTextCondPro';
-        helpInfo.style.fontSize = geo.relW(28) + 'px';
-        helpInfo.style.zIndex = '300';
-        helpInfo.textContent = 'Podwójny klik / Enter - wymień | Prawy / Esc - zakończ';
-        overlay.appendChild(helpInfo);
 
         const timerUI = document.createElement('div');
         timerUI.id = 'powiek-timer';
         timerUI.style.position = 'absolute';
-        timerUI.style.top = '5%';
+        timerUI.style.top = geo.relH(2000) + 'px';
         timerUI.style.left = '50%';
         timerUI.style.transform = 'translateX(-50%)';
-        timerUI.style.color = '#ff4d4d';
-        timerUI.style.fontFamily = 'PFDinTextCondPro-Bold';
-        timerUI.style.fontSize = geo.relW(48) + 'px';
-        timerUI.style.textShadow = '2px 2px 4px #000';
+        timerUI.style.color = '#c29f5a';
+        timerUI.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        timerUI.style.fontSize = geo.relH(70) + 'px';
+        timerUI.style.letterSpacing = geo.relW(-2) + 'px';
+        timerUI.style.textAlign = 'center';
+        timerUI.style.whiteSpace = 'nowrap';
+        timerUI.style.lineHeight = '1';
+        timerUI.style.textShadow = '2px 2px 4px #000, 0 0 10px #000';
         timerUI.style.zIndex = '300';
+        if (window.mulliganTimerSeconds !== null && window.mulliganTimerSeconds !== undefined && window.mulliganTimerSeconds > 0) {
+            timerUI.textContent = `Automatyczne zakończenia za: ${window.mulliganTimerSeconds}s`;
+            timerUI.style.display = 'block';
+        } else {
+            timerUI.style.display = 'none';
+        }
         overlay.appendChild(timerUI);
     }
 
@@ -1050,7 +1068,7 @@ let touchTargetEl = null;
 
 window.addEventListener('touchstart', (e) => {
     if (powiekActive) return;
-    const target = e.target.closest('.card, .leader-card, .hand-card-wrapper');
+    const target = e.target.closest('.card, .leader-card, .hand-card-wrapper, .board-card-wrapper');
     if (!target) return;
 
     touchTargetEl = target;
@@ -1060,7 +1078,7 @@ window.addEventListener('touchstart', (e) => {
     if (touchCardTimer) clearTimeout(touchCardTimer);
     touchCardTimer = setTimeout(() => {
         if (touchTargetEl) {
-            if (touchTargetEl.classList.contains('hand-card-wrapper')) {
+            if (touchTargetEl.classList.contains('hand-card-wrapper') || touchTargetEl.classList.contains('board-card-wrapper')) {
                 if (typeof touchTargetEl.oncontextmenu === 'function') {
                     touchTargetEl.oncontextmenu(new MouseEvent('contextmenu'));
                 }
@@ -1134,6 +1152,7 @@ window.addEventListener('keydown', (event) => {
                 tryHidePowiek();
             }
         } else if (powiekOptions && powiekOptions.isMulligan) {
+            if (powiekOptions.isSwapPending) return;
             if (powiekOptions.onSwap) powiekOptions.onSwap(targetAnimIndex);
         } else if (isForcedSelectMode() || (powiekOptions && powiekOptions.onSelect && powiekMode === 'game')) {
             if (powiekOptions.onSelect && powiekDeck[targetAnimIndex]) {
@@ -1150,3 +1169,15 @@ window.addEventListener('wheel', (event) => {
     if (event.deltaY < 0) queueDelta(-1);
     else if (event.deltaY > 0) queueDelta(1);
 }, { passive: true });
+
+export function updateMulliganSwaps(count) {
+    if (powiekOptions) {
+        powiekOptions.swapsCount = count;
+        powiekOptions.swapsLeft = 2 - count;
+    }
+    const swapInfo = document.getElementById('powiek-swap-info');
+    if (swapInfo) {
+        swapInfo.textContent = `Wybierz kartę, którą chcesz wymienić, ${count}/2`;
+    }
+}
+window.updateMulliganSwaps = updateMulliganSwaps;

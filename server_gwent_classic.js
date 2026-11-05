@@ -719,7 +719,8 @@ function registerClassicGwentEvents(socket, io, games) {
             const opponentId = isPlayer1 ? game.player2 : game.player1;
             if (opponentId) {
                 io.to(opponentId).emit('opponent-game-update', {
-                    deckCount: deck.length
+                    deckCount: deck.length,
+                    handCount: handToReturn.length
                 });
             }
         }
@@ -1122,21 +1123,24 @@ function registerClassicGwentEvents(socket, io, games) {
             const oppMulliganDone = isPlayer1 ? game.p2MulliganDone : game.p1MulliganDone;
 
             if (!oppMulliganDone && opponentId) {
-                // Opponent is still mulliganing. Start 60s timer if not started.
+                // Opponent is still mulliganing. Start 15s timer if not started.
                 if (!game.mulliganTimer) {
-                    game.mulliganTimeLeft = 60;
+                    game.mulliganTimeLeft = 15;
                     game.mulliganTimer = setInterval(() => {
                         game.mulliganTimeLeft--;
                         if (game.mulliganTimeLeft <= 0) {
                             clearInterval(game.mulliganTimer);
+                            game.mulliganTimer = null;
                             // Force end
                             io.to(gameCode).emit('mulligan-timer-expired');
+                        } else {
+                            io.to(opponentId).emit('start-mulligan-timer', { timeLeft: game.mulliganTimeLeft });
                         }
                     }, 1000);
-                    // Notify opponent they have 60s
-                    io.to(opponentId).emit('start-mulligan-timer', { timeLeft: 60 });
+                    // Notify opponent they have 15s
+                    io.to(opponentId).emit('start-mulligan-timer', { timeLeft: 15 });
                     // Notify finisher to wait
-                    socket.emit('wait-for-mulligan', { timeLeft: 60 });
+                    socket.emit('wait-for-mulligan', { timeLeft: 15 });
                 }
             } else if (oppMulliganDone) {
                 // Both done! Clear timer and start game
@@ -1144,12 +1148,17 @@ function registerClassicGwentEvents(socket, io, games) {
                     clearInterval(game.mulliganTimer);
                     game.mulliganTimer = null;
                 }
-                io.to(gameCode).emit('mulligan-finished-all');
+                io.to(gameCode).emit('mulligan-finished-all', {
+                    p1HandCount: state.p1Hand ? state.p1Hand.length : 10,
+                    p2HandCount: state.p2Hand ? state.p2Hand.length : 10
+                });
             }
 
             if (opponentId) {
+                const myHand = isPlayer1 ? state.p1Hand : state.p2Hand;
                 io.to(opponentId).emit('opponent-game-update', {
-                    deckCount: state[deckKey].length
+                    deckCount: state[deckKey].length,
+                    handCount: myHand ? myHand.length : 10
                 });
             }
         }

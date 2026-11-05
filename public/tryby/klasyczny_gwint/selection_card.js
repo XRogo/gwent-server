@@ -816,7 +816,10 @@ function setupSelectionScrollbar(area, id, trackL, trackT, trackR, trackB, bgLef
     bar.style.width = `${barW}px`;
     bar.style.height = `${barH}px`;
     bar.style.left = `${trackX}px`;
-    bar.style.display = 'block';
+    // Pokaż suwak tylko gdy ekran wyboru kart jest widoczny
+    const selScreen = document.getElementById('cardSelectionScreen');
+    const selVisible = selScreen && selScreen.style.display !== 'none';
+    bar.style.display = selVisible ? 'block' : 'none';
 
     const syncBar = () => {
         const maxScroll = area.scrollHeight - area.clientHeight;

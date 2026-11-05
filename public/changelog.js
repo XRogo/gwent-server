@@ -15,7 +15,32 @@
 //    }, <- jeśli coś jest usunięte to ignoruj i nie pisz np czego dotyczy (bo najprawdopodobniej wszystkeigo) 
     
 const wersja = [
-       {
+
+    {
+        version0: "10.10",
+        data: "03.11.2026",
+        zmiany: {
+            line1: 'Dodałem animacje zagrania karty sztormu',
+            line2: {
+                title: 'Doadałem poprawne / nowe dzwięki dla',
+                subtitle1: "Wygrania gry",
+                subtitle2: "Użycia dowódcy",
+                subtitle3: "Przetasowania kart",
+                subtitle4: "Wylosowania szpiega kupki kart w tali",
+                subtitle5: "Zakończenia wymiany kart"
+            },
+            line3: {
+                title: "Od teraz obok dowódcy jest ikona koryny",
+                subtitle1: "Czerwona - Karta jest ale nie można użyć",
+                subtitle2: "Niebieska - Karta jest i można użyć",
+                subtitle3: "Brak - ruch przeciwnika / brak karty"
+            },
+            line3: "Naprawiłem działanie kart z pk = 0 podczas działania effektów pogodowych (nie dostają gratisowego pk)",
+            line4: "Zagrywanie kart z umiejętności dowódcy ma teraz animacje przelotu",
+            line5: "Po zagraniu widać opis i umiejętności karty dowódcy"
+        }
+    }, 
+    {
         version0: "10.9",
         data: "02.11.2026",
         zmiany: {

@@ -2,7 +2,7 @@ import cards from './cards.js';
 import { getCardImage } from './cardImages.js';
 import { renderCardHTML, getPowerImage } from './bcard_render.js';
 import * as moce from './moce.js';
-import { showPowiek, renderPowiek } from './rcard.js';
+import { showPowiek, renderPowiek, updateMulliganSwaps } from './rcard.js';
 import { krole } from './krole.js';
 import { isLeaderUsable } from './krol_code.js';
 import { showPrzejscie, hidePrzejscie, getIsShowing } from './przejsciakod.js';
@@ -823,6 +823,7 @@ let isMulliganActive = false;
 let roundScoresHistory = [];
 let isProcessingMove = false; // Flag to prevent rapid clicks / double playing
 let swapsCount = 0;
+let currentMulliganOptions = null;
 let playerLives = 2;
 let opponentLives = 2;
 let playerPassed = false;
@@ -958,6 +959,46 @@ function sortHand() {
     });
 }
 
+let mulliganTimerInterval = null;
+
+function stopMulliganTimer() {
+    if (mulliganTimerInterval) {
+        clearInterval(mulliganTimerInterval);
+        mulliganTimerInterval = null;
+    }
+    window.mulliganTimerSeconds = null;
+    const timerUI = document.getElementById('powiek-timer');
+    if (timerUI) timerUI.style.display = 'none';
+}
+
+function startMulliganCountdown(seconds) {
+    window.mulliganTimerSeconds = seconds;
+    const updateUI = () => {
+        const timerUI = document.getElementById('powiek-timer');
+        if (timerUI) {
+            timerUI.textContent = `Automatyczne zakończenia za: ${window.mulliganTimerSeconds}s`;
+            timerUI.style.display = 'block';
+        }
+    };
+    updateUI();
+
+    if (!mulliganTimerInterval) {
+        mulliganTimerInterval = setInterval(() => {
+            if (window.mulliganTimerSeconds === null || window.mulliganTimerSeconds === undefined) {
+                stopMulliganTimer();
+                return;
+            }
+            if (window.mulliganTimerSeconds > 0) {
+                window.mulliganTimerSeconds--;
+                updateUI();
+            }
+            if (window.mulliganTimerSeconds <= 0) {
+                stopMulliganTimer();
+            }
+        }, 1000);
+    }
+}
+
 export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     isProcessingMove = false;
 
@@ -999,16 +1040,24 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 data.board.weather.forEach(w => window.arrivedWeatherCards.add(w));
             }
 
-            opponentHandCount = data.opponentHandCount;
+            if (data.leader) playerLeaderObj = krole.find(k => k.numer === data.leader);
+            if (data.opponentLeader) opponentLeaderObj = krole.find(k => k.numer === data.opponentLeader);
+
+            if (data.opponentHandCount !== undefined && data.opponentHandCount > 0) {
+                opponentHandCount = data.opponentHandCount;
+            } else if (data.status === 'playing' && (!data.board || Object.values(data.board).every(r => !r || r.length === 0))) {
+                const oppHasExtra = opponentLeaderObj && String(opponentLeaderObj.numer) === '3002';
+                opponentHandCount = oppHasExtra ? 11 : 10;
+            } else if (data.opponentHandCount !== undefined) {
+                opponentHandCount = data.opponentHandCount;
+            }
+
             opponentDeckCount = data.opponentDeckCount;
             window.playerFaction = data.faction || localStorage.getItem('faction') || '1';
             window.opponentFaction = data.opponentFaction;
             swapsCount = data.swapsPerformed || 0;
             if (data.opponentNickname) window.opponentNickname = data.opponentNickname;
             if (data.nickname) { nick = data.nickname; currentNick = nick; }
-
-            if (data.leader) playerLeaderObj = krole.find(k => k.numer === data.leader);
-            if (data.opponentLeader) opponentLeaderObj = krole.find(k => k.numer === data.opponentLeader);
 
             playerLeaderUsed = isPlayer1Local ? data.p1LeaderUsed : data.p2LeaderUsed;
             opponentLeaderUsed = isPlayer1Local ? data.p2LeaderUsed : data.p1LeaderUsed;
@@ -1187,10 +1236,20 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             });
         }
 
+        if (!opponentHandCount || opponentHandCount <= 0) {
+            const oppHasExtra = opponentLeaderObj && String(opponentLeaderObj.numer) === '3002';
+            opponentHandCount = oppHasExtra ? 11 : 10;
+        }
+
         updateLeaderCache();
         // Natychmiast otwórz mulligan (animacje lecą "pod" nim)
         playerHand = handObjects;
         sortHand();
+
+        const hasHero = handObjects.some(c => c.bohater);
+        if (window.playSound) {
+            window.playSound(hasHero ? 'ohoooooSound' : 'addcardSound');
+        }
 
         const areaLeft = 1163, areaRight = 3018, areaTop = 1691, cardW = 180;
         const count = playerHand.length;
@@ -1237,6 +1296,10 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             playerHand[cardIndex] = cardObj;
             console.log(`[BOARD] Swap successful: Index ${cardIndex} -> ${cardObj.nazwa}`);
 
+            if (cardObj.bohater && window.playSound) {
+                window.playSound('ohoooooSound');
+            }
+
             // Sync local drawPile - remove the card that just arrived in hand
             const dIdx = drawPile.findIndex(c => String(c.numer) === String(newCard));
             if (dIdx !== -1) drawPile.splice(dIdx, 1);
@@ -1244,6 +1307,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
             renderPowiek();
         }
         swapsCount = 2 - swapsLeft;
+        updateMulliganSwaps(swapsCount);
 
         // Visual background animation
         const areaLeft = 1163, areaRight = 3018, areaTop = 1691, cardW = 180;
@@ -1256,65 +1320,66 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         }
 
         if (swapsLeft <= 0) {
-            // 1. Zakończenie wymiany (zamknięcie okna)
-            window.mulliganFinished = true; // Set early to avoid onClose redundancy
-            if (window.hidePowiek) window.hidePowiek();
-
-            // 2. Posortowanie kart (zmienia indeksy w playerHand)
-            sortHand();
-
-            // Znajdź nowy indeks podmienionej karty po posortowaniu
-            const newIndex = playerHand.findIndex(c => c === cardObj);
-
-            // Ukryj tylko tę nową kartę dopóki nie doleci (arrivedCards już ma inne)
-            window.arrivedCards.delete(cardObj);
-
-            // Renderujemy rąkę z "dziurą" na nową kartę
-            renderAll(currentNick);
-
-            // Obliczamy pozycję 4K docelową dla nowej karty w posortowanej ręce
-            // Używamy getBoundingClientRect na ukrytym elemencie (który renderAll właśnie wstawił)
-            const wrappers = document.querySelectorAll('.hand-card-img');
-            const targetEl = Array.from(wrappers).find(el => parseInt(el.dataset.index) === newIndex);
-
-            const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
-            const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
-            const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
-            const boardTop = (window.innerHeight - 2160 * scale) / 2;
-
-            let finalTarget = { x: startXInHand, y: areaTop }; // Fallback
-            if (targetEl) {
-                const rect = targetEl.getBoundingClientRect();
-                finalTarget = {
-                    x: (rect.left - boardLeft) / scale,
-                    y: (rect.top - boardTop) / scale
-                };
-            }
-
-            // 3. Animacja wymiany do DOCELOWEJ posortowanej pozycji
-            animateDeckToHand([cardObj], [finalTarget], () => {
-                window.arrivedCards.add(cardObj);
+            // Po 2 wymianie dajemy chwilę (800ms) aby gracz zobaczył nową kartę w oknie
+            setTimeout(() => {
+                if (window.mulliganFinished) return;
+                stopMulliganTimer();
                 window.mulliganFinished = true;
-                socket.emit('end-mulligan', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
-                renderAll(currentNick);
-            });
+                if (window.playSound) {
+                    window.playSound('wymiana2Sound');
+                }
+                if (window.hidePowiek) window.hidePowiek();
 
-        } else {
-            // Animacja dla pojedynczej wymiany
-            window.arrivedCards.delete(cardObj);
-            renderAll(currentNick);
-            animateDeckToHand([cardObj], [{ x: startXInHand, y: areaTop }], () => {
-                window.arrivedCards.add(cardObj);
+                sortHand();
+
+                const newIndex = cardObj ? playerHand.findIndex(c => c === cardObj) : -1;
+                if (cardObj) window.arrivedCards.delete(cardObj);
                 renderAll(currentNick);
-            });
+
+                const wrappers = document.querySelectorAll('.hand-card-img');
+                const targetEl = (newIndex !== -1) ? Array.from(wrappers).find(el => parseInt(el.dataset.index) === newIndex) : null;
+
+                const GUI_WIDTH = 3840, GUI_HEIGHT = 2160;
+                const scale = Math.min(window.innerWidth / GUI_WIDTH, window.innerHeight / GUI_HEIGHT);
+                const boardLeft = (window.innerWidth - GUI_WIDTH * scale) / 2;
+                const boardTop = (window.innerHeight - 2160 * scale) / 2;
+
+                let finalTarget = { x: startXInHand, y: areaTop };
+                if (targetEl) {
+                    const rect = targetEl.getBoundingClientRect();
+                    finalTarget = {
+                        x: (rect.left - boardLeft) / scale,
+                        y: (rect.top - boardTop) / scale
+                    };
+                }
+
+                if (cardObj) {
+                    animateDeckToHand([cardObj], [finalTarget], () => {
+                        window.arrivedCards.add(cardObj);
+                        socket.emit('end-mulligan', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+                        renderAll(currentNick);
+                    });
+                } else {
+                    socket.emit('end-mulligan', { gameCode: gameCodeLocal, isPlayer1: isPlayer1Local });
+                    renderAll(currentNick);
+                }
+            }, 800);
+        } else {
+            if (currentMulliganOptions) currentMulliganOptions.isSwapPending = false;
+            if (cardObj) {
+                window.arrivedCards.delete(cardObj);
+                renderAll(currentNick);
+                animateDeckToHand([cardObj], [{ x: startXInHand, y: areaTop }], () => {
+                    window.arrivedCards.add(cardObj);
+                    renderAll(currentNick);
+                });
+            }
         }
     });
 
     socket.on('start-mulligan-timer', (data) => {
-        // Przeciwnik skończył, masz 60s
-        // Update timer safely without overriding the mulligan screen
-        const timerUI = document.getElementById('powiek-timer');
-        if (timerUI) timerUI.textContent = `Pozostały czas: ${data.timeLeft}s`;
+        const secs = (data && typeof data.timeLeft === 'number') ? data.timeLeft : 15;
+        startMulliganCountdown(secs);
     });
 
     socket.on('wait-for-mulligan', (data) => {
@@ -1325,6 +1390,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     });
 
     socket.on('mulligan-timer-expired', () => {
+        stopMulliganTimer();
         if (window.hidePowiek) window.hidePowiek();
         sortHand();
         window.mulliganFinished = true;
@@ -1332,7 +1398,13 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
         renderAll(currentNick);
     });
 
-    socket.on('mulligan-finished-all', () => {
+    socket.on('mulligan-finished-all', (data) => {
+        stopMulliganTimer();
+        if (data) {
+            const oppCount = isPlayer1Local ? data.p2HandCount : data.p1HandCount;
+            if (oppCount !== undefined) opponentHandCount = oppCount;
+        }
+        renderAll(currentNick);
         hidePrzejscie(true); // Close t06 instantly
         showPrzejscie('t05', {
             onFinish: () => {
@@ -1601,6 +1673,14 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 }
 
                 if (data.spyDrawn && data.spyDrawn.length > 0) {
+                    const spyHasHero = data.spyDrawn.some(n => {
+                        const c = cards.find(x => String(x.numer) === String(n));
+                        return !!(c && c.bohater);
+                    });
+                    if (spyHasHero && window.playSound) {
+                        window.playSound('ohoooooSound');
+                    }
+
                     const isLocalSpy = data.spyPlayer === (isPlayer1Local ? 'p1' : 'p2');
 
                     if (isLocalSpy) {
@@ -1621,10 +1701,6 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                         // Usuń karty szpiega z lokalnej talii
                         const drawnNums = data.spyDrawn.map(n => String(n));
                         drawPile = drawPile.filter(c => !drawnNums.includes(c.numer));
-
-                        // Odtwórz dźwięk przed animacją dla załadowania kart
-                        const hasHero = drawnObjs.some(c => c.bohater);
-                        if (hasHero && window.playSound) window.playSound('ohoooooSound');
 
                         renderAll(currentNick);
 
@@ -1859,10 +1935,18 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 }
 
                 // 3. Królestwa Północy (frakcja 1) - dobranie karty po wygranej rundzie
-                const myNrDraw = data.northernRealmsDraw && (isPlayer1Local ? data.northernRealmsDraw.p1 : data.northernRealmsDraw.p2);
-                if (myNrDraw) {
+                const p1Nr = data.northernRealmsDraw && data.northernRealmsDraw.p1;
+                const p2Nr = data.northernRealmsDraw && data.northernRealmsDraw.p2;
+                if (data.northernRealmsDraw && (p1Nr || p2Nr)) {
+                    const nrHasHero = (p1Nr && cards.find(c => String(c.numer) === String(p1Nr))?.bohater) ||
+                                      (p2Nr && cards.find(c => String(c.numer) === String(p2Nr))?.bohater);
                     abilityBanners.push({
-                        code: 't11'
+                        code: 't11',
+                        action: () => {
+                            if (window.playSound) {
+                                window.playSound(nrHasHero ? 'ohoooooSound' : 'addcardSound');
+                            }
+                        }
                     });
                 }
 
@@ -2009,31 +2093,38 @@ function handleScoiaDecision(socket, gameCode, deciderId) {
 }
 
 function startMulligan(socket, gameCode, isPlayer1, selectedIndex = 0) {
-    // Dźwięk otwierania mulliganu
-    if (window.playSound) window.playSound('ohoooooSound');
+    swapsCount = 0;
+    stopMulliganTimer();
 
-    showPowiek(playerHand, selectedIndex, 'hand', {
+    currentMulliganOptions = {
         isMulligan: true,
-        swapsLeft: 2 - swapsCount,
+        swapsLeft: 2,
+        swapsCount: 0,
+        isSwapPending: false,
         onSwap: (idx) => {
-            // Dźwięk wymiany (1. lub 2. wymiana)
+            if (currentMulliganOptions.isSwapPending || swapsCount >= 2) return;
+            currentMulliganOptions.isSwapPending = true;
+
             if (window.playSound) {
-                window.playSound(swapsCount === 0 ? 'wymiana1Sound' : 'wymiana2Sound');
+                window.playSound('wymiana1Sound');
             }
-            swapsCount++;
-            if (swapsCount >= 2) {
-                if (window.hidePowiek) window.hidePowiek();
-            }
+
             socket.emit('mulligan-swap', { gameCode, isPlayer1, cardIndex: idx });
         },
         onClose: () => {
-            if (window.mulliganFinished) return; // Jeśli już skończyliśmy przez 2 wymiany, nie dubluj
+            stopMulliganTimer();
+            if (window.mulliganFinished) return;
+            if (window.playSound) {
+                window.playSound('wymiana2Sound');
+            }
             sortHand();
             window.mulliganFinished = true;
             socket.emit('end-mulligan', { gameCode, isPlayer1 });
             renderAll();
         }
-    });
+    };
+
+    showPowiek(playerHand, selectedIndex, 'hand', currentMulliganOptions);
 }
 
 export function renderAll(nick) {
@@ -2354,16 +2445,17 @@ function renderStats(overlay) {
         div.style.top = `${y * scale + boardTop}px`;
         div.style.minWidth = `${100 * scale}px`;
         div.style.textAlign = 'center';
-        div.style.fontSize = `${64 * scale}px`;
-        div.style.color = '#b18941';
+        div.style.fontSize = `${70 * scale}px`;
+        div.style.color = '#b28a41';
         div.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
-        div.style.transform = 'translate(-50%, -50%)';
+        div.style.letterSpacing = '0';
+        div.style.textAlign = 'left';
         div.textContent = val;
         return div;
     };
 
-    overlay.appendChild(createStat(opponentHandCount, 550 + 50, 738));
-    overlay.appendChild(createStat(playerHand.length, 550 + 50, 1418));
+    overlay.appendChild(createStat(opponentHandCount, 548, 705));
+    overlay.appendChild(createStat(playerHand.length, 548, 1382));
 }
 
 function calculateScores() {
@@ -2834,51 +2926,55 @@ function renderNicknames(overlay, nick) {
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
     const boardTop = (window.innerHeight - 2160 * scale) / 2;
 
-    const createNick = (name, x, y, fact_h, factionId) => {
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = `${483 * scale + boardLeft}px`;
-        container.style.top = `${y * scale + boardTop}px`;
-        container.style.width = `${(850 - 483) * scale}px`;
-        container.style.height = `${(fact_h - y) * scale}px`;
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.justifyContent = 'center';
-
+    // Wszystkie pozycje to lewy górny róg elementu (4K px)
+    const createNick = (name, nickX, nickY, factX, factY, shieldX, shieldY, factionId) => {
         const fInfo = factionInfo[factionId] || factionInfo["1"];
 
-        const headerGroup = document.createElement('div');
-        headerGroup.style.display = 'flex';
-        headerGroup.style.alignItems = 'center';
-
+        // --- Tarcza frakcji ---
         const logo = document.createElement('img');
         logo.src = `assets/asety/${fInfo.logo}`;
-        logo.style.width = `${60 * scale}px`;
-        logo.marginRight = `${15 * scale}px`;
-        headerGroup.appendChild(logo);
+        logo.style.position = 'absolute';
+        logo.style.left = `${shieldX * scale + boardLeft}px`;
+        logo.style.top = `${shieldY * scale + boardTop}px`;
+        logo.style.width = `${80 * scale}px`;
+        logo.style.height = 'auto';
+        logo.style.zIndex = '10';
+        overlay.appendChild(logo);
 
+        // --- Nick gracza ---
         const nickDiv = document.createElement('div');
         nickDiv.className = 'game-nick';
-        nickDiv.style.fontSize = `${32 * scale}px`;
+        nickDiv.style.position = 'absolute';
+        nickDiv.style.left = `${nickX * scale + boardLeft}px`;
+        nickDiv.style.top = `${nickY * scale + boardTop}px`;
+        nickDiv.style.fontSize = `${45 * scale}px`;
+        nickDiv.style.letterSpacing = '0';
         nickDiv.style.color = '#b28a41';
+        nickDiv.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
         nickDiv.style.fontWeight = 'bold';
+        nickDiv.style.whiteSpace = 'nowrap';
+        nickDiv.style.zIndex = '10';
         nickDiv.textContent = name;
-        headerGroup.appendChild(nickDiv);
+        overlay.appendChild(nickDiv);
 
-        container.appendChild(headerGroup);
-
+        // --- Nazwa frakcji ---
         const factDiv = document.createElement('div');
-        factDiv.style.fontSize = `${24 * scale}px`;
-        factDiv.style.color = '#b08948';
-        factDiv.style.marginTop = `${5 * scale}px`;
+        factDiv.style.position = 'absolute';
+        factDiv.style.left = `${factX * scale + boardLeft}px`;
+        factDiv.style.top = `${factY * scale + boardTop}px`;
+        factDiv.style.fontSize = `${40 * scale}px`;
+        factDiv.style.letterSpacing = '0';
+        factDiv.style.color = '#a8855b';
+        factDiv.style.fontFamily = 'PFDinTextCondPro, sans-serif';
+        factDiv.style.whiteSpace = 'nowrap';
+        factDiv.style.zIndex = '10';
         factDiv.textContent = fInfo.name;
-        container.appendChild(factDiv);
-
-        return container;
+        overlay.appendChild(factDiv);
     };
 
-    overlay.appendChild(createNick(window.opponentNickname || 'PRZECIWNIK', 483, 569, 602, window.opponentFaction));
-    overlay.appendChild(createNick(nick, 483, 1498, 1532, window.playerFaction));
+    //                   name                           nickX  nickY  factX  factY  shieldX shieldY  factionId
+    createNick(window.opponentNickname || 'PRZECIWNIK', 481,   567,   481,   620,   210,    562,     window.opponentFaction);
+    createNick(nick,                                    481,   1497,  481,   1555,  201,    1495,    window.playerFaction);
 }
 
 function renderGraveyards(overlay) {
@@ -3061,6 +3157,11 @@ async function playLeaderAction(lp, data) {
             window.lastDestroyedCardsDOM = [];
             boardState = data.board;
             renderAll(currentNick);
+        }
+    } else if (res.action === 'take_deck_card' && res.card) {
+        const c = cards.find(x => String(x.numer) === String(res.card));
+        if (c && c.bohater && window.playSound) {
+            window.playSound('ohoooooSound');
         }
     }
 }
@@ -3276,6 +3377,22 @@ function renderWeather(overlay) {
     syncRainFx(rainActive);
 }   
 
+function openRowPreview(targetRowKey, clickedIdx) {
+    if (!boardState) return;
+    const rowNums = boardState[targetRowKey] || [];
+    const rowCards = rowNums.map((n, idx) => {
+        const ck = targetRowKey + '_' + idx;
+        const effNum = (window.activeDecoySequences && window.activeDecoySequences.has(ck))
+            ? window.activeDecoySequences.get(ck)
+            : String(n);
+        return cards.find(c => String(c.numer) === effNum);
+    }).filter(Boolean);
+
+    if (rowCards.length === 0) return;
+    const targetIdx = Math.max(0, Math.min(rowCards.length - 1, clickedIdx));
+    showPowiek(rowCards, targetIdx, 'row');
+}
+
 function renderRows(overlay) {
     const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
     const boardLeft = (window.innerWidth - 3840 * scale) / 2;
@@ -3311,21 +3428,22 @@ function renderRows(overlay) {
         rowDiv.style.width = `${totalRowWidth}px`;
         rowDiv.style.height = `${cardH}px`;
 
+        const isMelee = rowKey.endsWith('1');
+        const isRanged = rowKey.endsWith('2');
+        const isSiege = rowKey.endsWith('3');
+        const isMySide = rowKey.startsWith(isP1 ? 'p1' : 'p2');
+        let isValidRow = false;
+        const isMyTurn = (currentTurn === window.socket.id);
+
         // Podświetlanie rzędów przy zagrywaniu karty
         if (window.proposedCard) {
             const pCard = window.proposedCard;
-            const isMelee = rowKey.endsWith('1');
-            const isRanged = rowKey.endsWith('2');
-            const isSiege = rowKey.endsWith('3');
-            const isMySide = rowKey.startsWith(isP1 ? 'p1' : 'p2');
 
             // Logika walidacji rzędu
             const isWeather = ["mroz", "mgla", "deszcz", "sztorm", "niebo"].includes(pCard.moc);
             const isHornSpecial = (pCard.typ === 'specjalna' && pCard.moc === 'rog') || isSpecialSlotCard(pCard);
             const isPorz = (pCard.moc === 'porz' && typeof pCard.punkty !== 'number');      // Porzoga ogólna (specjalna)
             const isIporz = (pCard.moc === 'iporz');     // Porzoga rzędowa
-
-            let isValidRow = false;
 
             if (isPorz) {
                 // Porzoga ogólna: aktywuje się na DOWOLNYM własnym rzędzie (jako trigger)
@@ -3355,7 +3473,6 @@ function renderRows(overlay) {
                 }
             }
 
-            const isMyTurn = (currentTurn === window.socket.id);
             if (isMyTurn && isValidRow) {
                 rowDiv.style.backgroundColor = (isPorz || isIporz || pCard.moc === 'porz')
                     ? 'rgba(180, 60, 30, 0.25)'
@@ -3491,7 +3608,26 @@ function renderRows(overlay) {
                         if (isProcessingMove) return;
                         confirmPlayProposed({ targetCardNumer: card.numer, targetRow: rowKey });
                     };
+                } else if (isMyTurn && isValidRow && window.proposedCard) {
+                    wrapper.style.cursor = 'pointer';
+                    wrapper.onclick = (e) => {
+                        e.stopPropagation();
+                        const rowIdx = isMelee ? 1 : (isRanged ? 2 : 3);
+                        confirmPlayProposed({ rowIdx });
+                    };
+                } else {
+                    wrapper.style.cursor = 'pointer';
+                    wrapper.onclick = (e) => {
+                        e.stopPropagation();
+                        openRowPreview(rowKey, i);
+                    };
                 }
+
+                wrapper.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openRowPreview(rowKey, i);
+                };
 
                 // Hover effect (blokowany podczas animacji manekina)
                 wrapper.onmouseenter = () => {
@@ -3543,13 +3679,22 @@ function renderRows(overlay) {
 
         slot.innerHTML = '';
         if (num) {
-            const card = cards.find(c => c.numer === num);
+            const card = cards.find(c => String(c.numer) === String(num));
             if (card) {
                 const img = document.createElement('img');
                 img.src = getCardImage(card);
                 img.style.width = '100%';
                 img.style.height = '100%';
                 slot.appendChild(img);
+
+                slot.style.cursor = 'pointer';
+                const showSpecialSlot = (e) => {
+                    e.stopPropagation();
+                    if (e.type === 'contextmenu') e.preventDefault();
+                    showPowiek([card], 0, 'row');
+                };
+                slot.onclick = showSpecialSlot;
+                slot.oncontextmenu = showSpecialSlot;
             }
         }
     };
@@ -3647,7 +3792,7 @@ const crownImgs = {};
 ['bkorona', 'rkorona'].forEach(n => {
     const i = new Image();
     i.src = `assets/asety/${n}.webp`;
-    i.onload = () => { renderAll(currentNick); };
+    i.onload = () => { if (window.socket) renderAll(currentNick); };
     crownImgs[n] = i;
 });
 
