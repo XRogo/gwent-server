@@ -118,6 +118,7 @@ const ConnectionUI = {
 
         statusRow.appendChild(dot);
         statusRow.appendChild(text);
+        if (window.GameMusic) statusRow.appendChild(window.GameMusic.createControl(isMobile));
         statusRow.appendChild(fBtn);
         container.appendChild(oppLabel);
         container.appendChild(statusRow);

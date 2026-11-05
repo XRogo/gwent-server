@@ -15,7 +15,35 @@
 //    }, <- jeśli coś jest usunięte to ignoruj i nie pisz np czego dotyczy (bo najprawdopodobniej wszystkeigo) 
     
 const wersja = [
-
+    {
+        version0: "11.0",
+        data: "05.11.2026",
+        zmiany: {
+            line1: 'Dodałem muzykę do gry wreszcie'
+        }
+    }, 
+    {
+        version0: "10.11",
+        data: "05.11.2026",
+        zmiany: {
+            line1: 'Suwaki z wyboru kart nie wracają już po zmianie rozdzielczości okna',
+            line2: "Dodałem możliwość anulowania wybranej karty",
+            line3: {
+                title: 'Poprawiłem pozycje ',
+                subtitle1: "Nicku gracza",
+                subtitle2: "Nazwy frakcji",
+                subtitle3: "Tarcza z herberm",
+                subtitle4: "Ilość kart",
+            },
+            line4: "Ilość kart pokazuje się teraz od samego początku a nie od pierwszego ruchu",
+            line5: "Dodałem możliwość podglądu kart już zagranych",
+            line6: "Dźwięk otrzymanie karty bohatera działa poprawnie",
+            line7: "Wymiana wylosowanych kart ma teraz limit czasu",
+            line8: "Wymiana kart jest teraz jak w Wiedźminie 3",
+            line9: "Poprawiłem funkcje wymiany kart, od teraz klient czeka na odpowiedz serwera o wylosowanej karcie a nie losuje sam przez co po wejściu do gry karty sie niezmieniają"
+        },
+        image: "/asset/aktualizacja_grafiki/10.11.webp"
+    }, 
     {
         version0: "10.10",
         data: "03.11.2026",
@@ -35,9 +63,9 @@ const wersja = [
                 subtitle2: "Niebieska - Karta jest i można użyć",
                 subtitle3: "Brak - ruch przeciwnika / brak karty"
             },
-            line3: "Naprawiłem działanie kart z pk = 0 podczas działania effektów pogodowych (nie dostają gratisowego pk)",
-            line4: "Zagrywanie kart z umiejętności dowódcy ma teraz animacje przelotu",
-            line5: "Po zagraniu widać opis i umiejętności karty dowódcy"
+            line4: "Naprawiłem działanie kart z pk = 0 podczas działania effektów pogodowych (nie dostają gratisowego pk)",
+            line5: "Zagrywanie kart z umiejętności dowódcy ma teraz animacje przelotu",
+            line6: "Po zagraniu widać opis i umiejętności karty dowódcy"
         }
     }, 
     {

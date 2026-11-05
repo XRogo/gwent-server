@@ -434,7 +434,7 @@ function buildPowiekDOM() {
         swapInfo.style.left = '50%';
         swapInfo.style.transform = 'translateX(-50%)';
         swapInfo.style.color = '#c29f5a';
-        swapInfo.style.fontFamily = 'PFDinTextCondPro-Bold, sans-serif';
+        swapInfo.style.fontFamily = 'PFDinTextCondPro, sans-serif';
         swapInfo.style.fontSize = geo.relH(70) + 'px';
         swapInfo.style.letterSpacing = geo.relW(-2) + 'px';
         swapInfo.style.textAlign = 'center';
