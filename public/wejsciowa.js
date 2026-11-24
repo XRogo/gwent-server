@@ -43,6 +43,132 @@
         if (play && dict.bplay) play.textContent = dict.bplay;
         if (settings && dict.bsetings) settings.textContent = dict.bsetings;
         if (info && dict.binfo) info.textContent = dict.binfo;
+        document.querySelectorAll('[data-locale]').forEach((element) => {
+            const value = dict[element.dataset.locale];
+            if (value) element.textContent = value;
+        });
+        document.querySelectorAll('[data-locale-aria]').forEach((element) => {
+            const value = dict[element.dataset.localeAria];
+            if (value) element.setAttribute('aria-label', value);
+        });
+    }
+
+    function setupAccountPanel(dict) {
+        const modal = document.getElementById('accountModal');
+        const status = document.getElementById('accountStatus');
+        const nicknameInput = document.getElementById('accountNickname');
+        const loginButton = document.getElementById('accountDiscordLogin');
+        const logoutButton = document.getElementById('accountLogout');
+        const button = document.getElementById('accountButton');
+        if (!modal || !status || !nicknameInput) return;
+
+        const text = (key) => dict && dict[key] ? dict[key] : key;
+        const setStatus = (key) => { status.textContent = text(key); };
+        const open = () => {
+            modal.hidden = false;
+            nicknameInput.focus();
+        };
+        const close = () => { modal.hidden = true; };
+
+        async function renderAccount() {
+            const accountState = window.gwentAccountState;
+            if (!accountState) return;
+            nicknameInput.value = accountState.profile.nickname;
+            await window.gwentAccountReady;
+            nicknameInput.value = accountState.user
+                ? accountState.user.nickname
+                : accountState.profile.nickname;
+            setStatus(accountState.error
+                ? 'account.syncFailed'
+                : accountState.user ? 'account.loggedInStatus' : 'account.localStatus');
+            loginButton.hidden = Boolean(accountState.user);
+            loginButton.disabled = !accountState.configured;
+            logoutButton.hidden = !accountState.user;
+            if (!accountState.configured && !accountState.user) {
+                setStatus('account.discordUnavailable');
+            }
+        }
+
+        button.addEventListener('click', async () => {
+            open();
+            await renderAccount();
+        });
+        document.getElementById('accountClose').addEventListener('click', close);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) close();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modal.hidden) close();
+        });
+
+        document.getElementById('accountSaveNickname').addEventListener('click', async () => {
+            const nickname = nicknameInput.value.trim();
+            if (!nickname || nickname.length > 24) {
+                setStatus('account.nicknameInvalid');
+                return;
+            }
+
+            const accountState = window.gwentAccountState;
+            try {
+                if (accountState.user) {
+                    const response = await fetch('/api/me', {
+                        method: 'PATCH',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nickname })
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    accountState.user = await response.json();
+                }
+                window.gwentSetNickname(nickname);
+                setStatus('account.nicknameSaved');
+            } catch (error) {
+                console.error('[ACCOUNT] Nie udało się zapisać nicku.', error);
+                setStatus('account.profileSaveFailed');
+            }
+        });
+
+        loginButton.addEventListener('click', () => {
+            if (window.gwentAccountState.configured) {
+                window.location.href = '/auth/discord';
+            }
+        });
+
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                window.gwentAccountState.user = null;
+                await renderAccount();
+            } catch (error) {
+                console.error('[ACCOUNT] Nie udało się wylogować.', error);
+                setStatus('account.logoutFailed');
+            }
+        });
+
+        const result = new URLSearchParams(window.location.search).get('account');
+        if (result) {
+            renderAccount().then(() => {
+                if (result === 'connected') {
+                    setStatus(window.gwentAccountState.error
+                        ? 'account.syncFailed'
+                        : 'account.loginConnected');
+                }
+                else if (result === 'unavailable') setStatus('account.discordUnavailable');
+                else if (result === 'login-error') setStatus('account.loginFailed');
+                open();
+            });
+        } else {
+            renderAccount();
+        }
+        if (result) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('account');
+            window.history.replaceState({}, '', url);
+        }
     }
 
 /**
@@ -216,7 +342,9 @@ function fitContainerToScreen() {
     document.addEventListener('DOMContentLoaded', async () => {
         const lang = detectLang();
         setLogo(lang);
-        applyLocale(await loadLocale(lang));
+        const dict = await loadLocale(lang);
+        applyLocale(dict);
+        setupAccountPanel(dict);
 
         fitContainerToScreen();
         window.addEventListener('resize', fitContainerToScreen);

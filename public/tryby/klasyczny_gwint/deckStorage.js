@@ -7,6 +7,17 @@ function saveDeck(frakcja, dowodca, karty) {
     } catch(e) {}
     talie[frakcja] = { dowodca, karty };
     localStorage.setItem('gwint_talie', JSON.stringify(talie));
+
+    let updatedAt = {};
+    try {
+        updatedAt = JSON.parse(localStorage.getItem('gwent_deck_updated_at_v1')) || {};
+    } catch (e) {}
+    updatedAt[frakcja] = new Date().toISOString();
+    localStorage.setItem('gwent_deck_updated_at_v1', JSON.stringify(updatedAt));
+
+    if (typeof window.gwentSyncSavedDeck === 'function') {
+        window.gwentSyncSavedDeck(String(frakcja), talie[frakcja]);
+    }
 }
 
 // Zwraca obiekt: { frakcja: { dowodca, karty } }

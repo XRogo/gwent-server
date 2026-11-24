@@ -63,7 +63,7 @@ function refreshAllTranslations() {
 
 // ========== KONIEC SYSTEMU JĘZYKÓW ==========
 
-const socket = io();
+const socket = io({ auth: { nickname: localStorage.getItem('nickname') || '' } });
 
 const mainMenu = document.getElementById('mainMenu');
 const sidePanel = document.getElementById('sidePanel');
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nickInput = document.getElementById('nicknameInput');
 
-    let savedNick = getCookie('gwent_nickname');
+    let savedNick = localStorage.getItem('nickname') || getCookie('gwent_nickname');
     if (!savedNick) {
         const filtered = nicknames.filter(n => !n.toLowerCase().includes('test'));
         savedNick = filtered[Math.floor(Math.random() * filtered.length)];

@@ -10,7 +10,9 @@ import {
   animateHeroPlayFromHand,
   playHeroCardEffect,
   playWezwanieOnCards,
-  playCardLandWithPower
+  playCardLandWithPower,
+  playCardSmokeEffect,
+  resolveCardSmokeConfig
 } from './anim_effects.js';
 
 const GUI_W = 3840;
@@ -671,6 +673,204 @@ function effectPower(power) {
   }
 }
 
+// ---------- Konfiguracja i obsługa dymu kart (Szpieg, Berserk, Manekin...) ----------
+
+const SMOKE_PRESETS = {
+  szpieg: {
+    color: '#333333',
+    brightness: 0.42,
+    size: 1.0,
+    speed: 1.0,
+    rotation: 50,
+    count: 6,
+    frames: 24,
+    hold: 60,
+    fade: 60
+  },
+  berserk: {
+    color: '#dc143c', // karmazynowy
+    brightness: 0.85,
+    size: 1.15,
+    speed: 1.15,
+    rotation: 65,
+    count: 6,
+    frames: 24,
+    hold: 60,
+    fade: 60
+  },
+  manekin: {
+    color: '#c8a268', // drewno/pył
+    brightness: 0.9,
+    size: 0.95,
+    speed: 0.85,
+    rotation: 40,
+    count: 6,
+    frames: 24,
+    hold: 60,
+    fade: 60
+  },
+  przetasowanie: {
+    color: '#3ba2e8', // mistyczny błękit
+    brightness: 0.95,
+    size: 1.1,
+    speed: 1.25,
+    rotation: 75,
+    count: 6,
+    frames: 24,
+    hold: 60,
+    fade: 60
+  },
+  default: {
+    color: '#e0e0e0',
+    brightness: 0.95,
+    size: 1.0,
+    speed: 1.0,
+    rotation: 50,
+    count: 6,
+    frames: 24,
+    hold: 60,
+    fade: 60
+  }
+};
+
+let currentSmokePreset = 'szpieg';
+
+function getSmokeConfigFromUI() {
+  const color = document.getElementById('smoke-color')?.value || '#333333';
+  const brightness = parseFloat(document.getElementById('smoke-brightness')?.value || '0.42');
+  const size = parseFloat(document.getElementById('smoke-size')?.value || '1.0');
+  const speed = parseFloat(document.getElementById('smoke-speed')?.value || '1.0');
+  const rotationSpeed = parseFloat(document.getElementById('smoke-rotation')?.value || '50');
+  const count = parseInt(document.getElementById('smoke-count')?.value || '6', 10);
+  const smokeFrames = parseInt(document.getElementById('smoke-frames')?.value || '24', 10);
+  const holdFrames = parseInt(document.getElementById('smoke-hold-frames')?.value || '60', 10);
+  const fadeFrames = parseInt(document.getElementById('smoke-fade-frames')?.value || '60', 10);
+
+  return {
+    preset: currentSmokePreset,
+    color,
+    brightness,
+    size,
+    speed,
+    rotationSpeed,
+    count,
+    smokeFrames,
+    holdFrames,
+    fadeFrames
+  };
+}
+
+function updateSmokeUIBadges() {
+  const cfg = getSmokeConfigFromUI();
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setEl('smoke-color-val', cfg.color.toUpperCase());
+  setEl('smoke-brightness-val', cfg.brightness.toFixed(2));
+  setEl('smoke-size-val', `${cfg.size.toFixed(2)}x`);
+  setEl('smoke-speed-val', `${cfg.speed.toFixed(2)}x`);
+  setEl('smoke-rotation-val', `${cfg.rotationSpeed}°`);
+  setEl('smoke-count-val', `${cfg.count}`);
+  setEl('smoke-frames-val', `${cfg.smokeFrames} kl`);
+  setEl('smoke-hold-val', `${cfg.holdFrames} kl`);
+  setEl('smoke-fade-val', `${cfg.fadeFrames} kl`);
+}
+
+function applySmokePreset(presetName) {
+  const p = SMOKE_PRESETS[presetName] || SMOKE_PRESETS.default;
+  currentSmokePreset = presetName;
+
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+
+  setVal('smoke-color', p.color);
+  setVal('smoke-brightness', p.brightness);
+  setVal('smoke-size', p.size);
+  setVal('smoke-speed', p.speed);
+  setVal('smoke-rotation', p.rotation);
+  setVal('smoke-count', p.count);
+  setVal('smoke-frames', p.frames);
+  setVal('smoke-hold-frames', p.hold);
+  setVal('smoke-fade-frames', p.fade);
+
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.preset === presetName);
+  });
+
+  updateSmokeUIBadges();
+  log(`Wybrano preset dymu: ${presetName}`);
+}
+
+async function playSmokeOnSelectedCard() {
+  if (!selectedKey) {
+    const firstWrapper = document.querySelector('.board-card-wrapper');
+    if (firstWrapper && firstWrapper.dataset.key) {
+      selectedKey = firstWrapper.dataset.key;
+      renderAll();
+    } else {
+      log('Brak kart na planszy do odtworzenia dymu');
+      return;
+    }
+  }
+
+  const el = document.getElementById(`slot-placeholder-${selectedKey}`);
+  if (!el) {
+    log(`Nie znaleziono elementu dla ${selectedKey}`);
+    return;
+  }
+
+  const cfg = getSmokeConfigFromUI();
+  log(`Dym karty (${cfg.preset}, ${cfg.color}): ${selectedKey}`);
+  playSound('zagranieKartySound');
+  await playCardSmokeEffect(el, cfg);
+  log(`Dym karty zakończony`);
+}
+
+async function playCardWithSmokeSequence(card, targetRowKey, presetName) {
+  if (!card) return;
+  if (presetName) {
+    applySmokePreset(presetName);
+  }
+  const cfg = getSmokeConfigFromUI();
+
+  const rowKey = targetRowKey || rowKeyFromPozycja(card.pozycja, 'p1');
+  boardState[rowKey].push(card.numer);
+  const cardIdx = boardState[rowKey].length - 1;
+  const cardKey = `${rowKey}_${cardIdx}`;
+  renderAll();
+
+  let placeholder = document.getElementById(`slot-placeholder-${cardKey}`);
+  let to4K = {
+    x: rowCoords.self1.x + rowCoords.self1.w / 2 - 90,
+    y: rowCoords.self1.y
+  };
+  if (placeholder) to4K = getElement4KPos(placeholder);
+
+  playSound('zagranieKartySound');
+  log(`Zagrana karta z ręki: ${card.nazwa || card.numer} (${presetName || 'dym'})`);
+
+  await animateHeroPlayFromHand({
+    card,
+    from4K: HAND_CENTER_4K,
+    to4K,
+    onLanded: () => {
+      window.arrivedBoardCards.add(cardKey);
+      renderAll();
+    }
+  });
+
+  const cardEl = document.getElementById(`slot-placeholder-${cardKey}`);
+  if (cardEl) {
+    selectedKey = cardKey;
+    renderAll();
+    await playCardSmokeEffect(cardEl, cfg);
+  }
+}
+
 function bindUI() {
   document.getElementById('btn-reset')?.addEventListener('click', resetBoard);
   document.getElementById('btn-clear')?.addEventListener('click', clearBoard);
@@ -730,9 +930,59 @@ function bindUI() {
     btn.addEventListener('click', () => effectPower(btn.dataset.power));
   });
 
+  // Obsługa dymu kart (Szpieg, Berserk, Manekin, Przetasowanie...)
+  const smokeInputIds = [
+    'smoke-color', 'smoke-brightness', 'smoke-size', 'smoke-speed',
+    'smoke-rotation', 'smoke-count', 'smoke-frames', 'smoke-hold-frames', 'smoke-fade-frames'
+  ];
+  smokeInputIds.forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => {
+      updateSmokeUIBadges();
+    });
+  });
+
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      applySmokePreset(btn.dataset.preset);
+    });
+  });
+
+  document.getElementById('btn-play-custom-smoke')?.addEventListener('click', () => {
+    playSmokeOnSelectedCard();
+  });
+
+  document.getElementById('btn-play-spy-card')?.addEventListener('click', () => {
+    const dijkstra = findCardByNumer('119') || cards.find(c => c.moc === 'szpieg');
+    if (dijkstra) {
+      playCardWithSmokeSequence(dijkstra, 'p2R1', 'szpieg');
+    }
+  });
+
+  document.getElementById('btn-play-berserk-card')?.addEventListener('click', () => {
+    const berserk = findCardByNumer('515') || cards.find(c => c.moc === 'berserk');
+    if (berserk) {
+      playCardWithSmokeSequence(berserk, 'p1R1', 'berserk');
+    }
+  });
+
+  document.getElementById('btn-play-dummy-card')?.addEventListener('click', () => {
+    const dummy = findCardByNumer('001') || cards.find(c => /manekin/i.test(c.nazwa));
+    if (dummy) {
+      playCardWithSmokeSequence(dummy, 'p1R1', 'manekin');
+    }
+  });
+
+  document.getElementById('btn-play-shuffle-card')?.addEventListener('click', () => {
+    const shuffleCard = findCardByNumer('118') || cards.find(c => c.moc === 'medyk');
+    if (shuffleCard) {
+      playCardWithSmokeSequence(shuffleCard, 'p1R2', 'przetasowanie');
+    }
+  });
+
   window.addEventListener('resize', () => renderAll());
 }
 
 bindUI();
 resetBoard();
+applySmokePreset('szpieg');
 log('Poligon gotowy – FX tylko z anim_effects.js');

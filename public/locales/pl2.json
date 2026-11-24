@@ -37,6 +37,27 @@
     "lobby_music": "Muzyka w menu",
     "cookies": "Ciasteczka",
 
+"com7": "System kont ================================================================================================================",
+
+    "account.button": "Konto",
+    "account.title": "Konto gracza",
+    "account.close": "Zamknij",
+    "account.nickname": "Nick gracza",
+    "account.saveNickname": "Zapisz nick",
+    "account.localDescription": "Profil lokalny i talie są zapisywane w tej przeglądarce. Po zalogowaniu talie będą synchronizowane z kontem.",
+    "account.discordLogin": "Zaloguj przez Discord",
+    "account.logout": "Wyloguj",
+    "account.localStatus": "Profil lokalny — dane są zapisane w tej przeglądarce.",
+    "account.loggedInStatus": "Zalogowano przez Discord.",
+    "account.nicknameSaved": "Zapisano nick.",
+    "account.nicknameInvalid": "Nick musi mieć od 1 do 24 znaków.",
+    "account.discordUnavailable": "Logowanie Discord nie jest jeszcze skonfigurowane na serwerze.",
+    "account.loginConnected": "Połączono konto Discord.",
+    "account.loginFailed": "Nie udało się zalogować przez Discord. Spróbuj ponownie.",
+    "account.logoutFailed": "Nie udało się wylogować. Spróbuj ponownie.",
+    "account.profileSaveFailed": "Nie udało się zapisać profilu na serwerze.",
+    "account.syncFailed": "Konto działa, ale synchronizacja nie powiodła się. Talia lokalna pozostała bez zmian.",
+
 
 "com5": "tryby gry opisy ===========================================================================================================",
 

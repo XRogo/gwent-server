@@ -4,11 +4,13 @@ import { initGameBoard, renderAll } from './game_board.js';
 document.addEventListener('DOMContentLoaded', () => {
     const cardSelectionScreen = document.getElementById('cardSelectionScreen');
     const gameScreen = document.getElementById('gameScreen');
-    const socket = typeof io !== 'undefined' ? io() : null;
     const urlParams = new URLSearchParams(window.location.search);
     const gameCode = urlParams.get('code');
 const isP1 = urlParams.get('host') === 'true';
 const nick = urlParams.get('nick') || localStorage.getItem('nickname') || (isP1 ? 'Gospodarz' : 'Gość');
+    const socket = typeof io !== 'undefined'
+        ? io({ auth: { nickname: nick } })
+        : null;
 
 function getGameToken(code) {
     try {

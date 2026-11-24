@@ -46,6 +46,97 @@
       <button id="btn-wezwanie-random">Losowe wezwanie</button>
     </section>
 
+    <section id="sec-card-smoke">
+      <h3>Dym kart (Szpieg, Berserk, Manekin...)</h3>
+      <div class="smoke-preset-grid">
+        <button type="button" class="preset-btn active" data-preset="szpieg">Szpieg (ciemny)</button>
+        <button type="button" class="preset-btn" data-preset="berserk">Berserker (karmazyn)</button>
+        <button type="button" class="preset-btn" data-preset="manekin">Manekin (drewno)</button>
+        <button type="button" class="preset-btn" data-preset="przetasowanie">Przetasowanie</button>
+        <button type="button" class="preset-btn" data-preset="default">Domyślny</button>
+      </div>
+
+      <div class="smoke-controls">
+        <div class="smoke-row">
+          <label for="smoke-color">Kolor / Barwa</label>
+          <div class="smoke-input-wrap">
+            <input type="color" id="smoke-color" value="#333333">
+            <span class="smoke-badge" id="smoke-color-val">#333333</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-brightness">Jasność (szpieg ciemny)</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-brightness" min="0.1" max="1.6" step="0.05" value="0.42">
+            <span class="smoke-badge" id="smoke-brightness-val">0.42</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-size">Wielkość dymu</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-size" min="0.5" max="2.2" step="0.05" value="1.0">
+            <span class="smoke-badge" id="smoke-size-val">1.00x</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-speed">Szybkość wylotu</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-speed" min="0.2" max="2.5" step="0.05" value="1.0">
+            <span class="smoke-badge" id="smoke-speed-val">1.00x</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-rotation">Prędkość rotacji (°/s)</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-rotation" min="0" max="180" step="5" value="50">
+            <span class="smoke-badge" id="smoke-rotation-val">50°</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-count">Ilość dymków (dookoła)</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-count" min="2" max="12" step="1" value="6">
+            <span class="smoke-badge" id="smoke-count-val">6</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-frames">Dym główny (24 kl fade)</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-frames" min="10" max="60" step="2" value="24">
+            <span class="smoke-badge" id="smoke-frames-val">24 kl</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-hold-frames">Dymki: czas trwania (hold)</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-hold-frames" min="15" max="120" step="5" value="60">
+            <span class="smoke-badge" id="smoke-hold-val">60 kl</span>
+          </div>
+        </div>
+
+        <div class="smoke-row">
+          <label for="smoke-fade-frames">Dymki: czas zanikania (fade)</label>
+          <div class="smoke-input-wrap">
+            <input type="range" id="smoke-fade-frames" min="15" max="120" step="5" value="60">
+            <span class="smoke-badge" id="smoke-fade-val">60 kl</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-play-custom-smoke" class="smoke-trigger-btn">▶ Odtwórz na zaznaczonej karcie</button>
+      <button id="btn-play-spy-card">Zagraj Szpiega z ręki (Dijkstra)</button>
+      <button id="btn-play-berserk-card">Zagraj Berserkera z ręki (karmazyn)</button>
+      <button id="btn-play-dummy-card">Zagraj Manekina z ręki</button>
+      <button id="btn-play-shuffle-card">Zagraj Przetasowanie z ręki</button>
+    </section>
+
     <section>
       <h3>Pogoda</h3>
       <button class="weather" data-w="mroz">Mróz</button>

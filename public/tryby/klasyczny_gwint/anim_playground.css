@@ -305,3 +305,134 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
+/* ===== NOWE EFEKTY DYMU KART (SZPIEG, BERSERK, MANEKIN...) ===== */
+.ap-card-dym-frame {
+  position: absolute;
+  pointer-events: none;
+  z-index: 25;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.ap-card-dymek-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 26;
+  overflow: visible;
+}
+
+.ap-card-dymek-puff {
+  position: absolute;
+  pointer-events: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* UI Panel: Dym kart */
+.smoke-preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.smoke-preset-grid button.preset-btn {
+  font-size: 11px;
+  padding: 5px 6px;
+  text-align: center;
+  margin: 0;
+  background: #181614;
+  border: 1px solid #3c3528;
+  color: #c0b096;
+}
+
+.smoke-preset-grid button.preset-btn:hover {
+  background: #27221a;
+  border-color: #d4a86a;
+  color: #fff;
+}
+
+.smoke-preset-grid button.preset-btn.active {
+  background: #342a19;
+  border-color: #f0a020;
+  color: #ffe090;
+  font-weight: bold;
+  box-shadow: 0 0 6px rgba(240, 160, 32, 0.35);
+}
+
+.smoke-controls {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #302820;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+
+.smoke-row {
+  margin-bottom: 7px;
+}
+
+.smoke-row:last-child {
+  margin-bottom: 0;
+}
+
+.smoke-row label {
+  display: block;
+  font-size: 11px;
+  color: #a89880;
+  margin-bottom: 3px;
+  letter-spacing: 0.02em;
+}
+
+.smoke-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.smoke-input-wrap input[type="range"] {
+  flex: 1;
+  height: 5px;
+  accent-color: #d4a86a;
+  background: #2a241b;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.smoke-input-wrap input[type="color"] {
+  width: 32px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #4a3d2c;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.smoke-badge {
+  min-width: 50px;
+  font-size: 11px;
+  font-family: monospace;
+  text-align: right;
+  color: #f0c070;
+}
+
+.smoke-trigger-btn {
+  background: #2b2210 !important;
+  border-color: #f0a020 !important;
+  color: #ffe080 !important;
+  font-weight: bold;
+  text-align: center !important;
+  margin-top: 6px !important;
+  margin-bottom: 6px !important;
+  padding: 9px 10px !important;
+  box-shadow: 0 0 8px rgba(240, 160, 32, 0.25);
+}
+
+.smoke-trigger-btn:hover {
+  background: #3e3016 !important;
+  box-shadow: 0 0 12px rgba(240, 160, 32, 0.5);
+}

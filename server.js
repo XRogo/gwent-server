@@ -1,11 +1,17 @@
+require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const crypto = require('crypto');
+const { initializeAccountsDatabase, registerAccountRoutes } = require('./accounts');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.use(express.json({ limit: '16kb' }));
+registerAccountRoutes(app);
 
 const { registerClassicGwentEvents } = require('./server_gwent_classic');
 const games = {};
@@ -25,6 +31,11 @@ app.get('/', (req, res) => {
 
 function generateToken() {
     return crypto.randomBytes(24).toString('hex');
+}
+
+function socketLabel(socket) {
+    const nickname = (socket.data.nickname || 'Gość').replace(/[\u0000-\u001f\u007f]/g, '');
+    return `${nickname} (${socket.id})`;
 }
 
 function isSocketAlive(socketId) {
@@ -351,7 +362,11 @@ function scheduleTestCleanup() {
 // ========== SOCKET.IO ==========
 
 io.on('connection', (socket) => {
-    console.log(`[CONN] Nowy użytkownik połączony: ${socket.id}`);
+    const handshakeNickname = socket.handshake.auth && socket.handshake.auth.nickname;
+    socket.data.nickname = typeof handshakeNickname === 'string'
+        ? handshakeNickname.trim().slice(0, 24)
+        : '';
+    console.log(`[CONN] Nowy użytkownik połączony: ${socketLabel(socket)}`);
 
     socket.on('create-game', () => {
         let gameCode;
@@ -377,7 +392,7 @@ io.on('connection', (socket) => {
             selectionTimer: null
         };
 
-        const assigned = assignToGame(games[gameCode], socket, null, true, true, null);
+        const assigned = assignToGame(games[gameCode], socket, socket.data.nickname, true, true, null);
         socket.join(gameCode);
         socket.emit('game-created', {
             gameCode,
@@ -385,13 +400,14 @@ io.on('connection', (socket) => {
             role: 'p1',
             token: assigned ? assigned.token : null
         });
-        console.log(`[LOBBY] Utworzono ${gameCode} przez ${socket.id}`);
+        console.log(`[LOBBY] Utworzono ${gameCode} przez ${socketLabel(socket)}`);
         broadcastStatus(gameCode);
     });
 
     socket.on('join-game', (data) => {
         const gameCode = String((data && data.gameCode) || '').trim();
         const nickname = (data && data.nickname) || null;
+        if (typeof nickname === 'string') socket.data.nickname = nickname.trim().slice(0, 24);
         const clientToken = (data && data.token) || null;
         const game = games[gameCode];
 
@@ -436,13 +452,14 @@ io.on('connection', (socket) => {
             io.to(game.p2.socketId).emit('opponent-joined', { opponentId: socket.id });
         }
 
-        console.log(`[LOBBY] ${socket.id} dołączył do ${gameCode} jako ${assigned.role}`);
+        console.log(`[LOBBY] ${socketLabel(socket)} dołączył do ${gameCode} jako ${assigned.role}`);
         broadcastStatus(gameCode);
     });
 
     socket.on('rejoin-game', (data) => {
         const gameCode = String((data && data.gameCode) || '').trim();
         const nickname = (data && data.nickname) || null;
+        if (typeof nickname === 'string') socket.data.nickname = nickname.trim().slice(0, 24);
         const clientToken = (data && data.token) || null;
         let preferredIsP1 = null;
         if (typeof (data && data.isPlayer1) === 'boolean') {
@@ -481,7 +498,7 @@ io.on('connection', (socket) => {
                 socket.join('TEST');
                 socket.emit('join-success', { gameCode: 'TEST', isPlayer1: true, role: 'p1' });
                 socket.emit('test-game-joined', { gameCode: 'TEST', isHost: true, nickname: g.hostNickname || 'test1' });
-                console.log(`[TEST] Rejoin jako test1: ${socket.id}`);
+                console.log(`[TEST] Rejoin jako test1: ${socketLabel(socket)}`);
             } else {
                 if (!g.players) g.players = [];
                 if (!g.players.includes(socket.id)) {
@@ -493,7 +510,7 @@ io.on('connection', (socket) => {
                 socket.join('TEST');
                 socket.emit('join-success', { gameCode: 'TEST', isPlayer1: false, role: 'p2' });
                 socket.emit('test-game-joined', { gameCode: 'TEST', isHost: false, nickname: g.opponentNickname || 'test2' });
-                console.log(`[TEST] Rejoin jako test2: ${socket.id}`);
+                console.log(`[TEST] Rejoin jako test2: ${socketLabel(socket)}`);
             }
 
             if (g.host) g.player1 = g.host;
@@ -520,7 +537,7 @@ io.on('connection', (socket) => {
             token: assigned.token
         });
 
-        console.log(`[LOBBY] Rejoin ${socket.id} → ${gameCode} jako ${assigned.role} (host/P1 prefer=${preferredIsP1})`);
+        console.log(`[LOBBY] Rejoin ${socketLabel(socket)} → ${gameCode} jako ${assigned.role} (host/P1 prefer=${preferredIsP1})`);
         broadcastStatus(gameCode);
 
         if (game.gameState && (game.status === 'playing' || game.status === 'scoia-decision')) {
@@ -575,7 +592,7 @@ io.on('connection', (socket) => {
             };
             socket.join(testCode);
             socket.emit('test-game-joined', { gameCode: testCode, isHost: true, nickname: 'test1' });
-            console.log(`[TEST] ${socket.id} jako test1`);
+            console.log(`[TEST] ${socketLabel(socket)} jako test1`);
         } else if (games[testCode].players.length === 0 && games[testCode].host !== socket.id) {
             games[testCode].players.push(socket.id);
             games[testCode].isClosed = true;
@@ -585,7 +602,7 @@ io.on('connection', (socket) => {
             socket.join(testCode);
             socket.emit('test-game-joined', { gameCode: testCode, isHost: false, nickname: 'test2' });
             io.to(games[testCode].host).emit('opponent-joined', { opponentId: socket.id });
-            console.log(`[TEST] ${socket.id} jako test2`);
+            console.log(`[TEST] ${socketLabel(socket)} jako test2`);
             broadcastStatus(testCode);
         } else if (games[testCode].host === socket.id || (games[testCode].players || []).includes(socket.id)) {
             const isHost = games[testCode].host === socket.id;
@@ -604,6 +621,8 @@ io.on('connection', (socket) => {
         const nickname = data && data.nickname;
         const game = games[gameCode];
         if (!game || gameCode === 'TEST') return;
+        if (typeof nickname !== 'string') return;
+        socket.data.nickname = nickname.trim().slice(0, 24);
 
         if (game.p1 && game.p1.socketId === socket.id) {
             game.p1.nickname = nickname;
@@ -616,7 +635,7 @@ io.on('connection', (socket) => {
         }
 
         syncLegacy(game);
-        console.log(`[LOBBY] Nick w ${gameCode}: ${nickname}`);
+        console.log(`[LOBBY] ${socketLabel(socket)} ustawił nick w ${gameCode}`);
         broadcastStatus(gameCode);
     });
 
@@ -728,7 +747,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('p1Left', () => {
-        console.log(`[LOBBY] p1Left od ${socket.id}`);
+        console.log(`[LOBBY] p1Left od ${socketLabel(socket)}`);
         for (const gameCode of Object.keys(games)) {
             if (gameCode === 'TEST') continue;
             const game = games[gameCode];
@@ -752,7 +771,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('p2Left', (message) => {
-        console.log(`[LOBBY] p2Left od ${socket.id}`);
+        console.log(`[LOBBY] p2Left od ${socketLabel(socket)}`);
         for (const gameCode of Object.keys(games)) {
             if (gameCode === 'TEST') continue;
             const game = games[gameCode];
@@ -771,7 +790,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', (reason) => {
-        console.log(`[CONN] Rozłączony: ${socket.id}, powód: ${reason}`);
+        console.log(`[CONN] Rozłączony: ${socketLabel(socket)}, powód: ${reason}`);
 
         for (const gameCode of Object.keys(games)) {
             if (gameCode === 'TEST') {
@@ -798,6 +817,19 @@ process.stdin.on('data', (data) => {
     }
 });
 
-server.listen(3000, '0.0.0.0', () => {
-    console.log('Serwer działa na http://0.0.0.0:3000');
+const port = Number(process.env.PORT) || 3000;
+async function startServer() {
+    if (process.env.DATABASE_URL) {
+        await initializeAccountsDatabase();
+        console.log('[ACCOUNT] Baza danych gotowa.');
+    }
+
+    server.listen(port, '0.0.0.0', () => {
+        console.log(`Serwer działa na porcie ${port}`);
+    });
+}
+
+startServer().catch(error => {
+    console.error('[SYSTEM] Nie udało się uruchomić serwera.', error);
+    process.exitCode = 1;
 });

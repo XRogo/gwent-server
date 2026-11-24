@@ -857,10 +857,10 @@ function updateLeaderCache() {
         const localState = {
             p1Leader: isPlayer1Local ? (playerLeaderObj ? playerLeaderObj.numer : null) : (opponentLeaderObj ? opponentLeaderObj.numer : null),
             p2Leader: isPlayer1Local ? (opponentLeaderObj ? opponentLeaderObj.numer : null) : (playerLeaderObj ? playerLeaderObj.numer : null),
-            p1LeaderUsed: playerLeaderUsed,
-            p2LeaderUsed: opponentLeaderUsed,
-            p1LeaderBlocked: playerLeaderBlocked,
-            p2LeaderBlocked: opponentLeaderBlocked,
+            p1LeaderUsed: isPlayer1Local ? playerLeaderUsed : opponentLeaderUsed,
+            p2LeaderUsed: isPlayer1Local ? opponentLeaderUsed : playerLeaderUsed,
+            p1LeaderBlocked: isPlayer1Local ? playerLeaderBlocked : opponentLeaderBlocked,
+            p2LeaderBlocked: isPlayer1Local ? opponentLeaderBlocked : playerLeaderBlocked,
             p1Deck: isPlayer1Local ? drawPile.map(c => c.numer) : [],
             p2Deck: isPlayer1Local ? [] : drawPile.map(c => c.numer),
             p1Hand: isPlayer1Local ? playerHand.map(c => c.numer) : [],
@@ -1433,6 +1433,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
     });
 
     socket.on('leader-select-prompt', (data) => {
+        isProcessingMove = false;
         const { type, cards: numers } = data;
         if (type === 'discard_two') {
             let selectedToDiscard = [];
@@ -1868,6 +1869,7 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
 
         boardState = board;
         currentTurn = newTurn;
+        isProcessingMove = false;
         if (p1Graveyard) {
             const gy = isPlayer1Local ? p1Graveyard : p2Graveyard;
             const ogy = isPlayer1Local ? p2Graveyard : p1Graveyard;
@@ -1953,6 +1955,9 @@ export function initGameBoard(socket, gameCode, isPlayer1, nick) {
                 const runNextBanner = (idx) => {
                     if (idx >= abilityBanners.length) {
                         const isMyTurn = currentTurn === window.socket.id;
+                        isProcessingMove = false;
+                        updateLeaderCache();
+                        renderAll(currentNick);
                         showPrzejscie(isMyTurn ? 't07' : 't08');
                         return;
                     }

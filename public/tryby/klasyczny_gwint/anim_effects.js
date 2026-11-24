@@ -1859,3 +1859,299 @@ export async function playCardLandWithPower(cardEl, moc = null, opts = {}) {
   }
   await Promise.all(tasks);
 }
+
+// ==========================================
+// NOWE EFEKTY DYMU KART (SZPIEG, BERSERK, MANEKIN, PRZETASOWANIE...)
+// ==========================================
+
+/**
+ * Konwertuje kolor hex na filtr CSS (sepia + saturate + hue-rotate + brightness + contrast),
+ * aby zabarwić biało-szary dym na dowolny odcień z zachowaniem cieniowania, krawędzi i przezroczystości.
+ */
+export function colorToSmokeFilter(hexColor, brightness = 1.0, contrast = 1.0) {
+  if (!hexColor) {
+    return `brightness(${brightness}) contrast(${contrast})`;
+  }
+  let c = String(hexColor).replace('#', '').trim();
+  if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  if (c.length !== 6) {
+    return `brightness(${brightness}) contrast(${contrast})`;
+  }
+  const num = parseInt(c, 16);
+  const r = (num >> 16) / 255;
+  const g = ((num >> 8) & 255) / 255;
+  const b = (num & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  h = Math.round(h * 360);
+  s = Math.round(s * 100);
+  l = Math.round(l * 100);
+
+  // Odcienie szarości / czerni (np. pociemniony szpieg)
+  if (s < 12 || l < 18) {
+    const bri = Math.max(0.15, Math.min(1.5, (l / 60) * brightness)).toFixed(2);
+    return `brightness(${bri}) contrast(${contrast.toFixed(2)})`;
+  }
+
+  // Filtr barwny – baza sepia to ~38 stopni
+  const rot = ((h - 38 + 360) % 360).toFixed(0);
+  const sat = Math.min(1000, Math.max(180, Math.round(s * 8)));
+  const bri = Math.max(0.25, Math.min(1.5, (l / 50) * brightness)).toFixed(2);
+  return `sepia(1) saturate(${sat}%) hue-rotate(${rot}deg) brightness(${bri}) contrast(${contrast.toFixed(2)})`;
+}
+
+/**
+ * Rozwiązuje konfigurację dymu na podstawie presetów i przekazanych opcji.
+ */
+export function resolveCardSmokeConfig(opts = {}) {
+  const cfg = {
+    smokeFrames: opts.smokeFrames ?? 24,
+    holdFrames: opts.holdFrames ?? 60,
+    fadeFrames: opts.fadeFrames ?? 60,
+    count: opts.count ?? 6,
+    size: opts.size ?? 1.0,
+    speed: opts.speed ?? 1.0,
+    rotationSpeed: opts.rotationSpeed ?? 50,
+    preset: opts.preset ?? 'default',
+    color: opts.color ?? null,
+    brightness: opts.brightness ?? 1.0,
+    contrast: opts.contrast ?? 1.05,
+    opacity: opts.opacity ?? 0.95,
+    filter: opts.filter ?? null
+  };
+
+  if (cfg.preset === 'szpieg') {
+    if (!opts.color) cfg.color = '#333333';
+    if (opts.brightness === undefined) cfg.brightness = 0.42;
+    if (opts.contrast === undefined) cfg.contrast = 1.2;
+    if (opts.size === undefined) cfg.size = 1.0;
+  } else if (cfg.preset === 'berserk') {
+    if (!opts.color) cfg.color = '#dc143c'; // karmazynowy
+    if (opts.brightness === undefined) cfg.brightness = 0.85;
+    if (opts.contrast === undefined) cfg.contrast = 1.15;
+    if (opts.size === undefined) cfg.size = 1.1;
+    if (opts.speed === undefined) cfg.speed = 1.15;
+  } else if (cfg.preset === 'manekin') {
+    if (!opts.color) cfg.color = '#c8a268'; // drewno/pył
+    if (opts.brightness === undefined) cfg.brightness = 0.9;
+    if (opts.contrast === undefined) cfg.contrast = 1.1;
+    if (opts.size === undefined) cfg.size = 0.95;
+    if (opts.speed === undefined) cfg.speed = 0.85;
+  } else if (cfg.preset === 'przetasowanie') {
+    if (!opts.color) cfg.color = '#3ba2e8'; // mistyczny błękit
+    if (opts.brightness === undefined) cfg.brightness = 0.95;
+    if (opts.contrast === undefined) cfg.contrast = 1.1;
+    if (opts.size === undefined) cfg.size = 1.05;
+    if (opts.speed === undefined) cfg.speed = 1.25;
+  }
+
+  if (!cfg.filter) {
+    cfg.filter = colorToSmokeFilter(cfg.color, cfg.brightness, cfg.contrast);
+  }
+
+  return cfg;
+}
+
+/**
+ * 1. Główny dym na karcie (animacja klatek dymu dym1..8).
+ * Trwa zadane klatki (domyślnie 24 klatki przy 60 fps = 400ms) i od samego początku zanika (fade 1.0 -> 0.0).
+ */
+export function playCardSmokeFramesOnElement(cardEl, opts = {}) {
+  return new Promise(resolve => {
+    if (!cardEl) {
+      resolve();
+      return;
+    }
+
+    const cfg = resolveCardSmokeConfig(opts);
+    const rect = cardEl.getBoundingClientRect();
+    const cardW = rect.width || 180;
+    const cardH = rect.height || 240;
+
+    const scale = cfg.size || 1.0;
+    const w = cardW * scale;
+    const h = cardH * scale;
+    const left = (cardW - w) / 2;
+    const top = (cardH - h) / 2;
+
+    const dym = document.createElement('div');
+    dym.className = 'ap-card-dym-frame';
+    dym.style.cssText = `
+      position:absolute; left:${left}px; top:${top}px;
+      width:${w}px; height:${h}px;
+      pointer-events:none; z-index:25;
+      background-size:100% 100%; background-repeat:no-repeat; background-position:0 0;
+      opacity:1;
+      filter:${cfg.filter};
+      will-change:opacity;
+    `;
+
+    const setFrame = index => {
+      dym.style.backgroundImage = `url('${FX.dymFrames[index]}')`;
+    };
+
+    setFrame(0);
+    cardEl.appendChild(dym);
+
+    const totalFrames = cfg.smokeFrames || 24;
+    const frameMs = 1000 / 60;
+    const totalMs = totalFrames * frameMs;
+    const frameCount = FX.dymFrames.length;
+    const stepMs = totalMs / frameCount;
+
+    let frame = 0;
+    const t0 = performance.now();
+
+    const tickFrames = () => {
+      frame++;
+      if (frame < frameCount) {
+        setFrame(frame);
+        setTimeout(tickFrames, stepMs);
+      }
+    };
+
+    const tickOpacity = now => {
+      const elapsed = now - t0;
+      const u = Math.min(1, elapsed / totalMs);
+      // Od samego początku zanika liniowo do zera
+      const op = Math.max(0, 1 - u);
+      dym.style.opacity = String(op);
+
+      if (elapsed < totalMs) {
+        requestAnimationFrame(tickOpacity);
+      } else {
+        dym.remove();
+        resolve();
+      }
+    };
+
+    setTimeout(tickFrames, stepMs);
+    requestAnimationFrame(tickOpacity);
+  });
+}
+
+/**
+ * 2. Dymki dookoła (dymek.webp ze środka w różne strony z rotacją).
+ * Pojawia się natychmiast (ramka 0), utrzymuje się przez 60 klatek,
+ * a potem przez kolejne 60 klatek zanika do 0.
+ */
+export function playCardDymekBurstOnElement(cardEl, opts = {}) {
+  return new Promise(resolve => {
+    if (!cardEl) {
+      resolve();
+      return;
+    }
+
+    const cfg = resolveCardSmokeConfig(opts);
+    const rect = cardEl.getBoundingClientRect();
+    const cardW = rect.width || 180;
+    const cardH = rect.height || 240;
+
+    const layer = document.createElement('div');
+    layer.className = 'ap-card-dymek-layer';
+    layer.style.cssText = `
+      position:absolute; inset:0; overflow:visible;
+      pointer-events:none; z-index:26;
+    `;
+    cardEl.appendChild(layer);
+
+    const count = cfg.count || 6;
+    const frameMs = 1000 / 60;
+    const holdMs = (cfg.holdFrames || 60) * frameMs;
+    const fadeMs = (cfg.fadeFrames || 60) * frameMs;
+    const totalMs = holdMs + fadeMs;
+
+    const speedMul = cfg.speed || 1.0;
+    const travel = Math.min(cardW, cardH) * 0.4 * speedMul;
+    const baseSize = Math.min(cardW, cardH) * 1.15 * (cfg.size || 1.0);
+    const baseOpacity = cfg.opacity || 0.95;
+
+    const items = [];
+    const cxCenter = cardW * 0.5;
+    const cyCenter = cardH * 0.5;
+
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'ap-card-dymek-puff';
+      const size = baseSize * (0.85 + Math.random() * 0.3);
+      const cx = cxCenter + (Math.random() - 0.5) * (cardW * 0.12);
+      const cy = cyCenter + (Math.random() - 0.5) * (cardH * 0.12);
+
+      const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const dist = travel * (0.75 + Math.random() * 0.5);
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+
+      const rotDir = Math.random() < 0.5 ? 1 : -1;
+      const rotSpeed = (cfg.rotationSpeed || 50) * (0.8 + Math.random() * 0.4);
+      const totalRot = rotDir * rotSpeed * (totalMs / 1000);
+      const initialRot = Math.random() * 360;
+
+      el.style.cssText = `
+        position:absolute;
+        left:${cx}px; top:${cy}px;
+        width:${size}px; height:${size}px;
+        margin-left:${-size / 2}px; margin-top:${-size / 2}px;
+        background:url('${FX.dymek}') center / contain no-repeat;
+        filter:${cfg.filter};
+        opacity:${baseOpacity};
+        transform:translate(0px, 0px) rotate(${initialRot}deg) scale(1);
+        pointer-events:none;
+        will-change:transform,opacity;
+      `;
+      layer.appendChild(el);
+      items.push({ el, dx, dy, initialRot, totalRot });
+    }
+
+    const t0 = performance.now();
+    const tick = now => {
+      const elapsed = now - t0;
+      const uMove = Math.min(1, elapsed / totalMs);
+      const moveEase = 1 - Math.pow(1 - uMove, 1.4);
+
+      let op = baseOpacity;
+      if (elapsed > holdMs) {
+        const uFade = (elapsed - holdMs) / Math.max(1, fadeMs);
+        op = baseOpacity * (1 - Math.min(1, uFade));
+      }
+
+      items.forEach(({ el, dx, dy, initialRot, totalRot }) => {
+        el.style.opacity = String(Math.max(0, op));
+        el.style.transform = `translate(${dx * moveEase}px, ${dy * moveEase}px) rotate(${
+          initialRot + totalRot * uMove
+        }deg) scale(${1 + 0.08 * moveEase})`;
+      });
+
+      if (elapsed < totalMs) {
+        requestAnimationFrame(tick);
+      } else {
+        layer.remove();
+        resolve();
+      }
+    };
+
+    requestAnimationFrame(tick);
+  });
+}
+
+/**
+ * Główna funkcja odtwarzająca pełny efekt dymu karty (dym klatkowy + dymki wylotowe).
+ */
+export async function playCardSmokeEffect(cardEl, opts = {}) {
+  if (!cardEl) return;
+  const cfg = resolveCardSmokeConfig(opts);
+  await Promise.all([
+    playCardSmokeFramesOnElement(cardEl, cfg),
+    playCardDymekBurstOnElement(cardEl, cfg)
+  ]);
+}

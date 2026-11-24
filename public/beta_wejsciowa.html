@@ -48,6 +48,35 @@
         </div>
     </div>
 
+    <button type="button" id="accountButton" class="account-button">
+        <span data-locale="account.button">Konto</span>
+    </button>
+
+    <div id="accountModal" class="account-overlay" hidden>
+        <section class="account-panel" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+            <button type="button" id="accountClose" class="account-close"
+                aria-label="Zamknij" data-locale-aria="account.close">×</button>
+            <h2 id="accountTitle" class="account-title" data-locale="account.title">Konto gracza</h2>
+            <p id="accountStatus" class="account-status" role="status"></p>
+
+            <label class="account-label" for="accountNickname" data-locale="account.nickname">Nick</label>
+            <input id="accountNickname" class="account-input" type="text" maxlength="24" autocomplete="nickname">
+            <button type="button" id="accountSaveNickname" class="account-action" data-locale="account.saveNickname">
+                Zapisz nick
+            </button>
+
+            <p class="account-description" data-locale="account.localDescription">
+                Profil lokalny i talie są zapisywane w tej przeglądarce.
+            </p>
+            <button type="button" id="accountDiscordLogin" class="account-action" data-locale="account.discordLogin">
+                Zaloguj przez Discord
+            </button>
+            <button type="button" id="accountLogout" class="account-action" data-locale="account.logout" hidden>
+                Wyloguj
+            </button>
+        </section>
+    </div>
+
     <button type="button" id="versionBadge" class="version-badge" title="Changelog">
         <span id="versionDate">—</span>
         <span class="version-sep">·</span>
@@ -63,6 +92,7 @@
     </div>
 
     <script src="changelog.js"></script>
+    <script src="accountSync.js"></script>
     <script src="wejsciowa.js"></script>
 </body>
 </html>

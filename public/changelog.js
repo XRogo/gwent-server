@@ -15,25 +15,44 @@
 //    }, <- jeśli coś jest usunięte to ignoruj i nie pisz np czego dotyczy (bo najprawdopodobniej wszystkeigo) 
     
 const wersja = [
+     {
+        version0: "3.02",
+        data: "24.11.2026",
+        zmiany: {
+            line1: {
+                title: 'Dodałem możliwość tworzenia kont poprzez zalogowanie się przez discorda',
+                subtitle1: "Zapisuje nick",
+                subtitle2: "Zapisuje wybrane karty"
+            },
+            line2: 'Poprawiłem grafiki Loga Gwinta'
+        }
+    }, 
     {
-        version0: "11.0",
+        version1: "11.1",
+        data: "24.11.2026",
+        zmiany: {
+            line1: 'Został poprawiony błąd z błędnym flagowaniem dowódców przez co użycie ich było niemożliwe'
+        }
+    }, 
+    {
+        version1: "11.0",
         data: "05.11.2026",
         zmiany: {
             line1: 'Dodałem muzykę do gry wreszcie'
         }
     }, 
     {
-        version0: "10.11",
+        version1: "10.11",
         data: "05.11.2026",
         zmiany: {
             line1: 'Suwaki z wyboru kart nie wracają już po zmianie rozdzielczości okna',
             line2: "Dodałem możliwość anulowania wybranej karty",
             line3: {
-                title: 'Poprawiłem pozycje ',
+                title: 'Poprawiłem pozycje',
                 subtitle1: "Nicku gracza",
                 subtitle2: "Nazwy frakcji",
                 subtitle3: "Tarcza z herberm",
-                subtitle4: "Ilość kart",
+                subtitle4: "Ilość kart"
             },
             line4: "Ilość kart pokazuje się teraz od samego początku a nie od pierwszego ruchu",
             line5: "Dodałem możliwość podglądu kart już zagranych",
@@ -45,7 +64,7 @@ const wersja = [
         image: "/asset/aktualizacja_grafiki/10.11.webp"
     }, 
     {
-        version0: "10.10",
+        version1: "10.10",
         data: "03.11.2026",
         zmiany: {
             line1: 'Dodałem animacje zagrania karty sztormu',
@@ -69,7 +88,7 @@ const wersja = [
         }
     }, 
     {
-        version0: "10.9",
+        version1: "10.9",
         data: "02.11.2026",
         zmiany: {
             line1: 'Dodałem animacje mgły i deszczu',
@@ -79,7 +98,7 @@ const wersja = [
         image: "/asset/aktualizacja_grafiki/10.9.webp"
     }, 
     {
-        version0: "10.8",
+        version1: "10.8",
         data: "31.10.2026",
         zmiany: {
             line1: 'Opisy dowódców nie wychodzą już poza obszar karty',
